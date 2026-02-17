@@ -4,17 +4,16 @@
 >
 > **Role:** Backend Engineer — Telegram, Storage Integration, Tooling
 > **Status:** 🟢 Idle
-> **Last Active:** 2026-02-17T12:45:00+07:00
+> **Last Active:** 2026-02-17T13:15:00+07:00
 
 ---
 
 ## 📋 My Current Task
 
 ```
-Task:    Telegram Mock Tests (teloxide) + Storage Schema Review
-Status:  In Progress
-Started: 2026-02-17
-Files:   crates/openclaw-telegram/src/lib.rs
+Task:    Workspace build & compile fixes
+Status:  Completed
+Files:   crates/openclaw-core/src/lib.rs
 ```
 
 ---

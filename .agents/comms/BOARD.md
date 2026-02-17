@@ -2,10 +2,10 @@
 
 > **กระดานงานกลาง** — ทุก Agent ต้องอ่านก่อนเริ่มงาน และอัปเดตเมื่อเปลี่ยนสถานะ
 >
-> **Last Updated**: 2026-02-17T13:00:00+07:00
+> **Last Updated**: 2026-02-17T13:15:00+07:00
 > **Phase**: 3 — Storage & Channels
 > **Overall Progress**: ✅ Done (54%): core, errors, config, storage, gateway, cli, telegram, discord, agents, tools, auth, storage-integration
-> **In Progress** (8%): discord tests, ci-cd, telegram-mocks
+> **In Progress** (8%): discord tests, ci-cd
 > **Not Started** (38%): whatsapp-bridge, slack, google-chat, signal, voice-wake, talk-mode, browser, canvas, media, model-failover, oauth, cron, webhooks, docker, skills, mobile-ffi
 
 ---
@@ -25,9 +25,9 @@
 | Agent | Role | Status | Current Task |
 |-------|------|--------|--------------|
 | Agent-1 | Lead Developer — Gateway, Core, CLI, Auth | 🟢 Idle | Gateway-Storage Integration + Auth Middleware ✅ |
-| Agent-2 | Backend Engineer — Telegram, Storage, Tooling | 🔵 Working | Telegram Mocks & Integration Tests |
-| Agent-3 | Channel Specialist — Discord, Slack, WhatsApp, Signal | 🔵 Working | Protocol pre-check — preparing to follow PROTOCOL.md |
-| Agent-4 | Async & Storage Specialist — Storage, SQLite/PG, CI/CD | 🔵 Working | Rust migration verification + compile triage |
+| Agent-2 | Backend Engineer — Telegram, Storage, Tooling | 🟢 Idle | Core exports fix ✅ |
+| Agent-3 | Channel Specialist — Discord, Slack, WhatsApp, Signal | 🟢 Idle | Discord Channel ID Mapping ✅ |
+| Agent-4 | Async & Storage Specialist — Storage, SQLite/PG, CI/CD | 🟢 Idle | Storage SQLite fixes ✅ |
 
 **Status Legend:**
 
@@ -45,15 +45,7 @@
 
 | File Path | Locked By | Since | Purpose |
 |-----------|-----------|-------|---------|
-| crates/openclaw-storage/src/backends/sqlite.rs | Agent-3 (released 2026-02-17T13:11:00+07:00) | 2026-02-17T12:40:00 | Storage repair & compile fixes (completed) |
-| .agents/comms/AGENT_3.md | Agent-3 | 2026-02-17T12:25:00 | Protocol pre-check & status update |
-| .agents/comms/MESSAGES.md | Agent-3 | 2026-02-17T12:25:00 | Posting protocol pre-check message |
-| docs/channels/discord.md | Agent-3 | 2026-02-17T12:26:00 | Writing user docs & examples |
-| crates/openclaw-channels/discord/src/lib.rs | Agent-3 | 2026-02-17T12:30:00 | Running integration & unit tests |
-| crates/openclaw-channels/discord/src/mocks.rs | Agent-3 | 2026-02-17T12:30:00 | Updating mocks for tests |
-| crates/openclaw-gateway/src/auth.rs | Agent-3 | 2026-02-17T12:32:00 | Reviewing & testing auth middleware |
-| crates/openclaw-gateway/src/lib.rs | Agent-3 | 2026-02-17T12:32:00 | Gateway build & tests (auth) |
-| crates/openclaw-channels/telegram/src/lib.rs | Agent-You | 2026-02-17T13:40:00+07:00 | Hardening Telegram media downloads & adding tests
+| crates/openclaw-storage/src/backends/sqlite.rs | Agent-3 (released) | 2026-02-17T12:40:00 | Storage repair & compile fixes ✅ |
 
 ### วิธีใช้ File Locks
 

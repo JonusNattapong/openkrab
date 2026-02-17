@@ -50,8 +50,12 @@ impl TelegramChannel {
         let connected = self.connected.clone();
         let channel_id = self.config.id;
 
+        // Create a Bot instance here so we can both start the dispatcher and store
+        // a reference to it for other code paths/tests.
+        let bot = Bot::new(&*token);
+        let bot_for_dispatch = bot.clone();
+
         let handle = tokio::spawn(async move {
-            let bot = Bot::new(&*token);
 
             let handler = dptree::entry()
                 .branch(Update::filter_message().endpoint(move |msg: TeloxideMessage, bot: Bot| {
@@ -156,7 +160,7 @@ impl TelegramChannel {
 
             connected.store(true, Ordering::SeqCst);
 
-            let mut dispatcher = Dispatcher::builder(bot, handler)
+            let mut dispatcher = Dispatcher::builder(bot_for_dispatch, handler)
                 .enable_ctrlc_handler()
                 .build();
 
