@@ -6,6 +6,11 @@ members = [
     "crates/openclaw-cli",
     "crates/openclaw-channels/discord",
     "crates/openclaw-channels/telegram",
+    "crates/openclaw-channels/slack",
+    "crates/openclaw-channels/signal",
+    "crates/openclaw-browser",
+    "crates/openclaw-mobile-ffi",
+    "crates/openclaw-bench",
 ]
 
 [workspace.package]

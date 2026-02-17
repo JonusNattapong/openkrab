@@ -1,5 +1,5 @@
 [package]
-name = "openclaw-channels-slack"
+name = "openclaw-channels-signal"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,8 +7,7 @@ edition = "2021"
 openclaw-core = { path = "../../openclaw-core" }
 async-trait = "0.1"
 tracing = "0.1"
-slack-morphism = "1.0"
 
 [lib]
-name = "openclaw-slack"
+name = "openclaw-signal"
 path = "src/lib.rs"

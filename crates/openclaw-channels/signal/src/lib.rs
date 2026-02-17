@@ -3,22 +3,22 @@ use std::sync::Arc;
 
 use openclaw_core::{Channel, ChannelId, ChannelType, Message, OpenClawError, Result};
 
-/// Minimal Slack channel shim. Actual implementation will use slack-morphism to
-/// connect to Slack via Web API/RTM or Events API. This crate provides the
-/// Channel trait implementation surface so the gateway can reference it.
-pub struct SlackChannel {
+/// Minimal Signal channel skeleton. Integration can be built around `signal-cli`
+/// via IPC or a local daemon; for now provide the Channel trait surface so it's
+/// present in the workspace.
+pub struct SignalChannel {
     id: ChannelId,
     name: String,
 }
 
-impl SlackChannel {
+impl SignalChannel {
     pub fn new(id: ChannelId, name: impl Into<String>) -> Self {
         Self { id, name: name.into() }
     }
 }
 
 #[async_trait]
-impl Channel for SlackChannel {
+impl Channel for SignalChannel {
     fn id(&self) -> ChannelId {
         self.id
     }
@@ -28,7 +28,7 @@ impl Channel for SlackChannel {
     }
 
     fn channel_type(&self) -> ChannelType {
-        ChannelType::Slack
+        ChannelType::Signal
     }
 
     fn config(&self) -> &openclaw_core::channel::ChannelConfig {
@@ -36,17 +36,17 @@ impl Channel for SlackChannel {
     }
 
     async fn start(&mut self) -> Result<()> {
-        tracing::info!("Starting Slack channel: {}", self.name);
+        tracing::info!("Starting Signal channel: {}", self.name);
         Ok(())
     }
 
     async fn stop(&mut self) -> Result<()> {
-        tracing::info!("Stopping Slack channel: {}", self.name);
+        tracing::info!("Stopping Signal channel: {}", self.name);
         Ok(())
     }
 
     async fn send_message(&self, _message: Message) -> Result<()> {
-        tracing::info!("(slack) send_message called");
+        tracing::info!("(signal) send_message called");
         Err(OpenClawError::Channel { message: "Not implemented".to_string() })
     }
 
@@ -60,5 +60,5 @@ impl Channel for SlackChannel {
 }
 
 pub fn create_stub(id: ChannelId, name: &str) -> Arc<dyn Channel> {
-    Arc::new(SlackChannel::new(id, name.to_string()))
+    Arc::new(SignalChannel::new(id, name.to_string()))
 }
