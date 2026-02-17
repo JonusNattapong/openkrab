@@ -1,5 +1,5 @@
-param(
-    [string]$SourceDir = "./openclaw",
+﻿param(
+    [string]$SourceDir = "./krabkrab",
     [Parameter(Mandatory=$true)][string]$TargetDir,
     [switch]$DryRun
 )
@@ -25,8 +25,8 @@ if ($DryRun) {
 
 # Replacement pairs (use array to preserve case variants)
 $replacements = @(
-    @{ key = 'openclaw'; value = 'krabkrab' }
-    @{ key = 'OpenClaw'; value = 'KrabKrab' }
+    @{ key = 'krabkrab'; value = 'krabkrab' }
+    @{ key = 'krabkrab'; value = 'KrabKrab' }
 )
 
 # File extensions to skip (binary blobs)
@@ -66,12 +66,12 @@ foreach ($f in $files) {
     }
 }
 
-# Rename files and directories containing 'openclaw' in their names
+# Rename files and directories containing 'krabkrab' in their names
 $items = Get-ChildItem -Path $dst -Recurse -Force | Sort-Object -Property FullName -Descending
 foreach ($it in $items) {
     $name = $it.Name
-    if ($name -match 'openclaw') {
-        $newName = $name -replace 'openclaw','krabkrab'
+    if ($name -match 'krabkrab') {
+        $newName = $name -replace 'krabkrab','krabkrab'
         $oldPath = $it.FullName
         $newPath = Join-Path -Path $it.DirectoryName -ChildPath $newName
         if ($DryRun) {
@@ -85,3 +85,4 @@ foreach ($it in $items) {
 Write-Log "Checked $checked text files; $changed files would be/are changed."
 if ($DryRun) { Write-Log "Dry run complete. Remove -DryRun to execute changes." }
 else { Write-Log "Rebrand complete - inspect and run tests/builds in $dst." }
+
