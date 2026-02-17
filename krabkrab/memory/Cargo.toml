@@ -1,0 +1,11 @@
+[package]
+name = "krabkrab_memory"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Memory subsystem scaffolding for KrabKrab"
+
+[dependencies]
+krabkrab_common = { path = "../common" }

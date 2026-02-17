@@ -1,0 +1,14 @@
+[package]
+name = "krabkrab_common"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Shared types and utilities for KrabKrab"
+
+[dependencies]
+anyhow.workspace = true
+env_logger.workspace = true
+log.workspace = true
+serde.workspace = true

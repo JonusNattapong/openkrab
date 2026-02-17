@@ -1,0 +1,11 @@
+[package]
+name = "krabkrab_media"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Media processing scaffolding for KrabKrab"
+
+[dependencies]
+krabkrab_common = { path = "../common" }

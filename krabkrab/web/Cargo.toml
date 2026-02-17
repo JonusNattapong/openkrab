@@ -1,0 +1,13 @@
+[package]
+name = "krabkrab_web"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Web API scaffolding for KrabKrab"
+
+[dependencies]
+anyhow.workspace = true
+krabkrab_channels = { path = "../channels" }
+krabkrab_common = { path = "../common" }

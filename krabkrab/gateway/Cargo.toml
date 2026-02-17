@@ -1,0 +1,11 @@
+[package]
+name = "krabkrab_gateway"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Gateway scaffolding for KrabKrab"
+
+[dependencies]
+krabkrab_common = { path = "../common" }

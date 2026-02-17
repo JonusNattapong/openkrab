@@ -1,0 +1,19 @@
+[package]
+name = "krabkrab_cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "KrabKrab command line interface"
+
+[[bin]]
+name = "krabkrab"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+krabkrab_agents = { path = "../agents" }
+krabkrab_common = { path = "../common" }
+krabkrab_gateway = { path = "../gateway" }
+krabkrab_wizard = { path = "../wizard" }

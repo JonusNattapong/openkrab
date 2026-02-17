@@ -1,0 +1,11 @@
+[package]
+name = "krabkrab_channels"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Channel adapter scaffolding for KrabKrab"
+
+[dependencies]
+krabkrab_common = { path = "../common" }

@@ -1,0 +1,11 @@
+[package]
+name = "krabkrab_sessions"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Session management scaffolding for KrabKrab"
+
+[dependencies]
+krabkrab_common = { path = "../common" }
