@@ -71,17 +71,19 @@ impl TelegramChannel {
                             // Get largest photo and attempt to download via Bot API
                             let mut data: Option<Vec<u8>> = None;
                             if let Some(photo_size) = photo.last() {
-                                // PhotoSize contains a `file` with `id`
-                                let file_id = photo_size.file.id.clone();
-                                if let Ok(file) = bot.get_file(&file_id).await {
-                                    let path = file.path; // teloxide File.path is String
-                                     let url = format!("https://api.telegram.org/file/bot{}/{}", token.as_ref(), path);
-                                    if let Ok(resp) = reqwest::get(&url).await {
-                                        if let Ok(bytes) = resp.bytes().await {
-                                            data = Some(bytes.to_vec());
-                                        }
-                                    }
-                                }
+                                 // PhotoSize contains a `file` with `id`
+                                 let file_id = photo_size.file.id.clone();
+                                 if let Ok(file) = bot.get_file(&file_id).await {
+                                     let path = file.path; // teloxide File.path is String/Option depending on version
+                                     if !path.is_empty() {
+                                         let url = format!("https://api.telegram.org/file/bot{}/{}", token.as_ref(), path);
+                                         if let Ok(resp) = reqwest::get(&url).await {
+                                             if let Ok(bytes) = resp.bytes().await {
+                                                 data = Some(bytes.to_vec());
+                                             }
+                                         }
+                                     }
+                                 }
                             }
                             MessageContent::Image {
                                 url: None,
@@ -90,16 +92,18 @@ impl TelegramChannel {
                             }
                         } else if let Some(document) = msg.document() {
                             let mut data: Vec<u8> = Vec::new();
-                            let file_id = document.file.id.clone();
-                            if let Ok(file) = bot.get_file(&file_id).await {
-                                let path = file.path;
-                                 let url = format!("https://api.telegram.org/file/bot{}/{}", token.as_ref(), path);
-                                if let Ok(resp) = reqwest::get(&url).await {
-                                    if let Ok(bytes) = resp.bytes().await {
-                                        data = bytes.to_vec();
-                                    }
-                                }
-                            }
+                             let file_id = document.file.id.clone();
+                             if let Ok(file) = bot.get_file(&file_id).await {
+                                 let path = file.path;
+                                 if !path.is_empty() {
+                                     let url = format!("https://api.telegram.org/file/bot{}/{}", token.as_ref(), path);
+                                     if let Ok(resp) = reqwest::get(&url).await {
+                                         if let Ok(bytes) = resp.bytes().await {
+                                             data = bytes.to_vec();
+                                         }
+                                     }
+                                 }
+                             }
                             MessageContent::File {
                                 name: document.file_name.clone().unwrap_or_default(),
                                 data,
@@ -107,16 +111,18 @@ impl TelegramChannel {
                             }
                         } else if let Some(sticker) = msg.sticker() {
                             let mut data: Vec<u8> = Vec::new();
-                            let file_id = sticker.file.id.clone();
-                            if let Ok(file) = bot.get_file(&file_id).await {
-                                let path = file.path;
-                                 let url = format!("https://api.telegram.org/file/bot{}/{}", token.as_ref(), path);
-                                if let Ok(resp) = reqwest::get(&url).await {
-                                    if let Ok(bytes) = resp.bytes().await {
-                                        data = bytes.to_vec();
-                                    }
-                                }
-                            }
+                             let file_id = sticker.file.id.clone();
+                             if let Ok(file) = bot.get_file(&file_id).await {
+                                 let path = file.path;
+                                 if !path.is_empty() {
+                                     let url = format!("https://api.telegram.org/file/bot{}/{}", token.as_ref(), path);
+                                     if let Ok(resp) = reqwest::get(&url).await {
+                                         if let Ok(bytes) = resp.bytes().await {
+                                             data = bytes.to_vec();
+                                         }
+                                     }
+                                 }
+                             }
                             MessageContent::Sticker {
                                 data,
                             }
@@ -166,7 +172,8 @@ impl TelegramChannel {
 
         {
             let mut bot_lock = self.bot.write().await;
-            // We could store bot here if needed
+            // Store bot so tests or other parts can access it if needed
+            *bot_lock = Some(bot.clone());
         }
 
         Ok(())

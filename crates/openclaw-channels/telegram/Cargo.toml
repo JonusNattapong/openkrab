@@ -16,3 +16,7 @@ tracing.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
 reqwest.workspace = true
+
+[dev-dependencies]
+httptest = "0.11"
+wiremock = "0.6"

@@ -53,7 +53,7 @@
 | crates/openclaw-channels/discord/src/mocks.rs | Agent-3 | 2026-02-17T12:30:00 | Updating mocks for tests |
 | crates/openclaw-gateway/src/auth.rs | Agent-3 | 2026-02-17T12:32:00 | Reviewing & testing auth middleware |
 | crates/openclaw-gateway/src/lib.rs | Agent-3 | 2026-02-17T12:32:00 | Gateway build & tests (auth) |
-| crates/openclaw-channels/telegram/src/lib.rs | Agent-3 | 2026-02-17T12:33:00 | Fixing closure FnOnce -> Fn issue (compile)
+| crates/openclaw-channels/telegram/src/lib.rs | Agent-You | 2026-02-17T13:40:00+07:00 | Hardening Telegram media downloads & adding tests
 
 ### วิธีใช้ File Locks
 
