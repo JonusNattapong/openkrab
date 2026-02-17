@@ -22,6 +22,12 @@ pub use message::*;
 pub use session::*;
 pub use user::*;
 
+// Explicitly re-export traits and types needed across crates
+pub use crate::channel::Channel;
+pub use crate::channel::ChannelConfig;
+pub use crate::config::Config;
+pub use crate::channel::ChannelRegistry;
+
 // Suppress ambiguous glob re-export warnings for other modules by keeping their
 // exports explicit in-place where required. This reduces accidental symbol
 // collisions across the workspace.

@@ -24,7 +24,7 @@
 
 | Agent | Role | Status | Current Task |
 |-------|------|--------|--------------|
-| Agent-1 | Lead Developer — Gateway, Core, CLI, Auth | 🔵 Working | Gateway-Storage Integration + Auth Middleware |
+| Agent-1 | Lead Developer — Gateway, Core, CLI, Auth | 🟢 Idle | Gateway-Storage Integration + Auth Middleware ✅ |
 | Agent-2 | Backend Engineer — Telegram, Storage, Tooling | 🔵 Working | Telegram Mocks & Integration Tests |
 | Agent-3 | Channel Specialist — Discord, Slack, WhatsApp, Signal | 🔵 Working | Protocol pre-check — preparing to follow PROTOCOL.md |
 | Agent-4 | Async & Storage Specialist — Storage, SQLite/PG, CI/CD | 🔵 Working | Rust migration verification + compile triage |

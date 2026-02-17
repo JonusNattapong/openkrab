@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
 import module from "node:module";
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 // https://nodejs.org/api/module.html#module-compile-cache
 if (module.enableCompileCache && !process.env.NODE_DISABLE_COMPILE_CACHE) {
@@ -11,46 +15,46 @@ if (module.enableCompileCache && !process.env.NODE_DISABLE_COMPILE_CACHE) {
   }
 }
 
-const isModuleNotFoundError = (err) =>
-  err && typeof err === "object" && "code" in err && err.code === "ERR_MODULE_NOT_FOUND";
+const runRustCli = () => {
 
-const installProcessWarningFilter = async () => {
-  // Keep bootstrap warnings consistent with the TypeScript runtime.
-  for (const specifier of ["./dist/warning-filter.js", "./dist/warning-filter.mjs"]) {
-    try {
-      const mod = await import(specifier);
-      if (typeof mod.installProcessWarningFilter === "function") {
-        mod.installProcessWarningFilter();
-        return;
-      }
-    } catch (err) {
-      if (isModuleNotFoundError(err)) {
-        continue;
-      }
-      throw err;
-    }
+  const rootDir = path.dirname(fileURLToPath(import.meta.url));
+  const executableName = process.platform === "win32" ? "openclaw.exe" : "openclaw";
+  const candidates = [];
+
+  if (process.env.OPENCLAW_RUST_BIN) {
+    candidates.push(process.env.OPENCLAW_RUST_BIN);
   }
-};
 
-await installProcessWarningFilter();
+  candidates.push(
+    path.join(rootDir, "target", "release", executableName),
+    path.join(rootDir, "target", "debug", executableName),
+  );
 
-const tryImport = async (specifier) => {
-  try {
-    await import(specifier);
-    return true;
-  } catch (err) {
-    // Only swallow missing-module errors; rethrow real runtime errors.
-    if (isModuleNotFoundError(err)) {
+  const rustBin = candidates.find((candidate) => {
+    try {
+      return fs.statSync(candidate).isFile();
+    } catch {
       return false;
     }
-    throw err;
+  });
+
+  if (!rustBin) {
+    const searched = candidates.join(", ");
+    throw new Error(
+      `openclaw: Rust binary not found. Build it with 'cargo build --release'. Looked in: ${searched}. Node fallback has been disabled; reference: openclaw.node-reference.mjs`,
+    );
   }
+
+  const result = spawnSync(rustBin, process.argv.slice(2), {
+    stdio: "inherit",
+    env: process.env,
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  process.exit(result.status ?? 1);
 };
 
-if (await tryImport("./dist/entry.js")) {
-  // OK
-} else if (await tryImport("./dist/entry.mjs")) {
-  // OK
-} else {
-  throw new Error("openclaw: missing dist/entry.(m)js (build output).");
-}
+runRustCli();

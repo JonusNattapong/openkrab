@@ -1,0 +1,17 @@
+[package]
+name = "openclaw-discord"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+openclaw-core.workspace = true
+
+serenity = { version = "0.12", features = ["full"] }
+
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+chrono.workspace = true

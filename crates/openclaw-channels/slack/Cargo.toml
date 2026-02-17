@@ -1,0 +1,21 @@
+[package]
+name = "openclaw-slack"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+openclaw-core.workspace = true
+
+# slack-morphism crate for Slack API
+# Version needs research - placeholder based on similar crates (teloxide 0.13, serenity 0.12)
+slack-morphism = "1.0"
+
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+uuid.workspace = true

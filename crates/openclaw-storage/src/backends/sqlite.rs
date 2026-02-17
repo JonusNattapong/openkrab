@@ -49,33 +49,33 @@ impl SqliteStorage {
         // This avoids connection string parsing pitfalls on Windows.
         if raw_path != connection_string {
             let path = std::path::PathBuf::from(raw_path.clone());
-            tracing::debug!("SQLite raw path: {:?}", path);
+            tracing::trace!("SQLite raw path: {:?}", path);
 
             // Ensure parent directory exists (tempdir should), try to create the file so sqlite can open it
             if let Some(parent) = path.parent() {
                 if !parent.exists() {
                     if let Err(e) = std::fs::create_dir_all(parent) {
-                        tracing::debug!("Failed to create parent dirs for sqlite db {:?}: {}", parent, e);
+                    tracing::trace!("Failed to create parent dirs for sqlite db {:?}: {}", parent, e);
                     }
                 }
             }
 
             if let Err(e) = std::fs::OpenOptions::new().create(true).write(true).open(&path) {
-                tracing::debug!("Failed to ensure sqlite db file exists {:?}: {}", path, e);
+                tracing::trace!("Failed to ensure sqlite db file exists {:?}: {}", path, e);
             } else {
-                tracing::debug!("Ensured sqlite db file exists: {:?}", path);
+                tracing::trace!("Ensured sqlite db file exists: {:?}", path);
             }
 
             // Build connect options from filename (sqlx accepts Path)
             let opts = sqlx::sqlite::SqliteConnectOptions::new().filename(path);
             match SqlitePoolOptions::new().max_connections(10).connect_with(opts).await {
                 Ok(p) => pool_opt = Some(p),
-                Err(e) => tracing::debug!("connect_with failed: {}", e),
+                Err(e) => tracing::trace!("connect_with failed: {}", e),
             }
         }
         for cand in candidates {
             // Log attempt and check if the path portion exists (when applicable)
-            tracing::debug!("Attempting SQLite connect with: {}", cand);
+            tracing::trace!("Attempting SQLite connect with: {}", cand);
 
             match SqlitePoolOptions::new().max_connections(10).connect(&cand).await {
                 Ok(p) => {
@@ -83,7 +83,7 @@ impl SqliteStorage {
                     break;
                 }
                 Err(e) => {
-                    tracing::debug!("Failed to connect with `{}`: {}", cand, e);
+                    tracing::trace!("Failed to connect with `{}`: {}", cand, e);
                     last_err = Some(e.to_string());
                 }
             }

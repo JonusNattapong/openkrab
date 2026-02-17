@@ -1,0 +1,32 @@
+[package]
+name = "openclaw-agents"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+openclaw-core.workspace = true
+openclaw-errors.workspace = true
+openclaw-storage.workspace = true
+openclaw-tools.workspace = true
+
+# LLM integration
+rig-core = "0.5"
+reqwest.workspace = true
+
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+async-trait.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+dashmap.workspace = true
+parking_lot.workspace = true
+
+[dev-dependencies]
+tokio-test.workspace = true
+mockall.workspace = true
+wiremock.workspace = true

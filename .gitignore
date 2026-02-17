@@ -86,3 +86,8 @@ USER.md
 !.agent/workflows/
 /local/
 package-lock.json
+
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock

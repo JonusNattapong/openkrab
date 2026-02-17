@@ -1,0 +1,29 @@
+[package]
+name = "openclaw-storage"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+openclaw-core = { workspace = true }
+
+async-trait = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+tracing = { workspace = true }
+
+parking_lot = { workspace = true }
+
+# sqlx for database (align with workspace Teloxide usage)
+sqlx = { version = "0.7.3", features = ["runtime-tokio-rustls", "sqlite", "postgres", "chrono", "uuid", "json", "migrate"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3.0"
+futures = "0.3"
