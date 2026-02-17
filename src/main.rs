@@ -60,20 +60,22 @@ async fn run() -> anyhow::Result<()> {
 }
 
 fn init_logging() {
+    // Respect RUST_LOG if provided, otherwise default to INFO
     let level = std::env::var("RUST_LOG")
         .ok()
         .and_then(|s| s.parse().ok())
         .unwrap_or(Level::INFO);
-    
-    let subscriber = FmtSubscriber::builder()
+
+    let _subscriber = FmtSubscriber::builder()
         .with_max_level(level)
         .with_target(true)
         .with_thread_ids(true)
         .with_file(true)
         .with_line_number(true)
         .compact()
-        .init();
-    
+        .finish();
+
+    tracing::subscriber::set_global_default(_subscriber).expect("setting default subscriber failed");
     info!("Logging initialized at level: {:?}", level);
 }
 

@@ -3,7 +3,10 @@ use openclaw_gateway::GatewayServer;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt::init();
+    // Respect RUST_LOG if set; otherwise default to INFO
+    let _ = tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .try_init();
 
     let config = load_config()?;
     let server = GatewayServer::new(config);

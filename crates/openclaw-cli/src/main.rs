@@ -101,8 +101,17 @@ fn get_log_level(level: &LogLevel) -> tracing::Level {
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
+    // Prefer RUST_LOG environment if set; otherwise use CLI flag
+    let env_level = std::env::var("RUST_LOG").ok().and_then(|s| s.parse().ok());
+    let level = env_level.unwrap_or_else(|| get_log_level(&cli.log_level));
+
     tracing_subscriber::fmt()
-        .with_max_level(get_log_level(&cli.log_level))
+        .with_max_level(level)
+        .with_target(true)
+        .with_thread_ids(true)
+        .with_line_number(true)
+        .with_file(true)
+        .compact()
         .init();
 
     let config = load_config(cli.config.as_ref().map(|p| p.as_path()))?;
