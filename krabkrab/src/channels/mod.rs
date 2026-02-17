@@ -15,6 +15,7 @@ pub mod logging;
 pub mod location;
 pub mod typing;
 pub mod draft_stream_loop;
+pub mod ack_reactions;
 
 // Additional modules will be added incrementally as porting progresses.
 
