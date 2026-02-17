@@ -68,3 +68,8 @@ Immediate execution order (เริ่มทันที)
 หมายเหตุ
 - ขั้นตอนนี้เป็นแผนงานเชิงวิศวกรรม — port ทีละโมดูล ไว้ทดสอบและรีแฟกเตอร์ระหว่างทาง
 - บล็อกหลักตอนนี้: เครื่องมือ Rust (cargo) ยังไม่ติดตั้งใน environment ของคุณ (ผมบอกวิธีติดตั้งได้ถ้าต้องการ)
+
+Progress updates (2026-02-17)
+- Ported Slack runtime stubs: `send`, `probe`, `monitor` under `krabkrab/src/slack`.
+- Added unit tests for these helpers and ran `cargo test` — all tests passed locally.
+- Next: continue with the next module per the roadmap (recommend: connectors runtime or higher-level Slack message processing).
