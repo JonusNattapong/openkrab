@@ -9,6 +9,7 @@ tokio.workspace = true
 openclaw-core.workspace = true
 reqwest.workspace = true
 tracing.workspace = true
+serde.workspace = true
 
 [lib]
 name = "openclaw_browser"
