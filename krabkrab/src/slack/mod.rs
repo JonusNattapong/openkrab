@@ -6,6 +6,8 @@ pub mod send;
 pub mod probe;
 pub mod monitor;
 pub mod blocks_input;
+pub mod blocks_fallback;
+pub mod send;
 
 pub use accounts::{list_enabled_slack_accounts, resolve_slack_account, resolve_slack_reply_to_mode};
 pub use threading_tool_context::build_slack_threading_tool_context;
@@ -15,3 +17,5 @@ pub use send::build_slack_send_payload;
 pub use probe::build_probe_request;
 pub use monitor::should_monitor_thread;
 pub use blocks_input::{parse_slack_blocks_input, validate_slack_blocks_array};
+pub use blocks_fallback::build_slack_blocks_fallback_text;
+pub use send::send_message_slack;
