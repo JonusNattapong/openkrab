@@ -1,6 +1,6 @@
 use serde_json::json;
 use anyhow::Result;
-use reqwest::blocking::Client;
+use reqwest::Client;
 use std::time::Duration;
 
 /// Build the JSON payload for posting a message to Slack
@@ -15,17 +15,15 @@ pub fn build_slack_http_payload(channel: &str, text: &str, thread_ts: Option<&st
     payload
 }
 
-/// Send a message to Slack using a blocking reqwest client.
-/// This is a thin shim; in tests we avoid calling it.
-pub fn send_message(token: &str, channel: &str, text: &str, thread_ts: Option<&str>) -> Result<serde_json::Value> {
-    let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
+/// Send a message to Slack using an async reqwest client.
+pub async fn send_message(client: &Client, token: &str, channel: &str, text: &str, thread_ts: Option<&str>) -> Result<serde_json::Value> {
     let url = "https://slack.com/api/chat.postMessage";
     let payload = build_slack_http_payload(channel, text, thread_ts);
     let resp = client.post(url)
         .bearer_auth(token)
         .json(&payload)
-        .send()?;
-    let v: serde_json::Value = resp.json()?;
+        .send().await?;
+    let v: serde_json::Value = resp.json().await?;
     Ok(v)
 }
 

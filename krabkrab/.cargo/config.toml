@@ -1,0 +1,10 @@
+# Build environment configuration for krabkrab
+# Placed here so it applies to all cargo commands in this workspace.
+
+[env]
+# aws-lc-sys: disable ASM compilation to avoid needing NASM on Windows.
+# This falls back to pure-C cryptographic implementations.
+AWS_LC_SYS_NO_ASM = "1"
+
+# Prevent aws-lc-sys from looking for NASM or using prebuilt NASM scripts.
+AWS_LC_SYS_PREBUILT_NASM = "0"

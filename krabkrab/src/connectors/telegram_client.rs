@@ -1,6 +1,6 @@
 use serde_json::json;
 use anyhow::Result;
-use reqwest::blocking::Client;
+use reqwest::Client;
 use std::time::Duration;
 
 /// Build a JSON payload for Telegram `sendMessage` API
@@ -16,14 +16,28 @@ pub fn build_telegram_http_payload(chat_id: &str, text: &str, reply_to_message_i
     payload
 }
 
-/// Blocking send shim for Telegram Bot API.
+/// Async send shim for Telegram Bot API.
 /// `token` should be the bot token (no `bot` prefix needed here).
-pub fn send_message(token: &str, chat_id: &str, text: &str, reply_to_message_id: Option<i64>) -> Result<serde_json::Value> {
-    let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
+pub async fn send_message(client: &Client, token: &str, chat_id: &str, text: &str, reply_to_message_id: Option<i64>) -> Result<serde_json::Value> {
     let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
     let payload = build_telegram_http_payload(chat_id, text, reply_to_message_id);
-    let resp = client.post(&url).json(&payload).send()?;
-    let v: serde_json::Value = resp.json()?;
+    let resp = client.post(&url).json(&payload).send().await?;
+    let v: serde_json::Value = resp.json().await?;
+    Ok(v)
+}
+
+/// Async update fetch shim for Telegram Bot API.
+pub async fn get_updates(client: &Client, token: &str, offset: Option<i64>, timeout: Option<u64>) -> Result<serde_json::Value> {
+    let url = format!("https://api.telegram.org/bot{}/getUpdates", token);
+    let mut payload = json!({});
+    if let Some(o) = offset {
+        payload["offset"] = json!(o);
+    }
+    if let Some(t) = timeout {
+        payload["timeout"] = json!(t);
+    }
+    let resp = client.post(&url).json(&payload).send().await?;
+    let v: serde_json::Value = resp.json().await?;
     Ok(v)
 }
 

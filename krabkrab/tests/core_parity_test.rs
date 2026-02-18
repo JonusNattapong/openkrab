@@ -1,4 +1,5 @@
 use krabkrab::config::{validate_config, AppConfig};
+use krabkrab::memory::MemoryConfig;
 use krabkrab::utils::{is_truthy_env, safe_json_parse, truncate_text};
 use krabkrab::version::resolve_version;
 
@@ -37,5 +38,14 @@ fn config_validation_works() {
         ..AppConfig::default()
     };
     assert!(validate_config(&bad).is_err());
+}
+
+#[test]
+fn memory_supported_provider_list_parity() {
+    let providers = MemoryConfig::supported_embedding_providers();
+    assert!(providers.contains(&"openai"));
+    assert!(providers.contains(&"gemini"));
+    assert!(providers.contains(&"ollama"));
+    assert!(!providers.contains(&"minimax"));
 }
 

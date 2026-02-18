@@ -18,6 +18,7 @@ pub mod draft_stream_loop;
 pub mod ack_reactions;
 pub mod targets;
 pub mod account_summary;
+pub mod dock;
 
 // Additional modules will be added incrementally as porting progresses.
 

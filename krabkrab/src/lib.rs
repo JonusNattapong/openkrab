@@ -1,16 +1,48 @@
-//! krabkrab — minimal Rust scaffold ported from `openclaw` (proof-of-concept)
+//! krabkrab — incremental Rust port of `openclaw` (TypeScript → Rust).
 
+pub mod acp;
+pub mod agents;
+pub mod auto_reply;
+pub mod broadcast;
+pub mod channels;
 pub mod commands;
-pub mod daemon;
+pub mod compat;
 pub mod common;
 pub mod config;
 pub mod connectors;
-pub mod channels;
+pub mod cron;
+pub mod daemon;
+pub mod dashboard;
+pub mod diagnostics;
 pub mod gateway;
+pub mod hooks;
+pub mod infra;
+pub mod link_understanding;
+pub mod llm_task;
 pub mod logging;
+pub mod markdown;
+pub mod matrix;
+pub mod media;
+pub mod media_understanding;
+pub mod memory;
+pub mod oauth;
+pub mod pairing;
+pub mod plugin_sdk;
+pub mod plugins;
+pub mod polls;
+pub mod process;
+pub mod providers;
+pub mod routing;
 pub mod security;
+pub mod sessions;
+pub mod signal;
+pub mod terminal;
+pub mod thread_ownership;
+pub mod tools;
+pub mod tts;
 pub mod utils;
 pub mod version;
+pub mod web_connector;
 
 use once_cell::sync::Lazy;
 use serde::Serialize;
