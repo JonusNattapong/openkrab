@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(cmd /c \"dir D:\\\\Projects /b\")",
+      "Bash(cmd /c \"dir D:\\\\Projects\\\\Github /b\")",
+      "Bash(cmd /c \"cd /d D:\\\\Projects\\\\Github && dir /b\")",
+      "Bash(cmd /c \"cd /d D:\\\\Projects && dir /b\")",
+      "Bash(cmd /c \"dir D:\\\\Projects\\\\Github\\\\openkrab /b\")",
+      "Bash(cargo test:*)",
+      "Bash(cargo check:*)",
+      "Bash(cargo:*)"
+    ]
+  }
+}

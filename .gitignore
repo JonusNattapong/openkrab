@@ -1,0 +1,14 @@
+target/
+**/*.rs.bk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+node_modules/
+dist/
+pnpm-lock.yaml
+*.log
+*.txt
+test_out.txt
+!LICENSE.txt
+**/Cargo.lock
