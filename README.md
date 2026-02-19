@@ -1,8 +1,4 @@
-# 🦀 OpenKrab — Personal AI Assistant (Rust Edition)
-
-<p align="center">
-  <strong>EXFOLIATE! EXFOLIATE!</strong>
-</p>
+# OpenKrab — Personal AI Assistant (Rust Edition)
 
 <p align="center">
   <a href="https://github.com/JonusNattapong/openkrab/actions/workflows/rust.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/JonusNattapong/openkrab/rust.yml?branch=main&style=for-the-badge" alt="CI status"></a>
@@ -12,15 +8,15 @@
   <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=for-the-badge" alt="Status">
 </p>
 
-**OpenKrab** is a _personal AI assistant_ you run on your own devices — rewritten in **Rust** for maximum performance, safety, and reliability.
+**OpenKrab** is a personal AI assistant designed for self-hosted use across your own devices. The project is implemented in **Rust** to provide strong performance, predictable resource usage, and memory safety.
 
-It answers you on the channels you already use (**Telegram, Slack, Discord, Signal, WhatsApp, iMessage/BlueBubbles, Matrix, Google Chat, IRC, Microsoft Teams, WebChat**), with:
-- **Native Rust speed** — 5x faster than TypeScript
-- **Lower memory footprint** — no GC pauses
-- **Single-binary deployment** — compile once, run anywhere
-- **Memory safety guaranteed** — zero vulnerabilities by design
+OpenKrab integrates with familiar messaging channels (**Telegram, Slack, Discord, Signal, WhatsApp, iMessage/BlueBubbles, Matrix, Google Chat, IRC, Microsoft Teams, WebChat**) and provides:
+- **Native Rust performance** with low startup overhead
+- **Efficient memory profile** for long-running workloads
+- **Single-binary deployment** across supported platforms
+- **Compile-time memory safety guarantees**
 
-This is a complete Rust port of [OpenClaw](https://github.com/openclaw/openclaw) (TypeScript/Node.js) with **enhanced capabilities**.
+OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/openclaw/openclaw) (TypeScript/Node.js), extended with additional runtime capabilities.
 
 [Features](#-features) · [Quick Start](#-quick-start) · [Architecture](#-architecture) · [Channels](#-channels) · [Providers](#-providers)
 
@@ -51,7 +47,7 @@ This is a complete Rust port of [OpenClaw](https://github.com/openclaw/openclaw)
 - **Audit logging** — Comprehensive security event logging
 - **MFA/OAuth2** — Enterprise authentication support
 
-### 🎙️ Voice System (NEW)
+### 🎙️ Voice System
 - **Voice wake mode** — "Hey KrabKrab" activation
 - **Talk mode** — Continuous conversation with auto-sleep
 - **VAD** — Voice Activity Detection
@@ -59,7 +55,7 @@ This is a complete Rust port of [OpenClaw](https://github.com/openclaw/openclaw)
 - **Beep generation** — Audio feedback
 - **Microphone capture** — Real-time audio input
 
-### 🔌 Plugin System (NEW)
+### 🔌 Plugin System
 - **WASM runtime** — Cross-platform plugin execution
 - **Hot reload** — Development workflow with auto-reload
 - **Sandboxing** — Security isolation (4 levels)
@@ -151,45 +147,53 @@ krabkrab memory index --recursive ./knowledge-base
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         CLIENTS                                  │
-│  Telegram  Slack  Discord  WhatsApp  Signal  iMessage  WebChat  │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        GATEWAY                                   │
-│              WebSocket + HTTP Server (Tokio)                     │
-│                    127.0.0.1:18789                               │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │  Sessions   │  │   Channels  │  │      Authentication     │  │
-│  │  Manager    │  │   Registry  │  │  (OAuth2/JWT/MFA/Rate)  │  │
-│  └─────────────┘  └─────────────┘  └─────────────────────────┘  │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-        ┌──────────────┼──────────────┬──────────────┐
-        ▼              ▼              ▼              ▼
-┌──────────────┐ ┌──────────┐ ┌─────────────┐ ┌────────────┐
-│   AGENTS     │ │ MEMORY   │ │  PROVIDERS  │ │   TOOLS    │
-│  (AI Loop)   │ │(Vector + │ │  (LLM APIs) │ │ (Shell,    │
-│              │ │ Text FTS)│ │             │ │  Media,    │
-│ • Multi-agent│ │           │ │ • OpenAI    │ │  Web,      │
-│ • Tool use   │ │ • Hybrid  │ │ • Gemini    │ │  Browser)  │
-│ • Streaming  │ │   Search  │ │ • Anthropic │ │            │
-│ • Context    │ │ • MMR     │ │ • Ollama    │ │ • Sandboxed│
-│   mgmt       │ │ • Temporal│ │ • Copilot   │ │ • Safe exec│
-│              │ │   Decay   │ │ • MiniMax   │ │            │
-└──────────────┘ └──────────┘ └─────────────┘ └────────────┘
-        │
-        ▼
-┌─────────────────────────────────────────┐
-│           PLUGIN SYSTEM (NEW)            │
-│  ┌─────────┐ ┌──────────┐ ┌──────────┐ │
-│  │  WASM   │ │   Hot    │ │ Sandbox  │ │
-│  │ Runtime │ │  Reload  │ │  Security│ │
-│  └─────────┘ └──────────┘ └──────────┘ │
-└─────────────────────────────────────────┘
+The system is organized around a gateway control plane that receives channel events, routes sessions, and coordinates AI/runtime services.
+
+```mermaid
+flowchart TB
+    subgraph Clients[Clients]
+        Telegram[Telegram]
+        Slack[Slack]
+        Discord[Discord]
+        WhatsApp[WhatsApp]
+        Signal[Signal]
+        iMessage[iMessage]
+        WebChat[WebChat]
+    end
+
+    subgraph Gateway[Gateway - WebSocket + HTTP (Tokio)]
+        Sessions[Sessions Manager]
+        Channels[Channels Registry]
+        Auth[Authentication and Rate Control]
+    end
+
+    subgraph Runtime[Core Runtime]
+        Agents[Agents - AI loop and orchestration]
+        Memory[Memory - vector + full-text search]
+        Providers[Model Providers]
+        Tools[Tools - shell, web, media, browser]
+    end
+
+    subgraph Plugins[Plugin System]
+        WASM[WASM Runtime]
+        HotReload[Hot Reload]
+        Sandbox[Sandbox Security]
+    end
+
+    Telegram --> Gateway
+    Slack --> Gateway
+    Discord --> Gateway
+    WhatsApp --> Gateway
+    Signal --> Gateway
+    iMessage --> Gateway
+    WebChat --> Gateway
+
+    Gateway --> Agents
+    Gateway --> Memory
+    Gateway --> Providers
+    Gateway --> Tools
+
+    Agents --> Plugins
 ```
 
 ---
@@ -312,7 +316,7 @@ Create `plugin.json`:
 
 ## 📊 Porting Status
 
-**Status: ✅ COMPLETE — All 20 Phases Finished!**
+**Status: Complete — all planned porting phases finalized.**
 
 | Phase | Module(s) | Lines | Status |
 |-------|-----------|-------|--------|
@@ -418,9 +422,5 @@ MIT License — see [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <strong>Built with 🦀 Rust + ❤️ Love</strong>
-</p>
-
-<p align="center">
-  <strong>100% Complete — Production Ready! 🚀</strong>
+  <strong>Built with Rust</strong>
 </p>
