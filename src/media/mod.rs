@@ -4,6 +4,14 @@
 //! Provides normalised representations for images, audio, video, files,
 //! and documents that can flow through the agent pipeline.
 
+pub mod audio;
+pub mod mime;
+pub mod fetch;
+pub mod store;
+pub mod parse;
+pub mod image_ops;
+pub mod input_files;
+
 use serde::{Deserialize, Serialize};
 
 // ─── Media kind ───────────────────────────────────────────────────────────────

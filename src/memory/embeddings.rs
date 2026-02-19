@@ -174,26 +174,8 @@ impl EmbeddingProvider for GeminiProvider {
     }
 
     async fn embed_query(&self, text: &str) -> Result<Vec<f32>> {
-        let url = format!("{}/{}:embedContent", self.base_url.trim_end_matches('/'), self.model_path());
-        let response = self.client
-            .post(&url)
-            .header("x-goog-api-key", &self.api_key)
-            .json(&GeminiEmbedRequest {
-                content: GeminiContent {
-                    parts: vec![GeminiPart { text }],
-                },
-                task_type: "RETRIEVAL_QUERY",
-            })
-            .send()
-            .await?;
-
-        if !response.status().is_success() {
-            let err_text = response.text().await?;
-            return Err(anyhow::anyhow!("Gemini API error: {}", err_text));
-        }
-
-        let body: GeminiEmbedResponse = response.json().await?;
-        Ok(body.embedding.and_then(|e| e.values).unwrap_or_default())
+        let mut res = self.embed_batch(&[text.to_string()]).await?;
+        Ok(res.pop().unwrap_or_default())
     }
 
     async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>> {
@@ -220,6 +202,82 @@ impl EmbeddingProvider for GeminiProvider {
 
         let body: GeminiBatchResponse = response.json().await?;
         Ok(body.embeddings.unwrap_or_default().into_iter().map(|e| e.values.unwrap_or_default()).collect())
+    }
+}
+
+pub struct VoyageProvider {
+    client: Client,
+    api_key: String,
+    base_url: String,
+    model: String,
+}
+
+impl VoyageProvider {
+    pub fn new(api_key: String, base_url: Option<String>, model: Option<String>) -> Self {
+        Self {
+            client: Client::new(),
+            api_key,
+            base_url: base_url.unwrap_or_else(|| "https://api.voyageai.com/v1".to_string()),
+            model: model.unwrap_or_else(|| "voyage-3-large".to_string()),
+        }
+    }
+}
+
+#[derive(Serialize)]
+struct VoyageEmbeddingRequest<'a> {
+    model: &'a str,
+    input: &'a [String],
+    input_type: Option<&'a str>,
+}
+
+#[derive(Deserialize)]
+struct VoyageEmbeddingResponse {
+    data: Vec<VoyageEmbeddingData>,
+}
+
+#[derive(Deserialize)]
+struct VoyageEmbeddingData {
+    embedding: Vec<f32>,
+}
+
+#[async_trait]
+impl EmbeddingProvider for VoyageProvider {
+    fn id(&self) -> &str {
+        "voyage"
+    }
+
+    fn model(&self) -> &str {
+        &self.model
+    }
+
+    async fn embed_query(&self, text: &str) -> Result<Vec<f32>> {
+        let mut res = self.embed_batch(&[text.to_string()]).await?;
+        Ok(res.pop().unwrap_or_default())
+    }
+
+    async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>> {
+        let url = format!("{}/embeddings", self.base_url.trim_end_matches('/'));
+
+        let body = VoyageEmbeddingRequest {
+            model: &self.model,
+            input: texts,
+            input_type: Some("document"),
+        };
+
+        let resp = self.client
+            .post(&url)
+            .bearer_auth(&self.api_key)
+            .json(&body)
+            .send()
+            .await?;
+
+        if !resp.status().is_success() {
+            let err_text = resp.text().await?;
+            return Err(anyhow::anyhow!("Voyage API error: {}", err_text));
+        }
+
+        let response: VoyageEmbeddingResponse = resp.json().await?;
+        Ok(response.data.into_iter().map(|d| d.embedding).collect())
     }
 }
 

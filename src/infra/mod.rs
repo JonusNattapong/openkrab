@@ -6,6 +6,8 @@
 
 use std::path::{Path, PathBuf};
 
+pub mod outbound;
+
 // ─── Known directories ────────────────────────────────────────────────────────
 
 /// Returns the platform home directory.

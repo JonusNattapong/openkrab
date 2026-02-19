@@ -1,4 +1,4 @@
-use crate::gateway::{start_gateway, GatewayState};
+use crate::gateway::{start_gateway, GatewayState, GatewayServer, GatewayServerOptions};
 use crate::memory::{MemoryStore, MemoryManager, MemoryConfig};
 use anyhow::Result;
 use std::sync::Arc;

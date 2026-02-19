@@ -1,5 +1,142 @@
 use serde::{Deserialize, Serialize};
 
+/// Re-export OpenClawConfig as the main config type
+pub use crate::openclaw_config::OpenClawConfig;
+
+/// Re-export config I/O functions
+pub use crate::config_io::{
+    apply_env_substitution, clear_config_cache, get_default_config, load_config, load_config_file,
+    load_config_from_path, migrate_legacy_config, read_config_snapshot, resolve_config_path,
+    save_config, save_config_to_path, validate_config as validate_openclaw_config,
+};
+
+/// Re-export validation functions
+pub use crate::config_validation::{
+    format_validation_errors, validate_config_json, validate_config_object_raw,
+    validate_config_object_with_plugins, validate_config_schema, ValidationError, ValidationResult,
+};
+
+/// Convert OpenClawConfig to AppConfig (for backward compatibility)
+pub fn openclaw_to_app_config(openclaw: &OpenClawConfig) -> AppConfig {
+    AppConfig {
+        profile: "default".to_string(), // TODO: derive from openclaw config
+        log_level: openclaw
+            .logging
+            .as_ref()
+            .map(|l| l.level.clone())
+            .unwrap_or_else(|| "info".to_string()),
+        enable_telegram: openclaw
+            .channels
+            .as_ref()
+            .and_then(|c| c.telegram.get("default"))
+            .map(|c| c.enabled)
+            .unwrap_or(false),
+        enable_slack: openclaw
+            .channels
+            .as_ref()
+            .and_then(|c| c.slack.get("default"))
+            .map(|c| c.enabled)
+            .unwrap_or(false),
+        enable_discord: openclaw
+            .channels
+            .as_ref()
+            .and_then(|c| c.discord.get("default"))
+            .map(|c| c.enabled)
+            .unwrap_or(false),
+        enable_line: false, // TODO: add to OpenClawConfig
+        enable_whatsapp: openclaw
+            .channels
+            .as_ref()
+            .and_then(|c| c.whatsapp.get("default"))
+            .map(|c| c.enabled)
+            .unwrap_or(false),
+        enable_dashboard: openclaw.web.as_ref().map(|w| w.enabled).unwrap_or(false),
+        dashboard_bind: format!(
+            "0.0.0.0:{}",
+            openclaw.web.as_ref().and_then(|w| w.port).unwrap_or(3000)
+        ),
+        memory: crate::memory::config::MemoryConfig::default(), // TODO: convert from openclaw
+        agent: crate::agents::AgentIdentity::default(),         // TODO: convert from openclaw
+        feature_matrix: FeatureMatrix::default(),
+    }
+}
+
+/// Convert AppConfig to OpenClawConfig (for forward compatibility)
+pub fn app_to_openclaw_config(app: &AppConfig) -> OpenClawConfig {
+    let mut channels = crate::openclaw_config::ChannelsConfig::default();
+
+    if app.enable_telegram {
+        channels.telegram.insert(
+            "default".to_string(),
+            crate::openclaw_config::ChannelConfig {
+                enabled: true,
+                allowlist: vec![],
+                token: None,
+                webhook_secret: None,
+            },
+        );
+    }
+
+    if app.enable_slack {
+        channels.slack.insert(
+            "default".to_string(),
+            crate::openclaw_config::ChannelConfig {
+                enabled: true,
+                allowlist: vec![],
+                token: None,
+                webhook_secret: None,
+            },
+        );
+    }
+
+    if app.enable_discord {
+        channels.discord.insert(
+            "default".to_string(),
+            crate::openclaw_config::ChannelConfig {
+                enabled: true,
+                allowlist: vec![],
+                token: None,
+                webhook_secret: None,
+            },
+        );
+    }
+
+    if app.enable_whatsapp {
+        channels.whatsapp.insert(
+            "default".to_string(),
+            crate::openclaw_config::ChannelConfig {
+                enabled: true,
+                allowlist: vec![],
+                token: None,
+                webhook_secret: None,
+            },
+        );
+    }
+
+    let port = app
+        .dashboard_bind
+        .split(':')
+        .nth(1)
+        .and_then(|p| p.parse().ok());
+
+    OpenClawConfig {
+        meta: Some(crate::openclaw_config::ConfigMeta {
+            last_touched_version: Some(env!("CARGO_PKG_VERSION").to_string()),
+            last_touched_at: Some(chrono::Utc::now().to_rfc3339()),
+        }),
+        logging: Some(crate::openclaw_config::LoggingConfig {
+            level: app.log_level.clone(),
+            file: None,
+        }),
+        web: Some(crate::openclaw_config::WebConfig {
+            enabled: app.enable_dashboard,
+            port,
+        }),
+        channels: Some(channels),
+        ..Default::default()
+    }
+}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum RuntimeLayer {
@@ -89,13 +226,162 @@ pub struct AppConfig {
     pub enable_discord: bool,
     pub enable_line: bool,
     pub enable_whatsapp: bool,
-    // ── Web Dashboard ────────────────────────────────────────────────────────
+    // ── Web Dashboard ───────────────────────────────────────────────────────
     pub enable_dashboard: bool,
     pub dashboard_bind: String,
     // ── Sub-configs ──────────────────────────────────────────────────────────
     pub memory: crate::memory::config::MemoryConfig,
     pub agent: crate::agents::AgentIdentity,
     pub feature_matrix: FeatureMatrix,
+    // ── Legacy/OpenClaw fields ───────────────────────────────────────────
+    #[serde(default)]
+    pub agents: AgentsConfig,
+    #[serde(default)]
+    pub auth: AuthConfig,
+    #[serde(default)]
+    pub channels: ChannelsConfig,
+    #[serde(default)]
+    pub gateway: GatewayConfig,
+    #[serde(default)]
+    pub logging: LoggingConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct AgentsConfig {
+    #[serde(default)]
+    pub defaults: AgentDefaults,
+    #[serde(default)]
+    pub list: Vec<AgentInstance>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct AgentDefaults {
+    #[serde(default)]
+    pub model: Option<String>,
+    #[serde(default)]
+    pub sandbox: SandboxConfig,
+    #[serde(default)]
+    pub memory_search: Option<MemorySearchConfig>,
+    #[serde(default)]
+    pub tools: std::collections::HashMap<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct AgentInstance {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub model: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct SandboxConfig {
+    #[serde(default)]
+    pub mode: Option<String>,
+    #[serde(default)]
+    pub docker: DockerConfig,
+    #[serde(default)]
+    pub binds: Option<Vec<String>>,
+    #[serde(default)]
+    pub network: Option<String>,
+    #[serde(default)]
+    pub seccomp_profile: Option<String>,
+    #[serde(default)]
+    pub apparmor_profile: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct DockerConfig {
+    #[serde(default)]
+    pub image: Option<String>,
+    #[serde(default)]
+    pub browser: Option<BrowserConfig>,
+    #[serde(default)]
+    pub common: Option<CommonConfig>,
+    #[serde(default)]
+    pub network: Option<String>,
+    #[serde(default)]
+    pub seccomp_profile: Option<String>,
+    #[serde(default)]
+    pub apparmor_profile: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct BrowserConfig {
+    #[serde(default)]
+    pub image: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct CommonConfig {
+    #[serde(default)]
+    pub image: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct MemorySearchConfig {
+    #[serde(default)]
+    pub enabled: Option<bool>,
+    #[serde(default)]
+    pub max_results: Option<usize>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct AuthConfig {
+    #[serde(default)]
+    pub profiles: std::collections::HashMap<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct ChannelsConfig {
+    #[serde(default)]
+    pub telegram: std::collections::HashMap<String, ChannelConfig>,
+    #[serde(default)]
+    pub slack: std::collections::HashMap<String, ChannelConfig>,
+    #[serde(default)]
+    pub discord: std::collections::HashMap<String, ChannelConfig>,
+    #[serde(default)]
+    pub whatsapp: std::collections::HashMap<String, ChannelConfig>,
+    #[serde(default)]
+    pub accounts: std::collections::HashMap<String, ChannelConfig>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct ChannelConfig {
+    #[serde(default)]
+    pub enabled: bool,
+    #[serde(default)]
+    pub allowlist: Vec<String>,
+    #[serde(default)]
+    pub token: Option<String>,
+    #[serde(default)]
+    pub webhook_secret: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct GatewayConfig {
+    #[serde(default)]
+    pub bind: Option<String>,
+    #[serde(default)]
+    pub port: Option<u16>,
+    #[serde(default)]
+    pub url: Option<String>,
+    #[serde(default)]
+    pub mode: Option<String>,
+    #[serde(default)]
+    pub auth_token: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct LoggingConfig {
+    #[serde(default)]
+    pub level: Option<String>,
+    #[serde(default)]
+    pub file: Option<String>,
+    #[serde(default)]
+    pub directory: Option<String>,
 }
 
 impl Default for AppConfig {
@@ -115,6 +401,11 @@ impl Default for AppConfig {
             feature_matrix: FeatureMatrix::default(),
         }
     }
+}
+
+/// Get the default config file path
+pub fn config_path() -> anyhow::Result<std::path::PathBuf> {
+    resolve_config_path()
 }
 
 pub fn validate_config(cfg: &AppConfig) -> Result<(), String> {

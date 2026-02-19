@@ -48,6 +48,13 @@ urlencoding = "2.1"
 tokio-tungstenite = "0.21"
 ratatui = { version = "0.26", default-features = false, features = ["crossterm"] }
 crossterm = "0.27"
+atty = "0.2"
+url = "2.5"
+path-clean = "1.0"
+encoding_rs = "0.8"
+thiserror = "2.0"
+lazy_static = "1.4"
+tower = "0.4"
 
 # Discord: serenity with native_tls_backend avoids rustls/aws-lc-sys
 serenity = { version = "0.12.5", default-features = false, features = [

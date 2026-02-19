@@ -14,6 +14,7 @@ pub mod line;
 pub mod line_client;
 pub mod whatsapp;
 pub mod whatsapp_client;
+pub mod whatsapp_monitor;
 
 // ── Phase 11 connectors ────────────────────────────────────────────────────────
 pub mod irc;
@@ -30,6 +31,10 @@ pub mod nostr;
 
 // ── Phase 13 connectors ────────────────────────────────────────────────────────
 pub mod tlon;
+
+// ── Phase 5-6 connectors (additional) ───────────────────────────────────────────
+pub mod signal;
+pub mod matrix;
 
 // ── Public re-exports ─────────────────────────────────────────────────────────
 pub use slack::SlackConnector;
@@ -54,3 +59,5 @@ pub use feishu::{parse_event as feishu_parse_event, build_text_payload as feishu
 pub use nextcloud_talk::{parse_message as nctalk_parse_message};
 pub use nostr::{parse_event as nostr_parse_event, parse_relay_message as nostr_parse_relay};
 pub use tlon::{parse_graph_entry as tlon_parse_entry, extract_text as tlon_extract_text};
+pub use signal::{parse_signal_message, extract_signal_text, normalize_inbound as signal_normalize_inbound, format_outbound as signal_format_outbound, build_text_payload as signal_build_text_payload, is_signal_cli_available};
+pub use matrix::{parse_matrix_message, extract_matrix_text, normalize_inbound as matrix_normalize_inbound, format_outbound as matrix_format_outbound, build_text_message as matrix_build_text_message, build_html_message as matrix_build_html_message, parse_sync_response, extract_messages_from_sync};

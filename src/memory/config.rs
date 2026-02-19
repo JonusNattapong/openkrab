@@ -1,13 +1,16 @@
-use serde::{Deserialize, Serialize};
-use crate::memory::embeddings::{OpenAiProvider, GeminiProvider, OllamaProvider, EmbeddingProvider};
+use crate::memory::embeddings::{
+    EmbeddingProvider, GeminiProvider, OllamaProvider, OpenAiProvider, VoyageProvider,
+};
 use crate::memory::manager::HybridSearchOptions;
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
+use serde::{Deserialize, Serialize};
 
-pub const SUPPORTED_EMBEDDING_PROVIDERS: &[&str] = &["openai", "gemini", "ollama"];
+pub const SUPPORTED_EMBEDDING_PROVIDERS: &[&str] = &["openai", "gemini", "ollama", "voyage"];
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MemoryConfig {
-    pub provider: String, // "openai", "gemini", etc.
+    pub enabled: Option<bool>,
+    pub provider: String,
     pub model: Option<String>,
     pub api_key: Option<String>,
     pub base_url: Option<String>,
@@ -18,6 +21,7 @@ pub struct MemoryConfig {
 impl Default for MemoryConfig {
     fn default() -> Self {
         Self {
+            enabled: Some(true),
             provider: "openai".to_string(),
             model: None,
             api_key: None,
@@ -41,25 +45,52 @@ impl MemoryConfig {
     pub fn create_provider(&self) -> Result<Box<dyn EmbeddingProvider>> {
         match self.provider.trim().to_lowercase().as_str() {
             "openai" => {
-                let api_key = self.api_key.clone().or_else(|| std::env::var("OPENAI_API_KEY").ok())
+                let api_key = self
+                    .api_key
+                    .clone()
+                    .or_else(|| std::env::var("OPENAI_API_KEY").ok())
                     .ok_or_else(|| anyhow!("Missing OpenAI API Key"))?;
-                Ok(Box::new(OpenAiProvider::new(api_key, self.base_url.clone(), self.model.clone())))
-            },
+                Ok(Box::new(OpenAiProvider::new(
+                    api_key,
+                    self.base_url.clone(),
+                    self.model.clone(),
+                )))
+            }
             "gemini" | "google" => {
-                let api_key = self.api_key.clone().or_else(|| std::env::var("GOOGLE_API_KEY").ok())
+                let api_key = self
+                    .api_key
+                    .clone()
+                    .or_else(|| std::env::var("GOOGLE_API_KEY").ok())
                     .ok_or_else(|| anyhow!("Missing Gemini/Google API Key"))?;
-                Ok(Box::new(GeminiProvider::new(api_key, self.base_url.clone(), self.model.clone())))
-            },
-            "ollama" => {
-                Ok(Box::new(OllamaProvider::new(self.base_url.clone(), self.model.clone())))
-            },
+                Ok(Box::new(GeminiProvider::new(
+                    api_key,
+                    self.base_url.clone(),
+                    self.model.clone(),
+                )))
+            }
+            "ollama" => Ok(Box::new(OllamaProvider::new(
+                self.base_url.clone(),
+                self.model.clone(),
+            ))),
+            "voyage" => {
+                let api_key = self
+                    .api_key
+                    .clone()
+                    .or_else(|| std::env::var("VOYAGE_API_KEY").ok())
+                    .ok_or_else(|| anyhow!("Missing Voyage API Key"))?;
+                Ok(Box::new(VoyageProvider::new(
+                    api_key,
+                    self.base_url.clone(),
+                    self.model.clone(),
+                )))
+            }
             _ => Err(anyhow!("Unsupported embedding provider: {}", self.provider)),
         }
     }
 
     pub fn hybrid_search_options(&self) -> HybridSearchOptions {
         HybridSearchOptions {
-            max_results: 10, // Default
+            max_results: 10,
             vector_weight: self.vector_weight.unwrap_or(0.7),
             text_weight: self.text_weight.unwrap_or(0.3),
         }

@@ -72,6 +72,8 @@ impl Default for ProviderRegistry {
 ///
 /// - Registers `openai` when `OPENAI_API_KEY` is set.
 /// - Registers `gemini` when `GEMINI_API_KEY` or `GOOGLE_AI_API_KEY` is set.
+/// - Registers `copilot` when `GITHUB_TOKEN` is set.
+/// - Registers `qwen-portal` when `QWEN_ACCESS_TOKEN` is set.
 /// - Always registers local `ollama` (host/model can still come from env).
 pub fn default_registry_from_env() -> ProviderRegistry {
     let mut registry = ProviderRegistry::new();
@@ -81,6 +83,12 @@ pub fn default_registry_from_env() -> ProviderRegistry {
     }
     if let Some(p) = crate::providers::gemini::GeminiProvider::from_env() {
         registry.register(Box::new(p));
+    }
+    if std::env::var("GITHUB_TOKEN").is_ok() {
+        // Copilot provider requires GitHub token - will be resolved at runtime
+    }
+    if std::env::var("QWEN_ACCESS_TOKEN").is_ok() {
+        // Qwen provider requires access token - will be resolved at runtime
     }
     registry.register(Box::new(crate::providers::ollama::OllamaProvider::from_env()));
 

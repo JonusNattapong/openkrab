@@ -1,5 +1,5 @@
 use crate::common::{Message, UserId};
-use crate::gateway::GatewayState;
+use crate::gateway::{GatewayState, GatewayServer};
 use std::sync::Arc;
 
 const LINE_MAX_TEXT_CHARS: usize = 5000;

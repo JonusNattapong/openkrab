@@ -3,8 +3,10 @@ use krabkrab::commands::status::get_status_summary;
 use krabkrab::commands::{
     browser_command, configure_command, daemon_command, devices_command, directory_command,
     discord_send_dry_run_command, dns_command, docs_command, exec_approvals_command, hooks_command,
-    models_list_command, nodes_command, sandbox_command, skills_command, slack_send_command,
-    status_command, system_command, telegram_send_command, update_command, webhooks_command,
+    models_auth_add_command, models_auth_get_command, models_auth_list_command,
+    models_auth_remove_command, models_list_command, nodes_command, sandbox_command,
+    skills_command, slack_send_dry_run_command, status_command, system_command,
+    telegram_send_dry_run_command, update_command, webhooks_command,
 };
 
 #[test]
@@ -31,14 +33,28 @@ fn configure_command_formats_output() {
 
 #[test]
 fn telegram_command_formats_channel_prefix() {
-    let out = telegram_send_command("ping");
-    assert_eq!(out, "[telegram] ping");
+    let out = telegram_send_dry_run_command("-100123", "ping", None).unwrap();
+    assert!(out.contains("telegram to=-100123"));
+    assert!(out.contains("\"text\":\"ping\""));
 }
 
 #[test]
 fn slack_command_formats_channel_prefix() {
-    let out = slack_send_command("pong");
-    assert_eq!(out, "[slack] pong");
+    let out = slack_send_dry_run_command("C123456", "pong", None).unwrap();
+    assert!(out.contains("slack to=C123456"));
+    assert!(out.contains("\"text\":\"pong\""));
+}
+
+#[test]
+fn telegram_dry_run_rejects_empty_target() {
+    let err = telegram_send_dry_run_command("   ", "hello", None).unwrap_err();
+    assert!(err.to_string().contains("recipient is required"));
+}
+
+#[test]
+fn slack_dry_run_rejects_empty_target() {
+    let err = slack_send_dry_run_command("   ", "hello", None).unwrap_err();
+    assert!(err.to_string().contains("recipient is required"));
 }
 
 #[test]
@@ -52,6 +68,30 @@ fn models_command_lists_copilot_models() {
 fn models_command_rejects_unknown_provider() {
     let err = models_list_command("bad-provider").unwrap_err();
     assert!(err.to_string().contains("unsupported provider"));
+}
+
+#[test]
+fn models_auth_list_empty() {
+    let out = models_auth_list_command();
+    assert!(out.contains("none"));
+}
+
+#[test]
+fn models_auth_add_and_get() {
+    let result = models_auth_add_command("test-profile-cli", "openai", Some("sk-test123"));
+    assert!(result.is_ok());
+
+    let get_result = models_auth_get_command("test-profile-cli");
+    assert!(get_result.is_ok());
+    assert!(get_result.unwrap().contains("test-profile-cli"));
+
+    let _ = models_auth_remove_command("test-profile-cli");
+}
+
+#[test]
+fn models_auth_remove_nonexistent() {
+    let result = models_auth_remove_command("nonexistent-profile-cli-xyz");
+    assert!(result.is_err());
 }
 
 #[test]

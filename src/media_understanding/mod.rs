@@ -4,78 +4,51 @@
 //! Provides a unified trait for analysing image, audio and video content
 //! using an underlying vision / multimodal LLM.
 
+pub mod resolve;
+pub mod attachments;
+pub mod types;
+pub mod providers;
+pub mod apply;
+pub mod audio_preflight;
+pub mod format;
+
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-// ─── Analysis result ──────────────────────────────────────────────────────────
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MediaAnalysis {
-    /// Natural-language description of the media.
-    pub description: String,
-    /// Detected labels / tags (e.g. "cat", "outdoor", "sunset").
-    pub labels: Vec<String>,
-    /// Transcribed text (for images with text, audio, video).
-    pub transcript: Option<String>,
-    /// Detected language (ISO 639-1, if applicable).
-    pub language: Option<String>,
-    /// Confidence score 0.0–1.0.
-    pub confidence: f32,
-    /// Source modality that was analysed.
-    pub modality: MediaModality,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum MediaModality {
-    Image,
-    Audio,
-    Video,
-    Document,
-}
-
-// ─── Provider trait ───────────────────────────────────────────────────────────
+pub use resolve::{MediaCapability, MediaUnderstandingConfig, MediaModelConfig, resolve_scope_decision, build_provider_registry};
+pub use attachments::{MediaAttachment, MediaAttachmentCache, MediaAttachmentError, resolve_attachment_kind, is_video_attachment, is_audio_attachment, is_image_attachment, select_attachments};
+pub use types::{MediaAnalysis, MediaModality, MediaUnderstandingOutput, MediaUnderstandingDecision, MediaUnderstandingOutcome, ModelDecision};
+pub use providers::{MediaUnderstandingProvider, OpenAiVisionProvider, MockMediaProvider};
+pub use apply::{ApplyMediaUnderstandingResult, apply_media_understanding};
+pub use audio_preflight::transcribe_first_audio;
+pub use format::{get_text_stats, xml_escape_attr, sanitize_mime_type};
 
 #[async_trait]
-pub trait MediaUnderstandingProvider: Send + Sync {
+pub trait MediaUnderstandingProviderLegacy: Send + Sync {
     fn name(&self) -> &str;
 
-    /// Analyse an image given its URL or base64 data URI.
     async fn analyse_image(
         &self,
         image_url_or_data: &str,
         prompt: Option<&str>,
     ) -> Result<MediaAnalysis>;
 
-    /// Transcribe audio from a URL.
     async fn transcribe_audio(&self, audio_url: &str) -> Result<MediaAnalysis>;
 }
 
-// ─── OpenAI vision provider ───────────────────────────────────────────────────
-
-pub struct OpenAiVisionProvider {
-    api_key: String,
-    model: String,
-    client: reqwest::Client,
-}
-
 impl OpenAiVisionProvider {
-    pub fn new(api_key: impl Into<String>) -> Self {
-        Self {
-            api_key: api_key.into(),
-            model: "gpt-4o".to_string(),
-            client: reqwest::Client::new(),
-        }
+    pub fn new_legacy(api_key: impl Into<String>) -> Self {
+        Self::new(api_key.into())
     }
 
     pub fn from_env() -> Option<Self> {
-        std::env::var("OPENAI_API_KEY").ok().map(|k| Self::new(k))
+        std::env::var("OPENAI_API_KEY").ok().map(Self::new)
     }
 }
 
 #[async_trait]
-impl MediaUnderstandingProvider for OpenAiVisionProvider {
+impl MediaUnderstandingProviderLegacy for OpenAiVisionProvider {
     fn name(&self) -> &str {
         "openai-vision"
     }
@@ -89,14 +62,10 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
             "Describe this image concisely. List the main objects, scene, and any text present.",
         );
 
-        let image_content = if image_url_or_data.starts_with("data:") {
-            serde_json::json!({ "type": "image_url", "image_url": { "url": image_url_or_data } })
-        } else {
-            serde_json::json!({ "type": "image_url", "image_url": { "url": image_url_or_data } })
-        };
+        let image_content = serde_json::json!({ "type": "image_url", "image_url": { "url": image_url_or_data } });
 
         let body = serde_json::json!({
-            "model": self.model,
+            "model": "gpt-4o",
             "messages": [{
                 "role": "user",
                 "content": [
@@ -107,10 +76,10 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
             "max_tokens": 512
         });
 
-        let resp = self
-            .client
+        let client = reqwest::Client::new();
+        let resp = client
             .post("https://api.openai.com/v1/chat/completions")
-            .bearer_auth(&self.api_key)
+            .bearer_auth(&self.api_key())
             .json(&body)
             .send()
             .await?
@@ -133,8 +102,8 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
     }
 
     async fn transcribe_audio(&self, audio_url: &str) -> Result<MediaAnalysis> {
-        // Download audio then call Whisper
-        let audio_bytes = self.client.get(audio_url).send().await?.bytes().await?;
+        let client = reqwest::Client::new();
+        let audio_bytes = client.get(audio_url).send().await?.bytes().await?;
 
         let part = reqwest::multipart::Part::bytes(audio_bytes.to_vec())
             .file_name("audio.mp3")
@@ -143,10 +112,9 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
             .part("file", part)
             .text("model", "whisper-1");
 
-        let resp = self
-            .client
+        let resp = client
             .post("https://api.openai.com/v1/audio/transcriptions")
-            .bearer_auth(&self.api_key)
+            .bearer_auth(&self.api_key())
             .multipart(form)
             .send()
             .await?
@@ -166,43 +134,6 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
     }
 }
 
-// ─── Mock provider (for testing) ─────────────────────────────────────────────
-
-pub struct MockMediaProvider;
-
-#[async_trait]
-impl MediaUnderstandingProvider for MockMediaProvider {
-    fn name(&self) -> &str {
-        "mock"
-    }
-
-    async fn analyse_image(
-        &self,
-        _image_url_or_data: &str,
-        _prompt: Option<&str>,
-    ) -> Result<MediaAnalysis> {
-        Ok(MediaAnalysis {
-            description: "A test image containing various objects.".to_string(),
-            labels: vec!["test".to_string(), "mock".to_string()],
-            transcript: None,
-            language: None,
-            confidence: 0.95,
-            modality: MediaModality::Image,
-        })
-    }
-
-    async fn transcribe_audio(&self, _audio_url: &str) -> Result<MediaAnalysis> {
-        Ok(MediaAnalysis {
-            description: "Audio transcript: Hello, this is a test.".to_string(),
-            labels: Vec::new(),
-            transcript: Some("Hello, this is a test.".to_string()),
-            language: Some("en".to_string()),
-            confidence: 0.99,
-            modality: MediaModality::Audio,
-        })
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -210,7 +141,7 @@ mod tests {
     #[tokio::test]
     async fn mock_image_analysis() {
         let p = MockMediaProvider;
-        let result = p.analyse_image("https://example.com/img.jpg", None).await.unwrap();
+        let result = p.analyse_image(&[], None).await.unwrap();
         assert!(!result.description.is_empty());
         assert_eq!(result.modality, MediaModality::Image);
         assert!(result.confidence > 0.0);
@@ -219,7 +150,7 @@ mod tests {
     #[tokio::test]
     async fn mock_audio_transcription() {
         let p = MockMediaProvider;
-        let result = p.transcribe_audio("https://example.com/audio.mp3").await.unwrap();
+        let result = p.transcribe_audio(&[]).await.unwrap();
         assert!(result.transcript.is_some());
         assert_eq!(result.modality, MediaModality::Audio);
     }
@@ -227,6 +158,6 @@ mod tests {
     #[test]
     fn provider_name() {
         let p = MockMediaProvider;
-        assert_eq!(p.name(), "mock");
+        assert_eq!(p.id(), "mock");
     }
 }

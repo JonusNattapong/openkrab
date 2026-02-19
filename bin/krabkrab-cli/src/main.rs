@@ -1,7 +1,11 @@
 use clap::{Parser, Subcommand};
 use krabkrab::commands::{
-    configure_command_interactive, memory_search_command, memory_sync_command, slack_send_command,
-    status_command, telegram_send_command, models_list_command, discord_send_command, discord_send_dry_run_command,
+    configure_command_interactive, memory_search_command, memory_sync_command,
+    slack_send_command, slack_send_dry_run_command, status_command,
+    telegram_send_command, telegram_send_dry_run_command, models_list_command,
+    models_auth_list_command, models_auth_add_command, models_auth_remove_command, models_auth_get_command,
+    discord_send_command, discord_send_dry_run_command,
+    login_openai_codex_oauth_interactive, login_chutes_oauth,
     doctor_command, onboard_wizard, onboard_quick, run_interactive_shell, bridge_command,
     channels_list_command, channels_status_command, channels_add_command, channels_remove_command,
     channels_logs_command,
@@ -11,6 +15,8 @@ use krabkrab::commands::{
     update_command, skills_command, sandbox_command, nodes_command,
     hooks_command, webhooks_command, exec_approvals_command, docs_command, dns_command,
     directory_command, system_command, devices_command, daemon_command,
+    login_minimax_oauth, login_qwen_oauth, login_github_copilot,
+    send_whatsapp_message, send_whatsapp_media, send_whatsapp_template,
 };
 
 #[derive(Parser)]
@@ -41,17 +47,43 @@ enum CliCommand {
     },
     Telegram {
         #[arg(long)]
+        to: String,
+        #[arg(long)]
         text: String,
+        #[arg(long)]
+        reply_to_message_id: Option<i64>,
+        #[arg(long, default_value_t = false)]
+        dry_run: bool,
     },
     Slack {
         #[arg(long)]
+        to: String,
+        #[arg(long)]
         text: String,
+        #[arg(long)]
+        thread_ts: Option<String>,
+        #[arg(long, default_value_t = false)]
+        dry_run: bool,
     },
     Discord {
         #[arg(long)]
         to: String,
         #[arg(long)]
         text: String,
+        #[arg(long, default_value_t = false)]
+        dry_run: bool,
+    },
+    WhatsApp {
+        #[arg(long)]
+        to: String,
+        #[arg(long)]
+        text: String,
+        #[arg(long)]
+        access_token: String,
+        #[arg(long)]
+        phone_number_id: String,
+        #[arg(long)]
+        media_url: Option<String>,
         #[arg(long, default_value_t = false)]
         dry_run: bool,
     },
@@ -77,6 +109,14 @@ enum CliCommand {
     Models {
         #[arg(long)]
         provider: String,
+    },
+    ModelsAuth {
+        #[command(subcommand)]
+        sub: ModelsAuthSub,
+    },
+    Login {
+        #[command(subcommand)]
+        sub: LoginSub,
     },
     Bridge {
         #[arg(long)]
@@ -209,20 +249,45 @@ enum ChannelsSub {
     List,
     Status,
     Add {
-        #[arg(long)]
         channel: String,
-        #[arg(long)]
         token: Option<String>,
     },
     Remove {
-        #[arg(long)]
         channel: String,
     },
     Logs {
-        #[arg(long)]
         channel: Option<String>,
         #[arg(long, short)]
         lines: Option<usize>,
+    },
+}
+
+#[derive(Subcommand)]
+enum ModelsAuthSub {
+    List,
+    Add {
+        profile_id: String,
+        provider: String,
+        token: Option<String>,
+    },
+    Remove {
+        profile_id: String,
+    },
+    Get {
+        profile_id: String,
+    },
+}
+
+#[derive(Subcommand)]
+enum LoginSub {
+    Minimax {
+        #[arg(long, default_value = "global")]
+        region: String,
+    },
+    Qwen,
+    GithubCopilot {
+        #[arg(long)]
+        profile_id: Option<String>,
     },
 }
 
@@ -353,8 +418,32 @@ async fn main() -> anyhow::Result<()> {
                 session,
             }).await?;
         }
-        CliCommand::Telegram { text } => println!("{}", telegram_send_command(&text)),
-        CliCommand::Slack { text } => println!("{}", slack_send_command(&text)),
+        CliCommand::Telegram {
+            to,
+            text,
+            reply_to_message_id,
+            dry_run,
+        } => {
+            let out = if dry_run {
+                telegram_send_dry_run_command(&to, &text, reply_to_message_id)?
+            } else {
+                telegram_send_command(&to, &text, reply_to_message_id).await?
+            };
+            println!("{out}");
+        }
+        CliCommand::Slack {
+            to,
+            text,
+            thread_ts,
+            dry_run,
+        } => {
+            let out = if dry_run {
+                slack_send_dry_run_command(&to, &text, thread_ts.as_deref())?
+            } else {
+                slack_send_command(&to, &text, thread_ts.as_deref()).await?
+            };
+            println!("{out}");
+        }
         CliCommand::Discord { to, text, dry_run } => {
             let out = if dry_run {
                 discord_send_dry_run_command(&to, &text)?
@@ -362,6 +451,30 @@ async fn main() -> anyhow::Result<()> {
                 discord_send_command(&to, &text).await?
             };
             println!("{out}");
+        }
+        CliCommand::WhatsApp {
+            to,
+            text,
+            access_token,
+            phone_number_id,
+            media_url,
+            dry_run,
+        } => {
+            if dry_run {
+                let payload = if let Some(media_url) = media_url {
+                    krabkrab::connectors::whatsapp_client::build_whatsapp_text_payload(&to, &text)
+                } else {
+                    krabkrab::connectors::whatsapp_client::build_whatsapp_text_payload(&to, &text)
+                };
+                println!("WhatsApp dry run: {}", serde_json::to_string_pretty(&payload).unwrap());
+            } else {
+                let result = if let Some(media_url) = media_url {
+                    send_whatsapp_media(&to, Some(&text), &media_url, &access_token, &phone_number_id).await?
+                } else {
+                    send_whatsapp_message(&to, &text, &access_token, &phone_number_id).await?
+                };
+                println!("WhatsApp message sent: {}", serde_json::to_string_pretty(&result).unwrap());
+            }
         }
         CliCommand::Configure { .. } => {
             let out = configure_command_interactive();
@@ -395,6 +508,37 @@ async fn main() -> anyhow::Result<()> {
             let out = models_list_command(&provider)?;
             println!("{out}");
         }
+        CliCommand::ModelsAuth { sub } => match sub {
+            ModelsAuthSub::List => {
+                println!("{}", models_auth_list_command());
+            }
+            ModelsAuthSub::Add { profile_id, provider, token } => {
+                let out = models_auth_add_command(&profile_id, &provider, token.as_deref())?;
+                println!("{out}");
+            }
+            ModelsAuthSub::Remove { profile_id } => {
+                let out = models_auth_remove_command(&profile_id)?;
+                println!("{out}");
+            }
+            ModelsAuthSub::Get { profile_id } => {
+                let out = models_auth_get_command(&profile_id)?;
+                println!("{out}");
+            }
+        },
+        CliCommand::Login { sub } => match sub {
+            LoginSub::Minimax { region } => {
+                let out = login_minimax_oauth(Some(&region))?;
+                println!("{out}");
+            }
+            LoginSub::Qwen => {
+                let out = login_qwen_oauth()?;
+                println!("access={} expires={}", out.access, out.expires);
+            }
+            LoginSub::GithubCopilot { profile_id } => {
+                let out = login_github_copilot(profile_id.as_deref())?;
+                println!("{out}");
+            }
+        },
         CliCommand::Bridge {
             feature,
             action,

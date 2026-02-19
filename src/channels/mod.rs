@@ -20,6 +20,20 @@ pub mod targets;
 pub mod account_summary;
 pub mod dock;
 
+/// Common message handler trait for all connectors
+#[async_trait::async_trait]
+pub trait MessageHandler: Send + Sync {
+    async fn handle_message(&self, message: serde_json::Value) -> Result<()>;
+}
+
+/// Monitor options for connector monitoring
+#[derive(Debug, Clone, Default)]
+pub struct MonitorOptions {
+    pub account_id: Option<String>,
+    pub verbose: bool,
+    pub heartbeat_seconds: Option<u64>,
+}
+
 // Additional modules will be added incrementally as porting progresses.
 
 pub use registry::Registry;

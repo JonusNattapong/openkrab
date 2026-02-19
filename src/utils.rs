@@ -5,7 +5,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 pub fn is_truthy_env(value: &str) -> bool {
-    matches!(value.trim().to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on")
+    matches!(
+        value.trim().to_ascii_lowercase().as_str(),
+        "1" | "true" | "yes" | "on"
+    )
 }
 
 pub fn safe_json_parse(input: &str) -> Option<Value> {
@@ -45,7 +48,8 @@ pub fn clamp(value: f64, min: f64, max: f64) -> f64 {
 
 pub fn escape_regexp(value: &str) -> String {
     const SPECIALS: &[char] = &[
-        '.', '*', '+', '?', '^', '$', '{', '}', '(', ')', '|', '[', ']', '\\', '/', ' ', '\t', '\n', '\r',
+        '.', '*', '+', '?', '^', '$', '{', '}', '(', ')', '|', '[', ']', '\\', '/', ' ', '\t',
+        '\n', '\r',
     ];
     let mut out = String::with_capacity(value.len());
     for ch in value.chars() {
@@ -83,7 +87,10 @@ pub fn with_whatsapp_prefix(number: &str) -> String {
 
 pub fn normalize_e164(number: &str) -> String {
     let without_prefix = number.trim().trim_start_matches("whatsapp:");
-    let digits: String = without_prefix.chars().filter(|c| c.is_ascii_digit() || *c == '+').collect();
+    let digits: String = without_prefix
+        .chars()
+        .filter(|c| c.is_ascii_digit() || *c == '+')
+        .collect();
     if digits.starts_with('+') {
         format!("+{}", digits.trim_start_matches('+'))
     } else {
@@ -130,9 +137,19 @@ pub fn slice_utf16_safe(input: &str, start: isize, end: Option<isize>) -> String
     // Work with char indices which are Unicode scalar values in Rust
     let chars: Vec<char> = input.chars().collect();
     let len = chars.len() as isize;
-    let mut from = if start < 0 { (len + start).max(0) } else { start.min(len) };
+    let mut from = if start < 0 {
+        (len + start).max(0)
+    } else {
+        start.min(len)
+    };
     let mut to = match end {
-        Some(e) => if e < 0 { (len + e).max(0) } else { e.min(len) },
+        Some(e) => {
+            if e < 0 {
+                (len + e).max(0)
+            } else {
+                e.min(len)
+            }
+        }
         None => len,
     };
     if to < from {
@@ -157,14 +174,23 @@ pub fn resolve_user_path(input: &str) -> String {
     if trimmed.starts_with('~') {
         let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"));
         let expanded = trimmed.replacen("~", &home.to_string_lossy(), 1);
-        return fs::canonicalize(&expanded).map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|_| expanded);
+        return fs::canonicalize(&expanded)
+            .map(|p| p.to_string_lossy().to_string())
+            .unwrap_or_else(|_| expanded);
     }
-    fs::canonicalize(trimmed).map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|_| trimmed.to_string())
+    fs::canonicalize(trimmed)
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|_| trimmed.to_string())
 }
 
 pub fn resolve_config_dir() -> String {
-    let override_dir = env::var("krabkrab_STATE_DIR").ok().or_else(|| env::var("CLAWDBOT_STATE_DIR").ok());
-    if let Some(o) = override_dir.map(|s| s.trim().to_string()).filter(|s| !s.is_empty()) {
+    let override_dir = env::var("krabkrab_STATE_DIR")
+        .ok()
+        .or_else(|| env::var("CLAWDBOT_STATE_DIR").ok());
+    if let Some(o) = override_dir
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+    {
         return resolve_user_path(&o);
     }
     let mut new_dir = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
@@ -174,7 +200,10 @@ pub fn resolve_config_dir() -> String {
 
 fn resolve_home_display_prefix() -> Option<(String, String)> {
     let home = dirs::home_dir()?.to_string_lossy().to_string();
-    let explicit_home = env::var("krabkrab_HOME").ok().map(|s| s.trim().to_string()).filter(|s| !s.is_empty());
+    let explicit_home = env::var("krabkrab_HOME")
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
     if explicit_home.is_some() {
         return Some((home, "$krabkrab_HOME".to_string()));
     }
@@ -214,3 +243,141 @@ pub fn display_string(input: &str) -> String {
     shorten_home_in_string(input)
 }
 
+/// Convert a WhatsApp JID (e.g., "1234567890@s.whatsapp.net") to E164 format ("+1234567890")
+/// Supports device suffixes like "1234567890:1@s.whatsapp.net"
+pub fn jid_to_e164(jid: &str) -> Option<String> {
+    let re = regex::Regex::new(r"^(\d+)(?::\d+)?@(s\.whatsapp\.net|hosted)$").ok()?;
+    let caps = re.captures(jid)?;
+    let digits = caps.get(1)?;
+    Some(format!("+{}", digits.as_str()))
+}
+
+/// Check if character is a UTF-16 high surrogate
+pub fn is_high_surrogate(code_unit: u16) -> bool {
+    (0xD800..=0xDBFF).contains(&code_unit)
+}
+
+/// Check if character is a UTF-16 low surrogate
+pub fn is_low_surrogate(code_unit: u16) -> bool {
+    (0xDC00..=0xDFFF).contains(&code_unit)
+}
+
+/// Type assertion for web channel
+pub fn assert_web_channel(input: &str) -> Result<(), String> {
+    if input != "web" {
+        return Err("Web channel must be 'web'".to_string());
+    }
+    Ok(())
+}
+
+/// Format a terminal hyperlink using OSC 8 escape sequences
+/// Falls back to plain text if not a TTY
+pub fn format_terminal_link(
+    label: &str,
+    url: &str,
+    fallback: Option<&str>,
+    force: Option<bool>,
+) -> String {
+    let esc = "\x1b";
+    let safe_label = label.replace(esc, "");
+    let safe_url = url.replace(esc, "");
+
+    let allow = force.unwrap_or_else(|| atty::is(atty::Stream::Stdout));
+
+    if !allow {
+        return fallback
+            .map(|f| f.to_string())
+            .unwrap_or_else(|| format!("{} ({})", safe_label, safe_url));
+    }
+
+    format!("\x1b]8;;{}\x07{}\x1b]8;;\x07", safe_url, safe_label)
+}
+
+/// Global config directory constant
+pub static CONFIG_DIR: once_cell::sync::Lazy<String> =
+    once_cell::sync::Lazy::new(resolve_config_dir);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_jid_to_e164() {
+        assert_eq!(
+            jid_to_e164("1234567890@s.whatsapp.net"),
+            Some("+1234567890".to_string())
+        );
+        assert_eq!(
+            jid_to_e164("1234567890:1@s.whatsapp.net"),
+            Some("+1234567890".to_string())
+        );
+        assert_eq!(
+            jid_to_e164("1234567890@hosted"),
+            Some("+1234567890".to_string())
+        );
+        assert_eq!(jid_to_e164("invalid"), None);
+    }
+
+    #[test]
+    fn test_is_high_surrogate() {
+        assert!(is_high_surrogate(0xD800));
+        assert!(is_high_surrogate(0xDBFF));
+        assert!(!is_high_surrogate(0xDC00));
+        assert!(!is_high_surrogate(0x0041));
+    }
+
+    #[test]
+    fn test_is_low_surrogate() {
+        assert!(is_low_surrogate(0xDC00));
+        assert!(is_low_surrogate(0xDFFF));
+        assert!(!is_low_surrogate(0xDBFF));
+        assert!(!is_low_surrogate(0x0041));
+    }
+
+    #[test]
+    fn test_assert_web_channel() {
+        assert!(assert_web_channel("web").is_ok());
+        assert!(assert_web_channel("other").is_err());
+    }
+
+    #[test]
+    fn test_format_terminal_link() {
+        let result = format_terminal_link("Click here", "https://example.com", None, Some(true));
+        assert!(result.contains("Click here"));
+        assert!(result.contains("https://example.com"));
+
+        let fallback = format_terminal_link(
+            "Click here",
+            "https://example.com",
+            Some("fallback"),
+            Some(false),
+        );
+        assert_eq!(fallback, "fallback");
+    }
+
+    #[test]
+    fn test_normalize_e164() {
+        assert_eq!(normalize_e164("whatsapp:+1234567890"), "+1234567890");
+        assert_eq!(normalize_e164("1234567890"), "+1234567890");
+        assert_eq!(normalize_e164("+1234567890"), "+1234567890");
+    }
+
+    #[test]
+    fn test_to_whatsapp_jid() {
+        assert_eq!(to_whatsapp_jid("+1234567890"), "1234567890@s.whatsapp.net");
+        assert_eq!(
+            to_whatsapp_jid("whatsapp:+1234567890"),
+            "1234567890@s.whatsapp.net"
+        );
+        assert_eq!(
+            to_whatsapp_jid("1234567890@s.whatsapp.net"),
+            "1234567890@s.whatsapp.net"
+        );
+    }
+
+    #[test]
+    fn test_escape_regexp() {
+        assert_eq!(escape_regexp("hello.world"), "hello\\.world");
+        assert_eq!(escape_regexp("a*b+c?d"), "a\\*b\\+c\\?d");
+    }
+}
