@@ -151,47 +151,48 @@ The system is organized around a gateway control plane that receives channel eve
 
 ```mermaid
 flowchart TB
-    subgraph Clients[Clients]
-        Telegram[Telegram]
-        Slack[Slack]
-        Discord[Discord]
-        WhatsApp[WhatsApp]
-        Signal[Signal]
-        iMessage[iMessage]
-        WebChat[WebChat]
+    subgraph Clients["Clients"]
+        Telegram["Telegram"]
+        Slack["Slack"]
+        Discord["Discord"]
+        WhatsApp["WhatsApp"]
+        Signal["Signal"]
+        iMessage["iMessage"]
+        WebChat["WebChat"]
     end
 
-    subgraph Gateway[Gateway - WebSocket + HTTP (Tokio)]
-        Sessions[Sessions Manager]
-        Channels[Channels Registry]
-        Auth[Authentication and Rate Control]
+    subgraph GatewayPlane["Gateway"]
+        GatewayCore["WebSocket and HTTP Server (Tokio)"]
+        Sessions["Sessions Manager"]
+        Channels["Channels Registry"]
+        Auth["Authentication and Rate Control"]
     end
 
-    subgraph Runtime[Core Runtime]
-        Agents[Agents - AI loop and orchestration]
-        Memory[Memory - vector + full-text search]
-        Providers[Model Providers]
-        Tools[Tools - shell, web, media, browser]
+    subgraph Runtime["Core Runtime"]
+        Agents["Agents - AI loop and orchestration"]
+        Memory["Memory - vector and full-text search"]
+        Providers["Model Providers"]
+        Tools["Tools - shell, web, media, browser"]
     end
 
-    subgraph Plugins[Plugin System]
-        WASM[WASM Runtime]
-        HotReload[Hot Reload]
-        Sandbox[Sandbox Security]
+    subgraph Plugins["Plugin System"]
+        WASM["WASM Runtime"]
+        HotReload["Hot Reload"]
+        Sandbox["Sandbox Security"]
     end
 
-    Telegram --> Gateway
-    Slack --> Gateway
-    Discord --> Gateway
-    WhatsApp --> Gateway
-    Signal --> Gateway
-    iMessage --> Gateway
-    WebChat --> Gateway
+    Telegram --> GatewayCore
+    Slack --> GatewayCore
+    Discord --> GatewayCore
+    WhatsApp --> GatewayCore
+    Signal --> GatewayCore
+    iMessage --> GatewayCore
+    WebChat --> GatewayCore
 
-    Gateway --> Agents
-    Gateway --> Memory
-    Gateway --> Providers
-    Gateway --> Tools
+    GatewayCore --> Agents
+    GatewayCore --> Memory
+    GatewayCore --> Providers
+    GatewayCore --> Tools
 
     Agents --> Plugins
 ```
