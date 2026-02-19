@@ -11,6 +11,7 @@ pub mod input_files;
 pub mod mime;
 pub mod parse;
 pub mod store;
+pub mod temp_lifecycle;
 
 use serde::{Deserialize, Serialize};
 
@@ -201,6 +202,12 @@ pub fn kind_from_url(url: &str) -> MediaKind {
         .unwrap_or("");
     MediaKind::from_mime(ext_to_mime(ext))
 }
+
+// Re-export temp_lifecycle types
+pub use temp_lifecycle::{
+    global_registry, init_global_registry, CleanupResult, ScopedTempFile, TempFileMeta,
+    TempFileRegistry, TempHandle, TempRegistryStats, DEFAULT_TEMP_TTL,
+};
 
 #[cfg(test)]
 mod tests {

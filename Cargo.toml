@@ -55,7 +55,9 @@ encoding_rs = "0.8"
 thiserror = "2.0"
 lazy_static = "1.4"
 tower = "0.4"
-
+portable-pty = "0.9"
+nix = { version = "0.28", features = ["signal", "process"], optional = true }
+ 
 # Discord: serenity with native_tls_backend avoids rustls/aws-lc-sys
 serenity = { version = "0.12.5", default-features = false, features = [
     "client",
@@ -74,3 +76,22 @@ serenity = { version = "0.12.5", default-features = false, features = [
 
 [dev-dependencies]
 tempfile = "3.4"
+
+[features]
+default = ["unix-signals"]
+unix-signals = ["nix"]
+native-plugins = ["libloading"]
+wasm-plugins = ["wasmtime"]
+js-plugins = []
+
+[dependencies.libloading]
+version = "0.8"
+optional = true
+
+[dependencies.wasmtime]
+version = "18.0"
+optional = true
+
+[dependencies.wasmtime-wasi]
+version = "18.0"
+optional = true

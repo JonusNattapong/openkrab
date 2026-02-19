@@ -281,6 +281,8 @@ pub struct SkillsConfig {
 pub struct PluginsConfig {
     #[serde(default)]
     pub enabled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plugin_dirs: Option<Vec<String>>,
 }
 
 /// Models/LLM configuration

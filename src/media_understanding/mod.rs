@@ -10,6 +10,7 @@ pub mod audio_preflight;
 pub mod format;
 pub mod providers;
 pub mod resolve;
+pub mod transcription_hooks;
 pub mod types;
 
 use anyhow::Result;
@@ -27,6 +28,11 @@ pub use providers::{MediaUnderstandingProvider, MockMediaProvider, OpenAiVisionP
 pub use resolve::{
     build_provider_registry, resolve_scope_decision, MediaCapability, MediaModelConfig,
     MediaUnderstandingConfig,
+};
+pub use transcription_hooks::{
+    CleanupEvent, CleanupReason, LoggingTranscriptionHook, MetricsTranscriptionHook,
+    PostTranscriptionEvent, PreTranscriptionEvent, TranscriptionErrorEvent, TranscriptionHook,
+    TranscriptionHookBuilder, TranscriptionHookRegistry, TranscriptionStats,
 };
 pub use types::{
     MediaAnalysis, MediaModality, MediaUnderstandingDecision, MediaUnderstandingOutcome,

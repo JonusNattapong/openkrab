@@ -1,0 +1,10 @@
+{
+  "name": "hello-plugin",
+  "version": "1.0.0",
+  "description": "A simple example plugin that provides a greeting tool",
+  "author": "krabkrab Team",
+  "enabled": true,
+  "kind": "extension",
+  "requires": ["tools"],
+  "entry": null
+}

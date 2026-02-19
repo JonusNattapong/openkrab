@@ -1,5 +1,7 @@
 //! Channel subsystem (partial port from openclaw/src/channels)
 
+use anyhow::Result;
+
 pub mod account_summary;
 pub mod ack_reactions;
 pub mod allowlist_match;

@@ -1,4 +1,5 @@
 use anyhow::{anyhow, bail, Context, Result};
+use base64::Engine;
 use serde_json::{json, Value};
 
 use crate::config::{AppConfig, RuntimeLayer};
@@ -122,6 +123,286 @@ fn run_voice_action(action: &str, payload: &Value) -> Result<Value> {
             crate::tts::TtsSpeaker::new().speak(&text)?;
             Ok(json!({"ok": true, "message": "voice speak completed"}))
         }
+        "wake" => {
+            let controller = crate::voice::create_voice_controller();
+            let success = controller.wake();
+            Ok(json!({
+                "ok": success,
+                "action": "wake",
+                "state": controller.get_state(),
+                "message": if success { "voice wake activated" } else { "wake failed or already awake" }
+            }))
+        }
+        "sleep" => {
+            let controller = crate::voice::create_voice_controller();
+            controller.sleep();
+            Ok(json!({
+                "ok": true,
+                "action": "sleep",
+                "state": controller.get_state(),
+                "message": "voice sleep activated"
+            }))
+        }
+        "status" => {
+            let controller = crate::voice::create_voice_controller();
+            let info = controller.get_session_info();
+            Ok(json!({
+                "ok": true,
+                "action": "status",
+                "session": info,
+                "message": format!("voice session is {:?}", info.state)
+            }))
+        }
+        "process" => {
+            let transcript = payload
+                .get("transcript")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            if transcript.is_empty() {
+                bail!("voice process requires payload.transcript");
+            }
+            let controller = crate::voice::create_voice_controller();
+            let decision = controller.process_audio(transcript);
+            Ok(json!({
+                "ok": true,
+                "action": "process",
+                "decision": decision,
+                "state": controller.get_session_info(),
+                "message": format!("detected {:?}", decision.action)
+            }))
+        }
+        "beep" => {
+            let beep_type = payload
+                .get("type")
+                .and_then(Value::as_str)
+                .unwrap_or("wake");
+            let generator = crate::voice::create_beep_generator();
+            let result = match beep_type {
+                "wake" => generator.play_beep(crate::voice::BeepType::Wake),
+                "sleep" => generator.play_beep(crate::voice::BeepType::Sleep),
+                "error" => generator.play_beep(crate::voice::BeepType::Error),
+                _ => bail!("unknown beep type: {beep_type}"),
+            };
+            match result {
+                Ok(_) => Ok(json!({"ok": true, "message": "beep played"})),
+                Err(e) => Ok(json!({"ok": false, "message": format!("beep error: {}", e)})),
+            }
+        }
+        "detect_audio" => {
+            let bytes = crate::voice::decode_audio_payload(payload)?;
+            let sample_rate = payload
+                .get("sample_rate")
+                .and_then(Value::as_u64)
+                .unwrap_or(16000) as u32;
+            let sample_count = (bytes.len() - 44) / 2;
+            let samples: Vec<i16> = bytes[44..]
+                .chunks_exact(2)
+                .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]))
+                .collect();
+            let mut detector = crate::voice::create_wake_word_detector();
+            let detected = detector.detect_from_audio(&samples, sample_rate);
+            Ok(json!({
+                "ok": true,
+                "action": "detect_audio",
+                "detected": detected,
+                "message": if detected { "wake word detected" } else { "no wake word" }
+            }))
+        }
+        "mic_list" => {
+            let devices = crate::voice::microphone::list_devices();
+            Ok(json!({
+                "ok": true,
+                "action": "mic_list",
+                "devices": devices,
+                "message": format!("found {} devices", devices.len())
+            }))
+        }
+        "mic_start" => {
+            let sample_rate = payload
+                .get("sample_rate")
+                .and_then(Value::as_u64)
+                .unwrap_or(16000) as u32;
+            let buffer_size = payload
+                .get("buffer_size")
+                .and_then(Value::as_u64)
+                .unwrap_or(1024) as usize;
+            let device_id = payload.get("device_id").and_then(Value::as_str);
+
+            let mic = if let Some(dev) = device_id {
+                crate::voice::microphone::MicrophoneCapture::new(sample_rate, buffer_size)
+                    .with_device(dev)
+            } else {
+                crate::voice::microphone::MicrophoneCapture::new(sample_rate, buffer_size)
+            };
+            mic.start()?;
+            Ok(json!({
+                "ok": true,
+                "action": "mic_start",
+                "is_recording": mic.is_recording(),
+                "config": mic.get_config(),
+                "frame_count": mic.get_frame_count(),
+                "message": "microphone started"
+            }))
+        }
+        "mic_stop" => {
+            let sample_rate = payload
+                .get("sample_rate")
+                .and_then(Value::as_u64)
+                .unwrap_or(16000) as u32;
+            let buffer_size = payload
+                .get("buffer_size")
+                .and_then(Value::as_u64)
+                .unwrap_or(1024) as usize;
+            let mic = crate::voice::microphone::MicrophoneCapture::new(sample_rate, buffer_size);
+            mic.stop();
+            Ok(json!({
+                "ok": true,
+                "action": "mic_stop",
+                "is_recording": mic.is_recording(),
+                "message": "microphone stopped"
+            }))
+        }
+        "mic_read" => {
+            let sample_rate = payload
+                .get("sample_rate")
+                .and_then(Value::as_u64)
+                .unwrap_or(16000) as u32;
+            let buffer_size = payload
+                .get("buffer_size")
+                .and_then(Value::as_u64)
+                .unwrap_or(1024) as usize;
+            let mic = crate::voice::microphone::MicrophoneCapture::new(sample_rate, buffer_size);
+            let audio_data = mic.get_audio_buffer();
+            let base64_audio = base64::engine::general_purpose::STANDARD.encode(&audio_data);
+            Ok(json!({
+                "ok": true,
+                "action": "mic_read",
+                "samples_count": audio_data.len() / 2,
+                "audio_base64": base64_audio,
+                "frame_count": mic.get_frame_count(),
+                "message": format!("read {} bytes", audio_data.len() * 2)
+            }))
+        }
+        "mic_status" => {
+            let sample_rate = payload
+                .get("sample_rate")
+                .and_then(Value::as_u64)
+                .unwrap_or(16000) as u32;
+            let buffer_size = payload
+                .get("buffer_size")
+                .and_then(Value::as_u64)
+                .unwrap_or(1024) as usize;
+            let mic = crate::voice::microphone::MicrophoneCapture::new(sample_rate, buffer_size);
+            Ok(json!({
+                "ok": true,
+                "action": "mic_status",
+                "is_recording": mic.is_recording(),
+                "config": mic.get_config(),
+                "frame_count": mic.get_frame_count(),
+                "buffer_samples": mic.get_audio_buffer().len(),
+                "message": "microphone status"
+            }))
+        }
+        "config" => {
+            let config = crate::voice::VoiceModesConfig::default();
+            Ok(json!({
+                "ok": true,
+                "action": "config",
+                "config": config,
+                "message": "voice config retrieved"
+            }))
+        }
+        "vad" => {
+            let bytes = crate::voice::decode_audio_payload(payload)?;
+            let sample_rate = payload
+                .get("sample_rate")
+                .and_then(Value::as_u64)
+                .unwrap_or(16000) as u32;
+            let sample_count = (bytes.len().saturating_sub(44)) / 2;
+            let samples: Vec<i16> = bytes
+                .get(44..)
+                .map(|data| {
+                    data.chunks_exact(2)
+                        .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let mut vad = crate::voice::VoiceActivityDetector::new();
+            let state = vad.process(&samples, sample_rate);
+            Ok(json!({
+                "ok": true,
+                "action": "vad",
+                "is_speaking": vad.is_speaking(),
+                "state": state,
+                "message": format!("VAD state: {:?}", state)
+            }))
+        }
+        "spectral" => {
+            let bytes = crate::voice::decode_audio_payload(payload)?;
+            let samples: Vec<i16> = bytes
+                .get(44..)
+                .map(|data| {
+                    data.chunks_exact(2)
+                        .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let analyzer = crate::voice::SpectralAnalyzer::new(512);
+            let features = analyzer.analyze(&samples);
+            Ok(json!({
+                "ok": true,
+                "action": "spectral",
+                "features": features,
+                "message": "spectral analysis completed"
+            }))
+        }
+        "audio_stats" => {
+            let bytes = crate::voice::decode_audio_payload(payload)?;
+            let sample_rate = payload
+                .get("sample_rate")
+                .and_then(Value::as_u64)
+                .unwrap_or(16000) as u32;
+            let samples: Vec<i16> = bytes
+                .get(44..)
+                .map(|data| {
+                    data.chunks_exact(2)
+                        .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let stats = crate::voice::AudioStats::from_samples(&samples, sample_rate);
+            Ok(json!({
+                "ok": true,
+                "action": "audio_stats",
+                "stats": stats,
+                "message": "audio stats computed"
+            }))
+        }
+        "health" | "run" | "" => Ok(json!({
+            "ok": true,
+            "layer": "rust",
+            "feature": "voice_wake_talk",
+            "action": action,
+            "message": "Voice wake/talk runtime healthy",
+            "data": {
+                "supported_actions": [
+                    "analyze_audio", "detect", "speak",
+                    "wake", "sleep", "status", "process",
+                    "beep", "detect_audio", "mic_list",
+                    "mic_start", "mic_stop", "mic_read", "mic_status",
+                    "config", "vad", "spectral", "audio_stats"
+                ],
+                "modes": ["wake", "talk", "sleep"],
+                "features": {
+                    "microphone_capture": true,
+                    "audio_wake_detection": true,
+                    "beep_generation": true,
+                    "transcript_buffer": true,
+                    "vad": true,
+                    "spectral_analysis": true
+                }
+            }
+        })),
         other => bail!("unsupported voice_wake_talk action: {other}"),
     }
 }

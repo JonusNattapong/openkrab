@@ -1,9 +1,9 @@
 use crate::media_understanding::attachments::{MediaAttachment, MediaAttachmentCache};
 use crate::media_understanding::resolve::{
-    resolve_concurrency, resolve_max_bytes, resolve_prompt, resolve_scope_decision,
+    resolve_max_bytes, resolve_prompt, resolve_scope_decision,
     resolve_timeout_ms, MediaContext as ResolveMediaContext,
 };
-use crate::media_understanding::types::{MediaAnalysis, MediaUnderstandingError};
+use crate::media_understanding::types::MediaUnderstandingError;
 use crate::media_understanding::{
     MediaCapability, MediaUnderstandingDecision, MediaUnderstandingOutput,
     MediaUnderstandingProvider,
@@ -11,11 +11,19 @@ use crate::media_understanding::{
 use futures::future::join_all;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct MediaContext {
     pub session_key: Option<String>,
     pub channel: Option<String>,
     pub chat_type: Option<String>,
+}
+
+fn to_resolve_context(ctx: &MediaContext) -> ResolveMediaContext {
+    ResolveMediaContext {
+        session_key: ctx.session_key.clone(),
+        channel: ctx.channel.clone(),
+        chat_type: ctx.chat_type.clone(),
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -49,10 +57,8 @@ pub async fn apply_media_understanding(
     let mut applied_image = false;
     let mut applied_audio = false;
     let mut applied_video = false;
-    let mut applied_file = false;
+    let applied_file = false;
 
-    // Process each capability with concurrency
-    let concurrency = resolve_concurrency(&Default::default()); // TODO: pass config
     let tasks: Vec<_> = capabilities
         .into_iter()
         .map(|capability| async move {
@@ -72,15 +78,16 @@ pub async fn apply_media_understanding(
 
     for result in results {
         let (decision, outputs) = result?;
-        all_decisions.push(decision);
-        all_outputs.extend(outputs);
-
+        
         match decision.capability.as_str() {
             "image" => applied_image = true,
             "audio" => applied_audio = true,
             "video" => applied_video = true,
             _ => {}
         }
+        
+        all_decisions.push(decision);
+        all_outputs.extend(outputs);
     }
 
     // TODO: Add file extraction logic here
@@ -104,7 +111,8 @@ async fn run_capability(
     provider_registry: &HashMap<String, Box<dyn MediaUnderstandingProvider>>,
     config: Option<&crate::media_understanding::resolve::MediaUnderstandingConfig>,
 ) -> Result<(MediaUnderstandingDecision, Vec<MediaUnderstandingOutput>), MediaUnderstandingError> {
-    let config = config.unwrap_or(&Default::default());
+    let default_config = crate::media_understanding::resolve::MediaUnderstandingConfig::default();
+    let config = config.unwrap_or(&default_config);
 
     if !config.enabled.unwrap_or(false) {
         return Ok((
@@ -118,7 +126,8 @@ async fn run_capability(
     }
 
     // Check scope
-    let scope_decision = resolve_scope_decision(&config.scope.clone().unwrap_or_default(), ctx);
+    let resolve_ctx = to_resolve_context(ctx);
+    let scope_decision = resolve_scope_decision(&config.scope.clone().unwrap_or_default(), &resolve_ctx);
     if scope_decision == crate::media_understanding::resolve::ScopePolicy::Deny {
         return Ok((
             MediaUnderstandingDecision {
@@ -167,10 +176,11 @@ async fn run_capability(
             let buffer_result = cache
                 .get_buffer(
                     attachment.index,
-                    resolve_max_bytes(config, 0, config, None),
-                    resolve_timeout_ms(Some(config.timeout_seconds.unwrap_or(30.0)), 30.0) as u64,
+                    resolve_max_bytes(config.max_bytes, 5 * 1024 * 1024),
+                    resolve_timeout_ms(config.timeout_seconds, 30.0) as u64,
                 )
-                .await?;
+                .await
+                .map_err(|e| MediaUnderstandingError::FetchError(e.to_string()))?;
 
             let prompt = resolve_prompt(capability, config.prompt.as_deref(), Some(500));
 

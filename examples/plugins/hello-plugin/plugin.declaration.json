@@ -1,0 +1,21 @@
+{
+  "name": "hello-plugin",
+  "version": "1.0.0",
+  "tools": [
+    {
+      "name": "greet",
+      "description": "Generate a greeting message",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Name of the person to greet" },
+          "language": { "type": "string", "description": "Language code (en, es, fr, de)" }
+        },
+        "required": ["name"]
+      }
+    }
+  ],
+  "routes": [],
+  "provides_providers": [],
+  "hook_phases": ["before-tool-call", "after-tool-call"]
+}

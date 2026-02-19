@@ -4,6 +4,12 @@ use anyhow::{anyhow, Result};
 use std::sync::Arc;
 
 pub async fn ask_command(query: &str, db_path: Option<&str>) -> Result<String> {
+    let cfg = crate::config_io::load_config().ok();
+    let _ = crate::plugins::loader::PluginManager::bootstrap_from_config(
+        cfg.as_ref().and_then(|c| c.plugins.as_ref()),
+    )
+    .await?;
+
     let api_key = std::env::var("OPENAI_API_KEY")
         .map_err(|_| anyhow!("Missing OPENAI_API_KEY environment variable"))?;
 

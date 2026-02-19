@@ -9,6 +9,10 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+/// Native plugin ABI symbol names.
+pub const ABI_MANIFEST_SYMBOL: &[u8] = b"krabkrab_plugin_manifest_json\0";
+pub const ABI_DECLARATION_SYMBOL: &[u8] = b"krabkrab_plugin_declaration_json\0";
+
 // ─── Plugin context ───────────────────────────────────────────────────────────
 
 /// Context passed to every plugin callback.

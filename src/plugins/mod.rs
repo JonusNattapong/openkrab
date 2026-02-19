@@ -5,6 +5,12 @@ use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+pub mod loader;
+pub mod hot_reload;
+pub mod sandbox;
+#[cfg(feature = "wasm-plugins")]
+pub mod wasm_runtime;
+
 // ─── Manifest ─────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -138,6 +144,11 @@ impl PluginRegistry {
     /// Get a plugin entry by name.
     pub fn get(&self, name: &str) -> Option<&PluginEntry> {
         self.plugins.get(name)
+    }
+
+    /// Get a mutable plugin entry by name.
+    pub fn get_mut(&mut self, name: &str) -> Option<&mut PluginEntry> {
+        self.plugins.get_mut(name)
     }
 
     /// Enable a plugin.
