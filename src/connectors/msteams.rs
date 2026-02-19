@@ -33,7 +33,9 @@ impl Default for MsTeamsConfig {
 }
 
 impl MsTeamsConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
         if self.webhook_url.is_empty() {
             bail!("MSTEAMS_WEBHOOK_URL is required");
@@ -85,9 +87,13 @@ pub struct ParsedTeamsMessage {
 }
 
 pub fn parse_activity(activity: &TeamsActivity) -> Option<ParsedTeamsMessage> {
-    if activity.kind != "message" { return None; }
+    if activity.kind != "message" {
+        return None;
+    }
     let text = activity.text.as_deref()?.trim().to_string();
-    if text.is_empty() { return None; }
+    if text.is_empty() {
+        return None;
+    }
 
     let from = activity.from.as_ref()?;
     let conv = activity.conversation.as_ref()?;
@@ -124,13 +130,14 @@ pub fn build_reply_activity(conversation_id: &str, text: &str) -> serde_json::Va
 }
 
 /// Send a message via Incoming Webhook.
-pub async fn send_webhook(
-    client: &reqwest::Client,
-    webhook_url: &str,
-    text: &str,
-) -> Result<()> {
+pub async fn send_webhook(client: &reqwest::Client, webhook_url: &str, text: &str) -> Result<()> {
     let payload = build_webhook_payload(text);
-    client.post(webhook_url).json(&payload).send().await?.error_for_status()?;
+    client
+        .post(webhook_url)
+        .json(&payload)
+        .send()
+        .await?
+        .error_for_status()?;
     Ok(())
 }
 
@@ -152,7 +159,10 @@ mod tests {
 
     #[test]
     fn config_validate_missing_webhook() {
-        let cfg = MsTeamsConfig { webhook_url: "".into(), ..Default::default() };
+        let cfg = MsTeamsConfig {
+            webhook_url: "".into(),
+            ..Default::default()
+        };
         assert!(cfg.validate().is_err());
     }
 
@@ -162,8 +172,14 @@ mod tests {
             kind: "message".into(),
             id: Some("act-1".into()),
             text: Some("  hello  ".into()),
-            from: Some(TeamsAccount { id: "u1".into(), name: Some("Alice".into()) }),
-            conversation: Some(TeamsConversation { id: "conv-1".into(), is_group: Some(false) }),
+            from: Some(TeamsAccount {
+                id: "u1".into(),
+                name: Some("Alice".into()),
+            }),
+            conversation: Some(TeamsConversation {
+                id: "conv-1".into(),
+                is_group: Some(false),
+            }),
             channel_id: Some("msteams".into()),
             service_url: Some("https://smba.trafficmanager.net/".into()),
         };
@@ -177,8 +193,12 @@ mod tests {
     fn parse_non_message_activity_returns_none() {
         let a = TeamsActivity {
             kind: "conversationUpdate".into(),
-            id: None, text: None, from: None, conversation: None,
-            channel_id: None, service_url: None,
+            id: None,
+            text: None,
+            from: None,
+            conversation: None,
+            channel_id: None,
+            service_url: None,
         };
         assert!(parse_activity(&a).is_none());
     }
@@ -193,8 +213,13 @@ mod tests {
     #[test]
     fn normalize_inbound_test() {
         let msg = ParsedTeamsMessage {
-            activity_id: "a1".into(), from_id: "u1".into(), from_name: None,
-            conversation_id: "c1".into(), text: "hi".into(), is_group: false, service_url: None,
+            activity_id: "a1".into(),
+            from_id: "u1".into(),
+            from_name: None,
+            conversation_id: "c1".into(),
+            text: "hi".into(),
+            is_group: false,
+            service_url: None,
         };
         let m = normalize_inbound(&msg);
         assert!(m.id.starts_with("msteams:"));

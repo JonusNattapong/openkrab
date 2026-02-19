@@ -74,7 +74,11 @@ pub struct RouteContext {
 }
 
 impl RouteContext {
-    pub fn new(connector: impl Into<String>, from: impl Into<String>, text: impl Into<String>) -> Self {
+    pub fn new(
+        connector: impl Into<String>,
+        from: impl Into<String>,
+        text: impl Into<String>,
+    ) -> Self {
         Self {
             connector: connector.into(),
             from: from.into(),
@@ -95,7 +99,10 @@ pub struct Router {
 
 impl Router {
     pub fn new() -> Self {
-        Self { rules: Vec::new(), default_target: None }
+        Self {
+            rules: Vec::new(),
+            default_target: None,
+        }
     }
 
     pub fn with_default(mut self, target: DeliveryTarget) -> Self {
@@ -117,7 +124,9 @@ impl Router {
         }
         match &self.default_target {
             Some(target) => RouteDecision::Deliver(target.clone()),
-            None => RouteDecision::Drop { reason: "no matching route".to_string() },
+            None => RouteDecision::Drop {
+                reason: "no matching route".to_string(),
+            },
         }
     }
 }
@@ -151,7 +160,9 @@ pub struct BlocklistRule {
 
 impl BlocklistRule {
     pub fn new(keywords: Vec<String>) -> Self {
-        Self { blocked_keywords: keywords }
+        Self {
+            blocked_keywords: keywords,
+        }
     }
 }
 
@@ -180,7 +191,9 @@ pub struct AllowlistRoutingRule {
 
 impl AllowlistRoutingRule {
     pub fn new(allowed: Vec<String>) -> Self {
-        Self { allowed_senders: allowed }
+        Self {
+            allowed_senders: allowed,
+        }
     }
 }
 
@@ -190,10 +203,16 @@ impl RoutingRule for AllowlistRoutingRule {
     }
 
     fn evaluate(&self, ctx: &RouteContext) -> RouteDecision {
-        if self.allowed_senders.iter().any(|s| s == "*" || s == &ctx.from) {
+        if self
+            .allowed_senders
+            .iter()
+            .any(|s| s == "*" || s == &ctx.from)
+        {
             RouteDecision::Fallthrough
         } else {
-            RouteDecision::Drop { reason: format!("sender {} not allowlisted", ctx.from) }
+            RouteDecision::Drop {
+                reason: format!("sender {} not allowlisted", ctx.from),
+            }
         }
     }
 }
@@ -224,15 +243,23 @@ mod tests {
         let rule = BlocklistRule::new(vec!["spam".to_string()]);
         assert_eq!(
             rule.evaluate(&ctx("slack", "u", "this is spam")),
-            RouteDecision::Drop { reason: "blocked keyword: spam".to_string() }
+            RouteDecision::Drop {
+                reason: "blocked keyword: spam".to_string()
+            }
         );
-        assert_eq!(rule.evaluate(&ctx("slack", "u", "hello")), RouteDecision::Fallthrough);
+        assert_eq!(
+            rule.evaluate(&ctx("slack", "u", "hello")),
+            RouteDecision::Fallthrough
+        );
     }
 
     #[test]
     fn allowlist_rule_drops_unknown() {
         let rule = AllowlistRoutingRule::new(vec!["alice".to_string()]);
-        assert_eq!(rule.evaluate(&ctx("telegram", "alice", "hi")), RouteDecision::Fallthrough);
+        assert_eq!(
+            rule.evaluate(&ctx("telegram", "alice", "hi")),
+            RouteDecision::Fallthrough
+        );
         match rule.evaluate(&ctx("telegram", "bob", "hi")) {
             RouteDecision::Drop { .. } => {}
             other => panic!("expected Drop, got {:?}", other),

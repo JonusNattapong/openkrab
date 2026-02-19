@@ -1,7 +1,7 @@
-use rusqlite::{Connection, Result};
-use std::path::Path;
 use crate::memory::schema;
+use rusqlite::{Connection, Result};
 use serde::Serialize;
+use std::path::Path;
 
 pub struct MemoryStore {
     conn: std::sync::Mutex<Connection>,
@@ -11,20 +11,24 @@ impl MemoryStore {
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         let conn = Connection::open(path)?;
         Self::setup_conn(&conn)?;
-        Ok(Self { conn: std::sync::Mutex::new(conn) })
+        Ok(Self {
+            conn: std::sync::Mutex::new(conn),
+        })
     }
 
     pub fn open_in_memory() -> Result<Self> {
         let conn = Connection::open_in_memory()?;
         Self::setup_conn(&conn)?;
-        Ok(Self { conn: std::sync::Mutex::new(conn) })
+        Ok(Self {
+            conn: std::sync::Mutex::new(conn),
+        })
     }
 
     fn setup_conn(conn: &Connection) -> Result<()> {
         // Load sqlite-vec extension
         unsafe {
             conn.load_extension_enable()?;
-            
+
             // The sqlite-vec crate declares sqlite3_vec_init() with 0 arguments,
             // but the C function expects 3. We cast it to the correct signature.
             type Sqlite3VecInit = unsafe extern "C" fn(
@@ -33,14 +37,15 @@ impl MemoryStore {
                 *const rusqlite::ffi::sqlite3_api_routines,
             ) -> std::os::raw::c_int;
 
-            let init_fn: Sqlite3VecInit = std::mem::transmute(sqlite_vec::sqlite3_vec_init as *const ());
+            let init_fn: Sqlite3VecInit =
+                std::mem::transmute(sqlite_vec::sqlite3_vec_init as *const ());
             init_fn(conn.handle(), std::ptr::null_mut(), std::ptr::null());
-            
+
             conn.load_extension_disable()?;
         }
-        
+
         schema::ensure_schema(conn)?;
-        
+
         // Performance Tuning for Vector Search
         // WAL mode allows concurrent readers and better write performance
         conn.pragma_update(None, "journal_mode", "WAL")?;
@@ -125,7 +130,7 @@ impl MemoryStore {
         let now = chrono::Utc::now().timestamp_millis();
         let embedding_json = serde_json::to_string(&embedding).unwrap_or_default();
         let conn = self.conn.lock().unwrap();
-        
+
         // 1. Insert/Update chunks table
         conn.execute(
             "INSERT INTO chunks (id, path, source, start_line, end_line, hash, model, text, embedding, updated_at)
@@ -161,7 +166,11 @@ impl MemoryStore {
     }
 
     pub fn bm25_to_score(&self, rank: f64) -> f64 {
-        let normalized = if rank.is_finite() { rank.max(0.0) } else { 999.0 };
+        let normalized = if rank.is_finite() {
+            rank.max(0.0)
+        } else {
+            999.0
+        };
         1.0 / (1.0 + normalized)
     }
 
@@ -170,7 +179,7 @@ impl MemoryStore {
         let mut stmt = conn.prepare(
             "SELECT id, path, source, model, start_line, end_line, text, embedding FROM chunks WHERE model = ?1"
         )?;
-        
+
         let rows = stmt.query_map([model], |row| {
             Ok(ChunkData {
                 id: row.get(0)?,
@@ -203,9 +212,9 @@ impl MemoryStore {
              FROM chunks_vec v
              JOIN chunks c ON c.id = v.id
              WHERE v.embedding MATCH ?1 AND k = ?2
-             ORDER BY distance ASC"
+             ORDER BY distance ASC",
         )?;
-        
+
         // Note: sqlite-vec uses distance, lower is better. We convert it to a score.
         let rows = stmt.query_map(rusqlite::params![blob, limit as i64], |row| {
             let distance: f64 = row.get(7)?;
@@ -228,7 +237,12 @@ impl MemoryStore {
         Ok(results)
     }
 
-    pub fn search_fts(&self, query_str: &str, model: &str, limit: usize) -> Result<Vec<SearchResult>> {
+    pub fn search_fts(
+        &self,
+        query_str: &str,
+        model: &str,
+        limit: usize,
+    ) -> Result<Vec<SearchResult>> {
         let fts_query = match self.build_fts_query(query_str) {
             Some(q) => q,
             None => return Ok(Vec::new()),
@@ -241,9 +255,9 @@ impl MemoryStore {
              WHERE chunks_fts MATCH ?1 
                AND (model = ?2 OR model IS NULL)
              ORDER BY rank ASC 
-             LIMIT ?3"
+             LIMIT ?3",
         )?;
-        
+
         let rows = stmt.query_map(rusqlite::params![fts_query, model, limit as i64], |row| {
             let rank: f64 = row.get(7)?;
             Ok(SearchResult {

@@ -1,5 +1,5 @@
-use futures::future::BoxFuture;
 use futures::executor::block_on;
+use futures::future::BoxFuture;
 use std::sync::Arc;
 use std::thread;
 
@@ -137,7 +137,10 @@ mod tests {
         Box::pin(ready(v))
     }
 
-    fn to_box_remove(counter: Arc<AtomicUsize>, ret_ok: bool) -> Arc<dyn Fn() -> BoxFuture<'static, Result<(), String>> + Send + Sync> {
+    fn to_box_remove(
+        counter: Arc<AtomicUsize>,
+        ret_ok: bool,
+    ) -> Arc<dyn Fn() -> BoxFuture<'static, Result<(), String>> + Send + Sync> {
         Arc::new(move || {
             let c = counter.clone();
             Box::pin(async move {
@@ -195,15 +198,39 @@ mod tests {
 
     #[test]
     fn test_should_ack_reaction_for_whatsapp_modes() {
-        let params = WhatsAppParams { emoji: "👀", is_direct: true, is_group: false, direct_enabled: false, group_mode: WhatsAppAckReactionMode::Mentions, was_mentioned: false, group_activated: false };
+        let params = WhatsAppParams {
+            emoji: "👀",
+            is_direct: true,
+            is_group: false,
+            direct_enabled: false,
+            group_mode: WhatsAppAckReactionMode::Mentions,
+            was_mentioned: false,
+            group_activated: false,
+        };
         let res = should_ack_reaction_for_whatsapp(&params);
         assert!(!res);
 
-        let params2 = WhatsAppParams { emoji: "👀", is_direct: false, is_group: true, direct_enabled: true, group_mode: WhatsAppAckReactionMode::Always, was_mentioned: false, group_activated: false };
+        let params2 = WhatsAppParams {
+            emoji: "👀",
+            is_direct: false,
+            is_group: true,
+            direct_enabled: true,
+            group_mode: WhatsAppAckReactionMode::Always,
+            was_mentioned: false,
+            group_activated: false,
+        };
         let res2 = should_ack_reaction_for_whatsapp(&params2);
         assert!(res2);
 
-        let params3 = WhatsAppParams { emoji: "👀", is_direct: false, is_group: true, direct_enabled: true, group_mode: WhatsAppAckReactionMode::Never, was_mentioned: true, group_activated: true };
+        let params3 = WhatsAppParams {
+            emoji: "👀",
+            is_direct: false,
+            is_group: true,
+            direct_enabled: true,
+            group_mode: WhatsAppAckReactionMode::Never,
+            was_mentioned: true,
+            group_activated: true,
+        };
         let res3 = should_ack_reaction_for_whatsapp(&params3);
         assert!(!res3);
     }

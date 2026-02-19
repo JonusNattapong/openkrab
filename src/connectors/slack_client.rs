@@ -1,9 +1,13 @@
-use serde_json::json;
 use anyhow::Result;
 use reqwest::Client;
+use serde_json::json;
 
 /// Build the JSON payload for posting a message to Slack
-pub fn build_slack_http_payload(channel: &str, text: &str, thread_ts: Option<&str>) -> serde_json::Value {
+pub fn build_slack_http_payload(
+    channel: &str,
+    text: &str,
+    thread_ts: Option<&str>,
+) -> serde_json::Value {
     let mut payload = json!({
         "channel": channel,
         "text": text,
@@ -15,13 +19,21 @@ pub fn build_slack_http_payload(channel: &str, text: &str, thread_ts: Option<&st
 }
 
 /// Send a message to Slack using an async reqwest client.
-pub async fn send_message(client: &Client, token: &str, channel: &str, text: &str, thread_ts: Option<&str>) -> Result<serde_json::Value> {
+pub async fn send_message(
+    client: &Client,
+    token: &str,
+    channel: &str,
+    text: &str,
+    thread_ts: Option<&str>,
+) -> Result<serde_json::Value> {
     let url = "https://slack.com/api/chat.postMessage";
     let payload = build_slack_http_payload(channel, text, thread_ts);
-    let resp = client.post(url)
+    let resp = client
+        .post(url)
         .bearer_auth(token)
         .json(&payload)
-        .send().await?;
+        .send()
+        .await?;
     let v: serde_json::Value = resp.json().await?;
     Ok(v)
 }

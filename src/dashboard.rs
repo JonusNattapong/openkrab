@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::sync::Arc;
 
-use crate::gateway::{GatewayState, GatewayServer};
+use crate::gateway::{GatewayServer, GatewayState};
 use crate::memory::HybridSearchOptions;
 
 // ─── Request / Response types ─────────────────────────────────────────────────
@@ -604,9 +604,7 @@ pub async fn dashboard_handler() -> impl IntoResponse {
 }
 
 /// GET /api/status — returns gateway health + connector on/off flags.
-pub async fn api_status_handler(
-    State(state): State<Arc<GatewayState>>,
-) -> impl IntoResponse {
+pub async fn api_status_handler(State(state): State<Arc<GatewayState>>) -> impl IntoResponse {
     let connectors = json!({
         "telegram":  std::env::var("TELEGRAM_BOT_TOKEN").is_ok(),
         "slack":     std::env::var("SLACK_BOT_TOKEN").is_ok(),
@@ -618,7 +616,13 @@ pub async fn api_status_handler(
     // Try a trivial search just to confirm memory is reachable
     let memory_count: Option<usize> = state
         .memory
-        .search_hybrid("status", HybridSearchOptions { max_results: 1, ..Default::default() })
+        .search_hybrid(
+            "status",
+            HybridSearchOptions {
+                max_results: 1,
+                ..Default::default()
+            },
+        )
         .await
         .ok()
         .map(|_| 0); // Total count not exposed yet; shown as placeholder
@@ -689,7 +693,11 @@ pub async fn api_memory_handler(
                     })
                 })
                 .collect();
-            (StatusCode::OK, Json(json!({ "ok": true, "results": items }))).into_response()
+            (
+                StatusCode::OK,
+                Json(json!({ "ok": true, "results": items })),
+            )
+                .into_response()
         }
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,

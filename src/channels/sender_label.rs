@@ -10,7 +10,11 @@ pub struct SenderLabelParams {
 }
 
 fn normalize(value: &Option<String>) -> Option<String> {
-    value.as_deref().map(|s| s.trim()).filter(|s| !s.is_empty()).map(|s| s.to_string())
+    value
+        .as_deref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
 }
 
 pub fn resolve_sender_label(params: &SenderLabelParams) -> Option<String> {
@@ -36,7 +40,13 @@ pub fn resolve_sender_label(params: &SenderLabelParams) -> Option<String> {
 
 pub fn list_sender_label_candidates(params: &SenderLabelParams) -> Vec<String> {
     let mut candidates: HashSet<String> = HashSet::new();
-    for v in [normalize(&params.name), normalize(&params.username), normalize(&params.tag), normalize(&params.e164), normalize(&params.id)] {
+    for v in [
+        normalize(&params.name),
+        normalize(&params.username),
+        normalize(&params.tag),
+        normalize(&params.e164),
+        normalize(&params.id),
+    ] {
         if let Some(s) = v {
             candidates.insert(s);
         }

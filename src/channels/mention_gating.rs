@@ -37,11 +37,17 @@ pub fn resolve_mention_gating(params: MentionGateParams) -> MentionGateResult {
     let implicit = params.implicit_mention.unwrap_or(false);
     let bypass = params.should_bypass_mention.unwrap_or(false);
     let effective_was_mentioned = params.was_mentioned || implicit || bypass;
-    let should_skip = params.require_mention && params.can_detect_mention && !effective_was_mentioned;
-    MentionGateResult { effective_was_mentioned, should_skip }
+    let should_skip =
+        params.require_mention && params.can_detect_mention && !effective_was_mentioned;
+    MentionGateResult {
+        effective_was_mentioned,
+        should_skip,
+    }
 }
 
-pub fn resolve_mention_gating_with_bypass(params: MentionGateWithBypassParams) -> MentionGateWithBypassResult {
+pub fn resolve_mention_gating_with_bypass(
+    params: MentionGateWithBypassParams,
+) -> MentionGateWithBypassResult {
     let should_bypass_mention = params.is_group
         && params.require_mention
         && !params.was_mentioned

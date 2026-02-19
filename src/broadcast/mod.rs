@@ -108,12 +108,21 @@ pub struct BroadcastResult {
 
 impl BroadcastResult {
     pub fn new() -> Self {
-        Self { deliveries: Vec::new(), total: 0, succeeded: 0, failed: 0 }
+        Self {
+            deliveries: Vec::new(),
+            total: 0,
+            succeeded: 0,
+            failed: 0,
+        }
     }
 
     pub fn add(&mut self, delivery: BroadcastDelivery) {
         self.total += 1;
-        if delivery.success { self.succeeded += 1; } else { self.failed += 1; }
+        if delivery.success {
+            self.succeeded += 1;
+        } else {
+            self.failed += 1;
+        }
         self.deliveries.push(delivery);
     }
 
@@ -126,13 +135,19 @@ impl BroadcastResult {
             "Broadcast: {}/{} delivered successfully{}",
             self.succeeded,
             self.total,
-            if self.failed > 0 { format!(", {} failed", self.failed) } else { String::new() }
+            if self.failed > 0 {
+                format!(", {} failed", self.failed)
+            } else {
+                String::new()
+            }
         )
     }
 }
 
 impl Default for BroadcastResult {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ─── Broadcast registry ───────────────────────────────────────────────────────
@@ -144,7 +159,9 @@ pub struct BroadcastRegistry {
 }
 
 impl BroadcastRegistry {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     /// Register a broadcast group. Groups are dispatched in registration order.
     pub fn register(&mut self, group: BroadcastGroup) {
@@ -166,19 +183,25 @@ impl BroadcastRegistry {
 
     /// Returns enabled groups in registration order, filtered by target_groups if set.
     pub fn resolve_targets<'a>(&'a self, msg: &'a BroadcastMessage) -> Vec<&'a BroadcastGroup> {
-        self.order.iter()
+        self.order
+            .iter()
             .filter_map(|id| self.groups.get(id))
             .filter(|g| g.enabled)
             .filter(|g| {
-                msg.target_groups.as_ref()
+                msg.target_groups
+                    .as_ref()
                     .map(|targets| targets.contains(&g.id))
                     .unwrap_or(true)
             })
             .collect()
     }
 
-    pub fn len(&self) -> usize { self.groups.len() }
-    pub fn is_empty(&self) -> bool { self.groups.is_empty() }
+    pub fn len(&self) -> usize {
+        self.groups.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.groups.is_empty()
+    }
 
     /// Simulate a broadcast (for testing — does not actually send).
     pub fn simulate(&self, msg: &BroadcastMessage) -> BroadcastResult {
@@ -205,7 +228,9 @@ mod tests {
 
     fn make_group(id: &str, connector: &str, recipients: &[&str]) -> BroadcastGroup {
         BroadcastGroup::new(
-            id, id, connector,
+            id,
+            id,
+            connector,
             recipients.iter().map(|s| s.to_string()).collect(),
         )
     }
@@ -262,8 +287,22 @@ mod tests {
     #[test]
     fn broadcast_result_summary_with_failures() {
         let mut r = BroadcastResult::new();
-        r.add(BroadcastDelivery { group_id: "g1".into(), group_name: "G1".into(), connector: "tg".into(), recipient: "@a".into(), success: true, error: None });
-        r.add(BroadcastDelivery { group_id: "g1".into(), group_name: "G1".into(), connector: "tg".into(), recipient: "@b".into(), success: false, error: Some("timeout".into()) });
+        r.add(BroadcastDelivery {
+            group_id: "g1".into(),
+            group_name: "G1".into(),
+            connector: "tg".into(),
+            recipient: "@a".into(),
+            success: true,
+            error: None,
+        });
+        r.add(BroadcastDelivery {
+            group_id: "g1".into(),
+            group_name: "G1".into(),
+            connector: "tg".into(),
+            recipient: "@b".into(),
+            success: false,
+            error: Some("timeout".into()),
+        });
         assert!(!r.all_ok());
         assert!(r.summary().contains("failed"));
     }

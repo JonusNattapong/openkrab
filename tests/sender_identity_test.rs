@@ -36,6 +36,8 @@ fn test_validate_username_constraints() {
         SenderE164: None,
     };
     let issues = validate_sender_identity(&ctx);
-    assert!(issues.iter().any(|s| s.contains("should not include \"@\"")));
+    assert!(issues
+        .iter()
+        .any(|s| s.contains("should not include \"@\"")));
     assert!(issues.iter().any(|s| s.contains("whitespace")));
 }

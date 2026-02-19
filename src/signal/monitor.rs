@@ -8,8 +8,13 @@ use tokio::sync::mpsc;
 use tokio_tungstenite::{connect_async, tungstenite::Message};
 
 use super::client::{health_check, SseEvent};
-use super::daemon::{should_auto_start, daemon_opts_from_config, spawn_daemon, wait_for_daemon_ready, DaemonHandle};
-use super::{parse_inbound, SignalConfig, SignalEvent, SignalEventSender, SignalEventReceiver, create_signal_channel};
+use super::daemon::{
+    daemon_opts_from_config, should_auto_start, spawn_daemon, wait_for_daemon_ready, DaemonHandle,
+};
+use super::{
+    create_signal_channel, parse_inbound, SignalConfig, SignalEvent, SignalEventReceiver,
+    SignalEventSender,
+};
 
 /// Signal monitor with automatic daemon management.
 pub struct Monitor {
@@ -42,16 +47,22 @@ impl Monitor {
 
                     // Wait for daemon to be ready
                     let timeout_ms = self.config.startup_timeout_ms.unwrap_or(30_000);
-                    if let Err(e) = wait_for_daemon_ready(&self.client, &self.config.api_base, timeout_ms).await {
+                    if let Err(e) =
+                        wait_for_daemon_ready(&self.client, &self.config.api_base, timeout_ms).await
+                    {
                         eprintln!("Warning: Daemon startup failed: {}", e);
-                        let _ = event_tx.send(SignalEvent::Error(format!("Daemon startup failed: {}", e))).await;
+                        let _ = event_tx
+                            .send(SignalEvent::Error(format!("Daemon startup failed: {}", e)))
+                            .await;
                     } else {
                         println!("Signal daemon ready");
                     }
                 }
                 Err(e) => {
                     eprintln!("Failed to start signal daemon: {}", e);
-                    let _ = event_tx.send(SignalEvent::Error(format!("Failed to start daemon: {}", e))).await;
+                    let _ = event_tx
+                        .send(SignalEvent::Error(format!("Failed to start daemon: {}", e)))
+                        .await;
                 }
             }
         }
@@ -62,7 +73,9 @@ impl Monitor {
                 let _ = event_tx.send(SignalEvent::Connected).await;
             }
             _ => {
-                let _ = event_tx.send(SignalEvent::Error("Signal API not available".to_string())).await;
+                let _ = event_tx
+                    .send(SignalEvent::Error("Signal API not available".to_string()))
+                    .await;
             }
         }
 
@@ -72,7 +85,9 @@ impl Monitor {
 
         tokio::spawn(async move {
             if let Err(e) = Self::run_sse_monitor(&config, event_tx_clone).await {
-                let _ = event_tx_clone.send(SignalEvent::Error(format!("SSE monitor error: {}", e))).await;
+                let _ = event_tx_clone
+                    .send(SignalEvent::Error(format!("SSE monitor error: {}", e)))
+                    .await;
             }
         });
 
@@ -84,7 +99,11 @@ impl Monitor {
         event_tx: SignalEventSender,
     ) -> Result<()> {
         loop {
-            let url = format!("{}/api/v1/events?account={}", config.api_base, config.resolve_account());
+            let url = format!(
+                "{}/api/v1/events?account={}",
+                config.api_base,
+                config.resolve_account()
+            );
 
             match connect_async(&url).await {
                 Ok((ws_stream, _)) => {
@@ -94,7 +113,9 @@ impl Monitor {
                         match msg {
                             Ok(Message::Text(text)) => {
                                 // Parse as SignalInbound
-                                if let Ok(inbound) = serde_json::from_str::<super::SignalInbound>(&text) {
+                                if let Ok(inbound) =
+                                    serde_json::from_str::<super::SignalInbound>(&text)
+                                {
                                     if let Some(parsed) = parse_inbound(&inbound) {
                                         let _ = event_tx.send(SignalEvent::Message(parsed)).await;
                                     }
@@ -107,7 +128,9 @@ impl Monitor {
                                 break;
                             }
                             Err(e) => {
-                                let _ = event_tx.send(SignalEvent::Error(format!("WebSocket error: {}", e))).await;
+                                let _ = event_tx
+                                    .send(SignalEvent::Error(format!("WebSocket error: {}", e)))
+                                    .await;
                                 break;
                             }
                             _ => {}
@@ -115,7 +138,12 @@ impl Monitor {
                     }
                 }
                 Err(e) => {
-                    let _ = event_tx.send(SignalEvent::Error(format!("WebSocket connection failed: {}", e))).await;
+                    let _ = event_tx
+                        .send(SignalEvent::Error(format!(
+                            "WebSocket connection failed: {}",
+                            e
+                        )))
+                        .await;
                     // Reconnect after delay
                     tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
                 }
@@ -143,8 +171,16 @@ pub async fn run_monitor(config: SignalConfig) -> Result<()> {
             SignalEvent::Message(msg) => {
                 println!("[Signal] {}: {}", msg.from, msg.text);
             }
-            SignalEvent::Reaction { from, emoji, target_timestamp, .. } => {
-                println!("[Signal] {} reacted with {} at {}", from, emoji, target_timestamp);
+            SignalEvent::Reaction {
+                from,
+                emoji,
+                target_timestamp,
+                ..
+            } => {
+                println!(
+                    "[Signal] {} reacted with {} at {}",
+                    from, emoji, target_timestamp
+                );
             }
             SignalEvent::Connected => {
                 println!("[Signal] Connected");

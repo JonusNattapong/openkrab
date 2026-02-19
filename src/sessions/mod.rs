@@ -70,13 +70,25 @@ pub struct TranscriptEntry {
 
 impl TranscriptEntry {
     pub fn user(text: impl Into<String>) -> Self {
-        Self { role: "user".to_string(), text: text.into(), timestamp: Utc::now() }
+        Self {
+            role: "user".to_string(),
+            text: text.into(),
+            timestamp: Utc::now(),
+        }
     }
     pub fn assistant(text: impl Into<String>) -> Self {
-        Self { role: "assistant".to_string(), text: text.into(), timestamp: Utc::now() }
+        Self {
+            role: "assistant".to_string(),
+            text: text.into(),
+            timestamp: Utc::now(),
+        }
     }
     pub fn system(text: impl Into<String>) -> Self {
-        Self { role: "system".to_string(), text: text.into(), timestamp: Utc::now() }
+        Self {
+            role: "system".to_string(),
+            text: text.into(),
+            timestamp: Utc::now(),
+        }
     }
 }
 
@@ -171,7 +183,9 @@ pub struct SessionRegistry {
 
 impl SessionRegistry {
     pub fn new() -> Self {
-        Self { sessions: HashMap::new() }
+        Self {
+            sessions: HashMap::new(),
+        }
     }
 
     /// Get or create a session for the given ID.
@@ -234,7 +248,10 @@ mod tests {
             let s = reg.get_or_create("abc");
             s.model_override = Some("gpt-4o".to_string());
         }
-        assert_eq!(reg.get("abc").unwrap().model_override.as_deref(), Some("gpt-4o"));
+        assert_eq!(
+            reg.get("abc").unwrap().model_override.as_deref(),
+            Some("gpt-4o")
+        );
         assert_eq!(reg.count(), 1);
     }
 

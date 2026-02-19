@@ -45,16 +45,23 @@ pub struct QwenRefreshResponse {
 
 impl QwenRefreshResponse {
     pub fn into_credentials(self, old: &QwenCredentials) -> Result<QwenCredentials> {
-        let access = self.access_token
+        let access = self
+            .access_token
             .filter(|s| !s.is_empty())
             .ok_or_else(|| anyhow::anyhow!("Qwen OAuth refresh response missing access token"))?;
-        let expires_in = self.expires_in
+        let expires_in = self
+            .expires_in
             .ok_or_else(|| anyhow::anyhow!("Qwen OAuth refresh response missing expires_in"))?;
         let expires = now_ms() + expires_in * 1000;
-        let refresh = self.refresh_token
+        let refresh = self
+            .refresh_token
             .filter(|s| !s.is_empty())
             .or_else(|| old.refresh.clone());
-        Ok(QwenCredentials { access, refresh, expires })
+        Ok(QwenCredentials {
+            access,
+            refresh,
+            expires,
+        })
     }
 }
 
@@ -67,21 +74,26 @@ pub fn build_refresh_body(refresh_token: &str) -> String {
         ("refresh_token", refresh_token),
         ("client_id", QWEN_OAUTH_CLIENT_ID),
     ];
-    params.iter()
+    params
+        .iter()
         .map(|(k, v)| format!("{}={}", percent_encode(k), percent_encode(v)))
         .collect::<Vec<_>>()
         .join("&")
 }
 
 fn percent_encode(s: &str) -> String {
-    s.chars().flat_map(|c| {
-        if c.is_ascii_alphanumeric() || "-._~".contains(c) { vec![c] }
-        else {
-            c.to_string().bytes()
-                .flat_map(|b| format!("%{:02X}", b).chars().collect::<Vec<_>>())
-                .collect()
-        }
-    }).collect()
+    s.chars()
+        .flat_map(|c| {
+            if c.is_ascii_alphanumeric() || "-._~".contains(c) {
+                vec![c]
+            } else {
+                c.to_string()
+                    .bytes()
+                    .flat_map(|b| format!("%{:02X}", b).chars().collect::<Vec<_>>())
+                    .collect()
+            }
+        })
+        .collect()
 }
 
 /// Parse a Qwen token refresh response body (JSON string → `QwenRefreshResponse`).
@@ -105,7 +117,8 @@ pub async fn refresh_qwen_credentials(
     let refresh_token = validate_has_refresh(old)?;
     let body = build_refresh_body(refresh_token);
 
-    let resp = client.post(QWEN_OAUTH_TOKEN_ENDPOINT)
+    let resp = client
+        .post(QWEN_OAUTH_TOKEN_ENDPOINT)
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Accept", "application/json")
         .body(body)
@@ -150,7 +163,11 @@ mod tests {
 
     #[test]
     fn into_credentials_ok() {
-        let old = QwenCredentials { access: "old".into(), refresh: Some("old_ref".into()), expires: 0 };
+        let old = QwenCredentials {
+            access: "old".into(),
+            refresh: Some("old_ref".into()),
+            expires: 0,
+        };
         let resp = QwenRefreshResponse {
             access_token: Some("new".into()),
             refresh_token: None, // keep old refresh
@@ -163,29 +180,50 @@ mod tests {
 
     #[test]
     fn into_credentials_missing_access() {
-        let old = QwenCredentials { access: "x".into(), refresh: None, expires: 0 };
-        let resp = QwenRefreshResponse { access_token: None, refresh_token: None, expires_in: Some(3600) };
+        let old = QwenCredentials {
+            access: "x".into(),
+            refresh: None,
+            expires: 0,
+        };
+        let resp = QwenRefreshResponse {
+            access_token: None,
+            refresh_token: None,
+            expires_in: Some(3600),
+        };
         assert!(resp.into_credentials(&old).is_err());
     }
 
     #[test]
     fn validate_has_refresh_ok() {
-        let c = QwenCredentials { access: "a".into(), refresh: Some("r".into()), expires: 0 };
+        let c = QwenCredentials {
+            access: "a".into(),
+            refresh: Some("r".into()),
+            expires: 0,
+        };
         assert!(validate_has_refresh(&c).is_ok());
     }
 
     #[test]
     fn validate_has_refresh_missing() {
-        let c = QwenCredentials { access: "a".into(), refresh: None, expires: 0 };
+        let c = QwenCredentials {
+            access: "a".into(),
+            refresh: None,
+            expires: 0,
+        };
         assert!(validate_has_refresh(&c).is_err());
     }
 
     #[test]
     fn qwen_credentials_expiry() {
-        let expired = QwenCredentials { access: "a".into(), refresh: None, expires: 1 };
+        let expired = QwenCredentials {
+            access: "a".into(),
+            refresh: None,
+            expires: 1,
+        };
         assert!(expired.is_expired());
         let future = QwenCredentials {
-            access: "a".into(), refresh: None,
+            access: "a".into(),
+            refresh: None,
             expires: now_ms() + 60_000,
         };
         assert!(!future.is_expired());

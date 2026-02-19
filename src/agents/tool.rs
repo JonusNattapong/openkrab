@@ -1,7 +1,7 @@
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use anyhow::Result;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ToolDefinition {
@@ -44,7 +44,8 @@ impl Tool for SearchMemoryTool {
     fn definition(&self) -> ToolDefinition {
         ToolDefinition {
             name: "search_memory".to_string(),
-            description: "Search in the local memory/knowledge base for relevant information.".to_string(),
+            description: "Search in the local memory/knowledge base for relevant information."
+                .to_string(),
             parameters: serde_json::json!({
                 "type": "object",
                 "properties": {
@@ -60,16 +61,24 @@ impl Tool for SearchMemoryTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let query = args["query"].as_str().ok_or_else(|| anyhow::anyhow!("Missing query argument"))?;
-        
-        let results = self.manager.search_hybrid(query, Default::default()).await?;
+        let query = args["query"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing query argument"))?;
+
+        let results = self
+            .manager
+            .search_hybrid(query, Default::default())
+            .await?;
         if results.is_empty() {
             return Ok("No relevant information found in memory.".to_string());
         }
 
         let mut out = "Found the following information in memory:\n\n".to_string();
         for res in results.iter().take(5) {
-            out.push_str(&format!("--- Source: {} (Score: {:.2}) ---\n{}\n\n", res.path, res.score, res.text));
+            out.push_str(&format!(
+                "--- Source: {} (Score: {:.2}) ---\n{}\n\n",
+                res.path, res.score, res.text
+            ));
         }
         Ok(out)
     }
@@ -81,7 +90,9 @@ pub struct ReadFileTool {
 
 impl ReadFileTool {
     pub fn new(root: std::path::PathBuf) -> Self {
-        Self { workspace_root: root }
+        Self {
+            workspace_root: root,
+        }
     }
 }
 
@@ -106,13 +117,17 @@ impl Tool for ReadFileTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let rel_path = args["path"].as_str().ok_or_else(|| anyhow::anyhow!("Missing path argument"))?;
-        
+        let rel_path = args["path"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing path argument"))?;
+
         let full_path = self.workspace_root.join(rel_path);
-        
+
         // Security check: ensure path is within workspace
         if !full_path.starts_with(&self.workspace_root) {
-            return Err(anyhow::anyhow!("Access denied: Path is outside of workspace."));
+            return Err(anyhow::anyhow!(
+                "Access denied: Path is outside of workspace."
+            ));
         }
 
         if !full_path.exists() {
@@ -130,7 +145,9 @@ pub struct ListFilesTool {
 
 impl ListFilesTool {
     pub fn new(root: std::path::PathBuf) -> Self {
-        Self { workspace_root: root }
+        Self {
+            workspace_root: root,
+        }
     }
 }
 
@@ -155,12 +172,16 @@ impl Tool for ListFilesTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let rel_path = args["path"].as_str().ok_or_else(|| anyhow::anyhow!("Missing path argument"))?;
-        
+        let rel_path = args["path"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing path argument"))?;
+
         let full_path = self.workspace_root.join(rel_path);
 
         if !full_path.starts_with(&self.workspace_root) {
-            return Err(anyhow::anyhow!("Access denied: Path is outside of workspace."));
+            return Err(anyhow::anyhow!(
+                "Access denied: Path is outside of workspace."
+            ));
         }
 
         if !full_path.exists() || !full_path.is_dir() {
@@ -185,7 +206,9 @@ pub struct WriteFileTool {
 
 impl WriteFileTool {
     pub fn new(root: std::path::PathBuf) -> Self {
-        Self { workspace_root: root }
+        Self {
+            workspace_root: root,
+        }
     }
 }
 
@@ -194,7 +217,8 @@ impl Tool for WriteFileTool {
     fn definition(&self) -> ToolDefinition {
         ToolDefinition {
             name: "write_file".to_string(),
-            description: "Write content to a file within the workspace. Overwrites if exists.".to_string(),
+            description: "Write content to a file within the workspace. Overwrites if exists."
+                .to_string(),
             parameters: serde_json::json!({
                 "type": "object",
                 "properties": {
@@ -214,13 +238,19 @@ impl Tool for WriteFileTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let rel_path = args["path"].as_str().ok_or_else(|| anyhow::anyhow!("Missing path argument"))?;
-        let content = args["content"].as_str().ok_or_else(|| anyhow::anyhow!("Missing content argument"))?;
-        
+        let rel_path = args["path"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing path argument"))?;
+        let content = args["content"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing content argument"))?;
+
         let full_path = self.workspace_root.join(rel_path);
-        
+
         if !full_path.starts_with(&self.workspace_root) {
-            return Err(anyhow::anyhow!("Access denied: Path is outside of workspace."));
+            return Err(anyhow::anyhow!(
+                "Access denied: Path is outside of workspace."
+            ));
         }
 
         // Ensure parent directory exists
@@ -239,8 +269,14 @@ pub struct RememberTool {
 }
 
 impl RememberTool {
-    pub fn new(manager: std::sync::Arc<crate::memory::MemoryManager>, root: std::path::PathBuf) -> Self {
-        Self { manager, workspace_root: root }
+    pub fn new(
+        manager: std::sync::Arc<crate::memory::MemoryManager>,
+        root: std::path::PathBuf,
+    ) -> Self {
+        Self {
+            manager,
+            workspace_root: root,
+        }
     }
 }
 
@@ -249,7 +285,8 @@ impl Tool for RememberTool {
     fn definition(&self) -> ToolDefinition {
         ToolDefinition {
             name: "remember".to_string(),
-            description: "Save important information or notes to the agent's long-term memory.".to_string(),
+            description: "Save important information or notes to the agent's long-term memory."
+                .to_string(),
             parameters: serde_json::json!({
                 "type": "object",
                 "properties": {
@@ -269,11 +306,18 @@ impl Tool for RememberTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let name = args["note_name"].as_str().ok_or_else(|| anyhow::anyhow!("Missing note_name argument"))?;
-        let content = args["content"].as_str().ok_or_else(|| anyhow::anyhow!("Missing content argument"))?;
-        
+        let name = args["note_name"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing note_name argument"))?;
+        let content = args["content"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing content argument"))?;
+
         // Sanitize name for filename
-        let safe_name = name.chars().filter(|c| c.is_alphanumeric() || *c == '_' || *c == '-').collect::<String>();
+        let safe_name = name
+            .chars()
+            .filter(|c| c.is_alphanumeric() || *c == '_' || *c == '-')
+            .collect::<String>();
         let rel_path = format!("memory/agent_notes/{}.md", safe_name);
         let full_path = self.workspace_root.join(&rel_path);
 
@@ -282,13 +326,23 @@ impl Tool for RememberTool {
             tokio::fs::create_dir_all(parent).await?;
         }
 
-        let md_content = format!("# Agent Note: {}\n\n{}\n\n*Saved at: {}*", name, content, chrono::Local::now());
+        let md_content = format!(
+            "# Agent Note: {}\n\n{}\n\n*Saved at: {}*",
+            name,
+            content,
+            chrono::Local::now()
+        );
         tokio::fs::write(&full_path, md_content).await?;
-        
-        // Re-index this specific file immediately
-        self.manager.index_file(&self.workspace_root, &full_path).await?;
 
-        Ok(format!("I have recorded this note as '{}'. It is now part of my long-term memory.", name))
+        // Re-index this specific file immediately
+        self.manager
+            .index_file(&self.workspace_root, &full_path)
+            .await?;
+
+        Ok(format!(
+            "I have recorded this note as '{}'. It is now part of my long-term memory.",
+            name
+        ))
     }
 }
 
@@ -299,7 +353,10 @@ pub struct ExecCommandTool {
 
 impl ExecCommandTool {
     pub fn new(root: std::path::PathBuf, require_approval: bool) -> Self {
-        Self { workspace_root: root, require_approval }
+        Self {
+            workspace_root: root,
+            require_approval,
+        }
     }
 }
 
@@ -324,18 +381,20 @@ impl Tool for ExecCommandTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let command = args["command"].as_str().ok_or_else(|| anyhow::anyhow!("Missing command argument"))?;
-        
+        let command = args["command"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing command argument"))?;
+
         if self.require_approval {
             println!("\n⚠️  [SECURITY] Agent wishes to execute: {}", command);
             print!("👉 Approve execution? (y/N): ");
-            use std::io::{Write, BufRead};
+            use std::io::{BufRead, Write};
             std::io::stdout().flush()?;
-            
+
             let mut input = String::new();
             std::io::stdin().lock().read_line(&mut input)?;
             let input = input.trim().to_lowercase();
-            
+
             if input != "y" && input != "yes" {
                 return Ok("Execution REJECTED by user.".to_string());
             }
@@ -366,12 +425,18 @@ impl Tool for ExecCommandTool {
             result.push_str(&stdout);
         }
         if !stderr.is_empty() {
-            if !result.is_empty() { result.push('\n'); }
+            if !result.is_empty() {
+                result.push('\n');
+            }
             result.push_str("STDERR:\n");
             result.push_str(&stderr);
         }
         if result.is_empty() {
-            result = if output.status.success() { "Success (no output)".to_string() } else { format!("Failed with status: {}", output.status) };
+            result = if output.status.success() {
+                "Success (no output)".to_string()
+            } else {
+                format!("Failed with status: {}", output.status)
+            };
         }
 
         Ok(result)
@@ -384,7 +449,9 @@ pub struct TaskTool {
 
 impl TaskTool {
     pub fn new(root: std::path::PathBuf) -> Self {
-        Self { workspace_root: root }
+        Self {
+            workspace_root: root,
+        }
     }
 
     async fn load_tasks(&self) -> Result<Vec<String>> {
@@ -393,7 +460,8 @@ impl TaskTool {
             return Ok(Vec::new());
         }
         let content = tokio::fs::read_to_string(&task_file).await?;
-        let tasks = content.lines()
+        let tasks = content
+            .lines()
             .filter(|l| l.starts_with("- [ ] "))
             .map(|l| l.trim_start_matches("- [ ] ").to_string())
             .collect();
@@ -405,7 +473,11 @@ impl TaskTool {
         if let Some(parent) = task_file.parent() {
             tokio::fs::create_dir_all(parent).await?;
         }
-        let content = tasks.iter().map(|t| format!("- [ ] {}", t)).collect::<Vec<_>>().join("\n");
+        let content = tasks
+            .iter()
+            .map(|t| format!("- [ ] {}", t))
+            .collect::<Vec<_>>()
+            .join("\n");
         tokio::fs::write(task_file, content).await?;
         Ok(())
     }
@@ -437,17 +509,21 @@ impl Tool for TaskTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let action = args["action"].as_str().ok_or_else(|| anyhow::anyhow!("Missing action argument"))?;
-        
+        let action = args["action"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing action argument"))?;
+
         // Use self.load_tasks() and self.save_tasks() here.
         // But since they are async and need &self, we just inline or call them.
         // Wait, TaskTool struct implementation is separate from Tool trait impl.
-        
+
         let task_file = self.workspace_root.join("memory/tasks.md");
-        
+
         match action {
             "add" => {
-                let task = args["task"].as_str().ok_or_else(|| anyhow::anyhow!("Missing task argument for add"))?;
+                let task = args["task"]
+                    .as_str()
+                    .ok_or_else(|| anyhow::anyhow!("Missing task argument for add"))?;
                 let mut tasks = self.load_tasks().await?;
                 tasks.push(task.to_string());
                 self.save_tasks(&tasks).await?;
@@ -458,11 +534,18 @@ impl Tool for TaskTool {
                 if tasks.is_empty() {
                     Ok("No pending tasks.".to_string())
                 } else {
-                    Ok(tasks.iter().enumerate().map(|(i, t)| format!("{}. {}", i + 1, t)).collect::<Vec<_>>().join("\n"))
+                    Ok(tasks
+                        .iter()
+                        .enumerate()
+                        .map(|(i, t)| format!("{}. {}", i + 1, t))
+                        .collect::<Vec<_>>()
+                        .join("\n"))
                 }
             }
             "remove" => {
-                let task = args["task"].as_str().ok_or_else(|| anyhow::anyhow!("Missing task argument for remove"))?;
+                let task = args["task"]
+                    .as_str()
+                    .ok_or_else(|| anyhow::anyhow!("Missing task argument for remove"))?;
                 let mut tasks = self.load_tasks().await?;
                 if let Some(idx) = tasks.iter().position(|t| t == task) {
                     tasks.remove(idx);
@@ -506,8 +589,10 @@ impl Tool for SpeakTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let text = args["text"].as_str().ok_or_else(|| anyhow::anyhow!("Missing text argument"))?;
-        
+        let text = args["text"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing text argument"))?;
+
         let script = format!(
             "Add-Type -AssemblyName System.Speech; \
             $speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; \
@@ -520,11 +605,14 @@ impl Tool for SpeakTool {
             let output = std::process::Command::new("powershell")
                 .args(["-Command", &script])
                 .output()?;
-            
+
             if output.status.success() {
-                 Ok(format!("Spoken: \"{}\"", text))
+                Ok(format!("Spoken: \"{}\"", text))
             } else {
-                 Err(anyhow::anyhow!("TTS Failed: {}", String::from_utf8_lossy(&output.stderr)))
+                Err(anyhow::anyhow!(
+                    "TTS Failed: {}",
+                    String::from_utf8_lossy(&output.stderr)
+                ))
             }
         }
 
@@ -536,12 +624,12 @@ impl Tool for SpeakTool {
 
         #[cfg(target_os = "linux")]
         {
-             Ok("TTS not fully implemented for Linux yet.".to_string())
+            Ok("TTS not fully implemented for Linux yet.".to_string())
         }
 
         #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
         {
-             Ok("TTS only supported on Windows/macOS/Linux.".to_string())
+            Ok("TTS only supported on Windows/macOS/Linux.".to_string())
         }
     }
 }
@@ -560,7 +648,9 @@ pub struct ScheduleTool {
 
 impl ScheduleTool {
     pub fn new(root: std::path::PathBuf) -> Self {
-        Self { workspace_root: root }
+        Self {
+            workspace_root: root,
+        }
     }
 
     async fn load_schedule(&self) -> Result<Vec<ScheduledTask>> {
@@ -618,14 +708,20 @@ impl Tool for ScheduleTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let action = args["action"].as_str().ok_or_else(|| anyhow::anyhow!("Missing action argument"))?;
+        let action = args["action"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing action argument"))?;
 
         match action {
             "add" => {
-                let cron = args["cron"].as_str().ok_or_else(|| anyhow::anyhow!("Missing cron argument"))?;
-                let description = args["description"].as_str().ok_or_else(|| anyhow::anyhow!("Missing description argument"))?;
+                let cron = args["cron"]
+                    .as_str()
+                    .ok_or_else(|| anyhow::anyhow!("Missing cron argument"))?;
+                let description = args["description"]
+                    .as_str()
+                    .ok_or_else(|| anyhow::anyhow!("Missing description argument"))?;
                 let id = uuid::Uuid::new_v4().to_string();
-                
+
                 let mut tasks = self.load_schedule().await?;
                 tasks.push(ScheduledTask {
                     id: id.clone(),
@@ -635,21 +731,32 @@ impl Tool for ScheduleTool {
                 });
                 self.save_schedule(&tasks).await?;
                 Ok(format!("Scheduled task '{}' with ID: {}", description, id))
-            },
+            }
             "list" => {
                 let tasks = self.load_schedule().await?;
                 if tasks.is_empty() {
                     Ok("No scheduled tasks.".to_string())
                 } else {
-                    let list = tasks.iter()
-                        .map(|t| format!("[{}] {} - {} ({})", if t.enabled { "ON" } else { "OFF" }, t.cron, t.description, t.id))
+                    let list = tasks
+                        .iter()
+                        .map(|t| {
+                            format!(
+                                "[{}] {} - {} ({})",
+                                if t.enabled { "ON" } else { "OFF" },
+                                t.cron,
+                                t.description,
+                                t.id
+                            )
+                        })
                         .collect::<Vec<_>>()
                         .join("\n");
                     Ok(list)
                 }
-            },
+            }
             "remove" => {
-                let id = args["id"].as_str().ok_or_else(|| anyhow::anyhow!("Missing id argument"))?;
+                let id = args["id"]
+                    .as_str()
+                    .ok_or_else(|| anyhow::anyhow!("Missing id argument"))?;
                 let mut tasks = self.load_schedule().await?;
                 let len_before = tasks.len();
                 tasks.retain(|t| t.id != id);
@@ -659,7 +766,7 @@ impl Tool for ScheduleTool {
                 } else {
                     Ok(format!("Task not found with ID: {}", id))
                 }
-            },
+            }
             _ => Err(anyhow::anyhow!("Unknown action: {}", action)),
         }
     }
@@ -694,7 +801,9 @@ impl Tool for BrowserTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let url = args["url"].as_str().ok_or_else(|| anyhow::anyhow!("Missing url argument"))?;
+        let url = args["url"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing url argument"))?;
 
         let client = reqwest::Client::builder()
             .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
@@ -702,12 +811,15 @@ impl Tool for BrowserTool {
 
         let res = client.get(url).send().await?;
         if !res.status().is_success() {
-            return Err(anyhow::anyhow!("Failed to fetch URL: Status {}", res.status()));
+            return Err(anyhow::anyhow!(
+                "Failed to fetch URL: Status {}",
+                res.status()
+            ));
         }
 
         let html = res.text().await?;
         let md = html2md::parse_html(&html);
-        
+
         // Truncate if too long to save context
         if md.len() > 20000 {
             Ok(format!("(Content truncated) ... \n{}", &md[..20000]))
@@ -723,7 +835,9 @@ pub struct CodeInterpreterTool {
 
 impl CodeInterpreterTool {
     pub fn new(root: std::path::PathBuf) -> Self {
-        Self { workspace_root: root }
+        Self {
+            workspace_root: root,
+        }
     }
 }
 
@@ -732,7 +846,8 @@ impl Tool for CodeInterpreterTool {
     fn definition(&self) -> ToolDefinition {
         ToolDefinition {
             name: "code_interpreter".to_string(),
-            description: "Execute Python or JavaScript code in a sandboxed Docker container.".to_string(),
+            description: "Execute Python or JavaScript code in a sandboxed Docker container."
+                .to_string(),
             parameters: serde_json::json!({
                 "type": "object",
                 "properties": {
@@ -753,8 +868,12 @@ impl Tool for CodeInterpreterTool {
 
     async fn call(&self, arguments: &str) -> Result<String> {
         let args: Value = serde_json::from_str(arguments)?;
-        let language = args["language"].as_str().ok_or_else(|| anyhow::anyhow!("Missing language argument"))?;
-        let code = args["code"].as_str().ok_or_else(|| anyhow::anyhow!("Missing code argument"))?;
+        let language = args["language"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing language argument"))?;
+        let code = args["code"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing code argument"))?;
 
         let sandbox_dir = self.workspace_root.join(".sandbox");
         if !sandbox_dir.exists() {
@@ -781,11 +900,15 @@ impl Tool for CodeInterpreterTool {
 
         let output = std::process::Command::new("docker")
             .args([
-                "run", "--rm",
-                "-v", &format!("{}:/app", abs_path_str),
-                "-w", "/app",
+                "run",
+                "--rm",
+                "-v",
+                &format!("{}:/app", abs_path_str),
+                "-w",
+                "/app",
                 image,
-                cmd, filename
+                cmd,
+                filename,
             ])
             .output()?;
 
@@ -795,7 +918,10 @@ impl Tool for CodeInterpreterTool {
         if output.status.success() {
             Ok(format!("Output:\n{}", stdout))
         } else {
-            Ok(format!("Execution Failed:\nSTDOUT:\n{}\nSTDERR:\n{}", stdout, stderr))
+            Ok(format!(
+                "Execution Failed:\nSTDOUT:\n{}\nSTDERR:\n{}",
+                stdout, stderr
+            ))
         }
     }
 }

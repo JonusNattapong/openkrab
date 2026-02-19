@@ -5,12 +5,12 @@
 //! and documents that can flow through the agent pipeline.
 
 pub mod audio;
-pub mod mime;
 pub mod fetch;
-pub mod store;
-pub mod parse;
 pub mod image_ops;
 pub mod input_files;
+pub mod mime;
+pub mod parse;
+pub mod store;
 
 use serde::{Deserialize, Serialize};
 
@@ -140,7 +140,10 @@ pub struct MediaMessage {
 
 impl MediaMessage {
     pub fn text_only(text: impl Into<String>) -> Self {
-        Self { text: Some(text.into()), attachments: Vec::new() }
+        Self {
+            text: Some(text.into()),
+            attachments: Vec::new(),
+        }
     }
 
     pub fn add_attachment(mut self, item: MediaItem) -> Self {
@@ -149,7 +152,10 @@ impl MediaMessage {
     }
 
     pub fn is_media_only(&self) -> bool {
-        self.text.as_deref().map(|t| t.trim().is_empty()).unwrap_or(true)
+        self.text
+            .as_deref()
+            .map(|t| t.trim().is_empty())
+            .unwrap_or(true)
             && !self.attachments.is_empty()
     }
 
@@ -158,9 +164,9 @@ impl MediaMessage {
     }
 
     pub fn has_audio(&self) -> bool {
-        self.attachments.iter().any(|a| {
-            matches!(a.kind, MediaKind::Audio | MediaKind::Voice)
-        })
+        self.attachments
+            .iter()
+            .any(|a| matches!(a.kind, MediaKind::Audio | MediaKind::Voice))
     }
 }
 
@@ -186,7 +192,13 @@ pub fn ext_to_mime(ext: &str) -> &'static str {
 
 /// Guess the `MediaKind` from a URL's file extension.
 pub fn kind_from_url(url: &str) -> MediaKind {
-    let ext = url.split('.').last().unwrap_or("").split('?').next().unwrap_or("");
+    let ext = url
+        .split('.')
+        .last()
+        .unwrap_or("")
+        .split('?')
+        .next()
+        .unwrap_or("");
     MediaKind::from_mime(ext_to_mime(ext))
 }
 
@@ -229,9 +241,10 @@ mod tests {
         assert!(!msg.has_audio());
         assert!(!msg.is_media_only());
 
-        let media_only = MediaMessage { text: None, attachments: vec![
-            MediaItem::new(MediaKind::Audio)
-        ]};
+        let media_only = MediaMessage {
+            text: None,
+            attachments: vec![MediaItem::new(MediaKind::Audio)],
+        };
         assert!(media_only.is_media_only());
         assert!(media_only.has_audio());
     }

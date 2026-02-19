@@ -1,5 +1,5 @@
 use crate::common::{Message, UserId};
-use crate::gateway::{GatewayState, GatewayServer};
+use crate::gateway::{GatewayServer, GatewayState};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::sync::Arc;
@@ -8,7 +8,11 @@ pub mod signature {
     use hmac::{Hmac, Mac};
     use sha2::Sha256;
 
-    pub fn validate_whatsapp_signature(body: &str, signature_header: &str, app_secret: &str) -> bool {
+    pub fn validate_whatsapp_signature(
+        body: &str,
+        signature_header: &str,
+        app_secret: &str,
+    ) -> bool {
         type HmacSha256 = Hmac<Sha256>;
 
         if app_secret.trim().is_empty() {
@@ -99,8 +103,16 @@ fn parse_web_bridge_inbound(payload: &serde_json::Value) -> Option<WhatsAppWebIn
         return None;
     }
 
-    let from = payload.get("from").and_then(|v| v.as_str())?.trim().to_string();
-    let text = payload.get("text").and_then(|v| v.as_str())?.trim().to_string();
+    let from = payload
+        .get("from")
+        .and_then(|v| v.as_str())?
+        .trim()
+        .to_string();
+    let text = payload
+        .get("text")
+        .and_then(|v| v.as_str())?
+        .trim()
+        .to_string();
     if from.is_empty() || text.is_empty() {
         return None;
     }
@@ -108,7 +120,10 @@ fn parse_web_bridge_inbound(payload: &serde_json::Value) -> Option<WhatsAppWebIn
     Some(WhatsAppWebInbound {
         from,
         text,
-        chat_id: payload.get("chat_id").and_then(|v| v.as_str()).map(ToString::to_string),
+        chat_id: payload
+            .get("chat_id")
+            .and_then(|v| v.as_str())
+            .map(ToString::to_string),
         message_id: payload
             .get("message_id")
             .and_then(|v| v.as_str())
@@ -168,7 +183,10 @@ fn extract_message_text(msg: &serde_json::Value) -> Option<String> {
             .map(|t| format!("[button] {t}")),
         "interactive" => {
             let interactive = msg.get("interactive")?;
-            let interactive_type = interactive.get("type").and_then(|t| t.as_str()).unwrap_or("");
+            let interactive_type = interactive
+                .get("type")
+                .and_then(|t| t.as_str())
+                .unwrap_or("");
             match interactive_type {
                 "button_reply" => {
                     let id = interactive
@@ -401,7 +419,9 @@ pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value)
             };
 
             if access_token.is_empty() || pid.is_empty() {
-                tracing::warn!("[whatsapp] WHATSAPP_ACCESS_TOKEN or WHATSAPP_PHONE_NUMBER_ID not set.");
+                tracing::warn!(
+                    "[whatsapp] WHATSAPP_ACCESS_TOKEN or WHATSAPP_PHONE_NUMBER_ID not set."
+                );
                 return;
             }
 
@@ -572,8 +592,16 @@ mod tests {
         let sig = format!("sha256={}", hex::encode(mac.finalize().into_bytes()));
 
         assert!(signature::validate_whatsapp_signature(body, &sig, secret));
-        assert!(!signature::validate_whatsapp_signature(body, "sha256=deadbeef", secret));
-        assert!(!signature::validate_whatsapp_signature(body, &sig, "wrong-secret"));
+        assert!(!signature::validate_whatsapp_signature(
+            body,
+            "sha256=deadbeef",
+            secret
+        ));
+        assert!(!signature::validate_whatsapp_signature(
+            body,
+            &sig,
+            "wrong-secret"
+        ));
     }
 
     #[test]

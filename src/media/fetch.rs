@@ -55,23 +55,37 @@ fn strip_quotes(value: &str) -> String {
 
 fn parse_content_disposition_filename(header: Option<&str>) -> Option<String> {
     let header = header?;
-    
+
     let star_match = regex::Regex::new(r"filename\*\s*=\s*([^;]+)")
         .ok()?
         .captures(header)?;
-    
+
     if let Some(matched) = star_match.get(1) {
         let cleaned = strip_quotes(matched.as_str().trim());
         let encoded = cleaned.split("''").skip(1).collect::<Vec<_>>().join("''");
-        let to_decode = if encoded.is_empty() { &cleaned } else { &encoded };
+        let to_decode = if encoded.is_empty() {
+            &cleaned
+        } else {
+            &encoded
+        };
         let decoded = urlencoding::decode(to_decode).unwrap_or_default();
-        return Some(Path::new(&decoded).file_name()?.to_string_lossy().to_string());
+        return Some(
+            Path::new(&decoded)
+                .file_name()?
+                .to_string_lossy()
+                .to_string(),
+        );
     }
 
     let match_re = regex::Regex::new(r"filename\s*=\s*([^;]+)").ok()?;
     let caps = match_re.captures(header)?;
     let matched = caps.get(1)?;
-    Some(Path::new(strip_quotes(matched.as_str().trim()).as_str()).file_name()?.to_string_lossy().to_string())
+    Some(
+        Path::new(strip_quotes(matched.as_str().trim()).as_str())
+            .file_name()?
+            .to_string_lossy()
+            .to_string(),
+    )
 }
 
 async fn read_error_body_snippet(res: &mut Response, max_chars: usize) -> Option<String> {
@@ -91,8 +105,12 @@ async fn read_error_body_snippet(res: &mut Response, max_chars: usize) -> Option
 
 pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMediaResult> {
     let client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_millis(options.timeout_ms.unwrap_or(30_000)))
-        .redirect(reqwest::redirect::Policy::limited(options.max_redirects.unwrap_or(5)))
+        .timeout(std::time::Duration::from_millis(
+            options.timeout_ms.unwrap_or(30_000),
+        ))
+        .redirect(reqwest::redirect::Policy::limited(
+            options.max_redirects.unwrap_or(5),
+        ))
         .build()?;
 
     let res = client
@@ -114,7 +132,8 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
         return Err(MediaFetchError {
             code: MediaFetchErrorCode::HttpError,
             message: format!("Failed to fetch media from {}: {}", options.url, detail),
-        }.into());
+        }
+        .into());
     }
 
     let content_length = res.content_length();
@@ -122,11 +141,9 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
         if len as usize > max_bytes {
             return Err(MediaFetchError {
                 code: MediaFetchErrorCode::MaxBytes,
-                message: format!(
-                    "Content length {} exceeds maxBytes {}",
-                    len, max_bytes
-                ),
-            }.into());
+                message: format!("Content length {} exceeds maxBytes {}", len, max_bytes),
+            }
+            .into());
         }
     }
 
@@ -138,12 +155,9 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
         if limited.len() > max_bytes {
             return Err(MediaFetchError {
                 code: MediaFetchErrorCode::MaxBytes,
-                message: format!(
-                    "Payload {} exceeds maxBytes {}",
-                    limited.len(),
-                    max_bytes
-                ),
-            }.into());
+                message: format!("Payload {} exceeds maxBytes {}", limited.len(), max_bytes),
+            }
+            .into());
         }
         limited.to_vec()
     } else {
@@ -151,27 +165,33 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
     };
 
     let final_url = res.url().clone();
-    let content_disposition = res.headers().get("content-disposition")
+    let content_disposition = res
+        .headers()
+        .get("content-disposition")
         .and_then(|v| v.to_str().ok());
 
-    let file_name_from_url = final_url.path_segments()
+    let file_name_from_url = final_url
+        .path_segments()
         .and_then(|s| s.last().map(|p| p.to_string()));
 
     let header_file_name = parse_content_disposition_filename(content_disposition);
-    let file_path_hint_name = options.file_path_hint.as_ref()
+    let file_path_hint_name = options
+        .file_path_hint
+        .as_ref()
         .and_then(|p| Path::new(p).file_name())
         .map(|n| n.to_string_lossy().to_string());
 
-    let file_name = header_file_name.or(file_name_from_url).or(file_path_hint_name);
+    let file_name = header_file_name
+        .or(file_name_from_url)
+        .or(file_path_hint_name);
 
-    let header_mime = res.headers().get("content-type")
+    let header_mime = res
+        .headers()
+        .get("content-type")
         .and_then(|v| v.to_str().ok());
 
-    let content_type = super::mime::detect_mime(
-        Some(&buffer),
-        header_mime,
-        file_name.as_deref(),
-    ).await;
+    let content_type =
+        super::mime::detect_mime(Some(&buffer), header_mime, file_name.as_deref()).await;
 
     Ok(FetchMediaResult {
         buffer,

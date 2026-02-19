@@ -94,7 +94,8 @@ pub async fn monitor_whatsapp_provider(
     let message_handler_clone = message_handler.clone();
 
     let handle = tokio::spawn(async move {
-        let client = WhatsAppClient::new().map_err(|e| anyhow!("Failed to create WhatsApp client: {}", e))?;
+        let client = WhatsAppClient::new()
+            .map_err(|e| anyhow!("Failed to create WhatsApp client: {}", e))?;
 
         // Main monitoring loop
         loop {
@@ -170,7 +171,9 @@ async fn monitor_loop(
         // Check for stop signal
         if let Ok(_) = tokio::time::timeout(Duration::from_millis(100), async {
             // This would be non-blocking in real implementation
-        }).await {
+        })
+        .await
+        {
             break;
         }
 
@@ -184,8 +187,8 @@ async fn monitor_loop(
                     drop(status_guard);
 
                     // Handle the message
-                    let message_value = serde_json::to_value(&message)
-                        .unwrap_or_else(|_| serde_json::Value::Null);
+                    let message_value =
+                        serde_json::to_value(&message).unwrap_or_else(|_| serde_json::Value::Null);
                     if let Err(e) = message_handler.handle_message(message_value).await {
                         println!("Error handling WhatsApp message: {}", e);
                     }
@@ -207,7 +210,10 @@ async fn monitor_loop(
     Ok(())
 }
 
-async fn poll_messages(_client: &WhatsAppClient, _options: &MonitorOptions) -> Result<Vec<WhatsAppMessage>> {
+async fn poll_messages(
+    _client: &WhatsAppClient,
+    _options: &MonitorOptions,
+) -> Result<Vec<WhatsAppMessage>> {
     // In real implementation, this would:
     // 1. Listen to WebSocket events from WhatsApp Web
     // 2. Parse incoming messages

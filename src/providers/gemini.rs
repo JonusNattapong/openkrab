@@ -147,10 +147,8 @@ pub const KNOWN_GEMINI_CHAT_MODELS: &[&str] = &[
     "gemini-1.5-flash-8b",
 ];
 
-pub const KNOWN_GEMINI_EMBEDDING_MODELS: &[&str] = &[
-    "text-embedding-004",
-    "text-multilingual-embedding-002",
-];
+pub const KNOWN_GEMINI_EMBEDDING_MODELS: &[&str] =
+    &["text-embedding-004", "text-multilingual-embedding-002"];
 
 pub fn is_known_gemini_model(model: &str) -> bool {
     KNOWN_GEMINI_CHAT_MODELS.contains(&model) || KNOWN_GEMINI_EMBEDDING_MODELS.contains(&model)

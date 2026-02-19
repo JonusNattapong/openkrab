@@ -38,7 +38,10 @@ impl LinkPreview {
             out.push_str(&format!("<{}>\n", self.url));
         }
         if let Some(ref desc) = self.description {
-            out.push_str(&format!("> {}\n", desc.chars().take(280).collect::<String>()));
+            out.push_str(&format!(
+                "> {}\n",
+                desc.chars().take(280).collect::<String>()
+            ));
         }
         if let Some(ref site) = self.site_name {
             out.push_str(&format!("*— {}*\n", site));
@@ -51,7 +54,10 @@ impl LinkPreview {
 
 /// Extract Open Graph / Twitter Card / meta tags from raw HTML.
 pub fn parse_og_from_html(html: &str, source_url: &str) -> LinkPreview {
-    let mut preview = LinkPreview { url: source_url.to_string(), ..Default::default() };
+    let mut preview = LinkPreview {
+        url: source_url.to_string(),
+        ..Default::default()
+    };
 
     for line in html.lines() {
         let line = line.trim();
@@ -69,8 +75,8 @@ pub fn parse_og_from_html(html: &str, source_url: &str) -> LinkPreview {
         }
         // og:image
         if preview.image.is_none() {
-            preview.image = extract_meta(line, "og:image")
-                .or_else(|| extract_meta(line, "twitter:image"));
+            preview.image =
+                extract_meta(line, "og:image").or_else(|| extract_meta(line, "twitter:image"));
         }
         // og:site_name
         if preview.site_name.is_none() {
@@ -170,7 +176,9 @@ pub fn normalise_url(url: &str) -> String {
 
 /// Guess the domain name from a URL (e.g. "github.com").
 pub fn domain_from_url(url: &str) -> Option<String> {
-    let url = url.trim_start_matches("https://").trim_start_matches("http://");
+    let url = url
+        .trim_start_matches("https://")
+        .trim_start_matches("http://");
     url.split('/').next().map(|h| h.to_lowercase())
 }
 
@@ -188,14 +196,23 @@ mod tests {
 
     #[test]
     fn normalise_url_adds_scheme() {
-        assert_eq!(normalise_url("example.com/page"), "https://example.com/page");
+        assert_eq!(
+            normalise_url("example.com/page"),
+            "https://example.com/page"
+        );
         assert_eq!(normalise_url("https://example.com/"), "https://example.com");
     }
 
     #[test]
     fn domain_from_url_test() {
-        assert_eq!(domain_from_url("https://GitHub.COM/user/repo"), Some("github.com".to_string()));
-        assert_eq!(domain_from_url("http://example.com/path"), Some("example.com".to_string()));
+        assert_eq!(
+            domain_from_url("https://GitHub.COM/user/repo"),
+            Some("github.com".to_string())
+        );
+        assert_eq!(
+            domain_from_url("http://example.com/path"),
+            Some("example.com".to_string())
+        );
     }
 
     #[test]

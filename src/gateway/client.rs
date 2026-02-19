@@ -16,7 +16,9 @@ impl GatewayClient {
         Self { url }
     }
 
-    pub async fn connect(&self) -> Result<GatewayConnection, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn connect(
+        &self,
+    ) -> Result<GatewayConnection, Box<dyn std::error::Error + Send + Sync>> {
         let (ws_stream, _) = connect_async(&self.url).await?;
         let (write, read) = ws_stream.split();
 
@@ -30,19 +32,31 @@ impl GatewayClient {
 
 /// Active WebSocket connection to the gateway server
 pub struct GatewayConnection {
-    write: std::pin::Pin<Box<dyn futures_util::Sink<Message, Error = tokio_tungstenite::tungstenite::Error> + Send>>,
-    read: std::pin::Pin<Box<dyn futures_util::Stream<Item = Result<Message, tokio_tungstenite::tungstenite::Error>> + Send>>,
+    write: std::pin::Pin<
+        Box<dyn futures_util::Sink<Message, Error = tokio_tungstenite::tungstenite::Error> + Send>,
+    >,
+    read: std::pin::Pin<
+        Box<
+            dyn futures_util::Stream<Item = Result<Message, tokio_tungstenite::tungstenite::Error>>
+                + Send,
+        >,
+    >,
     pending_requests: HashMap<String, tokio::sync::oneshot::Sender<GatewayMessage>>,
 }
 
 impl GatewayConnection {
-    pub async fn send(&mut self, message: GatewayMessage) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn send(
+        &mut self,
+        message: GatewayMessage,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let json = serde_json::to_string(&message)?;
         self.write.send(Message::Text(json)).await?;
         Ok(())
     }
 
-    pub async fn receive(&mut self) -> Result<Option<GatewayMessage>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn receive(
+        &mut self,
+    ) -> Result<Option<GatewayMessage>, Box<dyn std::error::Error + Send + Sync>> {
         while let Some(msg) = self.read.next().await {
             let msg = msg?;
             match msg {
@@ -85,7 +99,9 @@ impl GatewayConnection {
     }
 
     /// Get server status
-    pub async fn get_status(&mut self) -> Result<GatewayMessage, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn get_status(
+        &mut self,
+    ) -> Result<GatewayMessage, Box<dyn std::error::Error + Send + Sync>> {
         // Wait for the next message (likely a status update)
         match self.receive().await? {
             Some(msg) => Ok(msg),

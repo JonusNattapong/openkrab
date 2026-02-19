@@ -14,13 +14,10 @@ pub async fn discord_send_command(to: &str, text: &str) -> Result<String> {
     let token = std::env::var("DISCORD_BOT_TOKEN")
         .map_err(|_| anyhow!("Missing DISCORD_BOT_TOKEN environment variable"))?;
     let client = reqwest::Client::new();
-    let response = crate::connectors::discord::send_outbound_message(
-        &client,
-        &token,
-        Some(to),
-        text,
-    )
-    .await?;
-    Ok(format!("sent discord message id={} channel={}", response.message_id, response.channel_id))
+    let response =
+        crate::connectors::discord::send_outbound_message(&client, &token, Some(to), text).await?;
+    Ok(format!(
+        "sent discord message id={} channel={}",
+        response.message_id, response.channel_id
+    ))
 }
-

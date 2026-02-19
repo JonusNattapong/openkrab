@@ -9,7 +9,10 @@ fn test_normalize_chat_type_direct() {
 #[test]
 fn test_normalize_chat_type_group_and_channel() {
     assert_eq!(normalize_chat_type(Some("group")), Some(ChatType::Group));
-    assert_eq!(normalize_chat_type(Some("channel")), Some(ChatType::Channel));
+    assert_eq!(
+        normalize_chat_type(Some("channel")),
+        Some(ChatType::Channel)
+    );
 }
 
 #[test]

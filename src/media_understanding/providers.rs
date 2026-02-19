@@ -1,20 +1,31 @@
-use std::collections::HashMap;
-use async_trait::async_trait;
-use serde::Deserialize;
 use crate::media_understanding::types::{MediaAnalysis, MediaUnderstandingError};
-use base64::{Engine, engine::general_purpose::STANDARD};
+use async_trait::async_trait;
+use base64::{engine::general_purpose::STANDARD, Engine};
+use serde::Deserialize;
+use std::collections::HashMap;
 
 #[async_trait]
 pub trait MediaUnderstandingProvider: Send + Sync {
     fn id(&self) -> &str;
-    
+
     fn capabilities(&self) -> &[super::resolve::MediaCapability];
-    
-    async fn analyse_image(&self, image_data: &[u8], prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError>;
-    
-    async fn transcribe_audio(&self, audio_data: &[u8]) -> Result<MediaAnalysis, MediaUnderstandingError>;
-    
-    async fn describe_video(&self, video_data: &[u8], prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError>;
+
+    async fn analyse_image(
+        &self,
+        image_data: &[u8],
+        prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError>;
+
+    async fn transcribe_audio(
+        &self,
+        audio_data: &[u8],
+    ) -> Result<MediaAnalysis, MediaUnderstandingError>;
+
+    async fn describe_video(
+        &self,
+        video_data: &[u8],
+        prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError>;
 }
 
 pub struct OpenAiVisionProvider {
@@ -49,12 +60,21 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
     }
 
     fn capabilities(&self) -> &[super::resolve::MediaCapability] {
-        &[super::resolve::MediaCapability::Image, super::resolve::MediaCapability::Audio]
+        &[
+            super::resolve::MediaCapability::Image,
+            super::resolve::MediaCapability::Audio,
+        ]
     }
 
-    async fn analyse_image(&self, image_data: &[u8], prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
-        let prompt_text = prompt.unwrap_or("Describe this image concisely. List the main objects, scene, and any text present.");
-        
+    async fn analyse_image(
+        &self,
+        image_data: &[u8],
+        prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
+        let prompt_text = prompt.unwrap_or(
+            "Describe this image concisely. List the main objects, scene, and any text present.",
+        );
+
         let base64_data = STANDARD.encode(image_data);
         let image_url = format!("data:image/jpeg;base64,{}", base64_data);
 
@@ -70,7 +90,8 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
             "max_tokens": 512
         });
 
-        let resp = self.client
+        let resp = self
+            .client
             .post("https://api.openai.com/v1/chat/completions")
             .bearer_auth(&self.api_key)
             .json(&body)
@@ -83,7 +104,9 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
             return Err(MediaUnderstandingError::ProviderError(err_text));
         }
 
-        let json: serde_json::Value = resp.json().await
+        let json: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MediaUnderstandingError::ProviderError(e.to_string()))?;
 
         let description = json["choices"][0]["message"]["content"]
@@ -101,17 +124,21 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
         })
     }
 
-    async fn transcribe_audio(&self, audio_data: &[u8]) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn transcribe_audio(
+        &self,
+        audio_data: &[u8],
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         let part = reqwest::multipart::Part::bytes(audio_data.to_vec())
             .file_name("audio.mp3")
             .mime_str("audio/mpeg")
             .map_err(|e| MediaUnderstandingError::ProviderError(e.to_string()))?;
-        
+
         let form = reqwest::multipart::Form::new()
             .part("file", part)
             .text("model", "whisper-1");
 
-        let resp = self.client
+        let resp = self
+            .client
             .post("https://api.openai.com/v1/audio/transcriptions")
             .bearer_auth(&self.api_key)
             .multipart(form)
@@ -124,7 +151,9 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
             return Err(MediaUnderstandingError::ProviderError(err_text));
         }
 
-        let json: serde_json::Value = resp.json().await
+        let json: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MediaUnderstandingError::ProviderError(e.to_string()))?;
 
         let text = json["text"].as_str().unwrap_or("").to_string();
@@ -139,7 +168,11 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
         })
     }
 
-    async fn describe_video(&self, _video_data: &[u8], _prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn describe_video(
+        &self,
+        _video_data: &[u8],
+        _prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         Err(MediaUnderstandingError::NoProvider("video".to_string()))
     }
 }
@@ -153,10 +186,17 @@ impl MediaUnderstandingProvider for MockMediaProvider {
     }
 
     fn capabilities(&self) -> &[super::resolve::MediaCapability] {
-        &[super::resolve::MediaCapability::Image, super::resolve::MediaCapability::Audio]
+        &[
+            super::resolve::MediaCapability::Image,
+            super::resolve::MediaCapability::Audio,
+        ]
     }
 
-    async fn analyse_image(&self, _image_data: &[u8], _prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn analyse_image(
+        &self,
+        _image_data: &[u8],
+        _prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         Ok(MediaAnalysis {
             description: "A test image containing various objects.".to_string(),
             labels: vec!["test".to_string(), "mock".to_string()],
@@ -167,7 +207,10 @@ impl MediaUnderstandingProvider for MockMediaProvider {
         })
     }
 
-    async fn transcribe_audio(&self, _audio_data: &[u8]) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn transcribe_audio(
+        &self,
+        _audio_data: &[u8],
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         Ok(MediaAnalysis {
             description: "Audio transcript: Hello, this is a test.".to_string(),
             labels: Vec::new(),
@@ -178,7 +221,11 @@ impl MediaUnderstandingProvider for MockMediaProvider {
         })
     }
 
-    async fn describe_video(&self, _video_data: &[u8], _prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn describe_video(
+        &self,
+        _video_data: &[u8],
+        _prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         Ok(MediaAnalysis {
             description: "A test video.".to_string(),
             labels: vec!["video".to_string()],
@@ -238,7 +285,8 @@ impl GeminiProvider {
             }]
         });
 
-        let resp = self.client
+        let resp = self
+            .client
             .post(&url)
             .header("Content-Type", "application/json")
             .json(&body)
@@ -251,7 +299,9 @@ impl GeminiProvider {
             return Err(MediaUnderstandingError::ProviderError(err_text));
         }
 
-        let json: serde_json::Value = resp.json().await
+        let json: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| MediaUnderstandingError::ProviderError(e.to_string()))?;
 
         let text = json["candidates"][0]["content"]["parts"][0]["text"]
@@ -260,7 +310,9 @@ impl GeminiProvider {
             .to_string();
 
         if text.is_empty() {
-            return Err(MediaUnderstandingError::ProviderError("Empty response from Gemini".to_string()));
+            return Err(MediaUnderstandingError::ProviderError(
+                "Empty response from Gemini".to_string(),
+            ));
         }
 
         Ok(text)
@@ -274,11 +326,20 @@ impl MediaUnderstandingProvider for GeminiProvider {
     }
 
     fn capabilities(&self) -> &[super::resolve::MediaCapability] {
-        &[super::resolve::MediaCapability::Image, super::resolve::MediaCapability::Video]
+        &[
+            super::resolve::MediaCapability::Image,
+            super::resolve::MediaCapability::Video,
+        ]
     }
 
-    async fn analyse_image(&self, image_data: &[u8], prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
-        let prompt_text = prompt.unwrap_or("Describe this image concisely. List the main objects, scene, and any text present.");
+    async fn analyse_image(
+        &self,
+        image_data: &[u8],
+        prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
+        let prompt_text = prompt.unwrap_or(
+            "Describe this image concisely. List the main objects, scene, and any text present.",
+        );
 
         let base64_data = STANDARD.encode(image_data);
         let mime_type = "image/jpeg"; // Assume JPEG for now
@@ -290,7 +351,9 @@ impl MediaUnderstandingProvider for GeminiProvider {
             }
         });
 
-        let description = self.generate_content(vec![inline_data], prompt_text).await?;
+        let description = self
+            .generate_content(vec![inline_data], prompt_text)
+            .await?;
 
         Ok(MediaAnalysis {
             description,
@@ -302,12 +365,20 @@ impl MediaUnderstandingProvider for GeminiProvider {
         })
     }
 
-    async fn transcribe_audio(&self, _audio_data: &[u8]) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn transcribe_audio(
+        &self,
+        _audio_data: &[u8],
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         Err(MediaUnderstandingError::NoProvider("audio".to_string()))
     }
 
-    async fn describe_video(&self, video_data: &[u8], prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
-        let prompt_text = prompt.unwrap_or("Describe this video concisely. What scenes or activities are shown?");
+    async fn describe_video(
+        &self,
+        video_data: &[u8],
+        prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
+        let prompt_text =
+            prompt.unwrap_or("Describe this video concisely. What scenes or activities are shown?");
 
         let base64_data = STANDARD.encode(video_data);
         let mime_type = "video/mp4"; // Assume MP4 for now
@@ -319,7 +390,9 @@ impl MediaUnderstandingProvider for GeminiProvider {
             }
         });
 
-        let description = self.generate_content(vec![inline_data], prompt_text).await?;
+        let description = self
+            .generate_content(vec![inline_data], prompt_text)
+            .await?;
 
         Ok(MediaAnalysis {
             description,
@@ -390,14 +463,26 @@ impl MediaUnderstandingProvider for DeepgramProvider {
         &[super::resolve::MediaCapability::Audio]
     }
 
-    async fn analyse_image(&self, _image_data: &[u8], _prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn analyse_image(
+        &self,
+        _image_data: &[u8],
+        _prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         Err(MediaUnderstandingError::NoProvider("image".to_string()))
     }
 
-    async fn transcribe_audio(&self, audio_data: &[u8]) -> Result<MediaAnalysis, MediaUnderstandingError> {
-        let url = format!("{}/v1/listen?model={}", self.base_url.trim_end_matches('/'), self.model);
+    async fn transcribe_audio(
+        &self,
+        audio_data: &[u8],
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
+        let url = format!(
+            "{}/v1/listen?model={}",
+            self.base_url.trim_end_matches('/'),
+            self.model
+        );
 
-        let resp = self.client
+        let resp = self
+            .client
             .post(&url)
             .header("Authorization", format!("Token {}", self.api_key))
             .header("Content-Type", "audio/mpeg") // Assume MP3 for now
@@ -411,14 +496,21 @@ impl MediaUnderstandingProvider for DeepgramProvider {
             return Err(MediaUnderstandingError::ProviderError(err_text));
         }
 
-        let data: DeepgramResponse = resp.json().await
+        let data: DeepgramResponse = resp
+            .json()
+            .await
             .map_err(|e| MediaUnderstandingError::ProviderError(e.to_string()))?;
 
-        let transcript = data.results
+        let transcript = data
+            .results
             .and_then(|r| r.channels.first())
             .and_then(|c| c.alternatives.first())
             .map(|a| a.transcript.trim().to_string())
-            .ok_or_else(|| MediaUnderstandingError::ProviderError("No transcript in Deepgram response".to_string()))?;
+            .ok_or_else(|| {
+                MediaUnderstandingError::ProviderError(
+                    "No transcript in Deepgram response".to_string(),
+                )
+            })?;
 
         Ok(MediaAnalysis {
             description: format!("Audio transcript: {}", transcript),
@@ -430,18 +522,25 @@ impl MediaUnderstandingProvider for DeepgramProvider {
         })
     }
 
-    async fn describe_video(&self, _video_data: &[u8], _prompt: Option<&str>) -> Result<MediaAnalysis, MediaUnderstandingError> {
+    async fn describe_video(
+        &self,
+        _video_data: &[u8],
+        _prompt: Option<&str>,
+    ) -> Result<MediaAnalysis, MediaUnderstandingError> {
         Err(MediaUnderstandingError::NoProvider("video".to_string()))
     }
 }
 
 pub fn build_provider_registry() -> HashMap<String, Box<dyn MediaUnderstandingProvider>> {
     let mut registry: HashMap<String, Box<dyn MediaUnderstandingProvider>> = HashMap::new();
-    
+
     registry.insert("mock".to_string(), Box::new(MockMediaProvider));
 
     if let Ok(api_key) = std::env::var("OPENAI_API_KEY") {
-        registry.insert("openai".to_string(), Box::new(OpenAiVisionProvider::new(api_key)));
+        registry.insert(
+            "openai".to_string(),
+            Box::new(OpenAiVisionProvider::new(api_key)),
+        );
     }
 
     if let Ok(api_key) = std::env::var("GEMINI_API_KEY") {
@@ -449,8 +548,11 @@ pub fn build_provider_registry() -> HashMap<String, Box<dyn MediaUnderstandingPr
     }
 
     if let Ok(api_key) = std::env::var("DEEPGRAM_API_KEY") {
-        registry.insert("deepgram".to_string(), Box::new(DeepgramProvider::new(api_key)));
+        registry.insert(
+            "deepgram".to_string(),
+            Box::new(DeepgramProvider::new(api_key)),
+        );
     }
-    
+
     registry
 }

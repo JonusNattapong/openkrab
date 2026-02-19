@@ -1,7 +1,7 @@
-use serde_json::json;
-use anyhow::Result;
 use anyhow::anyhow;
+use anyhow::Result;
 use reqwest::Client;
+use serde_json::json;
 
 const LINE_API_BASE: &str = "https://api.line.me/v2/bot";
 
@@ -176,7 +176,11 @@ pub async fn create_rich_menu(
     let status = resp.status();
     let raw_body = resp.text().await?;
     if !status.is_success() {
-        return Err(anyhow!("line create_rich_menu failed ({}): {}", status, raw_body));
+        return Err(anyhow!(
+            "line create_rich_menu failed ({}): {}",
+            status,
+            raw_body
+        ));
     }
 
     if raw_body.trim().is_empty() {
@@ -193,17 +197,17 @@ pub async fn delete_rich_menu(client: &Client, token: &str, rich_menu_id: &str) 
     let status = resp.status();
     let raw_body = resp.text().await?;
     if !status.is_success() {
-        return Err(anyhow!("line delete_rich_menu failed ({}): {}", status, raw_body));
+        return Err(anyhow!(
+            "line delete_rich_menu failed ({}): {}",
+            status,
+            raw_body
+        ));
     }
     Ok(())
 }
 
 /// Set a default rich menu for all users.
-pub async fn set_default_rich_menu(
-    client: &Client,
-    token: &str,
-    rich_menu_id: &str,
-) -> Result<()> {
+pub async fn set_default_rich_menu(client: &Client, token: &str, rich_menu_id: &str) -> Result<()> {
     let url = format!("{}/user/all/richmenu/{}", LINE_API_BASE, rich_menu_id);
     let resp = client.post(&url).bearer_auth(token).send().await?;
     let status = resp.status();
@@ -225,7 +229,11 @@ pub async fn list_rich_menus(client: &Client, token: &str) -> Result<serde_json:
     let status = resp.status();
     let raw_body = resp.text().await?;
     if !status.is_success() {
-        return Err(anyhow!("line list_rich_menus failed ({}): {}", status, raw_body));
+        return Err(anyhow!(
+            "line list_rich_menus failed ({}): {}",
+            status,
+            raw_body
+        ));
     }
 
     if raw_body.trim().is_empty() {
@@ -238,11 +246,7 @@ pub async fn list_rich_menus(client: &Client, token: &str) -> Result<serde_json:
 /// Retrieve the bot's profile info.
 pub async fn get_bot_info(client: &Client, token: &str) -> Result<serde_json::Value> {
     let url = format!("{}/info", LINE_API_BASE);
-    let resp = client
-        .get(&url)
-        .bearer_auth(token)
-        .send()
-        .await?;
+    let resp = client.get(&url).bearer_auth(token).send().await?;
     let status = resp.status();
     let raw_body = resp.text().await?;
     if !status.is_success() {

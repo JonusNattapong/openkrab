@@ -23,7 +23,10 @@ pub struct DraftStreamLoop {
 }
 
 fn now_ms() -> u128 {
-    SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis()
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis()
 }
 
 impl DraftStreamLoop {
@@ -37,7 +40,9 @@ impl DraftStreamLoop {
             Self::schedule_inner(self.inner.clone());
             return;
         }
-        if !inner.timer_running && now_ms().saturating_sub(inner.last_sent_at) >= inner.throttle_ms as u128 {
+        if !inner.timer_running
+            && now_ms().saturating_sub(inner.last_sent_at) >= inner.throttle_ms as u128
+        {
             // spawn immediate flush
             let me = self.clone();
             thread::spawn(move || {
@@ -57,7 +62,9 @@ impl DraftStreamLoop {
         let throttle = inner.throttle_ms;
         let last = inner.last_sent_at;
         drop(inner);
-        let me = DraftStreamLoop { inner: inner_arc.clone() };
+        let me = DraftStreamLoop {
+            inner: inner_arc.clone(),
+        };
         thread::spawn(move || {
             let delay = throttle.saturating_sub((now_ms().saturating_sub(last)) as u64);
             thread::sleep(Duration::from_millis(delay));
@@ -100,7 +107,8 @@ impl DraftStreamLoop {
                 inner.pending_text.clear();
                 let fut = (inner.send_or_edit)(text.clone());
                 // map Option<bool> -> bool (None -> true)
-                let mapped: BoxFuture<'static, bool> = Box::pin(async move { fut.await.unwrap_or(true) });
+                let mapped: BoxFuture<'static, bool> =
+                    Box::pin(async move { fut.await.unwrap_or(true) });
                 inner.in_flight = Some(mapped);
             }
 
@@ -158,5 +166,7 @@ pub fn create_draft_stream_loop(
         in_flight: None,
         timer_running: false,
     };
-    DraftStreamLoop { inner: Arc::new(Mutex::new(inner)) }
+    DraftStreamLoop {
+        inner: Arc::new(Mutex::new(inner)),
+    }
 }

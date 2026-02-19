@@ -42,7 +42,9 @@ impl Default for MatrixConfig {
 }
 
 impl MatrixConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
 
     pub fn validate(&self) -> Result<()> {
         if self.access_token.is_empty() {
@@ -114,11 +116,16 @@ pub struct ParsedMatrixMessage {
 }
 
 pub fn parse_text_event(event: &MatrixEvent) -> Option<ParsedMatrixMessage> {
-    if event.kind != "m.room.message" { return None; }
+    if event.kind != "m.room.message" {
+        return None;
+    }
     let content: MatrixTextContent = serde_json::from_value(event.content.clone()).ok()?;
-    if content.msgtype != "m.text" && content.msgtype != "m.emote" { return None; }
+    if content.msgtype != "m.text" && content.msgtype != "m.emote" {
+        return None;
+    }
 
-    let reply_to = content.relates_to
+    let reply_to = content
+        .relates_to
         .as_ref()
         .and_then(|r| r.in_reply_to.as_ref())
         .map(|r| r.event_id.clone());
@@ -272,7 +279,9 @@ pub async fn send_message(
     let txn_id = format!("krab_{}", now_ms);
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/send/m.room.message/{}",
-        cfg.homeserver, encode_room_id(room_id), txn_id
+        cfg.homeserver,
+        encode_room_id(room_id),
+        txn_id
     );
     let payload = build_text_event(body);
     let resp = client
@@ -301,7 +310,9 @@ pub async fn send_formatted_message(
     let txn_id = format!("krab_{}", now_ms);
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/send/m.room.message/{}",
-        cfg.homeserver, encode_room_id(room_id), txn_id
+        cfg.homeserver,
+        encode_room_id(room_id),
+        txn_id
     );
     let payload = build_formatted_text_event(body, formatted);
     let resp = client
@@ -330,7 +341,9 @@ pub async fn send_html_message(
     let txn_id = format!("krab_html_{}", now_ms);
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/send/m.room.message/{}",
-        cfg.homeserver, encode_room_id(room_id), txn_id
+        cfg.homeserver,
+        encode_room_id(room_id),
+        txn_id
     );
     let payload = build_formatted_text_event(plain_text, html);
     let resp = client
@@ -358,7 +371,9 @@ pub async fn send_notice(
     let txn_id = format!("krab_notice_{}", now_ms);
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/send/m.room.message/{}",
-        cfg.homeserver, encode_room_id(room_id), txn_id
+        cfg.homeserver,
+        encode_room_id(room_id),
+        txn_id
     );
     let payload = serde_json::json!({
         "msgtype": "m.notice",
@@ -390,7 +405,9 @@ pub async fn send_reaction(
     let txn_id = format!("krab_react_{}", now_ms);
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/send/m.reaction/{}",
-        cfg.homeserver, encode_room_id(room_id), txn_id
+        cfg.homeserver,
+        encode_room_id(room_id),
+        txn_id
     );
     let payload = build_reaction_event(emoji, target_event_id);
     let resp = client
@@ -414,11 +431,16 @@ pub async fn redact_message(
 ) -> Result<String> {
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/redact/{}/{}",
-        cfg.homeserver, encode_room_id(room_id), event_id,
-        format!("krab_{}", std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_millis())
+        cfg.homeserver,
+        encode_room_id(room_id),
+        event_id,
+        format!(
+            "krab_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_millis()
+        )
     );
     let mut payload = serde_json::json!({});
     if let Some(r) = reason {
@@ -459,14 +481,11 @@ pub async fn join_room(
 }
 
 /// Leave a room.
-pub async fn leave_room(
-    client: &reqwest::Client,
-    cfg: &MatrixConfig,
-    room_id: &str,
-) -> Result<()> {
+pub async fn leave_room(client: &reqwest::Client, cfg: &MatrixConfig, room_id: &str) -> Result<()> {
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/leave",
-        cfg.homeserver, encode_room_id(room_id)
+        cfg.homeserver,
+        encode_room_id(room_id)
     );
     let payload = serde_json::json!({});
     let _resp = client
@@ -487,7 +506,8 @@ pub async fn get_room_members(
 ) -> Result<Vec<String>> {
     let url = format!(
         "{}/_matrix/client/v3/rooms/{}/members",
-        cfg.homeserver, encode_room_id(room_id)
+        cfg.homeserver,
+        encode_room_id(room_id)
     );
     let resp = client
         .get(&url)
@@ -496,7 +516,8 @@ pub async fn get_room_members(
         .await?
         .error_for_status()?;
     let data: MatrixMembersResponse = resp.json().await?;
-    let members: Vec<String> = data.chunk
+    let members: Vec<String> = data
+        .chunk
         .iter()
         .filter(|e| e.kind == "m.room.member")
         .filter(|e| {
@@ -546,7 +567,10 @@ pub enum MatrixMonitorEvent {
     Error(String),
 }
 
-pub fn create_matrix_channel() -> (mpsc::Sender<MatrixMonitorEvent>, mpsc::Receiver<MatrixMonitorEvent>) {
+pub fn create_matrix_channel() -> (
+    mpsc::Sender<MatrixMonitorEvent>,
+    mpsc::Receiver<MatrixMonitorEvent>,
+) {
     mpsc::channel(100)
 }
 
@@ -606,9 +630,15 @@ impl Monitor {
 
         loop {
             let url = if next_batch.is_empty() {
-                format!("{}/_matrix/client/v3/sync?timeout={}", config.homeserver, timeout)
+                format!(
+                    "{}/_matrix/client/v3/sync?timeout={}",
+                    config.homeserver, timeout
+                )
             } else {
-                format!("{}/_matrix/client/v3/sync?timeout={}&since={}", config.homeserver, timeout, next_batch)
+                format!(
+                    "{}/_matrix/client/v3/sync?timeout={}&since={}",
+                    config.homeserver, timeout, next_batch
+                )
             };
 
             let resp = client
@@ -635,15 +665,19 @@ impl Monitor {
                                 if event.kind == "m.room.member" {
                                     if let Some(content) = event.content.get("membership") {
                                         if content.as_str() == Some("join") {
-                                            let _ = event_tx.send(MatrixMonitorEvent::RoomJoin {
-                                                room_id: room_id.clone(),
-                                                user_id: event.sender.clone(),
-                                            }).await;
+                                            let _ = event_tx
+                                                .send(MatrixMonitorEvent::RoomJoin {
+                                                    room_id: room_id.clone(),
+                                                    user_id: event.sender.clone(),
+                                                })
+                                                .await;
                                         } else if content.as_str() == Some("leave") {
-                                            let _ = event_tx.send(MatrixMonitorEvent::RoomLeave {
-                                                room_id: room_id.clone(),
-                                                user_id: event.sender.clone(),
-                                            }).await;
+                                            let _ = event_tx
+                                                .send(MatrixMonitorEvent::RoomLeave {
+                                                    room_id: room_id.clone(),
+                                                    user_id: event.sender.clone(),
+                                                })
+                                                .await;
                                         }
                                     }
                                 }
@@ -783,7 +817,9 @@ mod tests {
     #[test]
     fn build_reply_event_has_relates_to() {
         let ev = build_reply_event("hello", "$original");
-        assert!(ev["m.relates_to"]["m.in_reply_to"]["event_id"].as_str().is_some());
+        assert!(ev["m.relates_to"]["m.in_reply_to"]["event_id"]
+            .as_str()
+            .is_some());
     }
 
     #[test]

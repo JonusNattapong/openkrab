@@ -23,16 +23,18 @@ pub struct ChannelIssue {
 /// Check gateway health.
 pub async fn check_gateway_health(cfg: &AppConfig, timeout_ms: Option<u64>) -> GatewayHealthResult {
     let timeout_ms = timeout_ms.unwrap_or(10_000);
-    
+
     // Try to connect to gateway
-    let gateway_url = cfg.gateway.url.clone().unwrap_or_else(|| {
-        format!("http://127.0.0.1:{}", crate::gateway::DEFAULT_PORT)
-    });
-    
+    let gateway_url = cfg
+        .gateway
+        .url
+        .clone()
+        .unwrap_or_else(|| format!("http://127.0.0.1:{}", crate::gateway::DEFAULT_PORT));
+
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_millis(timeout_ms))
         .build();
-    
+
     let client = match client {
         Ok(c) => c,
         Err(e) => {
@@ -43,7 +45,7 @@ pub async fn check_gateway_health(cfg: &AppConfig, timeout_ms: Option<u64>) -> G
             };
         }
     };
-    
+
     // Try health endpoint
     let health_url = format!("{}/health", gateway_url);
     match client.get(&health_url).send().await {
@@ -89,36 +91,36 @@ pub async fn check_gateway_health(cfg: &AppConfig, timeout_ms: Option<u64>) -> G
 /// Collect channel status issues from gateway response.
 pub fn collect_channel_status_issues(status: &serde_json::Value) -> Vec<ChannelIssue> {
     let mut issues = Vec::new();
-    
+
     if let Some(channels) = status.get("channels").and_then(|c| c.as_array()) {
         for channel in channels {
             let name = channel
                 .get("name")
                 .and_then(|n| n.as_str())
                 .unwrap_or("unknown");
-            
+
             let account_id = channel
                 .get("account_id")
                 .and_then(|a| a.as_str())
                 .unwrap_or("default");
-            
+
             let healthy = channel
                 .get("healthy")
                 .and_then(|h| h.as_bool())
                 .unwrap_or(true);
-            
+
             if !healthy {
                 let message = channel
                     .get("error")
                     .and_then(|e| e.as_str())
                     .unwrap_or("Channel unhealthy")
                     .to_string();
-                
+
                 let fix = channel
                     .get("fix")
                     .and_then(|f| f.as_str())
                     .map(|s| s.to_string());
-                
+
                 issues.push(ChannelIssue {
                     channel: name.to_string(),
                     account_id: account_id.to_string(),
@@ -128,18 +130,20 @@ pub fn collect_channel_status_issues(status: &serde_json::Value) -> Vec<ChannelI
             }
         }
     }
-    
+
     issues
 }
 
 /// Format gateway health result for display.
 pub fn format_gateway_health(result: &GatewayHealthResult) -> String {
     let mut lines = vec![result.message.clone()];
-    
+
     if !result.channel_issues.is_empty() {
         lines.push("\nChannel issues:".to_string());
         for issue in &result.channel_issues {
-            let fix_str = issue.fix.as_ref()
+            let fix_str = issue
+                .fix
+                .as_ref()
                 .map(|f| format!(" (fix: {})", f))
                 .unwrap_or_default();
             lines.push(format!(
@@ -148,7 +152,7 @@ pub fn format_gateway_health(result: &GatewayHealthResult) -> String {
             ));
         }
     }
-    
+
     lines.join("\n")
 }
 
@@ -182,7 +186,7 @@ mod tests {
                 }
             ]
         });
-        
+
         let issues = collect_channel_status_issues(&status);
         assert_eq!(issues.len(), 1);
         assert_eq!(issues[0].channel, "slack");

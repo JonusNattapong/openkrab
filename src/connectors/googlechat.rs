@@ -35,7 +35,9 @@ impl Default for GoogleChatConfig {
 }
 
 impl GoogleChatConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
         if self.service_account_key.is_empty() && self.webhook_url.is_none() {
             bail!("GOOGLECHAT_SERVICE_ACCOUNT_KEY or GOOGLECHAT_WEBHOOK_URL is required");
@@ -104,19 +106,38 @@ pub struct ParsedGoogleChatMessage {
 }
 
 pub fn parse_event(event: &GoogleChatEvent) -> Option<ParsedGoogleChatMessage> {
-    if event.kind != "MESSAGE" { return None; }
+    if event.kind != "MESSAGE" {
+        return None;
+    }
     let msg = event.message.as_ref()?;
     let raw_text = msg.text.as_deref().unwrap_or("").trim().to_string();
-    let text = msg.argument_text.as_deref()
+    let text = msg
+        .argument_text
+        .as_deref()
         .map(|t| t.trim().to_string())
         .unwrap_or_else(|| raw_text.clone());
-    if raw_text.is_empty() { return None; }
+    if raw_text.is_empty() {
+        return None;
+    }
 
     let sender = msg.sender.as_ref().or(event.user.as_ref());
-    let sender_name = sender.as_ref().and_then(|u| u.name.as_deref()).unwrap_or("").to_string();
-    let sender_display = sender.as_ref().and_then(|u| u.display_name.as_deref()).unwrap_or("").to_string();
-    let space_name = msg.space.as_ref().or(event.space.as_ref())
-        .and_then(|s| s.name.as_deref()).unwrap_or("").to_string();
+    let sender_name = sender
+        .as_ref()
+        .and_then(|u| u.name.as_deref())
+        .unwrap_or("")
+        .to_string();
+    let sender_display = sender
+        .as_ref()
+        .and_then(|u| u.display_name.as_deref())
+        .unwrap_or("")
+        .to_string();
+    let space_name = msg
+        .space
+        .as_ref()
+        .or(event.space.as_ref())
+        .and_then(|s| s.name.as_deref())
+        .unwrap_or("")
+        .to_string();
 
     // Detect bot mention (<bot_name> or @bot)
     let is_bot_mentioned = raw_text != text;
@@ -154,7 +175,12 @@ pub async fn send_webhook(
     text: &str,
 ) -> Result<serde_json::Value> {
     let payload = build_text_message(text);
-    let resp = client.post(webhook_url).json(&payload).send().await?.error_for_status()?;
+    let resp = client
+        .post(webhook_url)
+        .json(&payload)
+        .send()
+        .await?
+        .error_for_status()?;
     Ok(resp.json().await?)
 }
 
@@ -194,7 +220,9 @@ mod tests {
                     display_name: None,
                     kind: Some("ROOM".into()),
                 }),
-                thread: Some(GoogleChatThread { name: Some("spaces/sp1/threads/t1".into()) }),
+                thread: Some(GoogleChatThread {
+                    name: Some("spaces/sp1/threads/t1".into()),
+                }),
             }),
         }
     }
@@ -211,7 +239,10 @@ mod tests {
     fn parse_non_message_event_returns_none() {
         let ev = GoogleChatEvent {
             kind: "ADDED_TO_SPACE".into(),
-            event_time: None, message: None, user: None, space: None,
+            event_time: None,
+            message: None,
+            user: None,
+            space: None,
         };
         assert!(parse_event(&ev).is_none());
     }

@@ -37,14 +37,22 @@ pub fn build_messaging_target(kind: MessagingTargetKind, id: &str, raw: &str) ->
     }
 }
 
-pub fn ensure_target_id(candidate: &str, pattern: &Regex, error_message: &str) -> Result<String, String> {
+pub fn ensure_target_id(
+    candidate: &str,
+    pattern: &Regex,
+    error_message: &str,
+) -> Result<String, String> {
     if !pattern.is_match(candidate) {
         return Err(error_message.to_string());
     }
     Ok(candidate.to_string())
 }
 
-pub fn parse_target_mention(raw: &str, mention_pattern: &Regex, kind: MessagingTargetKind) -> Option<MessagingTarget> {
+pub fn parse_target_mention(
+    raw: &str,
+    mention_pattern: &Regex,
+    kind: MessagingTargetKind,
+) -> Option<MessagingTarget> {
     if let Some(caps) = mention_pattern.captures(raw) {
         if let Some(m) = caps.get(1) {
             return Some(build_messaging_target(kind, m.as_str(), raw));
@@ -53,7 +61,11 @@ pub fn parse_target_mention(raw: &str, mention_pattern: &Regex, kind: MessagingT
     None
 }
 
-pub fn parse_target_prefix(raw: &str, prefix: &str, kind: MessagingTargetKind) -> Option<MessagingTarget> {
+pub fn parse_target_prefix(
+    raw: &str,
+    prefix: &str,
+    kind: MessagingTargetKind,
+) -> Option<MessagingTarget> {
     if !raw.starts_with(prefix) {
         return None;
     }
@@ -65,7 +77,10 @@ pub fn parse_target_prefix(raw: &str, prefix: &str, kind: MessagingTargetKind) -
     }
 }
 
-pub fn parse_target_prefixes(raw: &str, prefixes: &[(String, MessagingTargetKind)]) -> Option<MessagingTarget> {
+pub fn parse_target_prefixes(
+    raw: &str,
+    prefixes: &[(String, MessagingTargetKind)],
+) -> Option<MessagingTarget> {
     for (prefix, kind) in prefixes {
         if let Some(t) = parse_target_prefix(raw, prefix, kind.clone()) {
             return Some(t);
@@ -74,14 +89,21 @@ pub fn parse_target_prefixes(raw: &str, prefixes: &[(String, MessagingTargetKind
     None
 }
 
-pub fn require_target_kind(platform: &str, target: Option<&MessagingTarget>, kind: &MessagingTargetKind) -> Result<String, String> {
+pub fn require_target_kind(
+    platform: &str,
+    target: Option<&MessagingTarget>,
+    kind: &MessagingTargetKind,
+) -> Result<String, String> {
     let kind_label = kind.to_string();
     if target.is_none() {
         return Err(format!("{} {} id is required.", platform, kind_label));
     }
     let t = target.unwrap();
     if &t.kind != kind {
-        return Err(format!("{} {} id is required (use {}:<id>).", platform, kind_label, kind_label));
+        return Err(format!(
+            "{} {} id is required (use {}:<id>).",
+            platform, kind_label, kind_label
+        ));
     }
     Ok(t.id.clone())
 }
@@ -108,7 +130,10 @@ mod tests {
 
     #[test]
     fn test_parse_prefixes() {
-        let prefixes = vec![("#".to_string(), MessagingTargetKind::Channel), ("@".to_string(), MessagingTargetKind::User)];
+        let prefixes = vec![
+            ("#".to_string(), MessagingTargetKind::Channel),
+            ("@".to_string(), MessagingTargetKind::User),
+        ];
         let p = parse_target_prefixes("#general", &prefixes);
         assert!(p.is_some());
         let p = p.unwrap();

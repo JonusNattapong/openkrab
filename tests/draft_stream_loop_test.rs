@@ -1,9 +1,12 @@
-use krabkrab::channels::draft_stream_loop::*;
 use futures::executor::block_on;
 use futures::future::BoxFuture;
+use krabkrab::channels::draft_stream_loop::*;
 use std::sync::{Arc, Mutex};
 
-fn make_send_counter() -> (Arc<Mutex<Vec<String>>>, Arc<dyn Fn(String) -> BoxFuture<'static, Option<bool>> + Send + Sync>) {
+fn make_send_counter() -> (
+    Arc<Mutex<Vec<String>>>,
+    Arc<dyn Fn(String) -> BoxFuture<'static, Option<bool>> + Send + Sync>,
+) {
     let sent = Arc::new(Mutex::new(Vec::new()));
     let sent_clone = sent.clone();
     let f = Arc::new(move |text: String| {

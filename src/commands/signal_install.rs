@@ -34,13 +34,13 @@ pub fn get_signal_cli_version() -> Option<String> {
 pub async fn install_signal_cli() -> SignalInstallResult {
     #[cfg(target_os = "macos")]
     return install_signal_cli_macos().await;
-    
+
     #[cfg(target_os = "linux")]
     return install_signal_cli_linux().await;
-    
+
     #[cfg(target_os = "windows")]
     return install_signal_cli_windows().await;
-    
+
     #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
     SignalInstallResult {
         success: false,
@@ -56,17 +56,16 @@ async fn install_signal_cli_macos() -> SignalInstallResult {
         .args(["install", "signal-cli"])
         .status()
     {
-        Ok(status) if status.success() => {
-            SignalInstallResult {
-                success: true,
-                version: get_signal_cli_version(),
-                message: "Signal CLI installed via Homebrew".to_string(),
-            }
-        }
+        Ok(status) if status.success() => SignalInstallResult {
+            success: true,
+            version: get_signal_cli_version(),
+            message: "Signal CLI installed via Homebrew".to_string(),
+        },
         _ => SignalInstallResult {
             success: false,
             version: None,
-            message: "Failed to install Signal CLI via Homebrew. Try: brew install signal-cli".to_string(),
+            message: "Failed to install Signal CLI via Homebrew. Try: brew install signal-cli"
+                .to_string(),
         },
     }
 }
@@ -78,17 +77,17 @@ async fn install_signal_cli_linux() -> SignalInstallResult {
         .args(["install", "-y", "signal-cli"])
         .status()
     {
-        Ok(status) if status.success() => {
-            SignalInstallResult {
-                success: true,
-                version: get_signal_cli_version(),
-                message: "Signal CLI installed via apt".to_string(),
-            }
-        }
+        Ok(status) if status.success() => SignalInstallResult {
+            success: true,
+            version: get_signal_cli_version(),
+            message: "Signal CLI installed via apt".to_string(),
+        },
         _ => SignalInstallResult {
             success: false,
             version: None,
-            message: "Failed to install Signal CLI via apt. See: https://github.com/AsamK/signal-cli".to_string(),
+            message:
+                "Failed to install Signal CLI via apt. See: https://github.com/AsamK/signal-cli"
+                    .to_string(),
         },
     }
 }
@@ -108,10 +107,10 @@ pub async fn signal_install_command() -> String {
         let version = get_signal_cli_version().unwrap_or_else(|| "unknown".to_string());
         return format!("Signal CLI is already installed: {}", version);
     }
-    
+
     println!("Installing Signal CLI...");
     let result = install_signal_cli().await;
-    
+
     if result.success {
         format!("✅ {}", result.message)
     } else {

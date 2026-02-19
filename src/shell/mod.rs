@@ -73,8 +73,8 @@ fn to_ws_url(input: &str) -> anyhow::Result<String> {
         format!("http://{base}")
     };
 
-    let mut url = reqwest::Url::parse(&normalized)
-        .with_context(|| format!("invalid shell url: {base}"))?;
+    let mut url =
+        reqwest::Url::parse(&normalized).with_context(|| format!("invalid shell url: {base}"))?;
 
     match url.scheme() {
         "http" => {

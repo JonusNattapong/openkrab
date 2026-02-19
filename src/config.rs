@@ -141,34 +141,17 @@ pub fn app_to_openclaw_config(app: &AppConfig) -> OpenClawConfig {
 #[serde(rename_all = "lowercase")]
 pub enum RuntimeLayer {
     Rust,
-    Js,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct FeatureRoute {
     pub primary: RuntimeLayer,
-    pub fallback: Option<RuntimeLayer>,
 }
 
 impl FeatureRoute {
     pub const fn rust_only() -> Self {
         Self {
             primary: RuntimeLayer::Rust,
-            fallback: None,
-        }
-    }
-
-    pub const fn js_only() -> Self {
-        Self {
-            primary: RuntimeLayer::Js,
-            fallback: None,
-        }
-    }
-
-    pub const fn rust_then_js() -> Self {
-        Self {
-            primary: RuntimeLayer::Rust,
-            fallback: Some(RuntimeLayer::Js),
         }
     }
 }
@@ -188,14 +171,14 @@ pub struct FeatureMatrix {
 impl Default for FeatureMatrix {
     fn default() -> Self {
         Self {
-            browser_automation: FeatureRoute::js_only(),
-            canvas_host: FeatureRoute::rust_then_js(),
-            voice_wake_talk: FeatureRoute::rust_then_js(),
-            macos_native: FeatureRoute::js_only(),
-            node_host: FeatureRoute::rust_then_js(),
-            imessage_native: FeatureRoute::js_only(),
-            whatsapp_full: FeatureRoute::rust_then_js(),
-            line_full: FeatureRoute::rust_then_js(),
+            browser_automation: FeatureRoute::rust_only(),
+            canvas_host: FeatureRoute::rust_only(),
+            voice_wake_talk: FeatureRoute::rust_only(),
+            macos_native: FeatureRoute::rust_only(),
+            node_host: FeatureRoute::rust_only(),
+            imessage_native: FeatureRoute::rust_only(),
+            whatsapp_full: FeatureRoute::rust_only(),
+            line_full: FeatureRoute::rust_only(),
         }
     }
 }
@@ -415,21 +398,6 @@ pub fn validate_config(cfg: &AppConfig) -> Result<(), String> {
     if cfg.log_level.trim().is_empty() {
         return Err("log_level must not be empty".to_string());
     }
-    let all = [
-        &cfg.feature_matrix.browser_automation,
-        &cfg.feature_matrix.canvas_host,
-        &cfg.feature_matrix.voice_wake_talk,
-        &cfg.feature_matrix.macos_native,
-        &cfg.feature_matrix.node_host,
-        &cfg.feature_matrix.imessage_native,
-        &cfg.feature_matrix.whatsapp_full,
-        &cfg.feature_matrix.line_full,
-    ];
-    for route in all {
-        if route.fallback == Some(route.primary) {
-            return Err("feature_matrix fallback must differ from primary".to_string());
-        }
-    }
     Ok(())
 }
 
@@ -455,30 +423,25 @@ mod tests {
     }
 
     #[test]
-    fn feature_matrix_defaults_to_js_for_non_ported_areas() {
+    fn feature_matrix_defaults_to_rust_only() {
         let cfg = AppConfig::default();
         assert_eq!(
             cfg.feature_matrix.browser_automation.primary,
-            RuntimeLayer::Js
+            RuntimeLayer::Rust
         );
         assert_eq!(cfg.feature_matrix.canvas_host.primary, RuntimeLayer::Rust);
         assert_eq!(
             cfg.feature_matrix.voice_wake_talk.primary,
             RuntimeLayer::Rust
         );
+        assert_eq!(cfg.feature_matrix.macos_native.primary, RuntimeLayer::Rust);
+        assert_eq!(
+            cfg.feature_matrix.imessage_native.primary,
+            RuntimeLayer::Rust
+        );
         assert_eq!(cfg.feature_matrix.node_host.primary, RuntimeLayer::Rust);
         assert_eq!(cfg.feature_matrix.whatsapp_full.primary, RuntimeLayer::Rust);
-        assert_eq!(
-            cfg.feature_matrix.whatsapp_full.fallback,
-            Some(RuntimeLayer::Js)
-        );
-    }
-
-    #[test]
-    fn invalid_matrix_rejects_same_primary_and_fallback() {
-        let mut cfg = AppConfig::default();
-        cfg.feature_matrix.browser_automation.fallback = Some(RuntimeLayer::Js);
-        assert!(validate_config(&cfg).is_err());
+        assert_eq!(cfg.feature_matrix.line_full.primary, RuntimeLayer::Rust);
     }
 
     #[test]

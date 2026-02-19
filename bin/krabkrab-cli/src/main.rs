@@ -1,22 +1,19 @@
 use clap::{Parser, Subcommand};
 use krabkrab::commands::{
-    configure_command_interactive, memory_search_command, memory_sync_command,
-    slack_send_command, slack_send_dry_run_command, status_command,
-    telegram_send_command, telegram_send_dry_run_command, models_list_command,
-    models_auth_list_command, models_auth_add_command, models_auth_remove_command, models_auth_get_command,
-    discord_send_command, discord_send_dry_run_command,
-    login_openai_codex_oauth_interactive, login_chutes_oauth,
-    doctor_command, onboard_wizard, onboard_quick, run_interactive_shell, bridge_command,
-    channels_list_command, channels_status_command, channels_add_command, channels_remove_command,
-    channels_logs_command,
-    logs_tail_command, config_show_command, config_get_command, config_set_command, config_edit_command,
-    cron_list_command, cron_add_command,
-    pairing_list_command, pairing_approve_command, pairing_generate_command,
-    update_command, skills_command, sandbox_command, nodes_command,
-    hooks_command, webhooks_command, exec_approvals_command, docs_command, dns_command,
-    directory_command, system_command, devices_command, daemon_command,
-    login_minimax_oauth, login_qwen_oauth, login_github_copilot,
-    send_whatsapp_message, send_whatsapp_media, send_whatsapp_template,
+    bridge_command, channels_add_command, channels_list_command, channels_logs_command,
+    channels_remove_command, channels_status_command, config_edit_command, config_get_command,
+    config_set_command, config_show_command, configure_command_interactive, cron_add_command,
+    cron_list_command, daemon_command, devices_command, directory_command, discord_send_command,
+    discord_send_dry_run_command, dns_command, docs_command, doctor_command,
+    exec_approvals_command, hooks_command, login_chutes_oauth, login_github_copilot,
+    login_minimax_oauth, login_openai_codex_oauth_interactive, login_qwen_oauth, logs_tail_command,
+    memory_search_command, memory_sync_command, models_auth_add_command, models_auth_get_command,
+    models_auth_list_command, models_auth_remove_command, models_list_command, nodes_command,
+    onboard_quick, onboard_wizard, pairing_approve_command, pairing_generate_command,
+    pairing_list_command, run_interactive_shell, sandbox_command, send_whatsapp_media,
+    send_whatsapp_message, send_whatsapp_template, skills_command, slack_send_command,
+    slack_send_dry_run_command, status_command, system_command, telegram_send_command,
+    telegram_send_dry_run_command, update_command, webhooks_command,
 };
 
 #[derive(Parser)]
@@ -294,45 +291,26 @@ enum LoginSub {
 #[derive(Subcommand)]
 enum ConfigSub {
     Show,
-    Get {
-        key: String,
-    },
-    Set {
-        key: String,
-        value: String,
-    },
+    Get { key: String },
+    Set { key: String, value: String },
     Edit,
 }
 
 #[derive(Subcommand)]
 enum CronSub {
     List,
-    Add {
-        schedule: String,
-        command: String,
-    },
-    Remove {
-        id: String,
-    },
-    Enable {
-        id: String,
-    },
-    Disable {
-        id: String,
-    },
+    Add { schedule: String, command: String },
+    Remove { id: String },
+    Enable { id: String },
+    Disable { id: String },
 }
 
 #[derive(Subcommand)]
 enum PairingSub {
     List,
     Generate,
-    Approve {
-        channel: String,
-        code: String,
-    },
-    Revoke {
-        device_id: String,
-    },
+    Approve { channel: String, code: String },
+    Revoke { device_id: String },
 }
 
 #[derive(Subcommand)]
@@ -410,13 +388,18 @@ async fn main() -> anyhow::Result<()> {
             }
             let _ = profile; // profile is used internally by wizard
         }
-        CliCommand::Shell { url, token, session } => {
+        CliCommand::Shell {
+            url,
+            token,
+            session,
+        } => {
             use krabkrab::shell::ShellConfig;
             run_interactive_shell(ShellConfig {
                 url,
                 token,
                 session,
-            }).await?;
+            })
+            .await?;
         }
         CliCommand::Telegram {
             to,
@@ -466,14 +449,27 @@ async fn main() -> anyhow::Result<()> {
                 } else {
                     krabkrab::connectors::whatsapp_client::build_whatsapp_text_payload(&to, &text)
                 };
-                println!("WhatsApp dry run: {}", serde_json::to_string_pretty(&payload).unwrap());
+                println!(
+                    "WhatsApp dry run: {}",
+                    serde_json::to_string_pretty(&payload).unwrap()
+                );
             } else {
                 let result = if let Some(media_url) = media_url {
-                    send_whatsapp_media(&to, Some(&text), &media_url, &access_token, &phone_number_id).await?
+                    send_whatsapp_media(
+                        &to,
+                        Some(&text),
+                        &media_url,
+                        &access_token,
+                        &phone_number_id,
+                    )
+                    .await?
                 } else {
                     send_whatsapp_message(&to, &text, &access_token, &phone_number_id).await?
                 };
-                println!("WhatsApp message sent: {}", serde_json::to_string_pretty(&result).unwrap());
+                println!(
+                    "WhatsApp message sent: {}",
+                    serde_json::to_string_pretty(&result).unwrap()
+                );
             }
         }
         CliCommand::Configure { .. } => {
@@ -512,7 +508,11 @@ async fn main() -> anyhow::Result<()> {
             ModelsAuthSub::List => {
                 println!("{}", models_auth_list_command());
             }
-            ModelsAuthSub::Add { profile_id, provider, token } => {
+            ModelsAuthSub::Add {
+                profile_id,
+                provider,
+                token,
+            } => {
                 let out = models_auth_add_command(&profile_id, &provider, token.as_deref())?;
                 println!("{out}");
             }
@@ -556,11 +556,19 @@ async fn main() -> anyhow::Result<()> {
         CliCommand::Channels { sub } => match sub {
             ChannelsSub::List => println!("{}", channels_list_command()),
             ChannelsSub::Status => println!("{}", channels_status_command()),
-            ChannelsSub::Add { channel, token } => println!("{}", channels_add_command(&channel, token.as_deref())),
+            ChannelsSub::Add { channel, token } => {
+                println!("{}", channels_add_command(&channel, token.as_deref()))
+            }
             ChannelsSub::Remove { channel } => println!("{}", channels_remove_command(&channel)),
-            ChannelsSub::Logs { channel, lines } => println!("{}", channels_logs_command(channel.as_deref(), lines)),
+            ChannelsSub::Logs { channel, lines } => {
+                println!("{}", channels_logs_command(channel.as_deref(), lines))
+            }
         },
-        CliCommand::Logs { lines, follow, json } => {
+        CliCommand::Logs {
+            lines,
+            follow,
+            json,
+        } => {
             println!("{}", logs_tail_command(lines, follow, json));
         }
         CliCommand::Config { sub } => match sub {
@@ -571,7 +579,9 @@ async fn main() -> anyhow::Result<()> {
         },
         CliCommand::Cron { sub } => match sub {
             CronSub::List => println!("{}", cron_list_command()),
-            CronSub::Add { schedule, command } => println!("{}", cron_add_command(&schedule, &command)),
+            CronSub::Add { schedule, command } => {
+                println!("{}", cron_add_command(&schedule, &command))
+            }
             CronSub::Remove { id } => println!("Removing cron job: {}", id),
             CronSub::Enable { id } => println!("Enabling cron job: {}", id),
             CronSub::Disable { id } => println!("Disabling cron job: {}", id),
@@ -579,7 +589,9 @@ async fn main() -> anyhow::Result<()> {
         CliCommand::Pairing { sub } => match sub {
             PairingSub::List => println!("{}", pairing_list_command()),
             PairingSub::Generate => println!("{}", pairing_generate_command()),
-            PairingSub::Approve { channel, code } => println!("{}", pairing_approve_command(&channel, &code)),
+            PairingSub::Approve { channel, code } => {
+                println!("{}", pairing_approve_command(&channel, &code))
+            }
             PairingSub::Revoke { device_id } => println!("Revoking device: {}", device_id),
         },
         CliCommand::Update { channels } => println!("{}", update_command(channels)),
@@ -640,7 +652,12 @@ async fn main() -> anyhow::Result<()> {
                     files,
                 } => {
                     browser::upload_files(&profile, &selector, &files).await?;
-                    println!("upload ok profile={} selector={} files={}", profile, selector, files.len());
+                    println!(
+                        "upload ok profile={} selector={} files={}",
+                        profile,
+                        selector,
+                        files.len()
+                    );
                 }
                 BrowserSub::Snapshot { profile } => {
                     let snap = browser::snapshot(&profile).await?;
@@ -658,7 +675,7 @@ async fn main() -> anyhow::Result<()> {
         CliCommand::Devices { action } => println!("{}", devices_command(&action)),
         CliCommand::Daemon { action } => println!("{}", daemon_command(&action)),
         CliCommand::Tui { url, session } => {
-            use krabkrab::tui::{TuiConfig, run_tui};
+            use krabkrab::tui::{run_tui, TuiConfig};
             let config = TuiConfig {
                 gateway_url: url,
                 session,

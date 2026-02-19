@@ -13,8 +13,8 @@ pub mod ollama;
 pub mod openai;
 pub mod qwen_oauth;
 
-use async_trait::async_trait;
 use anyhow::Result;
+use async_trait::async_trait;
 use std::collections::HashMap;
 
 // ─── Core trait ───────────────────────────────────────────────────────────────
@@ -41,7 +41,9 @@ pub struct ProviderRegistry {
 
 impl ProviderRegistry {
     pub fn new() -> Self {
-        Self { providers: HashMap::new() }
+        Self {
+            providers: HashMap::new(),
+        }
     }
 
     /// Register a provider under the given name.
@@ -90,7 +92,9 @@ pub fn default_registry_from_env() -> ProviderRegistry {
     if std::env::var("QWEN_ACCESS_TOKEN").is_ok() {
         // Qwen provider requires access token - will be resolved at runtime
     }
-    registry.register(Box::new(crate::providers::ollama::OllamaProvider::from_env()));
+    registry.register(Box::new(
+        crate::providers::ollama::OllamaProvider::from_env(),
+    ));
 
     registry
 }
@@ -108,10 +112,7 @@ pub fn known_model_ids(provider: &str) -> Vec<String> {
             .chain(crate::providers::gemini::KNOWN_GEMINI_EMBEDDING_MODELS.iter())
             .map(|m| (*m).to_string())
             .collect(),
-        ProviderKind::Ollama => vec![
-            "llama3".to_string(),
-            "nomic-embed-text".to_string(),
-        ],
+        ProviderKind::Ollama => vec!["llama3".to_string(), "nomic-embed-text".to_string()],
         ProviderKind::Copilot => crate::providers::copilot_models::get_default_model_ids()
             .into_iter()
             .map(|m| m.to_string())
@@ -179,7 +180,10 @@ mod tests {
         assert_eq!(ProviderKind::from_str("gemini"), ProviderKind::Gemini);
         assert_eq!(ProviderKind::from_str("ollama"), ProviderKind::Ollama);
         assert_eq!(ProviderKind::from_str("copilot"), ProviderKind::Copilot);
-        assert_eq!(ProviderKind::from_str("qwen-portal"), ProviderKind::QwenPortal);
+        assert_eq!(
+            ProviderKind::from_str("qwen-portal"),
+            ProviderKind::QwenPortal
+        );
         assert_eq!(
             ProviderKind::from_str("custom-xyz"),
             ProviderKind::Custom("custom-xyz".to_string())
@@ -192,7 +196,9 @@ mod tests {
 
         #[async_trait::async_trait]
         impl LlmProvider for DummyProvider {
-            fn name(&self) -> &str { "dummy" }
+            fn name(&self) -> &str {
+                "dummy"
+            }
             async fn complete(&self, _prompt: &str) -> anyhow::Result<String> {
                 Ok("dummy reply".to_string())
             }

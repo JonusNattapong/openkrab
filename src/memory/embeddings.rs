@@ -1,7 +1,7 @@
-use async_trait::async_trait;
 use anyhow::Result;
-use serde::{Deserialize, Serialize};
+use async_trait::async_trait;
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 #[async_trait]
 pub trait EmbeddingProvider: Send + Sync {
@@ -62,7 +62,8 @@ impl EmbeddingProvider for OpenAiProvider {
 
     async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>> {
         let url = format!("{}/embeddings", self.base_url.trim_end_matches('/'));
-        let response = self.client
+        let response = self
+            .client
             .post(&url)
             .bearer_auth(&self.api_key)
             .json(&OpenAiEmbeddingRequest {
@@ -94,7 +95,8 @@ impl GeminiProvider {
         Self {
             client: Client::new(),
             api_key,
-            base_url: base_url.unwrap_or_else(|| "https://generativelanguage.googleapis.com/v1beta".to_string()),
+            base_url: base_url
+                .unwrap_or_else(|| "https://generativelanguage.googleapis.com/v1beta".to_string()),
             model: model.unwrap_or_else(|| "text-embedding-004".to_string()),
         }
     }
@@ -179,16 +181,24 @@ impl EmbeddingProvider for GeminiProvider {
     }
 
     async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>> {
-        let url = format!("{}/{}:batchEmbedContents", self.base_url.trim_end_matches('/'), self.model_path());
-        let requests = texts.iter().map(|t| GeminiBatchItem {
-            model: self.model_path(),
-            content: GeminiContentOwned {
-                parts: vec![GeminiPartOwned { text: t.clone() }],
-            },
-            task_type: "RETRIEVAL_DOCUMENT".to_string(),
-        }).collect();
+        let url = format!(
+            "{}/{}:batchEmbedContents",
+            self.base_url.trim_end_matches('/'),
+            self.model_path()
+        );
+        let requests = texts
+            .iter()
+            .map(|t| GeminiBatchItem {
+                model: self.model_path(),
+                content: GeminiContentOwned {
+                    parts: vec![GeminiPartOwned { text: t.clone() }],
+                },
+                task_type: "RETRIEVAL_DOCUMENT".to_string(),
+            })
+            .collect();
 
-        let response = self.client
+        let response = self
+            .client
             .post(&url)
             .header("x-goog-api-key", &self.api_key)
             .json(&GeminiBatchRequest { requests })
@@ -201,7 +211,12 @@ impl EmbeddingProvider for GeminiProvider {
         }
 
         let body: GeminiBatchResponse = response.json().await?;
-        Ok(body.embeddings.unwrap_or_default().into_iter().map(|e| e.values.unwrap_or_default()).collect())
+        Ok(body
+            .embeddings
+            .unwrap_or_default()
+            .into_iter()
+            .map(|e| e.values.unwrap_or_default())
+            .collect())
     }
 }
 
@@ -264,7 +279,8 @@ impl EmbeddingProvider for VoyageProvider {
             input_type: Some("document"),
         };
 
-        let resp = self.client
+        let resp = self
+            .client
             .post(&url)
             .bearer_auth(&self.api_key)
             .json(&body)
@@ -320,7 +336,8 @@ impl EmbeddingProvider for OllamaProvider {
 
     async fn embed_query(&self, text: &str) -> Result<Vec<f32>> {
         let url = format!("{}/api/embeddings", self.base_url.trim_end_matches('/'));
-        let response = self.client
+        let response = self
+            .client
             .post(&url)
             .json(&OllamaEmbedRequest {
                 model: &self.model,
@@ -352,17 +369,17 @@ pub fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     let mut dot = 0.0;
     let mut norm_a = 0.0;
     let mut norm_b = 0.0;
-    
+
     for i in 0..a.len() {
         dot += a[i] * b[i];
         norm_a += a[i] * a[i];
         norm_b += b[i] * b[i];
     }
-    
+
     if norm_a == 0.0 || norm_b == 0.0 {
         return 0.0;
     }
-    
+
     dot / (norm_a.sqrt() * norm_b.sqrt())
 }
 
@@ -372,10 +389,10 @@ pub fn sanitize_and_normalize(vec: &mut Vec<f32>) {
             *val = 0.0;
         }
     }
-    
+
     let magnitude_sq: f32 = vec.iter().map(|v| v * v).sum();
     let magnitude = magnitude_sq.sqrt();
-    
+
     if magnitude > 1e-10 {
         for val in vec.iter_mut() {
             *val /= magnitude;

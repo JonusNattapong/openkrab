@@ -79,7 +79,10 @@ pub fn create_action_gate<T: std::any::Any>(
 ) -> Box<ActionGate<T>> {
     let actions = actions.unwrap_or_default();
     Box::new(move |key: &str, default_value: Option<bool>| -> bool {
-        actions.get(key).copied().unwrap_or(default_value.unwrap_or(true))
+        actions
+            .get(key)
+            .copied()
+            .unwrap_or(default_value.unwrap_or(true))
     })
 }
 
@@ -96,7 +99,11 @@ pub fn read_string_param(
             return Err(ToolInputError::new(format!(
                 "Parameter '{}' is required{}",
                 key,
-                options.label.as_ref().map(|l| format!(" ({})", l)).unwrap_or_default()
+                options
+                    .label
+                    .as_ref()
+                    .map(|l| format!(" ({})", l))
+                    .unwrap_or_default()
             )));
         }
         return Ok(String::new());
@@ -111,7 +118,11 @@ pub fn read_string_param(
             return Err(ToolInputError::new(format!(
                 "Parameter '{}' must be a string{}",
                 key,
-                options.label.as_ref().map(|l| format!(" ({})", l)).unwrap_or_default()
+                options
+                    .label
+                    .as_ref()
+                    .map(|l| format!(" ({})", l))
+                    .unwrap_or_default()
             )));
         }
     };
@@ -126,7 +137,11 @@ pub fn read_string_param(
         return Err(ToolInputError::new(format!(
             "Parameter '{}' cannot be empty{}",
             key,
-            options.label.as_ref().map(|l| format!(" ({})", l)).unwrap_or_default()
+            options
+                .label
+                .as_ref()
+                .map(|l| format!(" ({})", l))
+                .unwrap_or_default()
         )));
     }
 
@@ -143,7 +158,10 @@ pub fn read_boolean_param(
 
     if value.is_none() {
         if options.required {
-            return Err(ToolInputError::new(format!("Parameter '{}' is required", key)));
+            return Err(ToolInputError::new(format!(
+                "Parameter '{}' is required",
+                key
+            )));
         }
         return Ok(options.default_value.unwrap_or(false));
     }
@@ -154,10 +172,16 @@ pub fn read_boolean_param(
         serde_json::Value::String(s) => match s.to_lowercase().as_str() {
             "true" | "1" | "yes" | "on" => Ok(true),
             "false" | "0" | "no" | "off" => Ok(false),
-            _ => Err(ToolInputError::new(format!("Parameter '{}' must be a valid boolean", key))),
+            _ => Err(ToolInputError::new(format!(
+                "Parameter '{}' must be a valid boolean",
+                key
+            ))),
         },
         serde_json::Value::Number(n) => Ok(*n.as_i64().unwrap_or(0) != 0),
-        _ => Err(ToolInputError::new(format!("Parameter '{}' must be a boolean", key))),
+        _ => Err(ToolInputError::new(format!(
+            "Parameter '{}' must be a boolean",
+            key
+        ))),
     }
 }
 
@@ -171,7 +195,10 @@ pub fn read_number_param(
 
     if value.is_none() {
         if options.required {
-            return Err(ToolInputError::new(format!("Parameter '{}' is required", key)));
+            return Err(ToolInputError::new(format!(
+                "Parameter '{}' is required",
+                key
+            )));
         }
         return Ok(options.default_value.unwrap_or(0.0));
     }
@@ -182,16 +209,26 @@ pub fn read_number_param(
         serde_json::Value::String(s) => s.parse::<f64>().map_err(|_| {
             ToolInputError::new(format!("Parameter '{}' must be a valid number", key))
         })?,
-        serde_json::Value::Bool(b) => if *b { 1.0 } else { 0.0 },
+        serde_json::Value::Bool(b) => {
+            if *b {
+                1.0
+            } else {
+                0.0
+            }
+        }
         _ => {
-            return Err(ToolInputError::new(format!("Parameter '{}' must be a number", key)));
+            return Err(ToolInputError::new(format!(
+                "Parameter '{}' must be a number",
+                key
+            )));
         }
     };
 
     if let Some(min) = options.min {
         if num_value < min {
             return Err(ToolInputError::new(format!(
-                "Parameter '{}' must be at least {}", key, min
+                "Parameter '{}' must be at least {}",
+                key, min
             )));
         }
     }
@@ -199,7 +236,8 @@ pub fn read_number_param(
     if let Some(max) = options.max {
         if num_value > max {
             return Err(ToolInputError::new(format!(
-                "Parameter '{}' must be at most {}", key, max
+                "Parameter '{}' must be at most {}",
+                key, max
             )));
         }
     }
@@ -233,26 +271,30 @@ pub fn read_path_param(
     if options.must_exist {
         if !path.exists() {
             return Err(ToolInputError::new(format!(
-                "Path '{}' does not exist", string_value
+                "Path '{}' does not exist",
+                string_value
             )));
         }
 
         if options.must_be_file && !path.is_file() {
             return Err(ToolInputError::new(format!(
-                "Path '{}' must be a file", string_value
+                "Path '{}' must be a file",
+                string_value
             )));
         }
 
         if options.must_be_dir && !path.is_dir() {
             return Err(ToolInputError::new(format!(
-                "Path '{}' must be a directory", string_value
+                "Path '{}' must be a directory",
+                string_value
             )));
         }
     }
 
     if !options.allow_relative && path.is_relative() {
         return Err(ToolInputError::new(format!(
-            "Path '{}' must be absolute", string_value
+            "Path '{}' must be absolute",
+            string_value
         )));
     }
 
@@ -289,7 +331,10 @@ mod tests {
     #[test]
     fn test_read_string_param_required() {
         let mut params = HashMap::new();
-        params.insert("name".to_string(), serde_json::Value::String("test".to_string()));
+        params.insert(
+            "name".to_string(),
+            serde_json::Value::String("test".to_string()),
+        );
 
         let result = read_string_param(
             &params,
@@ -323,11 +368,7 @@ mod tests {
         let mut params = HashMap::new();
         params.insert("enabled".to_string(), serde_json::Value::Bool(true));
 
-        let result = read_boolean_param(
-            &params,
-            "enabled",
-            BooleanParamOptions::default(),
-        );
+        let result = read_boolean_param(&params, "enabled", BooleanParamOptions::default());
         assert_eq!(result.unwrap(), true);
     }
 

@@ -119,7 +119,10 @@ impl LlmProvider for OpenAiProvider {
     }
 
     async fn embed(&self, text: &str) -> Result<Vec<f32>> {
-        let body = EmbeddingRequest { input: text, model: &self.embedding_model };
+        let body = EmbeddingRequest {
+            input: text,
+            model: &self.embedding_model,
+        };
 
         let resp = self
             .client
@@ -131,19 +134,20 @@ impl LlmProvider for OpenAiProvider {
             .error_for_status()?;
 
         let parsed: EmbeddingResponse = resp.json().await?;
-        let vec = parsed.data.into_iter().next().map(|d| d.embedding).unwrap_or_default();
+        let vec = parsed
+            .data
+            .into_iter()
+            .next()
+            .map(|d| d.embedding)
+            .unwrap_or_default();
         Ok(vec)
     }
 }
 
 // ─── Model list helpers ───────────────────────────────────────────────────────
 
-pub const KNOWN_OPENAI_CHAT_MODELS: &[&str] = &[
-    "gpt-4o",
-    "gpt-4o-mini",
-    "gpt-4-turbo",
-    "gpt-3.5-turbo",
-];
+pub const KNOWN_OPENAI_CHAT_MODELS: &[&str] =
+    &["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"];
 
 pub const KNOWN_OPENAI_EMBEDDING_MODELS: &[&str] = &[
     "text-embedding-3-large",

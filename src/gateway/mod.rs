@@ -3,18 +3,18 @@
 //!
 //! Core infrastructure for real-time communication and API services.
 
-pub mod server;
-pub mod client;
 pub mod auth;
-pub mod types;
+pub mod client;
 pub mod constants;
 pub mod monitor_manager;
+pub mod server;
+pub mod types;
 
 // Re-exports for convenience
-pub use constants::*;
-pub use types::*;
-pub use server::{GatewayServer, GatewayServerOptions, ClientConnection};
 pub use client::*;
+pub use constants::*;
+pub use server::{ClientConnection, GatewayServer, GatewayServerOptions};
+pub use types::*;
 
 /// Gateway state wrapper (for compatibility with old code)
 pub type GatewayState = GatewayServer;

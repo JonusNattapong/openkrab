@@ -42,7 +42,11 @@ pub enum ModelApi {
 /// Input modality supported by a model.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-pub enum InputModality { Text, Image, Audio }
+pub enum InputModality {
+    Text,
+    Image,
+    Audio,
+}
 
 /// Cost structure (all zero for Copilot — billed via subscription).
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -88,7 +92,8 @@ pub fn build_copilot_model_definition(model_id: &str) -> anyhow::Result<ModelDef
 
 /// Build definitions for all default Copilot models.
 pub fn build_default_copilot_models() -> Vec<ModelDefinition> {
-    DEFAULT_MODEL_IDS.iter()
+    DEFAULT_MODEL_IDS
+        .iter()
         .filter_map(|id| build_copilot_model_definition(id).ok())
         .collect()
 }

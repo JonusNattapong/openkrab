@@ -25,9 +25,18 @@ static EXT_BY_MIME: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     map.insert("application/msword", ".doc");
     map.insert("application/vnd.ms-excel", ".xls");
     map.insert("application/vnd.ms-powerpoint", ".ppt");
-    map.insert("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx");
-    map.insert("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx");
-    map.insert("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx");
+    map.insert(
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".docx",
+    );
+    map.insert(
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".xlsx",
+    );
+    map.insert(
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ".pptx",
+    );
     map.insert("text/csv", ".csv");
     map.insert("text/plain", ".txt");
     map.insert("text/markdown", ".md");
@@ -60,13 +69,17 @@ static AUDIO_FILE_EXTENSIONS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
 pub fn normalize_mime(mime: Option<&str>) -> Option<&str> {
     mime.and_then(|m| {
         let cleaned = m.split(';').next()?.trim().to_lowercase();
-        if cleaned.is_empty() { None } else { Some(cleaned.leak() as &'static str) }
+        if cleaned.is_empty() {
+            None
+        } else {
+            Some(cleaned.leak() as &'static str)
+        }
     })
 }
 
 pub fn get_file_extension(file_path: Option<&str>) -> Option<&'static str> {
     let path = file_path?;
-    
+
     if path.starts_with("http://") || path.starts_with("https://") {
         let path_part = path.split('?').next().unwrap_or(path);
         let path_part = path_part.split('#').next().unwrap_or(path_part);
@@ -80,7 +93,7 @@ pub fn get_file_extension(file_path: Option<&str>) -> Option<&'static str> {
         }
         return None;
     }
-    
+
     std::path::Path::new(path)
         .extension()
         .and_then(|e| e.to_str())
@@ -100,7 +113,11 @@ fn is_generic_mime(mime: Option<&str>) -> bool {
     }
 }
 
-pub async fn detect_mime(buffer: Option<&[u8]>, header_mime: Option<&str>, file_path: Option<&str>) -> Option<String> {
+pub async fn detect_mime(
+    buffer: Option<&[u8]>,
+    header_mime: Option<&str>,
+    file_path: Option<&str>,
+) -> Option<String> {
     let ext = get_file_extension(file_path);
     let ext_mime = ext.and_then(|e| MIME_BY_EXT.get(e)).copied();
 
@@ -132,7 +149,7 @@ pub async fn detect_mime(buffer: Option<&[u8]>, header_mime: Option<&str>, file_
 
 async fn sniff_mime(buffer: Option<&[u8]>) -> Option<String> {
     let buf = buffer?;
-    
+
     if buf.len() < 4 {
         return None;
     }
@@ -174,7 +191,10 @@ pub fn extension_for_mime(mime: Option<&str>) -> Option<&'static str> {
 }
 
 pub fn is_gif_media(content_type: Option<&str>, file_name: Option<&str>) -> bool {
-    if content_type.map(|c| c.to_lowercase() == "image/gif").unwrap_or(false) {
+    if content_type
+        .map(|c| c.to_lowercase() == "image/gif")
+        .unwrap_or(false)
+    {
         return true;
     }
     get_file_extension(file_name) == Some(".gif")
@@ -221,7 +241,10 @@ mod tests {
     #[test]
     fn test_normalize_mime() {
         assert_eq!(normalize_mime(Some("image/png")), Some("image/png"));
-        assert_eq!(normalize_mime(Some("image/png; charset=utf-8")), Some("image/png"));
+        assert_eq!(
+            normalize_mime(Some("image/png; charset=utf-8")),
+            Some("image/png")
+        );
         assert_eq!(normalize_mime(None), None);
     }
 

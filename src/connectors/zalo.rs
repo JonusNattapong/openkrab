@@ -31,9 +31,13 @@ impl Default for ZaloConfig {
 }
 
 impl ZaloConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
-        if self.access_token.is_empty() { bail!("ZALO_ACCESS_TOKEN is required"); }
+        if self.access_token.is_empty() {
+            bail!("ZALO_ACCESS_TOKEN is required");
+        }
         Ok(())
     }
 }
@@ -89,22 +93,36 @@ pub struct ParsedZaloMessage {
 }
 
 pub fn parse_event(event: &ZaloWebhookEvent) -> Option<ParsedZaloMessage> {
-    if event.event_name != "follow" && event.event_name != "user_send_text"
-        && !event.event_name.starts_with("user_") {
+    if event.event_name != "follow"
+        && event.event_name != "user_send_text"
+        && !event.event_name.starts_with("user_")
+    {
         // Only process user-initiated events
     }
     let msg_body = event.message.as_ref()?;
     let text = msg_body.text.as_deref().unwrap_or("").trim().to_string();
     // Accept messages even without text (media-only)
-    let sender_id = event.sender.as_ref().map(|s| s.id.clone()).unwrap_or_default();
-    let recipient_id = event.recipient.as_ref().map(|r| r.id.clone()).unwrap_or_default();
+    let sender_id = event
+        .sender
+        .as_ref()
+        .map(|s| s.id.clone())
+        .unwrap_or_default();
+    let recipient_id = event
+        .recipient
+        .as_ref()
+        .map(|r| r.id.clone())
+        .unwrap_or_default();
 
     Some(ParsedZaloMessage {
         sender_id,
         recipient_id,
         msg_id: msg_body.msg_id.clone().unwrap_or_default(),
         text,
-        has_attachment: msg_body.attachments.as_ref().map(|a| !a.is_empty()).unwrap_or(false),
+        has_attachment: msg_body
+            .attachments
+            .as_ref()
+            .map(|a| !a.is_empty())
+            .unwrap_or(false),
         timestamp: event.timestamp.unwrap_or(0),
     })
 }
@@ -147,7 +165,10 @@ pub async fn get_user_profile(
     cfg: &ZaloConfig,
     user_id: &str,
 ) -> Result<serde_json::Value> {
-    let url = format!("{}/getprofile?data={{\"user_id\":\"{}\"}}", ZALO_API_BASE, user_id);
+    let url = format!(
+        "{}/getprofile?data={{\"user_id\":\"{}\"}}",
+        ZALO_API_BASE, user_id
+    );
     let resp = client
         .get(&url)
         .header("access_token", &cfg.access_token)
@@ -175,7 +196,10 @@ mod tests {
 
     #[test]
     fn config_validate_missing_token() {
-        let cfg = ZaloConfig { access_token: "".into(), ..Default::default() };
+        let cfg = ZaloConfig {
+            access_token: "".into(),
+            ..Default::default()
+        };
         assert!(cfg.validate().is_err());
     }
 
@@ -203,7 +227,8 @@ mod tests {
     fn parse_event_no_message_body_returns_none() {
         let event = ZaloWebhookEvent {
             event_name: "follow".into(),
-            app_id: None, timestamp: None,
+            app_id: None,
+            timestamp: None,
             sender: Some(ZaloSender { id: "u1".into() }),
             recipient: Some(ZaloRecipient { id: "oa1".into() }),
             message: None,
@@ -221,9 +246,12 @@ mod tests {
     #[test]
     fn normalize_inbound_test() {
         let msg = ParsedZaloMessage {
-            sender_id: "u1".into(), recipient_id: "oa1".into(),
-            msg_id: "m1".into(), text: "hi".into(),
-            has_attachment: false, timestamp: 0,
+            sender_id: "u1".into(),
+            recipient_id: "oa1".into(),
+            msg_id: "m1".into(),
+            text: "hi".into(),
+            has_attachment: false,
+            timestamp: 0,
         };
         let m = normalize_inbound(&msg);
         assert!(m.id.starts_with("zalo:"));

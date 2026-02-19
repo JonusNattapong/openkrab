@@ -1,7 +1,7 @@
-use serde_json::json;
-use anyhow::Result;
 use anyhow::anyhow;
+use anyhow::Result;
 use reqwest::Client;
+use serde_json::json;
 
 const WHATSAPP_API_BASE: &str = "https://graph.facebook.com/v19.0";
 
@@ -98,6 +98,38 @@ pub async fn mark_as_read(
     if !status.is_success() {
         return Err(anyhow!(
             "whatsapp mark_as_read failed ({}): {}",
+            status,
+            raw_body
+        ));
+    }
+
+    if raw_body.trim().is_empty() {
+        Ok(json!({}))
+    } else {
+        Ok(serde_json::from_str(&raw_body)?)
+    }
+}
+
+/// Send a template message via WhatsApp Cloud API.
+pub async fn send_template(
+    client: &Client,
+    access_token: &str,
+    phone_number_id: &str,
+    payload: serde_json::Value,
+) -> Result<serde_json::Value> {
+    let url = format!("{}/{}/messages", WHATSAPP_API_BASE, phone_number_id);
+    let resp = client
+        .post(&url)
+        .bearer_auth(access_token)
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await?;
+    let status = resp.status();
+    let raw_body = resp.text().await?;
+    if !status.is_success() {
+        return Err(anyhow!(
+            "whatsapp send_template failed ({}): {}",
             status,
             raw_body
         ));

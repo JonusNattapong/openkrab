@@ -1,5 +1,5 @@
 //! iOS Native Module for node_host
-//! 
+//!
 //! This module provides Swift-based native functionality for iOS devices:
 //! - Camera snap (photo capture)
 //! - Screen recording
@@ -180,7 +180,8 @@ class KrabKrabCameraBridge: NSObject {
         }
     }
 }
-"#.to_string()
+"#
+        .to_string()
     }
 
     /// Generate Swift code for screen recording handler
@@ -276,7 +277,8 @@ class KrabKrabScreenRecordBridge: NSObject {
         }
     }
 }
-"#.to_string()
+"#
+        .to_string()
     }
 
     /// Generate Swift code for location handler
@@ -393,7 +395,8 @@ class KrabKrabLocationBridge: NSObject {
         }
     }
 }
-"#.to_string()
+"#
+        .to_string()
     }
 
     /// Generate Swift code for notification handler
@@ -515,7 +518,8 @@ class KrabKrabNotificationBridge: NSObject {
         }
     }
 }
-"#.to_string()
+"#
+        .to_string()
     }
 }
 

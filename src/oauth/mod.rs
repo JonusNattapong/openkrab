@@ -5,10 +5,10 @@
 //! callback URL parser, and token exchange — usable for Google, MiniMax, Qwen etc.
 
 use anyhow::{bail, Result};
-use sha2::{Digest, Sha256};
-use serde::{Deserialize, Serialize};
-use rand::RngCore;
 use base64::Engine;
+use rand::RngCore;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 // ─── PKCE ─────────────────────────────────────────────────────────────────────
 
@@ -26,14 +26,20 @@ impl PkceChallenge {
         rand::thread_rng().fill_bytes(&mut bytes);
         let verifier = hex::encode(bytes);
         let challenge = base64url_sha256(verifier.as_bytes());
-        Self { verifier, challenge }
+        Self {
+            verifier,
+            challenge,
+        }
     }
 
     /// Generate with explicit verifier bytes (for tests / deterministic flows).
     pub fn from_verifier(verifier: impl Into<String>) -> Self {
         let v = verifier.into();
         let challenge = base64url_sha256(v.as_bytes());
-        Self { verifier: v, challenge }
+        Self {
+            verifier: v,
+            challenge,
+        }
     }
 }
 
@@ -79,7 +85,8 @@ pub fn build_auth_url(
     ];
     params.extend_from_slice(extra_params);
 
-    let query: String = params.iter()
+    let query: String = params
+        .iter()
         .map(|(k, v)| format!("{}={}", url_encode(k), url_encode(v)))
         .collect::<Vec<_>>()
         .join("&");
@@ -119,7 +126,9 @@ pub fn parse_callback_url(url_str: &str) -> Result<OAuthCallback> {
     }
 
     // Parse query string
-    let query_start = trimmed.find('?').ok_or_else(|| anyhow::anyhow!("Missing query string in callback URL"))?;
+    let query_start = trimmed
+        .find('?')
+        .ok_or_else(|| anyhow::anyhow!("Missing query string in callback URL"))?;
     let query = &trimmed[query_start + 1..];
 
     let mut code = None;
@@ -136,8 +145,12 @@ pub fn parse_callback_url(url_str: &str) -> Result<OAuthCallback> {
         }
     }
 
-    let code = code.filter(|s| !s.is_empty()).ok_or_else(|| anyhow::anyhow!("Missing 'code' parameter in URL"))?;
-    let state = state.filter(|s| !s.is_empty()).ok_or_else(|| anyhow::anyhow!("Missing 'state' parameter in URL"))?;
+    let code = code
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| anyhow::anyhow!("Missing 'code' parameter in URL"))?;
+    let state = state
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| anyhow::anyhow!("Missing 'state' parameter in URL"))?;
 
     Ok(OAuthCallback { code, state })
 }
@@ -148,7 +161,7 @@ fn url_decode(s: &str) -> String {
     let mut i = 0;
     while i < bytes.len() {
         if bytes[i] == b'%' && i + 2 < bytes.len() {
-            if let Ok(hex) = std::str::from_utf8(&bytes[i+1..i+3]) {
+            if let Ok(hex) = std::str::from_utf8(&bytes[i + 1..i + 3]) {
                 if let Ok(b) = u8::from_str_radix(hex, 16) {
                     out.push(b as char);
                     i += 3;
@@ -198,10 +211,12 @@ pub struct TokenExchangeResponse {
 
 impl TokenExchangeResponse {
     pub fn into_tokens(self) -> Result<OAuthTokens> {
-        let access = self.access_token
+        let access = self
+            .access_token
             .filter(|s| !s.is_empty())
             .ok_or_else(|| anyhow::anyhow!("Token exchange returned no access_token"))?;
-        let refresh = self.refresh_token
+        let refresh = self
+            .refresh_token
             .filter(|s| !s.is_empty())
             .ok_or_else(|| anyhow::anyhow!("Token exchange returned no refresh_token"))?;
 
@@ -213,7 +228,12 @@ impl TokenExchangeResponse {
         // Buffer 5 minutes early
         let expires_at_ms = now_ms + expires_in * 1000 - 5 * 60 * 1000;
 
-        Ok(OAuthTokens { access_token: access, refresh_token: refresh, expires_at_ms, email: None })
+        Ok(OAuthTokens {
+            access_token: access,
+            refresh_token: refresh,
+            expires_at_ms,
+            email: None,
+        })
     }
 }
 
@@ -351,7 +371,9 @@ mod tests {
     #[test]
     fn token_exchange_response_missing_access() {
         let resp = TokenExchangeResponse {
-            access_token: None, refresh_token: Some("r".into()), expires_in: Some(3600),
+            access_token: None,
+            refresh_token: Some("r".into()),
+            expires_in: Some(3600),
         };
         assert!(resp.into_tokens().is_err());
     }
@@ -359,7 +381,9 @@ mod tests {
     #[test]
     fn token_exchange_response_missing_refresh() {
         let resp = TokenExchangeResponse {
-            access_token: Some("a".into()), refresh_token: None, expires_in: Some(3600),
+            access_token: Some("a".into()),
+            refresh_token: None,
+            expires_in: Some(3600),
         };
         assert!(resp.into_tokens().is_err());
     }

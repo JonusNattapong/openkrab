@@ -33,7 +33,9 @@ pub struct HookPayload {
 
 impl HookPayload {
     pub fn new() -> Self {
-        Self { data: HashMap::new() }
+        Self {
+            data: HashMap::new(),
+        }
     }
 
     pub fn set(&mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) {
@@ -62,7 +64,9 @@ pub struct HookRegistry {
 
 impl HookRegistry {
     pub fn new() -> Self {
-        Self { hooks: HashMap::new() }
+        Self {
+            hooks: HashMap::new(),
+        }
     }
 
     /// Register a callback for the given event name.
@@ -102,7 +106,11 @@ impl Default for HookRegistry {
 pub fn debug_logger_hook(event: &str) -> HookFn {
     let event = event.to_string();
     Box::new(move |payload| {
-        println!("[hook:{}] payload keys: {:?}", event, payload.data.keys().collect::<Vec<_>>());
+        println!(
+            "[hook:{}] payload keys: {:?}",
+            event,
+            payload.data.keys().collect::<Vec<_>>()
+        );
     })
 }
 
@@ -117,9 +125,12 @@ mod tests {
         let fired = Arc::new(Mutex::new(false));
         let fired2 = fired.clone();
 
-        reg.on(events::AGENT_COMPLETE, Box::new(move |_payload| {
-            *fired2.lock().unwrap() = true;
-        }));
+        reg.on(
+            events::AGENT_COMPLETE,
+            Box::new(move |_payload| {
+                *fired2.lock().unwrap() = true;
+            }),
+        );
 
         let mut p = HookPayload::new();
         p.set("response", serde_json::Value::String("ok".to_string()));

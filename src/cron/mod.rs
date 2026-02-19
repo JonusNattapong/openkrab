@@ -69,22 +69,16 @@ impl CronJob {
             return false;
         }
         match &self.frequency {
-            JobFrequency::Interval { secs } => {
-                match self.last_run {
-                    None => true,
-                    Some(last) => (now - last).num_seconds() >= *secs as i64,
-                }
-            }
-            JobFrequency::Once { at } => {
-                self.last_run.is_none() && now >= *at
-            }
+            JobFrequency::Interval { secs } => match self.last_run {
+                None => true,
+                Some(last) => (now - last).num_seconds() >= *secs as i64,
+            },
+            JobFrequency::Once { at } => self.last_run.is_none() && now >= *at,
             JobFrequency::Daily { hour, minute } => {
                 let same_slot = now.hour() == *hour as u32 && now.minute() == *minute as u32;
                 let not_run_today = match self.last_run {
                     None => true,
-                    Some(last) => {
-                        now.date_naive() > last.date_naive()
-                    }
+                    Some(last) => now.date_naive() > last.date_naive(),
                 };
                 same_slot && not_run_today
             }
@@ -113,7 +107,9 @@ pub struct CronStore {
 
 impl CronStore {
     pub fn new() -> Self {
-        Self { jobs: HashMap::new() }
+        Self {
+            jobs: HashMap::new(),
+        }
     }
 
     /// Load from a JSON file. Returns an empty store if the file doesn't exist.
@@ -173,7 +169,10 @@ impl CronService {
     pub fn new(store_path: impl Into<std::path::PathBuf>) -> Result<Self> {
         let path = store_path.into();
         let store = CronStore::load(&path)?;
-        Ok(Self { store, store_path: path })
+        Ok(Self {
+            store,
+            store_path: path,
+        })
     }
 
     pub fn add_job(&mut self, job: CronJob) -> Result<()> {
@@ -255,7 +254,12 @@ mod tests {
 
     #[test]
     fn interval_job_not_due_before_interval() {
-        let mut job = CronJob::new("1", "Test", "do thing", JobFrequency::Interval { secs: 120 });
+        let mut job = CronJob::new(
+            "1",
+            "Test",
+            "do thing",
+            JobFrequency::Interval { secs: 120 },
+        );
         job.last_run = Some(Utc::now());
         assert!(!job.is_due(Utc::now()));
     }
@@ -271,9 +275,18 @@ mod tests {
 
     #[test]
     fn parse_interval_strings() {
-        assert_eq!(parse_interval("every 30s"), Some(JobFrequency::Interval { secs: 30 }));
-        assert_eq!(parse_interval("every 5m"), Some(JobFrequency::Interval { secs: 300 }));
-        assert_eq!(parse_interval("every 2h"), Some(JobFrequency::Interval { secs: 7200 }));
+        assert_eq!(
+            parse_interval("every 30s"),
+            Some(JobFrequency::Interval { secs: 30 })
+        );
+        assert_eq!(
+            parse_interval("every 5m"),
+            Some(JobFrequency::Interval { secs: 300 })
+        );
+        assert_eq!(
+            parse_interval("every 2h"),
+            Some(JobFrequency::Interval { secs: 7200 })
+        );
         assert_eq!(parse_interval("bad"), None);
     }
 
@@ -287,8 +300,18 @@ mod tests {
     #[test]
     fn cron_store_add_and_list() {
         let mut store = CronStore::new();
-        store.add(CronJob::new("a", "A", "task a", JobFrequency::Interval { secs: 60 }));
-        store.add(CronJob::new("b", "B", "task b", JobFrequency::Interval { secs: 120 }));
+        store.add(CronJob::new(
+            "a",
+            "A",
+            "task a",
+            JobFrequency::Interval { secs: 60 },
+        ));
+        store.add(CronJob::new(
+            "b",
+            "B",
+            "task b",
+            JobFrequency::Interval { secs: 120 },
+        ));
         assert_eq!(store.jobs.len(), 2);
         store.remove("a");
         assert_eq!(store.jobs.len(), 1);

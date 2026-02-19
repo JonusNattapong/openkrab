@@ -20,7 +20,7 @@ fn sanitize_filename(name: &str) -> String {
     if trimmed.is_empty() {
         return String::new();
     }
-    
+
     let sanitized: String = trimmed
         .chars()
         .map(|c| {
@@ -31,7 +31,7 @@ fn sanitize_filename(name: &str) -> String {
             }
         })
         .collect();
-    
+
     sanitized
         .replace("__", "_")
         .trim_matches('_')
@@ -46,15 +46,19 @@ pub fn extract_original_filename(file_path: &str) -> String {
         .and_then(|n| n.to_str())
         .unwrap_or("file.bin");
 
-    let ext = Path::new(basename).extension().and_then(|e| e.to_str()).unwrap_or("");
+    let ext = Path::new(basename)
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("");
     let name_without_ext = Path::new(basename)
         .file_stem()
         .and_then(|n| n.to_str())
         .unwrap_or(basename);
 
     let uuid_pattern = regex::Regex::new(
-        r"^(.+?)---[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
-    ).unwrap();
+        r"^(.+?)---[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+    )
+    .unwrap();
 
     if let Some(caps) = uuid_pattern.captures(name_without_ext) {
         if let Some(original) = caps.get(1) {
@@ -142,19 +146,16 @@ pub async fn save_media_buffer(
     }
 
     let base_dir = resolve_media_dir();
-    let dir = subdir
-        .map(|s| base_dir.join(s))
-        .unwrap_or(base_dir);
-    
+    let dir = subdir.map(|s| base_dir.join(s)).unwrap_or(base_dir);
+
     fs::create_dir_all(&dir).await?;
     let _ = clean_old_media(None).await;
 
     let uuid = Uuid::new_v4().to_string();
-    let detected_mime = super::mime::detect_mime(Some(buffer), content_type, original_filename).await;
+    let detected_mime =
+        super::mime::detect_mime(Some(buffer), content_type, original_filename).await;
     let ext = super::mime::extension_for_mime(detected_mime.as_deref())
-        .or(original_filename.and_then(|f| {
-            Path::new(f).extension().and_then(|e| e.to_str())
-        }))
+        .or(original_filename.and_then(|f| Path::new(f).extension().and_then(|e| e.to_str())))
         .map(|e| format!(".{}", e.trim_start_matches('.')))
         .unwrap_or_default();
 
@@ -194,10 +195,8 @@ pub async fn save_media_source(
     subdir: Option<&str>,
 ) -> Result<SavedMedia> {
     let base_dir = resolve_media_dir();
-    let dir = subdir
-        .map(|s| base_dir.join(s))
-        .unwrap_or(base_dir);
-    
+    let dir = subdir.map(|s| base_dir.join(s)).unwrap_or(base_dir);
+
     fs::create_dir_all(&dir).await?;
     let _ = clean_old_media(None).await;
 
@@ -213,7 +212,7 @@ pub async fn save_media_source(
         };
 
         let fetched = super::fetch::fetch_remote_media(options).await?;
-        
+
         let ext = super::mime::extension_for_mime(fetched.content_type.as_deref())
             .map(|e| e.to_string())
             .or_else(|| {
@@ -229,9 +228,13 @@ pub async fn save_media_source(
             })
             .unwrap_or_default();
 
-        let id = if ext.is_empty() { uuid.clone() } else { format!("{}{}", uuid, ext) };
+        let id = if ext.is_empty() {
+            uuid.clone()
+        } else {
+            format!("{}{}", uuid, ext)
+        };
         let final_dest = dir.join(&id);
-        
+
         fs::write(&final_dest, &fetched.buffer).await?;
 
         return Ok(SavedMedia {
@@ -244,7 +247,7 @@ pub async fn save_media_source(
 
     let local_path = Path::new(source);
     let metadata = fs::metadata(local_path).await?;
-    
+
     if !metadata.is_file() {
         return Err(anyhow!("Media path is not a file"));
     }
@@ -255,15 +258,23 @@ pub async fn save_media_source(
 
     let buffer = fs::read(local_path).await?;
     let detected_mime = super::mime::detect_mime(Some(&buffer), None, Some(source)).await;
-    
+
     let ext = super::mime::extension_for_mime(detected_mime.as_deref())
         .map(|e| e.to_string())
-        .or_else(|| local_path.extension().map(|e| format!(".{}", e.to_string_lossy())))
+        .or_else(|| {
+            local_path
+                .extension()
+                .map(|e| format!(".{}", e.to_string_lossy()))
+        })
         .unwrap_or_default();
 
-    let id = if ext.is_empty() { uuid.clone() } else { format!("{}{}", uuid, ext) };
+    let id = if ext.is_empty() {
+        uuid.clone()
+    } else {
+        format!("{}{}", uuid, ext)
+    };
     let dest = dir.join(&id);
-    
+
     fs::write(&dest, &buffer).await?;
 
     Ok(SavedMedia {

@@ -23,7 +23,11 @@ impl MonitorManager {
     }
 
     /// Start monitoring for a connector
-    pub async fn start_monitor(&mut self, connector: &str, account_id: Option<String>) -> Result<()> {
+    pub async fn start_monitor(
+        &mut self,
+        connector: &str,
+        account_id: Option<String>,
+    ) -> Result<()> {
         let options = MonitorOptions {
             account_id: account_id.clone(),
             verbose: false,
@@ -35,7 +39,8 @@ impl MonitorManager {
                 let monitor_result = connectors::whatsapp_monitor::monitor_whatsapp_provider(
                     options,
                     self.message_handler.clone(),
-                ).await?;
+                )
+                .await?;
 
                 self.monitors.insert(
                     format!("whatsapp:{}", account_id.unwrap_or_default()),
@@ -54,7 +59,11 @@ impl MonitorManager {
     }
 
     /// Stop monitoring for a connector
-    pub async fn stop_monitor(&mut self, connector: &str, account_id: Option<String>) -> Result<()> {
+    pub async fn stop_monitor(
+        &mut self,
+        connector: &str,
+        account_id: Option<String>,
+    ) -> Result<()> {
         let key = format!("{}:{}", connector, account_id.unwrap_or_default());
         if let Some(monitor) = self.monitors.remove(&key) {
             monitor.stop().await?;
@@ -68,10 +77,13 @@ impl MonitorManager {
 
         for (key, monitor) in &self.monitors {
             // In real implementation, would get actual status from monitor
-            status.insert(key.clone(), serde_json::json!({
-                "running": true,
-                "connected": true
-            }));
+            status.insert(
+                key.clone(),
+                serde_json::json!({
+                    "running": true,
+                    "connected": true
+                }),
+            );
         }
 
         status

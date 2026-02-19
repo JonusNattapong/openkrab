@@ -19,7 +19,9 @@ pub enum TaskPriority {
 }
 
 impl Default for TaskPriority {
-    fn default() -> Self { Self::Normal }
+    fn default() -> Self {
+        Self::Normal
+    }
 }
 
 /// Status of a task.
@@ -55,7 +57,12 @@ pub struct LlmTask {
 }
 
 impl LlmTask {
-    pub fn new(id: impl Into<String>, name: impl Into<String>, system_prompt: impl Into<String>, user_prompt_template: impl Into<String>) -> Self {
+    pub fn new(
+        id: impl Into<String>,
+        name: impl Into<String>,
+        system_prompt: impl Into<String>,
+        user_prompt_template: impl Into<String>,
+    ) -> Self {
         Self {
             id: id.into(),
             name: name.into(),
@@ -168,7 +175,10 @@ impl TaskRun {
     }
 
     pub fn is_done(&self) -> bool {
-        matches!(self.status, TaskStatus::Completed | TaskStatus::Failed | TaskStatus::Cancelled)
+        matches!(
+            self.status,
+            TaskStatus::Completed | TaskStatus::Failed | TaskStatus::Cancelled
+        )
     }
 }
 
@@ -180,7 +190,9 @@ pub struct TaskRegistry {
 }
 
 impl TaskRegistry {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn register(&mut self, task: LlmTask) {
         self.tasks.insert(task.id.clone(), task);
@@ -200,8 +212,12 @@ impl TaskRegistry {
         tasks
     }
 
-    pub fn len(&self) -> usize { self.tasks.len() }
-    pub fn is_empty(&self) -> bool { self.tasks.is_empty() }
+    pub fn len(&self) -> usize {
+        self.tasks.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.tasks.is_empty()
+    }
 }
 
 #[cfg(test)]
@@ -210,13 +226,23 @@ mod tests {
 
     #[test]
     fn render_prompt_substitution() {
-        let task = LlmTask::new("t1", "summarize", "You are a summarizer.", "Summarize: {input}");
+        let task = LlmTask::new(
+            "t1",
+            "summarize",
+            "You are a summarizer.",
+            "Summarize: {input}",
+        );
         assert_eq!(task.render_prompt("Hello world"), "Summarize: Hello world");
     }
 
     #[test]
     fn render_prompt_with_vars() {
-        let task = LlmTask::new("t1", "translate", "Translator.", "Translate {text} to {lang}.");
+        let task = LlmTask::new(
+            "t1",
+            "translate",
+            "Translator.",
+            "Translate {text} to {lang}.",
+        );
         let mut vars = HashMap::new();
         vars.insert("text".into(), "hello".into());
         vars.insert("lang".into(), "Thai".into());

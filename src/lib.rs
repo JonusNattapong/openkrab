@@ -5,12 +5,12 @@ pub mod agents;
 pub mod auto_reply;
 pub mod broadcast;
 pub mod browser;
+pub mod canvas_host;
 pub mod channels;
 pub mod commands;
-pub mod compat;
 pub mod common;
+pub mod compat;
 pub mod config;
-pub mod openclaw_config;
 pub mod config_io;
 pub mod config_validation;
 pub mod connectors;
@@ -27,12 +27,12 @@ pub mod logging;
 mod logging_impl;
 pub mod markdown;
 pub mod matrix;
-pub mod canvas_host;
 pub mod media;
 pub mod media_understanding;
 pub mod memory;
 pub mod node_host;
 pub mod oauth;
+pub mod openclaw_config;
 pub mod pairing;
 pub mod plugin_sdk;
 pub mod plugins;
@@ -49,10 +49,11 @@ pub mod thread_ownership;
 pub mod tools;
 pub mod tts;
 pub mod tui;
-pub mod voice;
 pub mod utils;
 pub mod version;
+pub mod voice;
 pub mod web_connector;
+pub mod whatsapp;
 
 use once_cell::sync::Lazy;
 use serde::Serialize;
@@ -66,5 +67,8 @@ pub struct Hello {
 }
 
 pub fn hello() -> Hello {
-    Hello { message: "hello from krabkrab".into(), version: VERSION.clone() }
+    Hello {
+        message: "hello from krabkrab".into(),
+        version: VERSION.clone(),
+    }
 }

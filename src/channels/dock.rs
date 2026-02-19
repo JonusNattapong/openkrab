@@ -12,15 +12,31 @@ pub fn format_lower(allow_from: &[String]) -> Vec<String> {
         .collect()
 }
 
-pub fn build_direct_or_group_thread_tool_context(context: &serde_json::Map<String, Value>, has_replied_ref: Option<String>) -> (Option<String>, Option<String>, Option<String>) {
-    let chat_type = context.get("ChatType").and_then(|v| v.as_str()).map(|s| s.to_lowercase());
+pub fn build_direct_or_group_thread_tool_context(
+    context: &serde_json::Map<String, Value>,
+    has_replied_ref: Option<String>,
+) -> (Option<String>, Option<String>, Option<String>) {
+    let chat_type = context
+        .get("ChatType")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_lowercase());
     let is_direct = chat_type.as_deref() == Some("direct");
     let channel_id = if is_direct {
-        context.get("From").and_then(|v| v.as_str()).or_else(|| context.get("To").and_then(|v| v.as_str())).map(|s| s.trim().to_string())
+        context
+            .get("From")
+            .and_then(|v| v.as_str())
+            .or_else(|| context.get("To").and_then(|v| v.as_str()))
+            .map(|s| s.trim().to_string())
     } else {
-        context.get("To").and_then(|v| v.as_str()).map(|s| s.trim().to_string())
+        context
+            .get("To")
+            .and_then(|v| v.as_str())
+            .map(|s| s.trim().to_string())
     };
-    let thread_ts = context.get("ReplyToId").and_then(|v| v.as_str()).map(|s| s.to_string());
+    let thread_ts = context
+        .get("ReplyToId")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string());
     (channel_id, thread_ts, has_replied_ref)
 }
 

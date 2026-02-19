@@ -30,7 +30,9 @@ pub struct PluginManifest {
     pub entry: Option<String>,
 }
 
-fn default_true() -> bool { true }
+fn default_true() -> bool {
+    true
+}
 
 impl PluginManifest {
     pub fn new(name: impl Into<String>, version: impl Into<String>) -> Self {
@@ -56,7 +58,10 @@ impl PluginManifest {
         }
         // Simple semver check: at least one dot
         if !self.version.contains('.') && !self.version.is_empty() {
-            bail!("plugin version `{}` does not look like semver", self.version);
+            bail!(
+                "plugin version `{}` does not look like semver",
+                self.version
+            );
         }
         Ok(())
     }
@@ -98,7 +103,11 @@ impl PluginEntry {
         } else {
             PluginStatus::Disabled
         };
-        Self { manifest, status, install_path: None }
+        Self {
+            manifest,
+            status,
+            install_path: None,
+        }
     }
 
     pub fn is_enabled(&self) -> bool {
@@ -135,7 +144,10 @@ impl PluginRegistry {
     pub fn enable(&mut self, name: &str) -> Result<()> {
         match self.plugins.get_mut(name) {
             None => bail!("plugin `{}` not found", name),
-            Some(e) => { e.status = PluginStatus::Enabled; Ok(()) }
+            Some(e) => {
+                e.status = PluginStatus::Enabled;
+                Ok(())
+            }
         }
     }
 
@@ -143,7 +155,10 @@ impl PluginRegistry {
     pub fn disable(&mut self, name: &str) -> Result<()> {
         match self.plugins.get_mut(name) {
             None => bail!("plugin `{}` not found", name),
-            Some(e) => { e.status = PluginStatus::Disabled; Ok(()) }
+            Some(e) => {
+                e.status = PluginStatus::Disabled;
+                Ok(())
+            }
         }
     }
 
@@ -164,8 +179,12 @@ impl PluginRegistry {
         self.plugins.values().filter(|e| e.is_enabled()).collect()
     }
 
-    pub fn len(&self) -> usize { self.plugins.len() }
-    pub fn is_empty(&self) -> bool { self.plugins.is_empty() }
+    pub fn len(&self) -> usize {
+        self.plugins.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.plugins.is_empty()
+    }
 }
 
 // ─── Plugin hook slots ────────────────────────────────────────────────────────
@@ -225,7 +244,9 @@ impl HookSlots {
 pub fn is_valid_plugin_name(name: &str) -> bool {
     !name.is_empty()
         && !name.contains(' ')
-        && name.chars().all(|c| c.is_alphanumeric() || matches!(c, '-' | '_' | '.'))
+        && name
+            .chars()
+            .all(|c| c.is_alphanumeric() || matches!(c, '-' | '_' | '.'))
 }
 
 /// Build a display name from a plugin slug (e.g. "my-plugin" → "My Plugin").
@@ -269,7 +290,8 @@ mod tests {
     #[test]
     fn registry_register_enable_disable() {
         let mut reg = PluginRegistry::new();
-        reg.register(PluginManifest::new("test-plugin", "1.0.0")).unwrap();
+        reg.register(PluginManifest::new("test-plugin", "1.0.0"))
+            .unwrap();
         assert_eq!(reg.len(), 1);
         assert!(reg.get("test-plugin").unwrap().is_enabled());
         reg.disable("test-plugin").unwrap();
@@ -289,8 +311,16 @@ mod tests {
     #[test]
     fn hook_slots() {
         let mut slots = HookSlots::default();
-        slots.register(PluginHook { plugin: "p1".into(), phase: HookPhase::AfterReply, priority: 10 });
-        slots.register(PluginHook { plugin: "p2".into(), phase: HookPhase::AfterReply, priority: 5 });
+        slots.register(PluginHook {
+            plugin: "p1".into(),
+            phase: HookPhase::AfterReply,
+            priority: 10,
+        });
+        slots.register(PluginHook {
+            plugin: "p2".into(),
+            phase: HookPhase::AfterReply,
+            priority: 5,
+        });
         let hooks = slots.hooks_for(&HookPhase::AfterReply);
         assert_eq!(hooks.len(), 2);
         assert_eq!(hooks[0].priority, 5); // sorted by priority

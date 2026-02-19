@@ -11,7 +11,8 @@ fn normalize_target(to: &str) -> Result<String> {
 /// Prepare a Slack outbound send request without network I/O.
 pub fn slack_send_dry_run_command(to: &str, text: &str, thread_ts: Option<&str>) -> Result<String> {
     let channel = normalize_target(to)?;
-    let payload = crate::connectors::slack_client::build_slack_http_payload(&channel, text, thread_ts);
+    let payload =
+        crate::connectors::slack_client::build_slack_http_payload(&channel, text, thread_ts);
     Ok(format!("slack to={} payload={}", channel, payload))
 }
 
@@ -23,14 +24,9 @@ pub async fn slack_send_command(to: &str, text: &str, thread_ts: Option<&str>) -
     let token = std::env::var("SLACK_BOT_TOKEN")
         .map_err(|_| anyhow!("Missing SLACK_BOT_TOKEN environment variable"))?;
     let client = reqwest::Client::new();
-    let response = crate::connectors::slack_client::send_message(
-        &client,
-        &token,
-        &channel,
-        text,
-        thread_ts,
-    )
-    .await?;
+    let response =
+        crate::connectors::slack_client::send_message(&client, &token, &channel, text, thread_ts)
+            .await?;
 
     if response
         .get("ok")
@@ -50,4 +46,3 @@ pub async fn slack_send_command(to: &str, text: &str, thread_ts: Option<&str>) -
         .unwrap_or("unknown Slack API error");
     Err(anyhow!("Slack API error: {}", error))
 }
-

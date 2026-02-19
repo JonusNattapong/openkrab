@@ -59,12 +59,12 @@ impl OllamaProvider {
 
     /// Build from env vars: `OLLAMA_HOST` (default localhost:11434).
     pub fn from_env() -> Self {
-        let host = std::env::var("OLLAMA_HOST")
-            .unwrap_or_else(|_| "http://localhost:11434".to_string());
-        let chat_model = std::env::var("OLLAMA_CHAT_MODEL")
-            .unwrap_or_else(|_| "llama3".to_string());
-        let embed_model = std::env::var("OLLAMA_EMBED_MODEL")
-            .unwrap_or_else(|_| "nomic-embed-text".to_string());
+        let host =
+            std::env::var("OLLAMA_HOST").unwrap_or_else(|_| "http://localhost:11434".to_string());
+        let chat_model =
+            std::env::var("OLLAMA_CHAT_MODEL").unwrap_or_else(|_| "llama3".to_string());
+        let embed_model =
+            std::env::var("OLLAMA_EMBED_MODEL").unwrap_or_else(|_| "nomic-embed-text".to_string());
         Self::with_models(host, chat_model, embed_model)
     }
 
@@ -87,7 +87,13 @@ impl LlmProvider for OllamaProvider {
             "stream": false
         });
 
-        let resp = self.client.post(&url).json(&body).send().await?.error_for_status()?;
+        let resp = self
+            .client
+            .post(&url)
+            .json(&body)
+            .send()
+            .await?
+            .error_for_status()?;
         let parsed: OllamaChatResponse = resp.json().await?;
         Ok(parsed.message.content)
     }
@@ -99,7 +105,13 @@ impl LlmProvider for OllamaProvider {
             "prompt": text
         });
 
-        let resp = self.client.post(&url).json(&body).send().await?.error_for_status()?;
+        let resp = self
+            .client
+            .post(&url)
+            .json(&body)
+            .send()
+            .await?
+            .error_for_status()?;
         let parsed: OllamaEmbedResponse = resp.json().await?;
         Ok(parsed.embedding)
     }

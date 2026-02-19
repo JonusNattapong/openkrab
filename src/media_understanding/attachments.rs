@@ -33,16 +33,24 @@ pub fn resolve_attachment_kind(attachment: &MediaAttachment) -> &'static str {
         }
     }
 
-    let ext = crate::media::mime::get_file_extension(attachment.path.as_deref().or(attachment.url.as_deref()));
-    
+    let ext = crate::media::mime::get_file_extension(
+        attachment.path.as_deref().or(attachment.url.as_deref()),
+    );
+
     if let Some(e) = ext {
         if [".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v"].contains(&e) {
             return "video";
         }
-        if crate::media::mime::is_audio_file_name(attachment.path.as_deref().or(attachment.url.as_deref())) {
+        if crate::media::mime::is_audio_file_name(
+            attachment.path.as_deref().or(attachment.url.as_deref()),
+        ) {
             return "audio";
         }
-        if [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tiff", ".tif"].contains(&e) {
+        if [
+            ".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tiff", ".tif",
+        ]
+        .contains(&e)
+        {
             return "image";
         }
     }
@@ -91,29 +99,37 @@ impl MediaAttachmentCache {
         max_bytes: usize,
         timeout_ms: u64,
     ) -> Result<MediaBufferResult, MediaAttachmentError> {
-        let attachment = self.attachments.get(attachment_index)
+        let attachment = self
+            .attachments
+            .get(attachment_index)
             .ok_or_else(|| MediaAttachmentError::NotFound(attachment_index))?;
 
         if let Some(path) = &attachment.path {
             let path = PathBuf::from(path);
-            let metadata = fs::metadata(&path).await
+            let metadata = fs::metadata(&path)
+                .await
                 .map_err(|e| MediaAttachmentError::Io(e.to_string()))?;
 
             if metadata.len() as usize > max_bytes {
                 return Err(MediaAttachmentError::TooLarge(max_bytes));
             }
 
-            let buffer = fs::read(&path).await
+            let buffer = fs::read(&path)
+                .await
                 .map_err(|e| MediaAttachmentError::Io(e.to_string()))?;
 
-            let mime = attachment.mime.clone()
-                .or_else(|| {
-                    crate::media::mime::detect_mime(Some(&buffer), None, Some(path.to_str().unwrap_or("")))
-                        .now_or_never()
-                        .flatten()
-                });
+            let mime = attachment.mime.clone().or_else(|| {
+                crate::media::mime::detect_mime(
+                    Some(&buffer),
+                    None,
+                    Some(path.to_str().unwrap_or("")),
+                )
+                .now_or_never()
+                .flatten()
+            });
 
-            let file_name = path.file_name()
+            let file_name = path
+                .file_name()
                 .and_then(|n| n.to_str())
                 .unwrap_or(&format!("media-{}", attachment_index + 1))
                 .to_string();
@@ -135,14 +151,17 @@ impl MediaAttachmentCache {
                 timeout_ms: Some(timeout_ms),
             };
 
-            let result = crate::media::fetch::fetch_remote_media(options).await
+            let result = crate::media::fetch::fetch_remote_media(options)
+                .await
                 .map_err(|e| MediaAttachmentError::Fetch(e.to_string()))?;
 
             return Ok(MediaBufferResult {
                 size: result.buffer.len(),
                 buffer: result.buffer,
                 mime: result.content_type,
-                file_name: result.file_name.unwrap_or_else(|| format!("media-{}", attachment_index + 1)),
+                file_name: result
+                    .file_name
+                    .unwrap_or_else(|| format!("media-{}", attachment_index + 1)),
             });
         }
 

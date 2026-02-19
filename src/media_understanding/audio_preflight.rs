@@ -1,7 +1,11 @@
-use crate::media_understanding::{MediaUnderstandingProvider, MediaUnderstandingDecision, MediaUnderstandingOutput, MediaCapability};
 use crate::media_understanding::attachments::{MediaAttachment, MediaAttachmentCache};
-use crate::media_understanding::resolve::{resolve_scope_decision, MediaContext as ResolveMediaContext};
-use crate::media_understanding::types::{MediaAnalysis, MediaUnderstandingError};
+use crate::media_understanding::resolve::{
+    resolve_scope_decision, resolve_max_bytes, resolve_timeout_ms, MediaContext as ResolveMediaContext,
+};
+use crate::media_understanding::types::MediaUnderstandingError;
+use crate::media_understanding::{
+    MediaCapability, MediaUnderstandingProvider,
+};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -27,7 +31,9 @@ pub async fn transcribe_first_audio(
 
     // Find first audio attachment that hasn't been transcribed
     let first_audio = attachments.iter().find(|att| {
-        att.mime.as_ref().map_or(false, |mime| mime.starts_with("audio/"))
+        att.mime
+            .as_ref()
+            .map_or(false, |mime| mime.starts_with("audio/"))
             && !att.already_transcribed
     });
 
@@ -43,13 +49,17 @@ pub async fn transcribe_first_audio(
     }
 
     // Get buffer from cache
-    let buffer_result = cache.get_buffer(
-        audio_attachment.index,
-        resolve_max_bytes(cfg, 0, cfg, None), // Default max bytes
-        resolve_timeout_ms(Some(cfg.timeout_seconds.unwrap_or(30.0)), 30.0) as u64,
-    ).await?;
+    let buffer_result = cache
+        .get_buffer(
+            audio_attachment.index,
+        resolve_max_bytes(cfg.max_bytes, 10 * 1024 * 1024), // Default 10MB
+        resolve_timeout_ms(cfg.timeout_seconds, 30.0) as u64,
+        )
+        .await?;
 
-    let mime = buffer_result.mime.unwrap_or_else(|| "audio/mpeg".to_string());
+    let mime = buffer_result
+        .mime
+        .unwrap_or_else(|| "audio/mpeg".to_string());
     if !mime.starts_with("audio/") {
         return Ok(None);
     }
@@ -66,7 +76,11 @@ pub async fn transcribe_first_audio(
                 }
                 Err(e) => {
                     // Log error but continue trying other providers
-                    eprintln!("Audio transcription failed with provider {}: {:?}", provider.id(), e);
+                    eprintln!(
+                        "Audio transcription failed with provider {}: {:?}",
+                        provider.id(),
+                        e
+                    );
                 }
             }
         }
@@ -95,7 +109,10 @@ mod tests {
         };
         let mut provider_registry = HashMap::new();
         let provider = MockMediaProvider;
-        provider_registry.insert("mock".to_string(), Box::new(provider) as Box<dyn MediaUnderstandingProvider>);
+        provider_registry.insert(
+            "mock".to_string(),
+            Box::new(provider) as Box<dyn MediaUnderstandingProvider>,
+        );
 
         let result = transcribe_first_audio(&ctx, &[], &cache, &cfg, &provider_registry).await;
         assert!(result.is_ok());
@@ -121,7 +138,8 @@ mod tests {
         };
         let provider_registry = HashMap::new();
 
-        let result = transcribe_first_audio(&ctx, &attachments, &cache, &cfg, &provider_registry).await;
+        let result =
+            transcribe_first_audio(&ctx, &attachments, &cache, &cfg, &provider_registry).await;
         assert!(result.is_ok());
         assert!(result.unwrap().is_none());
     }

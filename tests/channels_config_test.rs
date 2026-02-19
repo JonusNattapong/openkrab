@@ -21,15 +21,27 @@ fn build_candidates_and_resolve() {
     assert_eq!(match1.entry, Some(1));
     assert_eq!(match1.key, Some("a".to_string()));
 
-    let match2 = resolve_channel_entry_match_with_fallback(&entries, &vec!["x".to_string()], None, Some("*"), None::<fn(&str) -> Option<String>>);
+    let match2 = resolve_channel_entry_match_with_fallback(
+        &entries,
+        &vec!["x".to_string()],
+        None,
+        Some("*"),
+        None::<fn(&str) -> Option<String>>,
+    );
     assert_eq!(match2.entry, Some(99));
     assert_eq!(match2.match_source, Some(ChannelMatchSource::Wildcard));
 }
 
 #[test]
 fn nested_allowlist() {
-    assert!(resolve_nested_allowlist_decision((false, false, false, false)));
-    assert!(!resolve_nested_allowlist_decision((true, false, true, true)));
-    assert!(resolve_nested_allowlist_decision((true, true, false, false)));
+    assert!(resolve_nested_allowlist_decision((
+        false, false, false, false
+    )));
+    assert!(!resolve_nested_allowlist_decision((
+        true, false, true, true
+    )));
+    assert!(resolve_nested_allowlist_decision((
+        true, true, false, false
+    )));
     assert!(resolve_nested_allowlist_decision((true, true, true, true)));
 }

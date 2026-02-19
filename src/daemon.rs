@@ -10,4 +10,3 @@ pub fn daemon_status() -> DaemonStatus {
         pid: None,
     }
 }
-

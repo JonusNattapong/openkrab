@@ -30,7 +30,11 @@ pub struct ThreadOwner {
 }
 
 impl ThreadOwner {
-    pub fn new(thread_id: impl Into<String>, owner_id: impl Into<String>, ttl_secs: Option<u64>) -> Self {
+    pub fn new(
+        thread_id: impl Into<String>,
+        owner_id: impl Into<String>,
+        ttl_secs: Option<u64>,
+    ) -> Self {
         let now = now_secs();
         Self {
             thread_id: thread_id.into(),
@@ -71,7 +75,9 @@ pub struct ThreadOwnershipRegistry {
 }
 
 impl ThreadOwnershipRegistry {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     /// Try to claim a thread for an agent.
     pub fn claim(&mut self, thread_id: &str, agent_id: &str, ttl_secs: Option<u64>) -> ClaimResult {
@@ -87,7 +93,9 @@ impl ThreadOwnershipRegistry {
                 ClaimResult::Claimed
             }
             Some(owner) if owner.owner_id == agent_id => ClaimResult::AlreadyOwned,
-            Some(owner) => ClaimResult::Contested { owner_id: owner.owner_id.clone() },
+            Some(owner) => ClaimResult::Contested {
+                owner_id: owner.owner_id.clone(),
+            },
         }
     }
 
@@ -129,8 +137,12 @@ impl ThreadOwnershipRegistry {
         self.owners.retain(|_, v| !v.is_expired());
     }
 
-    pub fn len(&self) -> usize { self.owners.len() }
-    pub fn is_empty(&self) -> bool { self.owners.is_empty() }
+    pub fn len(&self) -> usize {
+        self.owners.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.owners.is_empty()
+    }
 
     /// Force-release a thread (admin override).
     pub fn force_release(&mut self, thread_id: &str) -> bool {
@@ -161,7 +173,10 @@ mod tests {
     fn claim_and_own() {
         let mut reg = ThreadOwnershipRegistry::new();
         assert_eq!(reg.claim("thread1", "bot-a", None), ClaimResult::Claimed);
-        assert_eq!(reg.claim("thread1", "bot-a", None), ClaimResult::AlreadyOwned);
+        assert_eq!(
+            reg.claim("thread1", "bot-a", None),
+            ClaimResult::AlreadyOwned
+        );
     }
 
     #[test]

@@ -23,7 +23,10 @@ pub fn extract_frontmatter(input: &str) -> ParsedDoc {
     let mut lines = input.lines();
     let first = lines.next().unwrap_or("");
     if first.trim() != "---" {
-        return ParsedDoc { frontmatter: HashMap::new(), body: input.to_string() };
+        return ParsedDoc {
+            frontmatter: HashMap::new(),
+            body: input.to_string(),
+        };
     }
 
     let mut fm = HashMap::new();
@@ -170,7 +173,11 @@ pub fn strip_markdown(input: &str) -> String {
         // Remove heading markers
         let stripped = trimmed.trim_start_matches('#').trim();
         // Remove bold/italic
-        let stripped = stripped.replace("**", "").replace("__", "").replace('*', "").replace('_', "");
+        let stripped = stripped
+            .replace("**", "")
+            .replace("__", "")
+            .replace('*', "")
+            .replace('_', "");
         // Remove inline code
         let stripped = stripped.replace('`', "");
         // Remove link syntax [text](url) → text
@@ -200,7 +207,9 @@ fn remove_links(s: &str) -> String {
                 // Consume (url)
                 chars.next();
                 for c in chars.by_ref() {
-                    if c == ')' { break; }
+                    if c == ')' {
+                        break;
+                    }
                 }
                 result.push_str(&text);
             } else {
@@ -232,8 +241,14 @@ mod tests {
     fn extract_frontmatter_basic() {
         let doc = "---\ntitle: Hello\nauthor: Alice\n---\n# Body\nContent here.";
         let parsed = extract_frontmatter(doc);
-        assert_eq!(parsed.frontmatter.get("title").map(|s| s.as_str()), Some("Hello"));
-        assert_eq!(parsed.frontmatter.get("author").map(|s| s.as_str()), Some("Alice"));
+        assert_eq!(
+            parsed.frontmatter.get("title").map(|s| s.as_str()),
+            Some("Hello")
+        );
+        assert_eq!(
+            parsed.frontmatter.get("author").map(|s| s.as_str()),
+            Some("Alice")
+        );
         assert!(parsed.body.contains("# Body"));
     }
 

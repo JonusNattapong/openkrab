@@ -48,9 +48,12 @@ struct TokenApiResponse {
 /// Parse the GitHub Copilot token endpoint response.
 /// `expires_at` may be seconds (< 10_000_000_000) or milliseconds.
 pub fn parse_token_response(value: &serde_json::Value) -> Result<(String, u64)> {
-    let obj = value.as_object().ok_or_else(|| anyhow::anyhow!("unexpected Copilot token response shape"))?;
+    let obj = value
+        .as_object()
+        .ok_or_else(|| anyhow::anyhow!("unexpected Copilot token response shape"))?;
 
-    let token = obj.get("token")
+    let token = obj
+        .get("token")
         .and_then(|v| v.as_str())
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty())
@@ -58,14 +61,27 @@ pub fn parse_token_response(value: &serde_json::Value) -> Result<(String, u64)> 
 
     let expires_at_ms = match obj.get("expires_at") {
         Some(serde_json::Value::Number(n)) => {
-            let raw = n.as_u64().or_else(|| n.as_f64().map(|f| f as u64))
+            let raw = n
+                .as_u64()
+                .or_else(|| n.as_f64().map(|f| f as u64))
                 .ok_or_else(|| anyhow::anyhow!("Copilot token: invalid expires_at number"))?;
             // GitHub sends seconds; defensively accept ms too
-            if raw > 10_000_000_000 { raw } else { raw * 1000 }
+            if raw > 10_000_000_000 {
+                raw
+            } else {
+                raw * 1000
+            }
         }
         Some(serde_json::Value::String(s)) => {
-            let raw: u64 = s.trim().parse().map_err(|_| anyhow::anyhow!("Copilot token: invalid expires_at string"))?;
-            if raw > 10_000_000_000 { raw } else { raw * 1000 }
+            let raw: u64 = s
+                .trim()
+                .parse()
+                .map_err(|_| anyhow::anyhow!("Copilot token: invalid expires_at string"))?;
+            if raw > 10_000_000_000 {
+                raw
+            } else {
+                raw * 1000
+            }
         }
         _ => bail!("Copilot token response missing expires_at"),
     };
@@ -79,14 +95,19 @@ pub fn parse_token_response(value: &serde_json::Value) -> Result<(String, u64)> 
 /// Token format: `tid=<id>;proxy-ep=<host>;...`
 pub fn derive_api_base_url(token: &str) -> Option<String> {
     let trimmed = token.trim();
-    if trimmed.is_empty() { return None; }
+    if trimmed.is_empty() {
+        return None;
+    }
     for part in trimmed.split(';') {
         let part = part.trim();
         if let Some(rest) = part.strip_prefix("proxy-ep=") {
-            let host = rest.trim()
+            let host = rest
+                .trim()
                 .trim_start_matches("https://")
                 .trim_start_matches("http://");
-            if host.is_empty() { return None; }
+            if host.is_empty() {
+                return None;
+            }
             // pi-ai convention: proxy.* → api.*
             let api_host = if let Some(s) = host.strip_prefix("proxy.") {
                 format!("api.{}", s)
@@ -149,7 +170,8 @@ pub async fn resolve_copilot_token(
 
     // 2. Fetch fresh token
     let client = reqwest::Client::new();
-    let resp = client.get(COPILOT_TOKEN_URL)
+    let resp = client
+        .get(COPILOT_TOKEN_URL)
         .header("Accept", "application/json")
         .header("Authorization", format!("Bearer {}", github_token))
         .send()
@@ -161,10 +183,14 @@ pub async fn resolve_copilot_token(
 
     let json: serde_json::Value = resp.json().await?;
     let (token, expires_at) = parse_token_response(&json)?;
-    let base_url = derive_api_base_url(&token)
-        .unwrap_or_else(|| DEFAULT_COPILOT_API_BASE_URL.to_string());
+    let base_url =
+        derive_api_base_url(&token).unwrap_or_else(|| DEFAULT_COPILOT_API_BASE_URL.to_string());
 
-    let cached = CachedCopilotToken { token: token.clone(), expires_at, updated_at: now_ms() };
+    let cached = CachedCopilotToken {
+        token: token.clone(),
+        expires_at,
+        updated_at: now_ms(),
+    };
     // Best-effort cache write — ignore errors
     let _ = save_cached_token(cache_path, &cached);
 
@@ -231,10 +257,18 @@ mod tests {
     #[test]
     fn cached_token_usability() {
         let far_future = now_ms() + 60 * 60 * 1000; // 1 hour ahead
-        let usable = CachedCopilotToken { token: "t".into(), expires_at: far_future, updated_at: now_ms() };
+        let usable = CachedCopilotToken {
+            token: "t".into(),
+            expires_at: far_future,
+            updated_at: now_ms(),
+        };
         assert!(usable.is_usable());
 
-        let expired = CachedCopilotToken { token: "t".into(), expires_at: 1, updated_at: 1 };
+        let expired = CachedCopilotToken {
+            token: "t".into(),
+            expires_at: 1,
+            updated_at: 1,
+        };
         assert!(!expired.is_usable());
     }
 }

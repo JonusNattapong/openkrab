@@ -1,9 +1,13 @@
-use serde_json::json;
 use anyhow::Result;
 use reqwest::Client;
+use serde_json::json;
 
 /// Build a JSON payload for Telegram `sendMessage` API
-pub fn build_telegram_http_payload(chat_id: &str, text: &str, reply_to_message_id: Option<i64>) -> serde_json::Value {
+pub fn build_telegram_http_payload(
+    chat_id: &str,
+    text: &str,
+    reply_to_message_id: Option<i64>,
+) -> serde_json::Value {
     let mut payload = json!({
         "chat_id": chat_id,
         "text": text,
@@ -17,7 +21,13 @@ pub fn build_telegram_http_payload(chat_id: &str, text: &str, reply_to_message_i
 
 /// Async send shim for Telegram Bot API.
 /// `token` should be the bot token (no `bot` prefix needed here).
-pub async fn send_message(client: &Client, token: &str, chat_id: &str, text: &str, reply_to_message_id: Option<i64>) -> Result<serde_json::Value> {
+pub async fn send_message(
+    client: &Client,
+    token: &str,
+    chat_id: &str,
+    text: &str,
+    reply_to_message_id: Option<i64>,
+) -> Result<serde_json::Value> {
     let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
     let payload = build_telegram_http_payload(chat_id, text, reply_to_message_id);
     let resp = client.post(&url).json(&payload).send().await?;
@@ -26,7 +36,12 @@ pub async fn send_message(client: &Client, token: &str, chat_id: &str, text: &st
 }
 
 /// Async update fetch shim for Telegram Bot API.
-pub async fn get_updates(client: &Client, token: &str, offset: Option<i64>, timeout: Option<u64>) -> Result<serde_json::Value> {
+pub async fn get_updates(
+    client: &Client,
+    token: &str,
+    offset: Option<i64>,
+    timeout: Option<u64>,
+) -> Result<serde_json::Value> {
     let url = format!("https://api.telegram.org/bot{}/getUpdates", token);
     let mut payload = json!({});
     if let Some(o) = offset {

@@ -9,7 +9,11 @@ fn normalize_target(to: &str) -> Result<String> {
 }
 
 /// Prepare a Telegram outbound send request without network I/O.
-pub fn telegram_send_dry_run_command(to: &str, text: &str, reply_to_message_id: Option<i64>) -> Result<String> {
+pub fn telegram_send_dry_run_command(
+    to: &str,
+    text: &str,
+    reply_to_message_id: Option<i64>,
+) -> Result<String> {
     let chat_id = normalize_target(to)?;
     let payload = crate::connectors::telegram_client::build_telegram_http_payload(
         &chat_id,
@@ -22,7 +26,11 @@ pub fn telegram_send_dry_run_command(to: &str, text: &str, reply_to_message_id: 
 /// Send an outbound Telegram message via Bot API.
 ///
 /// Requires `TELEGRAM_BOT_TOKEN` in environment.
-pub async fn telegram_send_command(to: &str, text: &str, reply_to_message_id: Option<i64>) -> Result<String> {
+pub async fn telegram_send_command(
+    to: &str,
+    text: &str,
+    reply_to_message_id: Option<i64>,
+) -> Result<String> {
     let chat_id = normalize_target(to)?;
     let token = std::env::var("TELEGRAM_BOT_TOKEN")
         .map_err(|_| anyhow!("Missing TELEGRAM_BOT_TOKEN environment variable"))?;
@@ -59,4 +67,3 @@ pub async fn telegram_send_command(to: &str, text: &str, reply_to_message_id: Op
         .unwrap_or("unknown Telegram API error");
     Err(anyhow!("Telegram API error: {}", description))
 }
-

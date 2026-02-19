@@ -36,32 +36,72 @@ pub struct MsgContext {
 }
 
 pub fn resolve_conversation_label(ctx: &MsgContext) -> Option<String> {
-    if let Some(explicit) = ctx.ConversationLabel.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+    if let Some(explicit) = ctx
+        .ConversationLabel
+        .as_ref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
         return Some(explicit.to_string());
     }
-    if let Some(thread_label) = ctx.ThreadLabel.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+    if let Some(thread_label) = ctx
+        .ThreadLabel
+        .as_ref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
         return Some(thread_label.to_string());
     }
 
     let chat_type = crate::channels::chat_type::normalize_chat_type(ctx.ChatType.as_deref());
     if matches!(chat_type, Some(ChatType::Direct)) {
-        if let Some(name) = ctx.SenderName.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+        if let Some(name) = ctx
+            .SenderName
+            .as_ref()
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+        {
             return Some(name.to_string());
         }
-        if let Some(from) = ctx.From.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+        if let Some(from) = ctx
+            .From
+            .as_ref()
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+        {
             return Some(from.to_string());
         }
         return None;
     }
 
     // Build base from group/channel/space/from in order
-    let base = if let Some(v) = ctx.GroupChannel.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+    let base = if let Some(v) = ctx
+        .GroupChannel
+        .as_ref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
         v.to_string()
-    } else if let Some(v) = ctx.GroupSubject.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+    } else if let Some(v) = ctx
+        .GroupSubject
+        .as_ref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
         v.to_string()
-    } else if let Some(v) = ctx.GroupSpace.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+    } else if let Some(v) = ctx
+        .GroupSpace
+        .as_ref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
         v.to_string()
-    } else if let Some(v) = ctx.From.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+    } else if let Some(v) = ctx
+        .From
+        .as_ref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
         v.to_string()
     } else {
         String::new()

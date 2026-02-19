@@ -38,14 +38,30 @@ pub fn color(code: &str, text: &str) -> String {
     format!("{}{}{}", code, text, ansi::RESET)
 }
 
-pub fn bold(text: &str) -> String { color(ansi::BOLD, text) }
-pub fn dim(text: &str) -> String { color(ansi::DIM, text) }
-pub fn red(text: &str) -> String { color(ansi::RED, text) }
-pub fn green(text: &str) -> String { color(ansi::GREEN, text) }
-pub fn yellow(text: &str) -> String { color(ansi::YELLOW, text) }
-pub fn blue(text: &str) -> String { color(ansi::BLUE, text) }
-pub fn cyan(text: &str) -> String { color(ansi::CYAN, text) }
-pub fn magenta(text: &str) -> String { color(ansi::MAGENTA, text) }
+pub fn bold(text: &str) -> String {
+    color(ansi::BOLD, text)
+}
+pub fn dim(text: &str) -> String {
+    color(ansi::DIM, text)
+}
+pub fn red(text: &str) -> String {
+    color(ansi::RED, text)
+}
+pub fn green(text: &str) -> String {
+    color(ansi::GREEN, text)
+}
+pub fn yellow(text: &str) -> String {
+    color(ansi::YELLOW, text)
+}
+pub fn blue(text: &str) -> String {
+    color(ansi::BLUE, text)
+}
+pub fn cyan(text: &str) -> String {
+    color(ansi::CYAN, text)
+}
+pub fn magenta(text: &str) -> String {
+    color(ansi::MAGENTA, text)
+}
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 
@@ -56,21 +72,37 @@ pub struct Theme {
 
 impl Theme {
     pub fn new() -> Self {
-        let no_color = std::env::var("NO_COLOR").is_ok()
-            || std::env::var("TERM").as_deref() == Ok("dumb");
+        let no_color =
+            std::env::var("NO_COLOR").is_ok() || std::env::var("TERM").as_deref() == Ok("dumb");
         Self { no_color }
     }
 
     fn apply(&self, code: &str, text: &str) -> String {
-        if self.no_color { text.to_string() } else { color(code, text) }
+        if self.no_color {
+            text.to_string()
+        } else {
+            color(code, text)
+        }
     }
 
-    pub fn success(&self, text: &str) -> String { self.apply(ansi::BRIGHT_GREEN, text) }
-    pub fn error(&self, text: &str) -> String { self.apply(ansi::BRIGHT_RED, text) }
-    pub fn warning(&self, text: &str) -> String { self.apply(ansi::BRIGHT_YELLOW, text) }
-    pub fn info(&self, text: &str) -> String { self.apply(ansi::BRIGHT_CYAN, text) }
-    pub fn muted(&self, text: &str) -> String { self.apply(ansi::BRIGHT_BLACK, text) }
-    pub fn label(&self, text: &str) -> String { self.apply(ansi::BOLD, text) }
+    pub fn success(&self, text: &str) -> String {
+        self.apply(ansi::BRIGHT_GREEN, text)
+    }
+    pub fn error(&self, text: &str) -> String {
+        self.apply(ansi::BRIGHT_RED, text)
+    }
+    pub fn warning(&self, text: &str) -> String {
+        self.apply(ansi::BRIGHT_YELLOW, text)
+    }
+    pub fn info(&self, text: &str) -> String {
+        self.apply(ansi::BRIGHT_CYAN, text)
+    }
+    pub fn muted(&self, text: &str) -> String {
+        self.apply(ansi::BRIGHT_BLACK, text)
+    }
+    pub fn label(&self, text: &str) -> String {
+        self.apply(ansi::BOLD, text)
+    }
 }
 
 impl Default for Theme {
@@ -81,11 +113,21 @@ impl Default for Theme {
 
 // ─── Status icons ─────────────────────────────────────────────────────────────
 
-pub fn icon_ok() -> &'static str    { "✓" }
-pub fn icon_err() -> &'static str   { "✗" }
-pub fn icon_warn() -> &'static str  { "⚠" }
-pub fn icon_info() -> &'static str  { "ℹ" }
-pub fn icon_arrow() -> &'static str { "→" }
+pub fn icon_ok() -> &'static str {
+    "✓"
+}
+pub fn icon_err() -> &'static str {
+    "✗"
+}
+pub fn icon_warn() -> &'static str {
+    "⚠"
+}
+pub fn icon_info() -> &'static str {
+    "ℹ"
+}
+pub fn icon_arrow() -> &'static str {
+    "→"
+}
 
 // ─── Health style ─────────────────────────────────────────────────────────────
 
@@ -99,9 +141,9 @@ pub enum HealthStatus {
 
 pub fn health_line(theme: &Theme, status: &HealthStatus, label: &str, detail: &str) -> String {
     let (icon, styled) = match status {
-        HealthStatus::Ok      => (icon_ok(),   theme.success(label)),
+        HealthStatus::Ok => (icon_ok(), theme.success(label)),
         HealthStatus::Warning => (icon_warn(), theme.warning(label)),
-        HealthStatus::Error   => (icon_err(),  theme.error(label)),
+        HealthStatus::Error => (icon_err(), theme.error(label)),
         HealthStatus::Unknown => (icon_info(), theme.muted(label)),
     };
     format!("{} {}  {}", icon, styled, theme.muted(detail))
@@ -139,7 +181,11 @@ impl Table {
             }
         }
 
-        let sep = widths.iter().map(|&w| "-".repeat(w + 2)).collect::<Vec<_>>().join("+");
+        let sep = widths
+            .iter()
+            .map(|&w| "-".repeat(w + 2))
+            .collect::<Vec<_>>()
+            .join("+");
         let sep = format!("+{}+", sep);
 
         let format_row = |row: &[String]| -> String {
@@ -206,10 +252,10 @@ impl ProgressLine {
 /// Print a formatted note to stdout.
 pub fn note(theme: &Theme, kind: &str, text: &str) {
     let prefix = match kind {
-        "success" | "ok"  => theme.success(&format!("{} ", icon_ok())),
-        "error"           => theme.error(&format!("{} ", icon_err())),
-        "warning" | "warn"=> theme.warning(&format!("{} ", icon_warn())),
-        _                 => theme.info(&format!("{} ", icon_info())),
+        "success" | "ok" => theme.success(&format!("{} ", icon_ok())),
+        "error" => theme.error(&format!("{} ", icon_err())),
+        "warning" | "warn" => theme.warning(&format!("{} ", icon_warn())),
+        _ => theme.info(&format!("{} ", icon_info())),
     };
     println!("{}{}", prefix, text);
 }

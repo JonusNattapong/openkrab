@@ -1,5 +1,5 @@
 use crate::common::{Message, UserId};
-use crate::gateway::{GatewayState, GatewayServer};
+use crate::gateway::{GatewayServer, GatewayState};
 use std::sync::Arc;
 
 const LINE_MAX_TEXT_CHARS: usize = 5000;
@@ -12,7 +12,8 @@ pub mod signature {
     pub fn validate_line_signature(body: &str, signature: &str, channel_secret: &str) -> bool {
         type HmacSha256 = Hmac<Sha256>;
 
-        let mut mac = HmacSha256::new_from_slice(channel_secret.as_bytes()).expect("HMAC can take key of any size");
+        let mut mac = HmacSha256::new_from_slice(channel_secret.as_bytes())
+            .expect("HMAC can take key of any size");
         mac.update(body.as_bytes());
         let result = mac.finalize();
 
@@ -293,9 +294,10 @@ pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value)
                 }
                 Err(e) => {
                     tracing::error!("[line] Agent error: {}", e);
-                    if let (Ok(token), Some(reply_token)) =
-                        (std::env::var("LINE_CHANNEL_ACCESS_TOKEN"), reply_token.as_ref())
-                    {
+                    if let (Ok(token), Some(reply_token)) = (
+                        std::env::var("LINE_CHANNEL_ACCESS_TOKEN"),
+                        reply_token.as_ref(),
+                    ) {
                         let client = reqwest::Client::new();
                         for chunk in split_outbound_chunks(
                             &format!("⚠️ Agent unavailable: {e}"),

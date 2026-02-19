@@ -11,27 +11,27 @@ use std::collections::HashMap;
 
 /// Canonical name → set of accepted aliases (including itself).
 static CONNECTOR_ALIASES: &[(&str, &[&str])] = &[
-    ("telegram",  &["telegram", "tg", "tlg"]),
-    ("slack",     &["slack", "sl"]),
-    ("discord",   &["discord", "dc", "ds"]),
-    ("whatsapp",  &["whatsapp", "wa", "whats"]),
-    ("line",      &["line", "ln"]),
-    ("signal",    &["signal", "sig"]),
-    ("imessage",  &["imessage", "im", "imsg"]),
-    ("matrix",    &["matrix", "mx"]),
-    ("mattermost",&["mattermost", "mm"]),
-    ("irc",       &["irc"]),
-    ("nostr",     &["nostr"]),
+    ("telegram", &["telegram", "tg", "tlg"]),
+    ("slack", &["slack", "sl"]),
+    ("discord", &["discord", "dc", "ds"]),
+    ("whatsapp", &["whatsapp", "wa", "whats"]),
+    ("line", &["line", "ln"]),
+    ("signal", &["signal", "sig"]),
+    ("imessage", &["imessage", "im", "imsg"]),
+    ("matrix", &["matrix", "mx"]),
+    ("mattermost", &["mattermost", "mm"]),
+    ("irc", &["irc"]),
+    ("nostr", &["nostr"]),
 ];
 
 static PROVIDER_ALIASES: &[(&str, &[&str])] = &[
-    ("openai",    &["openai", "oai", "gpt"]),
-    ("gemini",    &["gemini", "google", "bard"]),
-    ("ollama",    &["ollama", "local"]),
+    ("openai", &["openai", "oai", "gpt"]),
+    ("gemini", &["gemini", "google", "bard"]),
+    ("ollama", &["ollama", "local"]),
     ("anthropic", &["anthropic", "claude"]),
-    ("groq",      &["groq"]),
-    ("mistral",   &["mistral"]),
-    ("cohere",    &["cohere"]),
+    ("groq", &["groq"]),
+    ("mistral", &["mistral"]),
+    ("cohere", &["cohere"]),
 ];
 
 /// Resolve a connector name (possibly a legacy alias) to its canonical form.
@@ -108,7 +108,11 @@ impl FeatureFlags {
     }
 
     pub fn enabled_flags(&self) -> Vec<&str> {
-        self.flags.iter().filter(|(_, &v)| v).map(|(k, _)| k.as_str()).collect()
+        self.flags
+            .iter()
+            .filter(|(_, &v)| v)
+            .map(|(k, _)| k.as_str())
+            .collect()
     }
 }
 
@@ -116,14 +120,14 @@ impl FeatureFlags {
 
 /// Maps old config key names to new ones (for migrating stored configs).
 static CONFIG_KEY_MIGRATIONS: &[(&str, &str)] = &[
-    ("agent.name",          "agent.identity.name"),
-    ("agent.emoji",         "agent.identity.emoji"),
-    ("agent.personality",   "agent.identity.system_prompt"),
-    ("memory.provider",     "memory.embedding_provider"),
-    ("memory.path",         "memory.dir"),
-    ("gateway.port",        "server.port"),
-    ("telegram.bot_token",  "connectors.telegram.token"),
-    ("slack.bot_token",     "connectors.slack.bot_token"),
+    ("agent.name", "agent.identity.name"),
+    ("agent.emoji", "agent.identity.emoji"),
+    ("agent.personality", "agent.identity.system_prompt"),
+    ("memory.provider", "memory.embedding_provider"),
+    ("memory.path", "memory.dir"),
+    ("gateway.port", "server.port"),
+    ("telegram.bot_token", "connectors.telegram.token"),
+    ("slack.bot_token", "connectors.slack.bot_token"),
 ];
 
 /// Migrate an old config key to its new name. Returns `None` if no migration needed.
@@ -188,7 +192,10 @@ mod tests {
 
     #[test]
     fn config_key_migration() {
-        assert_eq!(migrate_config_key("agent.name"), Some("agent.identity.name"));
+        assert_eq!(
+            migrate_config_key("agent.name"),
+            Some("agent.identity.name")
+        );
         assert_eq!(migrate_config_key("no.such.key"), None);
     }
 

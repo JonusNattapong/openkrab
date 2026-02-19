@@ -2,7 +2,10 @@ use krabkrab::channels::conversation_label::*;
 
 #[test]
 fn test_resolve_conversation_label_explicit() {
-    let ctx = MsgContext { ConversationLabel: Some("Explicit".to_string()), ..Default::default() };
+    let ctx = MsgContext {
+        ConversationLabel: Some("Explicit".to_string()),
+        ..Default::default()
+    };
     assert_eq!(resolve_conversation_label(&ctx).unwrap(), "Explicit");
 }
 

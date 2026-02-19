@@ -41,7 +41,11 @@ pub struct AllowlistMatch {
 
 impl AllowlistMatch {
     pub fn none() -> Self {
-        Self { allowed: false, match_key: None, match_source: None }
+        Self {
+            allowed: false,
+            match_key: None,
+            match_source: None,
+        }
     }
 }
 
@@ -54,8 +58,12 @@ pub struct MatchMeta {
 pub fn format_allowlist_match_meta(m: Option<&MatchMeta>) -> String {
     format!(
         "matchKey={} matchSource= {}",
-        m.and_then(|x| x.match_key.as_ref()).map(|s| s.as_str()).unwrap_or("none"),
-        m.and_then(|x| x.match_source.as_ref()).map(|s| s.as_str()).unwrap_or("none")
+        m.and_then(|x| x.match_key.as_ref())
+            .map(|s| s.as_str())
+            .unwrap_or("none"),
+        m.and_then(|x| x.match_source.as_ref())
+            .map(|s| s.as_str())
+            .unwrap_or("none")
     )
 }
 
@@ -75,18 +83,30 @@ pub fn resolve_allowlist_match_simple(
     }
 
     if allow_norm.iter().any(|s| s == "*") {
-        return AllowlistMatch { allowed: true, match_key: Some("*".to_string()), match_source: Some(AllowlistMatchSource::Wildcard) };
+        return AllowlistMatch {
+            allowed: true,
+            match_key: Some("*".to_string()),
+            match_source: Some(AllowlistMatchSource::Wildcard),
+        };
     }
 
     let sender_id_l = sender_id.to_lowercase();
     if allow_norm.iter().any(|s| s == &sender_id_l) {
-        return AllowlistMatch { allowed: true, match_key: Some(sender_id_l), match_source: Some(AllowlistMatchSource::Id) };
+        return AllowlistMatch {
+            allowed: true,
+            match_key: Some(sender_id_l),
+            match_source: Some(AllowlistMatchSource::Id),
+        };
     }
 
     if let Some(name) = sender_name {
         let name_l = name.to_lowercase();
         if allow_norm.iter().any(|s| s == &name_l) {
-            return AllowlistMatch { allowed: true, match_key: Some(name_l), match_source: Some(AllowlistMatchSource::Name) };
+            return AllowlistMatch {
+                allowed: true,
+                match_key: Some(name_l),
+                match_source: Some(AllowlistMatchSource::Name),
+            };
         }
     }
 

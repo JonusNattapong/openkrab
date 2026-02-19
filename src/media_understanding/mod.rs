@@ -4,25 +4,34 @@
 //! Provides a unified trait for analysing image, audio and video content
 //! using an underlying vision / multimodal LLM.
 
-pub mod resolve;
-pub mod attachments;
-pub mod types;
-pub mod providers;
 pub mod apply;
+pub mod attachments;
 pub mod audio_preflight;
 pub mod format;
+pub mod providers;
+pub mod resolve;
+pub mod types;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-pub use resolve::{MediaCapability, MediaUnderstandingConfig, MediaModelConfig, resolve_scope_decision, build_provider_registry};
-pub use attachments::{MediaAttachment, MediaAttachmentCache, MediaAttachmentError, resolve_attachment_kind, is_video_attachment, is_audio_attachment, is_image_attachment, select_attachments};
-pub use types::{MediaAnalysis, MediaModality, MediaUnderstandingOutput, MediaUnderstandingDecision, MediaUnderstandingOutcome, ModelDecision};
-pub use providers::{MediaUnderstandingProvider, OpenAiVisionProvider, MockMediaProvider};
-pub use apply::{ApplyMediaUnderstandingResult, apply_media_understanding};
+pub use apply::{apply_media_understanding, ApplyMediaUnderstandingResult};
+pub use attachments::{
+    is_audio_attachment, is_image_attachment, is_video_attachment, resolve_attachment_kind,
+    select_attachments, MediaAttachment, MediaAttachmentCache, MediaAttachmentError,
+};
 pub use audio_preflight::transcribe_first_audio;
-pub use format::{get_text_stats, xml_escape_attr, sanitize_mime_type};
+pub use format::{get_text_stats, sanitize_mime_type, xml_escape_attr};
+pub use providers::{MediaUnderstandingProvider, MockMediaProvider, OpenAiVisionProvider};
+pub use resolve::{
+    build_provider_registry, resolve_scope_decision, MediaCapability, MediaModelConfig,
+    MediaUnderstandingConfig,
+};
+pub use types::{
+    MediaAnalysis, MediaModality, MediaUnderstandingDecision, MediaUnderstandingOutcome,
+    MediaUnderstandingOutput, ModelDecision,
+};
 
 #[async_trait]
 pub trait MediaUnderstandingProviderLegacy: Send + Sync {
@@ -62,7 +71,8 @@ impl MediaUnderstandingProviderLegacy for OpenAiVisionProvider {
             "Describe this image concisely. List the main objects, scene, and any text present.",
         );
 
-        let image_content = serde_json::json!({ "type": "image_url", "image_url": { "url": image_url_or_data } });
+        let image_content =
+            serde_json::json!({ "type": "image_url", "image_url": { "url": image_url_or_data } });
 
         let body = serde_json::json!({
             "model": "gpt-4o",

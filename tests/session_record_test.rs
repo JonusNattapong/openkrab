@@ -1,4 +1,6 @@
-use krabkrab::channels::session::{record_inbound_session, RecordInboundSessionParams, InboundLastRouteUpdate};
+use krabkrab::channels::session::{
+    record_inbound_session, InboundLastRouteUpdate, RecordInboundSessionParams,
+};
 use serde_json::json;
 use std::fs;
 use tempfile::tempdir;

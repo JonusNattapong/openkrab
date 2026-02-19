@@ -23,7 +23,11 @@ pub struct LobsterConfig {
 
 impl Default for LobsterConfig {
     fn default() -> Self {
-        Self { lobster_path: None, timeout: Duration::from_secs(20), max_stdout_bytes: 512_000 }
+        Self {
+            lobster_path: None,
+            timeout: Duration::from_secs(20),
+            max_stdout_bytes: 512_000,
+        }
     }
 }
 
@@ -31,7 +35,10 @@ impl Default for LobsterConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum LobsterEnvelope { Ok(LobsterOkEnvelope), Err(LobsterErrEnvelope) }
+pub enum LobsterEnvelope {
+    Ok(LobsterOkEnvelope),
+    Err(LobsterErrEnvelope),
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LobsterOkEnvelope {
@@ -44,7 +51,11 @@ pub struct LobsterOkEnvelope {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum LobsterStatus { Ok, NeedsApproval, Cancelled }
+pub enum LobsterStatus {
+    Ok,
+    NeedsApproval,
+    Cancelled,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApprovalRequest {
@@ -57,7 +68,10 @@ pub struct ApprovalRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LobsterErrEnvelope { pub ok: bool, pub error: LobsterError }
+pub struct LobsterErrEnvelope {
+    pub ok: bool,
+    pub error: LobsterError,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LobsterError {
@@ -70,8 +84,14 @@ pub struct LobsterError {
 
 #[derive(Debug, Clone)]
 pub enum LobsterAction {
-    Run { pipeline: String, args_json: Option<String> },
-    Resume { token: String, approve: bool },
+    Run {
+        pipeline: String,
+        args_json: Option<String>,
+    },
+    Resume {
+        token: String,
+        approve: bool,
+    },
 }
 
 // ─── Security: path validation ────────────────────────────────────────────────
@@ -80,17 +100,28 @@ pub fn resolve_executable(path_override: Option<&Path>) -> Result<String> {
     match path_override {
         None => Ok("lobster".into()),
         Some(p) => {
-            if !p.is_absolute() { bail!("lobster_path must be an absolute path"); }
-            let filename = p.file_name().and_then(|n| n.to_str()).unwrap_or("").to_lowercase();
+            if !p.is_absolute() {
+                bail!("lobster_path must be an absolute path");
+            }
+            let filename = p
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("")
+                .to_lowercase();
             let allowed = if cfg!(windows) {
                 vec!["lobster.exe", "lobster.cmd", "lobster.bat"]
             } else {
                 vec!["lobster"]
             };
             if !allowed.contains(&filename.as_str()) {
-                bail!("lobster_path must point to the lobster executable (not {})", filename);
+                bail!(
+                    "lobster_path must point to the lobster executable (not {})",
+                    filename
+                );
             }
-            if !p.is_file() { bail!("lobster_path must exist and be a file"); }
+            if !p.is_file() {
+                bail!("lobster_path must exist and be a file");
+            }
             Ok(p.to_string_lossy().into_owned())
         }
     }
@@ -101,7 +132,9 @@ fn lexical_normalize(path: &Path) -> PathBuf {
     let mut out = PathBuf::new();
     for component in path.components() {
         match component {
-            std::path::Component::ParentDir => { out.pop(); }
+            std::path::Component::ParentDir => {
+                out.pop();
+            }
             std::path::Component::CurDir => {}
             c => out.push(c),
         }
@@ -114,7 +147,9 @@ pub fn resolve_cwd(workspace_root: &Path, cwd_rel: Option<&str>) -> Result<PathB
         None | Some("") => Ok(workspace_root.to_path_buf()),
         Some(rel) => {
             let rel = rel.trim();
-            if Path::new(rel).is_absolute() { bail!("cwd must be a relative path"); }
+            if Path::new(rel).is_absolute() {
+                bail!("cwd must be a relative path");
+            }
             // Lexically normalize BEFORE checking containment to catch `../` traversal
             let resolved = lexical_normalize(&workspace_root.join(rel));
             let norm_root = lexical_normalize(workspace_root);
@@ -132,9 +167,19 @@ pub fn resolve_cwd(workspace_root: &Path, cwd_rel: Option<&str>) -> Result<PathB
 
 pub fn build_argv(action: &LobsterAction) -> Result<Vec<String>> {
     match action {
-        LobsterAction::Run { pipeline, args_json } => {
-            if pipeline.trim().is_empty() { bail!("pipeline is required"); }
-            let mut argv = vec!["run".into(), "--mode".into(), "tool".into(), pipeline.clone()];
+        LobsterAction::Run {
+            pipeline,
+            args_json,
+        } => {
+            if pipeline.trim().is_empty() {
+                bail!("pipeline is required");
+            }
+            let mut argv = vec![
+                "run".into(),
+                "--mode".into(),
+                "tool".into(),
+                pipeline.clone(),
+            ];
             if let Some(json) = args_json.as_deref().filter(|s| !s.trim().is_empty()) {
                 argv.push("--args-json".into());
                 argv.push(json.into());
@@ -142,10 +187,15 @@ pub fn build_argv(action: &LobsterAction) -> Result<Vec<String>> {
             Ok(argv)
         }
         LobsterAction::Resume { token, approve } => {
-            if token.trim().is_empty() { bail!("token is required"); }
+            if token.trim().is_empty() {
+                bail!("token is required");
+            }
             Ok(vec![
-                "resume".into(), "--token".into(), token.clone(),
-                "--approve".into(), if *approve { "yes" } else { "no" }.into(),
+                "resume".into(),
+                "--token".into(),
+                token.clone(),
+                "--approve".into(),
+                if *approve { "yes" } else { "no" }.into(),
             ])
         }
     }
@@ -166,9 +216,7 @@ fn find_first_json_prefix(s: &str) -> Option<&str> {
 
 fn envelope_from_value(v: serde_json::Value) -> Result<LobsterEnvelope> {
     match v.get("ok") {
-        Some(serde_json::Value::Bool(true)) => {
-            Ok(LobsterEnvelope::Ok(serde_json::from_value(v)?))
-        }
+        Some(serde_json::Value::Bool(true)) => Ok(LobsterEnvelope::Ok(serde_json::from_value(v)?)),
         Some(serde_json::Value::Bool(false)) => {
             Ok(LobsterEnvelope::Err(serde_json::from_value(v)?))
         }
@@ -209,7 +257,9 @@ pub fn run_lobster_sync(
     let mut cmd = Command::new(exec);
     cmd.args(argv).current_dir(cwd).env("LOBSTER_MODE", "tool");
     if let Ok(node_opts) = std::env::var("NODE_OPTIONS") {
-        if node_opts.contains("--inspect") { cmd.env_remove("NODE_OPTIONS"); }
+        if node_opts.contains("--inspect") {
+            cmd.env_remove("NODE_OPTIONS");
+        }
     }
     let start = std::time::Instant::now();
     let output = cmd.output()?;
@@ -218,7 +268,10 @@ pub fn run_lobster_sync(
     }
     let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
     if stdout.len() > max_stdout_bytes {
-        bail!("lobster output exceeded maxStdoutBytes ({})", max_stdout_bytes);
+        bail!(
+            "lobster output exceeded maxStdoutBytes ({})",
+            max_stdout_bytes
+        );
     }
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
@@ -227,7 +280,12 @@ pub fn run_lobster_sync(
     Ok(stdout)
 }
 
-pub fn execute(cfg: &LobsterConfig, workspace_root: &Path, action: &LobsterAction, cwd_rel: Option<&str>) -> Result<LobsterEnvelope> {
+pub fn execute(
+    cfg: &LobsterConfig,
+    workspace_root: &Path,
+    action: &LobsterAction,
+    cwd_rel: Option<&str>,
+) -> Result<LobsterEnvelope> {
     let exec = resolve_executable(cfg.lobster_path.as_deref())?;
     let cwd = resolve_cwd(workspace_root, cwd_rel)?;
     let argv = build_argv(action)?;
@@ -262,7 +320,10 @@ mod tests {
 
     #[test]
     fn build_argv_run() {
-        let action = LobsterAction::Run { pipeline: "my-pipeline".into(), args_json: None };
+        let action = LobsterAction::Run {
+            pipeline: "my-pipeline".into(),
+            args_json: None,
+        };
         let argv = build_argv(&action).unwrap();
         assert_eq!(argv, vec!["run", "--mode", "tool", "my-pipeline"]);
     }
@@ -279,7 +340,10 @@ mod tests {
 
     #[test]
     fn build_argv_resume() {
-        let action = LobsterAction::Resume { token: "tok123".into(), approve: true };
+        let action = LobsterAction::Resume {
+            token: "tok123".into(),
+            approve: true,
+        };
         let argv = build_argv(&action).unwrap();
         assert!(argv.contains(&"yes".to_string()));
     }
@@ -307,7 +371,10 @@ mod tests {
 
     #[test]
     fn build_argv_empty_pipeline_errors() {
-        let action = LobsterAction::Run { pipeline: "".into(), args_json: None };
+        let action = LobsterAction::Run {
+            pipeline: "".into(),
+            args_json: None,
+        };
         assert!(build_argv(&action).is_err());
     }
 

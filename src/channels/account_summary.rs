@@ -25,7 +25,10 @@ pub fn build_channel_account_snapshot(
             }
         }
     }
-    map.insert("accountId".to_string(), Value::String(account_id.to_string()));
+    map.insert(
+        "accountId".to_string(),
+        Value::String(account_id.to_string()),
+    );
     Value::Object(map)
 }
 
@@ -36,7 +39,11 @@ pub fn format_channel_allow_from(
     allow_from: &[Value],
 ) -> Vec<String> {
     if let Some(f) = format_fn {
-        return f(&FormatAllowFromParams { cfg, account_id, allow_from });
+        return f(&FormatAllowFromParams {
+            cfg,
+            account_id,
+            allow_from,
+        });
     }
     allow_from
         .iter()
@@ -66,7 +73,7 @@ mod tests {
     #[test]
     fn format_allow_from_default() {
         let cfg = json!({});
-        let allow = vec![json!(" alice "), json!(123), json!("" )];
+        let allow = vec![json!(" alice "), json!(123), json!("")];
         let out = format_channel_allow_from(None, &cfg, None, &allow);
         assert_eq!(out, vec!["alice".to_string(), "123".to_string()]);
     }

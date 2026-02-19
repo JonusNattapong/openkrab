@@ -1,5 +1,5 @@
 //! Android Native Module for node_host
-//! 
+//!
 //! This module provides Kotlin-based native functionality for Android devices:
 //! - Camera snap (photo capture)
 //! - Screen recording
@@ -368,7 +368,8 @@ class KrabKrabLocationHandler(private val context: Context) {
         }
     }
 }
-"#.to_string()
+"#
+        .to_string()
     }
 
     /// Generate Kotlin code for notification handler
@@ -479,7 +480,8 @@ class KrabKrabNotificationHandler(private val context: Context) {
         NotificationManagerCompat.from(context).cancelAll()
     }
 }
-"#.to_string()
+"#
+        .to_string()
     }
 }
 

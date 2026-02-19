@@ -41,7 +41,8 @@ pub async fn send_whatsapp_template(
     phone_number_id: &str,
 ) -> Result<serde_json::Value> {
     let client = Client::new();
-    let payload = whatsapp_client::build_whatsapp_template_payload(to, template_name, language_code);
+    let payload =
+        whatsapp_client::build_whatsapp_template_payload(to, template_name, language_code);
     whatsapp_client::send_template(&client, access_token, phone_number_id, payload).await
 }
 
@@ -56,7 +57,8 @@ mod tests {
             "test message",
             "invalid_token",
             "phone_number_id",
-        ).await;
+        )
+        .await;
 
         // Should fail with auth error
         assert!(result.is_err());

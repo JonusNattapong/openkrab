@@ -5,14 +5,14 @@
 //! account resolution, DM policy helpers, action gates, message actions,
 //! and the thread-safe runtime singleton with gateway lifecycle.
 
+use crate::common::{Message, UserId};
+pub use crate::connectors::discord_client::*;
 use anyhow::{bail, Result};
-use serenity::all::{Context, EventHandler, GatewayIntents, Message as SerenityMessage, Ready};
 use serde::{Deserialize, Serialize};
+use serenity::all::{Context, EventHandler, GatewayIntents, Message as SerenityMessage, Ready};
 use std::sync::{Arc, OnceLock, RwLock};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::time::sleep;
-use crate::common::{Message, UserId};
-pub use crate::connectors::discord_client::*;
 
 // ─── Runtime singleton ────────────────────────────────────────────────────────
 
@@ -33,16 +33,21 @@ pub fn set_runtime(rt: DiscordRuntime) {
 
 /// Access the Discord runtime, or `Err` if not yet initialised.
 pub fn get_runtime() -> Result<Arc<DiscordRuntime>> {
-    DISCORD_RUNTIME.get()
+    DISCORD_RUNTIME
+        .get()
         .cloned()
         .ok_or_else(|| anyhow::anyhow!("Discord runtime not initialized"))
 }
 
 fn status_store() -> Arc<RwLock<DiscordStatusSnapshot>> {
-    DISCORD_STATUS.get_or_init(|| Arc::new(RwLock::new(DiscordStatusSnapshot {
-        account_id: DEFAULT_ACCOUNT_ID.to_string(),
-        ..Default::default()
-    }))).clone()
+    DISCORD_STATUS
+        .get_or_init(|| {
+            Arc::new(RwLock::new(DiscordStatusSnapshot {
+                account_id: DEFAULT_ACCOUNT_ID.to_string(),
+                ..Default::default()
+            }))
+        })
+        .clone()
 }
 
 fn now_ms() -> u64 {
@@ -165,13 +170,29 @@ pub struct DiscordDmConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-pub enum DiscordDmPolicy { Open, Pairing, Closed }
-impl Default for DiscordDmPolicy { fn default() -> Self { Self::Pairing } }
+pub enum DiscordDmPolicy {
+    Open,
+    Pairing,
+    Closed,
+}
+impl Default for DiscordDmPolicy {
+    fn default() -> Self {
+        Self::Pairing
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-pub enum DiscordGroupPolicy { Open, Allowlist, Closed }
-impl Default for DiscordGroupPolicy { fn default() -> Self { Self::Open } }
+pub enum DiscordGroupPolicy {
+    Open,
+    Allowlist,
+    Closed,
+}
+impl Default for DiscordGroupPolicy {
+    fn default() -> Self {
+        Self::Open
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct DiscordGuildConfig {
@@ -198,8 +219,16 @@ pub struct DiscordAccountConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-pub enum ReplyToMode { Off, Reply, Thread }
-impl Default for ReplyToMode { fn default() -> Self { Self::Off } }
+pub enum ReplyToMode {
+    Off,
+    Reply,
+    Thread,
+}
+impl Default for ReplyToMode {
+    fn default() -> Self {
+        Self::Off
+    }
+}
 
 // ─── Action Config (port of openclaw/src/config/types.discord.ts:DiscordActionConfig) ───────
 
@@ -245,7 +274,9 @@ pub struct DiscordActionConfig {
     pub presence: bool,
 }
 
-fn default_true() -> bool { true }
+fn default_true() -> bool {
+    true
+}
 
 impl Default for DiscordActionConfig {
     fn default() -> Self {
@@ -376,19 +407,35 @@ pub fn list_message_actions(gate: &impl Fn(&str, bool) -> bool) -> Vec<MessageAc
         actions.push(MessageAction::Poll);
     }
     if gate("reactions", true) {
-        actions.extend([MessageAction::React, MessageAction::Reactions, MessageAction::EmojiList]);
+        actions.extend([
+            MessageAction::React,
+            MessageAction::Reactions,
+            MessageAction::EmojiList,
+        ]);
     }
     if gate("messages", true) {
-        actions.extend([MessageAction::Read, MessageAction::Edit, MessageAction::Delete]);
+        actions.extend([
+            MessageAction::Read,
+            MessageAction::Edit,
+            MessageAction::Delete,
+        ]);
     }
     if gate("pins", true) {
-        actions.extend([MessageAction::Pin, MessageAction::Unpin, MessageAction::ListPins]);
+        actions.extend([
+            MessageAction::Pin,
+            MessageAction::Unpin,
+            MessageAction::ListPins,
+        ]);
     }
     if gate("permissions", true) {
         actions.push(MessageAction::Permissions);
     }
     if gate("threads", true) {
-        actions.extend([MessageAction::ThreadCreate, MessageAction::ThreadList, MessageAction::ThreadReply]);
+        actions.extend([
+            MessageAction::ThreadCreate,
+            MessageAction::ThreadList,
+            MessageAction::ThreadReply,
+        ]);
     }
     if gate("search", true) {
         actions.push(MessageAction::Search);
@@ -432,7 +479,11 @@ pub fn list_message_actions(gate: &impl Fn(&str, bool) -> bool) -> Vec<MessageAc
         actions.extend([MessageAction::EventList, MessageAction::EventCreate]);
     }
     if gate("moderation", false) {
-        actions.extend([MessageAction::Timeout, MessageAction::Kick, MessageAction::Ban]);
+        actions.extend([
+            MessageAction::Timeout,
+            MessageAction::Kick,
+            MessageAction::Ban,
+        ]);
     }
     if gate("presence", false) {
         actions.push(MessageAction::SetPresence);
@@ -444,7 +495,11 @@ pub fn list_message_actions(gate: &impl Fn(&str, bool) -> bool) -> Vec<MessageAc
 /// Token source indicator (env-var vs explicit config).
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
-pub enum TokenSource { Env, Config, None }
+pub enum TokenSource {
+    Env,
+    Config,
+    None,
+}
 
 // ─── Resolved account ─────────────────────────────────────────────────────────
 
@@ -460,7 +515,10 @@ pub struct ResolvedDiscordAccount {
 
 impl ResolvedDiscordAccount {
     pub fn is_configured(&self) -> bool {
-        self.token.as_deref().map(|t| !t.trim().is_empty()).unwrap_or(false)
+        self.token
+            .as_deref()
+            .map(|t| !t.trim().is_empty())
+            .unwrap_or(false)
     }
 }
 
@@ -497,7 +555,10 @@ pub fn normalize_target(raw: &str) -> String {
     let s = raw.trim();
     // Strip mention format <@123> or <@!123>
     if s.starts_with("<@") && s.ends_with('>') {
-        let inner = s.trim_start_matches("<@!").trim_start_matches("<@").trim_end_matches('>');
+        let inner = s
+            .trim_start_matches("<@!")
+            .trim_start_matches("<@")
+            .trim_end_matches('>');
         return inner.to_string();
     }
     // Strip common prefixes
@@ -595,10 +656,16 @@ pub struct DmPolicyResolution {
 }
 
 pub fn resolve_dm_policy(account: &ResolvedDiscordAccount) -> DmPolicyResolution {
-    let policy = account.config.dm.as_ref()
+    let policy = account
+        .config
+        .dm
+        .as_ref()
         .and_then(|dm| dm.policy.clone())
         .unwrap_or_default();
-    let allow_from = account.config.dm.as_ref()
+    let allow_from = account
+        .config
+        .dm
+        .as_ref()
         .and_then(|dm| dm.allow_from.clone())
         .unwrap_or_default()
         .into_iter()
@@ -617,17 +684,17 @@ pub fn resolve_dm_policy(account: &ResolvedDiscordAccount) -> DmPolicyResolution
 /// Evaluate whether a DM sender is allowed to trigger the bot.
 ///
 /// `pairing_approved` represents external pairing state lookup.
-pub fn is_dm_allowed(
-    sender_id: &str,
-    policy: &DmPolicyResolution,
-    pairing_approved: bool,
-) -> bool {
+pub fn is_dm_allowed(sender_id: &str, policy: &DmPolicyResolution, pairing_approved: bool) -> bool {
     let normalized_sender = normalize_allow_entry(sender_id);
     match policy.policy {
         DiscordDmPolicy::Open => true,
         DiscordDmPolicy::Closed => false,
         DiscordDmPolicy::Pairing => {
-            pairing_approved || policy.allow_from.iter().any(|allowed| allowed == &normalized_sender)
+            pairing_approved
+                || policy
+                    .allow_from
+                    .iter()
+                    .any(|allowed| allowed == &normalized_sender)
         }
     }
 }
@@ -642,8 +709,12 @@ pub fn resolve_group_policy(account: &ResolvedDiscordAccount) -> DiscordGroupPol
 pub fn collect_config_warnings(account: &ResolvedDiscordAccount) -> Vec<String> {
     let mut warnings = Vec::new();
     let group_policy = resolve_group_policy(account);
-    let guilds_configured = account.config.guilds.as_ref()
-        .map(|g| !g.is_empty()).unwrap_or(false);
+    let guilds_configured = account
+        .config
+        .guilds
+        .as_ref()
+        .map(|g| !g.is_empty())
+        .unwrap_or(false);
 
     if group_policy == DiscordGroupPolicy::Open {
         if guilds_configured {
@@ -667,7 +738,11 @@ pub fn collect_config_warnings(account: &ResolvedDiscordAccount) -> Vec<String> 
 
 pub fn normalize_account_id(raw: &str) -> String {
     let s = raw.trim().to_lowercase();
-    if s.is_empty() { DEFAULT_ACCOUNT_ID.to_string() } else { s }
+    if s.is_empty() {
+        DEFAULT_ACCOUNT_ID.to_string()
+    } else {
+        s
+    }
 }
 
 // ─── Status snapshot ──────────────────────────────────────────────────────────
@@ -754,8 +829,7 @@ impl EventHandler for DiscordEventHandler {
                     if part.trim().is_empty() {
                         continue;
                     }
-                    if let Err(e) = msg.channel_id.say(&ctx.http, &part).await
-                    {
+                    if let Err(e) = msg.channel_id.say(&ctx.http, &part).await {
                         set_error_status(format!("send failed: {}", e));
                         break;
                     }
@@ -773,10 +847,7 @@ impl EventHandler for DiscordEventHandler {
     }
 }
 
-async fn run_gateway_session(
-    state: Arc<crate::gateway::GatewayState>,
-    token: &str,
-) -> Result<()> {
+async fn run_gateway_session(state: Arc<crate::gateway::GatewayState>, token: &str) -> Result<()> {
     let intents = GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
@@ -828,15 +899,30 @@ mod tests {
 
     #[test]
     fn normalize_target_strips_mention() {
-        assert_eq!(normalize_target("<@!123456789012345678>"), "123456789012345678");
-        assert_eq!(normalize_target("<@123456789012345678>"), "123456789012345678");
+        assert_eq!(
+            normalize_target("<@!123456789012345678>"),
+            "123456789012345678"
+        );
+        assert_eq!(
+            normalize_target("<@123456789012345678>"),
+            "123456789012345678"
+        );
     }
 
     #[test]
     fn normalize_target_strips_prefix() {
-        assert_eq!(normalize_target("user:12345678901234567"), "12345678901234567");
-        assert_eq!(normalize_target("discord:12345678901234567"), "12345678901234567");
-        assert_eq!(normalize_target("channel:12345678901234567"), "12345678901234567");
+        assert_eq!(
+            normalize_target("user:12345678901234567"),
+            "12345678901234567"
+        );
+        assert_eq!(
+            normalize_target("discord:12345678901234567"),
+            "12345678901234567"
+        );
+        assert_eq!(
+            normalize_target("channel:12345678901234567"),
+            "12345678901234567"
+        );
     }
 
     #[test]
@@ -1008,7 +1094,9 @@ mod tests {
         let mut acc = ResolvedDiscordAccount {
             account_id: "default".into(),
             token: Some("  ".into()), // whitespace only
-            name: None, enabled: true, token_source: TokenSource::None,
+            name: None,
+            enabled: true,
+            token_source: TokenSource::None,
             config: Default::default(),
         };
         assert!(!acc.is_configured());
@@ -1045,13 +1133,18 @@ mod tests {
 
     #[test]
     fn resolve_http_channel_target_accepts_numeric_channel() {
-        assert_eq!(resolve_http_channel_target("channel:123456").unwrap(), "123456");
+        assert_eq!(
+            resolve_http_channel_target("channel:123456").unwrap(),
+            "123456"
+        );
     }
 
     #[test]
     fn resolve_http_channel_target_rejects_user_target() {
         let err = resolve_http_channel_target("user:123456").unwrap_err();
-        assert!(err.to_string().contains("not supported in HTTP sender path"));
+        assert!(err
+            .to_string()
+            .contains("not supported in HTTP sender path"));
     }
 
     #[test]

@@ -55,9 +55,7 @@ pub fn data_dir() -> PathBuf {
 pub fn cache_dir() -> PathBuf {
     std::env::var("KRABKRAB_CACHE_DIR")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            std::env::temp_dir().join("krabkrab")
-        })
+        .unwrap_or_else(|_| std::env::temp_dir().join("krabkrab"))
 }
 
 // ─── Workspace discovery ──────────────────────────────────────────────────────
@@ -109,8 +107,7 @@ pub fn env_required(key: &str) -> Result<String, String> {
 
 /// Returns `true` if the process is running inside a Docker container.
 pub fn is_docker() -> bool {
-    Path::new("/.dockerenv").exists()
-        || std::env::var("DOCKER_CONTAINER").is_ok()
+    Path::new("/.dockerenv").exists() || std::env::var("DOCKER_CONTAINER").is_ok()
 }
 
 /// Returns `true` if `CI` env var is set (GitHub Actions, GitLab CI, etc.).

@@ -6,7 +6,10 @@ fn test_log_inbound_drop_formats() {
     use std::sync::{Arc, Mutex};
     let captured = Arc::new(Mutex::new(String::new()));
     let cap = captured.clone();
-    let logger: LogFn = Box::new(move |s: &str| { let mut g = cap.lock().unwrap(); *g = s.to_string(); });
+    let logger: LogFn = Box::new(move |s: &str| {
+        let mut g = cap.lock().unwrap();
+        *g = s.to_string();
+    });
     let params = InboundDropParams {
         log: logger,
         channel: "whatsapp".to_string(),

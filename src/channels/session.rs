@@ -40,7 +40,10 @@ pub fn record_inbound_session(params: RecordInboundSessionParams) {
     }
     let path = dir.join(format!("session-{}.json", params.session_key));
     let mut obj = serde_json::Map::new();
-    obj.insert("sessionKey".to_string(), Value::String(params.session_key.clone()));
+    obj.insert(
+        "sessionKey".to_string(),
+        Value::String(params.session_key.clone()),
+    );
     obj.insert("ctx".to_string(), params.ctx.clone());
     if let Some(route) = params.update_last_route {
         let mut route_map = serde_json::Map::new();
@@ -54,6 +57,9 @@ pub fn record_inbound_session(params: RecordInboundSessionParams) {
         }
         obj.insert("lastRoute".to_string(), Value::Object(route_map));
     }
-    let _ = fs::write(path, serde_json::to_string_pretty(&Value::Object(obj)).unwrap_or_default());
+    let _ = fs::write(
+        path,
+        serde_json::to_string_pretty(&Value::Object(obj)).unwrap_or_default(),
+    );
     info!("recorded inbound session {}", params.session_key);
 }

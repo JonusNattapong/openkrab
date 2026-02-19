@@ -20,7 +20,7 @@ pub async fn message_send_command(opts: MessageSendOptions) -> anyhow::Result<St
         text: opts.text.clone(),
         from: None,
     };
-    
+
     // Route to appropriate connector
     let result = match opts.channel.as_str() {
         "slack" => send_slack_message(&opts).await,
@@ -30,7 +30,7 @@ pub async fn message_send_command(opts: MessageSendOptions) -> anyhow::Result<St
         "whatsapp" => send_whatsapp_message(&opts).await,
         _ => Err(anyhow::anyhow!("Unknown channel: {}", opts.channel)),
     };
-    
+
     match result {
         Ok(msg_id) => Ok(format!(
             "✓ Sent message to {} ({}): {}",
@@ -75,7 +75,11 @@ pub fn format_message(message: &Message, channel: &str) -> String {
     format!(
         "[{}] {}: {}",
         channel,
-        message.from.as_ref().map(|f| f.0.clone()).unwrap_or_else(|| "unknown".to_string()),
+        message
+            .from
+            .as_ref()
+            .map(|f| f.0.clone())
+            .unwrap_or_else(|| "unknown".to_string()),
         message.text
     )
 }
@@ -92,7 +96,7 @@ mod tests {
             text: "Hello world".to_string(),
             from: Some(UserId("user-456".to_string())),
         };
-        
+
         let formatted = format_message(&msg, "slack");
         assert!(formatted.contains("[slack]"));
         assert!(formatted.contains("user-456"));

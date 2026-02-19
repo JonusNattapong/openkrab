@@ -88,7 +88,9 @@ fn build_daemon_args(opts: &DaemonOpts) -> Vec<String> {
 }
 
 /// Spawn signal-cli daemon process.
-pub async fn spawn_daemon(opts: DaemonOpts) -> Result<DaemonHandle, Box<dyn std::error::Error + Send + Sync>> {
+pub async fn spawn_daemon(
+    opts: DaemonOpts,
+) -> Result<DaemonHandle, Box<dyn std::error::Error + Send + Sync>> {
     let args = build_daemon_args(&opts);
 
     let mut child = Command::new(&opts.cli_path)
@@ -144,21 +146,29 @@ pub async fn spawn_daemon(opts: DaemonOpts) -> Result<DaemonHandle, Box<dyn std:
 /// Check if daemon should auto-start based on config.
 pub fn should_auto_start(config: &super::SignalConfig) -> bool {
     config.auto_start.unwrap_or_else(|| {
-        config.api_base.starts_with("http://localhost") ||
-        config.api_base.starts_with("http://127.0.0.1")
+        config.api_base.starts_with("http://localhost")
+            || config.api_base.starts_with("http://127.0.0.1")
     })
 }
 
 /// Create daemon options from signal config.
 pub fn daemon_opts_from_config(config: &super::SignalConfig) -> DaemonOpts {
-    let url_parts: Vec<&str> = config.api_base.trim_start_matches("http://").split(':').collect();
+    let url_parts: Vec<&str> = config
+        .api_base
+        .trim_start_matches("http://")
+        .split(':')
+        .collect();
     let http_host = url_parts.get(0).unwrap_or(&"localhost").to_string();
-    let http_port = url_parts.get(1)
+    let http_port = url_parts
+        .get(1)
         .and_then(|p| p.parse().ok())
         .unwrap_or(8080);
 
     DaemonOpts {
-        cli_path: config.cli_path.clone().unwrap_or_else(|| "signal-cli".to_string()),
+        cli_path: config
+            .cli_path
+            .clone()
+            .unwrap_or_else(|| "signal-cli".to_string()),
         account: config.account.clone(),
         http_host,
         http_port,

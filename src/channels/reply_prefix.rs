@@ -61,7 +61,10 @@ pub fn resolve_effective_messages_config(
                         resolve_identity_name_prefix(cfg, agent_id),
                     );
                 }
-                return (resolve_message_prefix(cfg, agent_id, None), Some(s.to_string()));
+                return (
+                    resolve_message_prefix(cfg, agent_id, None),
+                    Some(s.to_string()),
+                );
             }
         }
     }
@@ -75,7 +78,10 @@ pub fn resolve_effective_messages_config(
                         resolve_identity_name_prefix(cfg, agent_id),
                     );
                 }
-                return (resolve_message_prefix(cfg, agent_id, None), Some(s.to_string()));
+                return (
+                    resolve_message_prefix(cfg, agent_id, None),
+                    Some(s.to_string()),
+                );
             }
         }
     }
@@ -88,7 +94,10 @@ pub fn resolve_effective_messages_config(
                     resolve_identity_name_prefix(cfg, agent_id),
                 );
             }
-            return (resolve_message_prefix(cfg, agent_id, None), Some(s.to_string()));
+            return (
+                resolve_message_prefix(cfg, agent_id, None),
+                Some(s.to_string()),
+            );
         }
     }
 
@@ -97,7 +106,11 @@ pub fn resolve_effective_messages_config(
 
 fn resolve_message_prefix(cfg: &Value, agent_id: &str, _opts: Option<&str>) -> String {
     // simplified: return messages.messagePrefix or identity prefix or default
-    if let Some(msg_pref) = cfg.get("messages").and_then(|m| m.get("messagePrefix")).and_then(|v| v.as_str()) {
+    if let Some(msg_pref) = cfg
+        .get("messages")
+        .and_then(|m| m.get("messagePrefix"))
+        .and_then(|v| v.as_str())
+    {
         return msg_pref.to_string();
     }
     resolve_identity_name_prefix(cfg, agent_id).unwrap_or_else(|| "[krabkrab]".to_string())
@@ -118,21 +131,22 @@ pub fn create_reply_prefix_context(
         thinking_level: None,
     }));
 
-    let ( _message_prefix, response_prefix ) = resolve_effective_messages_config(cfg, agent_id, channel, account_id);
+    let (_message_prefix, response_prefix) =
+        resolve_effective_messages_config(cfg, agent_id, channel, account_id);
 
     let provider_clone = Arc::clone(&prefix_ctx);
-    let response_prefix_context_provider: Box<dyn Fn() -> ResponsePrefixContext + Send + Sync> = Box::new(move || {
-        provider_clone.read().unwrap().clone()
-    });
+    let response_prefix_context_provider: Box<dyn Fn() -> ResponsePrefixContext + Send + Sync> =
+        Box::new(move || provider_clone.read().unwrap().clone());
 
     let model_ctx = Arc::clone(&prefix_ctx);
-    let on_model_selected: Box<dyn Fn(ModelSelectionContext) + Send + Sync> = Box::new(move |ctx: ModelSelectionContext| {
-        let mut lock = model_ctx.write().unwrap();
-        lock.provider = Some(ctx.provider.clone());
-        lock.model = Some(ctx.model.clone());
-        lock.model_full = Some(format!("{}/{}", ctx.provider, ctx.model));
-        lock.thinking_level = ctx.think_level.clone();
-    });
+    let on_model_selected: Box<dyn Fn(ModelSelectionContext) + Send + Sync> =
+        Box::new(move |ctx: ModelSelectionContext| {
+            let mut lock = model_ctx.write().unwrap();
+            lock.provider = Some(ctx.provider.clone());
+            lock.model = Some(ctx.model.clone());
+            lock.model_full = Some(format!("{}/{}", ctx.provider, ctx.model));
+            lock.thinking_level = ctx.think_level.clone();
+        });
 
     ReplyPrefixContextBundle {
         prefix_context: prefix_ctx,
@@ -147,7 +161,15 @@ pub fn create_reply_prefix_options(
     agent_id: &str,
     channel: Option<&str>,
     account_id: Option<&str>,
-) -> (Option<String>, Box<dyn Fn() -> ResponsePrefixContext + Send + Sync>, Box<dyn Fn(ModelSelectionContext) + Send + Sync>) {
+) -> (
+    Option<String>,
+    Box<dyn Fn() -> ResponsePrefixContext + Send + Sync>,
+    Box<dyn Fn(ModelSelectionContext) + Send + Sync>,
+) {
     let bundle = create_reply_prefix_context(cfg, agent_id, channel, account_id);
-    (bundle.response_prefix, bundle.response_prefix_context_provider, bundle.on_model_selected)
+    (
+        bundle.response_prefix,
+        bundle.response_prefix_context_provider,
+        bundle.on_model_selected,
+    )
 }

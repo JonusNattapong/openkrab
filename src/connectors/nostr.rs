@@ -36,13 +36,19 @@ impl Default for NostrConfig {
 }
 
 impl NostrConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
-        if self.private_key_hex.is_empty() { bail!("NOSTR_PRIVATE_KEY is required"); }
+        if self.private_key_hex.is_empty() {
+            bail!("NOSTR_PRIVATE_KEY is required");
+        }
         if self.private_key_hex.len() != 64 {
             bail!("NOSTR_PRIVATE_KEY must be a 64-character hex string (32 bytes)");
         }
-        if self.relays.is_empty() { bail!("NOSTR_RELAYS must not be empty"); }
+        if self.relays.is_empty() {
+            bail!("NOSTR_RELAYS must not be empty");
+        }
         Ok(())
     }
 }
@@ -78,8 +84,15 @@ pub struct NostrEvent {
 /// Relay message types received from WebSocket.
 #[derive(Debug, Clone)]
 pub enum RelayMessage {
-    Event { subscription_id: String, event: NostrEvent },
-    Ok { event_id: String, success: bool, message: String },
+    Event {
+        subscription_id: String,
+        event: NostrEvent,
+    },
+    Ok {
+        event_id: String,
+        success: bool,
+        message: String,
+    },
     Notice(String),
     Eose(String), // End of stored events
 }
@@ -92,13 +105,20 @@ pub fn parse_relay_message(raw: &str) -> Option<RelayMessage> {
         "EVENT" => {
             let sub_id = arr.get(1)?.as_str()?.to_string();
             let event: NostrEvent = serde_json::from_value(arr.get(2)?.clone()).ok()?;
-            Some(RelayMessage::Event { subscription_id: sub_id, event })
+            Some(RelayMessage::Event {
+                subscription_id: sub_id,
+                event,
+            })
         }
         "OK" => {
             let event_id = arr.get(1)?.as_str()?.to_string();
             let success = arr.get(2)?.as_bool().unwrap_or(false);
             let message = arr.get(3)?.as_str().unwrap_or("").to_string();
-            Some(RelayMessage::Ok { event_id, success, message })
+            Some(RelayMessage::Ok {
+                event_id,
+                success,
+                message,
+            })
         }
         "NOTICE" => {
             let msg = arr.get(1)?.as_str()?.to_string();
@@ -126,12 +146,18 @@ pub struct ParsedNostrMessage {
 
 /// Parse a Nostr event into a message (kind 1 text note or kind 4 DM).
 pub fn parse_event(event: &NostrEvent) -> Option<ParsedNostrMessage> {
-    if event.kind != kind::TEXT_NOTE && event.kind != kind::ENCRYPTED_DM { return None; }
+    if event.kind != kind::TEXT_NOTE && event.kind != kind::ENCRYPTED_DM {
+        return None;
+    }
     let text = event.content.trim().to_string();
-    if text.is_empty() { return None; }
+    if text.is_empty() {
+        return None;
+    }
 
     // Extract reply reference from tags
-    let reply_to = event.tags.iter()
+    let reply_to = event
+        .tags
+        .iter()
         .find(|t| t.first().map(|s| s == "e") == Some(true))
         .and_then(|t| t.get(1))
         .cloned();
@@ -160,7 +186,12 @@ pub fn build_close(subscription_id: &str) -> String {
 }
 
 /// Build an EVENT publish message (unsigned — caller must fill id/sig).
-pub fn build_event_payload(pubkey: &str, kind: u64, content: &str, tags: Vec<Vec<String>>) -> serde_json::Value {
+pub fn build_event_payload(
+    pubkey: &str,
+    kind: u64,
+    content: &str,
+    tags: Vec<Vec<String>>,
+) -> serde_json::Value {
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_secs() as i64)
@@ -175,10 +206,17 @@ pub fn build_event_payload(pubkey: &str, kind: u64, content: &str, tags: Vec<Vec
 }
 
 /// Build a DM event shell (content must be NIP-04 encrypted by caller).
-pub fn build_dm_event(from_pubkey: &str, to_pubkey: &str, encrypted_content: &str) -> serde_json::Value {
-    build_event_payload(from_pubkey, kind::ENCRYPTED_DM, encrypted_content, vec![
-        vec!["p".to_string(), to_pubkey.to_string()]
-    ])
+pub fn build_dm_event(
+    from_pubkey: &str,
+    to_pubkey: &str,
+    encrypted_content: &str,
+) -> serde_json::Value {
+    build_event_payload(
+        from_pubkey,
+        kind::ENCRYPTED_DM,
+        encrypted_content,
+        vec![vec!["p".to_string(), to_pubkey.to_string()]],
+    )
 }
 
 pub fn normalize_inbound(msg: &ParsedNostrMessage) -> Message {

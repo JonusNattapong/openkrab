@@ -28,8 +28,15 @@ pub fn validate_sender_identity(ctx: &MsgContext) -> Vec<String> {
     let sender_e164 = ctx.SenderE164.as_deref().unwrap_or("").trim();
 
     if !is_direct {
-        if sender_id.is_empty() && sender_name.is_empty() && sender_username.is_empty() && sender_e164.is_empty() {
-            issues.push("missing sender identity (SenderId/SenderName/SenderUsername/SenderE164)".to_string());
+        if sender_id.is_empty()
+            && sender_name.is_empty()
+            && sender_username.is_empty()
+            && sender_e164.is_empty()
+        {
+            issues.push(
+                "missing sender identity (SenderId/SenderName/SenderUsername/SenderE164)"
+                    .to_string(),
+            );
         }
     }
 
@@ -42,10 +49,16 @@ pub fn validate_sender_identity(ctx: &MsgContext) -> Vec<String> {
 
     if !sender_username.is_empty() {
         if sender_username.contains('@') {
-            issues.push(format!("SenderUsername should not include \"@\": {}", sender_username));
+            issues.push(format!(
+                "SenderUsername should not include \"@\": {}",
+                sender_username
+            ));
         }
         if sender_username.chars().any(|c| c.is_whitespace()) {
-            issues.push(format!("SenderUsername should not include whitespace: {}", sender_username));
+            issues.push(format!(
+                "SenderUsername should not include whitespace: {}",
+                sender_username
+            ));
         }
     }
 

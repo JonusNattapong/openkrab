@@ -36,9 +36,13 @@ impl Default for MattermostConfig {
 }
 
 impl MattermostConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
-        if self.server_url.is_empty() { bail!("MATTERMOST_URL is required"); }
+        if self.server_url.is_empty() {
+            bail!("MATTERMOST_URL is required");
+        }
         if self.access_token.is_empty() && self.webhook_url.is_none() {
             bail!("MATTERMOST_TOKEN or MATTERMOST_WEBHOOK_URL is required");
         }
@@ -75,7 +79,9 @@ pub struct ParsedMattermostMessage {
 
 pub fn parse_webhook(payload: &MattermostWebhookPayload) -> Option<ParsedMattermostMessage> {
     let text = payload.text.as_deref()?.trim().to_string();
-    if text.is_empty() { return None; }
+    if text.is_empty() {
+        return None;
+    }
 
     Some(ParsedMattermostMessage {
         user_id: payload.user_id.clone().unwrap_or_default(),
@@ -114,7 +120,12 @@ pub async fn send_webhook(
     channel: Option<&str>,
 ) -> Result<()> {
     let payload = build_webhook_payload(text, channel);
-    client.post(webhook_url).json(&payload).send().await?.error_for_status()?;
+    client
+        .post(webhook_url)
+        .json(&payload)
+        .send()
+        .await?
+        .error_for_status()?;
     Ok(())
 }
 
@@ -155,7 +166,10 @@ mod tests {
 
     #[test]
     fn config_validate_missing_url() {
-        let cfg = MattermostConfig { server_url: "".into(), ..Default::default() };
+        let cfg = MattermostConfig {
+            server_url: "".into(),
+            ..Default::default()
+        };
         assert!(cfg.validate().is_err());
     }
 
@@ -173,10 +187,14 @@ mod tests {
     #[test]
     fn parse_webhook_ok() {
         let p = MattermostWebhookPayload {
-            token: None, team_id: None,
-            channel_id: Some("ch1".into()), channel_name: Some("general".into()),
-            user_id: Some("u1".into()), user_name: Some("alice".into()),
-            post_id: Some("post1".into()), text: Some("  hello  ".into()),
+            token: None,
+            team_id: None,
+            channel_id: Some("ch1".into()),
+            channel_name: Some("general".into()),
+            user_id: Some("u1".into()),
+            user_name: Some("alice".into()),
+            post_id: Some("post1".into()),
+            text: Some("  hello  ".into()),
             trigger_word: None,
         };
         let msg = parse_webhook(&p).unwrap();
@@ -194,9 +212,12 @@ mod tests {
     #[test]
     fn normalize_inbound_test() {
         let msg = ParsedMattermostMessage {
-            user_id: "u1".into(), user_name: "alice".into(),
-            channel_id: "ch1".into(), channel_name: "general".into(),
-            post_id: "p1".into(), text: "hi".into(),
+            user_id: "u1".into(),
+            user_name: "alice".into(),
+            channel_id: "ch1".into(),
+            channel_name: "general".into(),
+            post_id: "p1".into(),
+            text: "hi".into(),
         };
         let m = normalize_inbound(&msg);
         assert!(m.id.starts_with("mattermost:"));

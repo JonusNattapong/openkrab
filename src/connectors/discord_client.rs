@@ -438,7 +438,12 @@ pub async fn fetch_message(
     Ok(resp.json().await?)
 }
 
-pub async fn pin_message(client: &Client, token: &str, channel_id: &str, message_id: &str) -> Result<()> {
+pub async fn pin_message(
+    client: &Client,
+    token: &str,
+    channel_id: &str,
+    message_id: &str,
+) -> Result<()> {
     let url = format!(
         "{}/channels/{}/pins/{}",
         DISCORD_API_BASE, channel_id, message_id
@@ -458,7 +463,12 @@ pub async fn pin_message(client: &Client, token: &str, channel_id: &str, message
     Ok(())
 }
 
-pub async fn unpin_message(client: &Client, token: &str, channel_id: &str, message_id: &str) -> Result<()> {
+pub async fn unpin_message(
+    client: &Client,
+    token: &str,
+    channel_id: &str,
+    message_id: &str,
+) -> Result<()> {
     let url = format!(
         "{}/channels/{}/pins/{}",
         DISCORD_API_BASE, channel_id, message_id
@@ -478,7 +488,11 @@ pub async fn unpin_message(client: &Client, token: &str, channel_id: &str, messa
     Ok(())
 }
 
-pub async fn list_pins(client: &Client, token: &str, channel_id: &str) -> Result<Vec<DiscordMessage>> {
+pub async fn list_pins(
+    client: &Client,
+    token: &str,
+    channel_id: &str,
+) -> Result<Vec<DiscordMessage>> {
     let url = format!("{}/channels/{}/pins", DISCORD_API_BASE, channel_id);
 
     let resp = client
@@ -779,7 +793,12 @@ pub async fn timeout_member(
     Ok(())
 }
 
-pub async fn kick_member(client: &Client, token: &str, guild_id: &str, user_id: &str) -> Result<()> {
+pub async fn kick_member(
+    client: &Client,
+    token: &str,
+    guild_id: &str,
+    user_id: &str,
+) -> Result<()> {
     let url = format!(
         "{}/guilds/{}/members/{}",
         DISCORD_API_BASE, guild_id, user_id
@@ -806,10 +825,7 @@ pub async fn ban_member(
     user_id: &str,
     reason: Option<&str>,
 ) -> Result<()> {
-    let url = format!(
-        "{}/guilds/{}/bans/{}",
-        DISCORD_API_BASE, guild_id, user_id
-    );
+    let url = format!("{}/guilds/{}/bans/{}", DISCORD_API_BASE, guild_id, user_id);
 
     let payload = json!({
         "delete_message_seconds": 86400,

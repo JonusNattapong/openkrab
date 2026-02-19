@@ -29,17 +29,27 @@ impl Default for NextcloudTalkConfig {
             username: std::env::var("NEXTCLOUD_USER").unwrap_or_default(),
             password: std::env::var("NEXTCLOUD_PASSWORD").unwrap_or_default(),
             poll_interval_secs: std::env::var("NEXTCLOUD_POLL_SECS")
-                .ok().and_then(|v| v.parse().ok()).unwrap_or(3),
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(3),
         }
     }
 }
 
 impl NextcloudTalkConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
-        if self.server_url.is_empty() { bail!("NEXTCLOUD_URL is required"); }
-        if self.username.is_empty() { bail!("NEXTCLOUD_USER is required"); }
-        if self.password.is_empty() { bail!("NEXTCLOUD_PASSWORD is required"); }
+        if self.server_url.is_empty() {
+            bail!("NEXTCLOUD_URL is required");
+        }
+        if self.username.is_empty() {
+            bail!("NEXTCLOUD_USER is required");
+        }
+        if self.password.is_empty() {
+            bail!("NEXTCLOUD_PASSWORD is required");
+        }
         Ok(())
     }
 
@@ -87,9 +97,13 @@ pub struct ParsedNcTalkMessage {
 }
 
 pub fn parse_message(msg: &NcTalkMessage) -> Option<ParsedNcTalkMessage> {
-    if msg.message_type != "comment" { return None; }
+    if msg.message_type != "comment" {
+        return None;
+    }
     let text = msg.message.trim().to_string();
-    if text.is_empty() { return None; }
+    if text.is_empty() {
+        return None;
+    }
 
     Some(ParsedNcTalkMessage {
         id: msg.id,
@@ -170,10 +184,13 @@ mod tests {
 
     fn make_msg(text: &str, msg_type: &str) -> NcTalkMessage {
         NcTalkMessage {
-            id: 42, token: "room1".into(),
-            actor_type: "users".into(), actor_id: "alice".into(),
+            id: 42,
+            token: "room1".into(),
+            actor_type: "users".into(),
+            actor_id: "alice".into(),
             actor_display_name: "Alice".into(),
-            message: text.into(), timestamp: 1_700_000,
+            message: text.into(),
+            timestamp: 1_700_000,
             message_type: msg_type.into(),
         }
     }
@@ -198,7 +215,10 @@ mod tests {
 
     #[test]
     fn config_validate_missing_url() {
-        let cfg = NextcloudTalkConfig { server_url: "".into(), ..Default::default() };
+        let cfg = NextcloudTalkConfig {
+            server_url: "".into(),
+            ..Default::default()
+        };
         assert!(cfg.validate().is_err());
     }
 

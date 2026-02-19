@@ -73,11 +73,20 @@ pub fn format_location_text(location: &NormalizedLocation) -> String {
     let resolved = resolve_location(location);
     let coords = format_coords(resolved.latitude, resolved.longitude);
     let accuracy = format_accuracy(resolved.accuracy);
-    let caption = resolved.caption.as_deref().map(|s| s.trim()).filter(|s| !s.is_empty()).map(|s| s.to_string());
+    let caption = resolved
+        .caption
+        .as_deref()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string());
     let header = if resolved.source == LocationSource::Live || resolved.is_live {
         format!("🛰 Live location: {}{}", coords, accuracy)
     } else if resolved.name.is_some() || resolved.address.is_some() {
-        let label = [resolved.name.as_deref(), resolved.address.as_deref()].iter().filter_map(|x| *x).collect::<Vec<_>>().join(" — ");
+        let label = [resolved.name.as_deref(), resolved.address.as_deref()]
+            .iter()
+            .filter_map(|x| *x)
+            .collect::<Vec<_>>()
+            .join(" — ");
         format!("📍 {} ({}{})", label, coords, accuracy)
     } else {
         format!("📍 {}{}", coords, accuracy)

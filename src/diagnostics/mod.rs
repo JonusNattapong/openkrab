@@ -88,8 +88,12 @@ impl Span {
         self.end_ms.map(|e| e.saturating_sub(self.start_ms))
     }
 
-    pub fn is_finished(&self) -> bool { self.end_ms.is_some() }
-    pub fn is_error(&self) -> bool { matches!(self.status, SpanStatus::Error(_)) }
+    pub fn is_finished(&self) -> bool {
+        self.end_ms.is_some()
+    }
+    pub fn is_error(&self) -> bool {
+        matches!(self.status, SpanStatus::Error(_))
+    }
 }
 
 // ─── Metrics ──────────────────────────────────────────────────────────────────
@@ -111,11 +115,21 @@ pub struct Metric {
 
 impl Metric {
     pub fn counter(name: impl Into<String>, value: i64) -> Self {
-        Self { name: name.into(), value: MetricValue::Counter(value), labels: HashMap::new(), timestamp_ms: now_ms() }
+        Self {
+            name: name.into(),
+            value: MetricValue::Counter(value),
+            labels: HashMap::new(),
+            timestamp_ms: now_ms(),
+        }
     }
 
     pub fn gauge(name: impl Into<String>, value: f64) -> Self {
-        Self { name: name.into(), value: MetricValue::Gauge(value), labels: HashMap::new(), timestamp_ms: now_ms() }
+        Self {
+            name: name.into(),
+            value: MetricValue::Gauge(value),
+            labels: HashMap::new(),
+            timestamp_ms: now_ms(),
+        }
     }
 
     pub fn with_label(mut self, k: impl Into<String>, v: impl Into<String>) -> Self {
@@ -133,7 +147,9 @@ pub struct Tracer {
 }
 
 impl Tracer {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn start_span(&self, name: impl Into<String>) -> Span {
         Span::new(name, new_id())
@@ -164,7 +180,13 @@ impl Tracer {
     }
 
     pub fn error_spans(&self) -> Vec<Span> {
-        self.spans.lock().unwrap().iter().filter(|s| s.is_error()).cloned().collect()
+        self.spans
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|s| s.is_error())
+            .cloned()
+            .collect()
     }
 
     pub fn clear(&self) {
@@ -182,7 +204,10 @@ pub struct TimedScope {
 
 impl TimedScope {
     pub fn new(name: impl Into<String>) -> Self {
-        Self { name: name.into(), start: Instant::now() }
+        Self {
+            name: name.into(),
+            start: Instant::now(),
+        }
     }
 
     pub fn elapsed(&self) -> Duration {
@@ -205,7 +230,10 @@ fn now_ms() -> u64 {
 
 fn new_id() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let t = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().subsec_nanos();
+    let t = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .subsec_nanos();
     format!("{:016x}", t as u64 ^ (now_ms() << 32))
 }
 

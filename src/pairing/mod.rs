@@ -82,7 +82,10 @@ pub struct PairingCode {
 impl PairingCode {
     pub fn new(account_id: impl Into<String>, ttl_secs: i64) -> Self {
         Self {
-            code: format!("{:08}", (Utc::now().timestamp_nanos_opt().unwrap_or(0) % 100_000_000).unsigned_abs()),
+            code: format!(
+                "{:08}",
+                (Utc::now().timestamp_nanos_opt().unwrap_or(0) % 100_000_000).unsigned_abs()
+            ),
             account_id: account_id.into(),
             expires_at: Utc::now() + Duration::seconds(ttl_secs),
         }
@@ -116,8 +119,8 @@ impl PairingService {
         Self {
             tokens: HashMap::new(),
             codes: HashMap::new(),
-            token_ttl_secs: 300,   // 5 minutes
-            code_ttl_secs: 120,    // 2 minutes
+            token_ttl_secs: 300, // 5 minutes
+            code_ttl_secs: 120,  // 2 minutes
         }
     }
 
@@ -154,7 +157,9 @@ impl PairingService {
                     RedeemResult::Expired
                 } else {
                     tok.redeem(device_id);
-                    RedeemResult::Success { account_id: tok.account_id.clone() }
+                    RedeemResult::Success {
+                        account_id: tok.account_id.clone(),
+                    }
                 }
             }
         }
@@ -204,7 +209,11 @@ mod tests {
 
     #[test]
     fn pairing_code_display() {
-        let code = PairingCode { code: "12345678".to_string(), account_id: "u1".to_string(), expires_at: Utc::now() + Duration::seconds(60) };
+        let code = PairingCode {
+            code: "12345678".to_string(),
+            account_id: "u1".to_string(),
+            expires_at: Utc::now() + Duration::seconds(60),
+        };
         assert_eq!(code.display(), "1234-5678");
     }
 

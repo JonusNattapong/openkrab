@@ -66,18 +66,29 @@ impl GatewayServer {
         }
     }
 
-    pub async fn broadcast(&self, message: GatewayMessage) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn broadcast(
+        &self,
+        message: GatewayMessage,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let json = serde_json::to_string(&message)?;
         let clients = self.clients.read().await;
 
         // In a real implementation, we'd have WebSocket senders stored here
         // For now, just log the broadcast
-        tracing::debug!("Broadcasting message to {} clients: {}", clients.len(), json);
+        tracing::debug!(
+            "Broadcasting message to {} clients: {}",
+            clients.len(),
+            json
+        );
 
         Ok(())
     }
 
-    pub async fn send_to_client(&self, client_id: &str, message: GatewayMessage) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn send_to_client(
+        &self,
+        client_id: &str,
+        message: GatewayMessage,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let json = serde_json::to_string(&message)?;
         let clients = self.clients.read().await;
 
@@ -108,10 +119,7 @@ async fn handle_websocket(
     ws.on_upgrade(move |socket| handle_socket(socket, server))
 }
 
-async fn handle_socket(
-    socket: axum::extract::ws::WebSocket,
-    server: Arc<GatewayServer>,
-) {
+async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<GatewayServer>) {
     let connection_id = {
         let mut next_id = server.next_connection_id.write().await;
         let id = *next_id;
@@ -158,7 +166,11 @@ async fn handle_socket(
 
                 // Parse incoming message
                 match serde_json::from_str::<GatewayMessage>(&text) {
-                    Ok(GatewayMessage::Chat { session_key, message, attachments }) => {
+                    Ok(GatewayMessage::Chat {
+                        session_key,
+                        message,
+                        attachments,
+                    }) => {
                         tracing::info!("Chat message from {}: {}", session_key, message);
 
                         // Send acknowledgment
@@ -222,9 +234,7 @@ pub async fn start_gateway_server(
     tracing::info!("Starting gateway server on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
-    let server_handle = tokio::spawn(async move {
-        axum::serve(listener, app).await
-    });
+    let server_handle = tokio::spawn(async move { axum::serve(listener, app).await });
 
     // In a real implementation, we'd return a handle to stop the server
     // For now, just return the GatewayServer instance

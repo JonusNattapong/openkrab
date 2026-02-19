@@ -70,7 +70,10 @@ impl InboundEnvelope {
 
 fn uuid_v4() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let t = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_nanos();
+    let t = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos();
     format!("{:x}", t)
 }
 
@@ -87,7 +90,11 @@ pub struct ReplyEnvelope {
 }
 
 impl ReplyEnvelope {
-    pub fn new(connector: impl Into<String>, chat_id: impl Into<String>, text: impl Into<String>) -> Self {
+    pub fn new(
+        connector: impl Into<String>,
+        chat_id: impl Into<String>,
+        text: impl Into<String>,
+    ) -> Self {
         Self {
             connector: connector.into(),
             chat_id: chat_id.into(),
@@ -130,7 +137,11 @@ impl ParsedCommand {
         // Remove @bot_name suffix if present (e.g. /help@mybot)
         let name = name.split('@').next().unwrap_or(&name).to_lowercase();
         let args: Vec<String> = parts.map(|s| s.to_string()).collect();
-        Some(ParsedCommand { name, args, raw: text.to_string() })
+        Some(ParsedCommand {
+            name,
+            args,
+            raw: text.to_string(),
+        })
     }
 }
 
@@ -168,7 +179,11 @@ impl Default for ActivationConfig {
 
 pub fn check_activation(env: &InboundEnvelope, cfg: &ActivationConfig) -> ActivationResult {
     // Sender allowlist check
-    if !cfg.allowed_senders.iter().any(|s| s == "*" || s == &env.sender_id) {
+    if !cfg
+        .allowed_senders
+        .iter()
+        .any(|s| s == "*" || s == &env.sender_id)
+    {
         return ActivationResult::Inactive {
             reason: format!("sender {} not in allowlist", env.sender_id),
         };
@@ -179,7 +194,9 @@ pub fn check_activation(env: &InboundEnvelope, cfg: &ActivationConfig) -> Activa
         if cfg.respond_to_dm {
             return ActivationResult::Active;
         }
-        return ActivationResult::Inactive { reason: "DM disabled".to_string() };
+        return ActivationResult::Inactive {
+            reason: "DM disabled".to_string(),
+        };
     }
 
     // Group check

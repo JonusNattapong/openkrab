@@ -61,8 +61,8 @@ pub fn next_interval(current: Duration, config: &PollConfig, error: bool) -> Dur
     if !error {
         return config.initial_interval;
     }
-    let next_secs = (current.as_secs_f64() * config.backoff_factor)
-        .min(config.max_interval.as_secs_f64());
+    let next_secs =
+        (current.as_secs_f64() * config.backoff_factor).min(config.max_interval.as_secs_f64());
 
     // Add jitter: up to ±jitter fraction of next_secs
     let jitter_delta = next_secs * config.jitter;
@@ -163,7 +163,10 @@ where
 /// Returns a channel receiver — send `true` to stop.
 pub fn start_ticker(
     interval: Duration,
-) -> (tokio::sync::mpsc::Receiver<()>, tokio::sync::watch::Sender<bool>) {
+) -> (
+    tokio::sync::mpsc::Receiver<()>,
+    tokio::sync::watch::Sender<bool>,
+) {
     let (tick_tx, tick_rx) = tokio::sync::mpsc::channel::<()>(8);
     let (stop_tx, mut stop_rx) = tokio::sync::watch::channel(false);
 
@@ -221,7 +224,10 @@ mod tests {
 
     #[tokio::test]
     async fn poll_loop_stops_on_signal() {
-        let cfg = PollConfig { initial_interval: Duration::from_millis(10), ..Default::default() };
+        let cfg = PollConfig {
+            initial_interval: Duration::from_millis(10),
+            ..Default::default()
+        };
         let (stop_tx, stop_rx) = tokio::sync::watch::channel(false);
         let count = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
         let count2 = count.clone();
@@ -233,7 +239,8 @@ mod tests {
                     c.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                     PollResult::<()>::Ok(())
                 }
-            }).await
+            })
+            .await
         });
 
         // Let it run a few ticks

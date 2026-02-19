@@ -27,7 +27,12 @@ pub struct ExecOptions {
 
 impl Default for ExecOptions {
     fn default() -> Self {
-        Self { cwd: None, env: Vec::new(), timeout: None, capture: true }
+        Self {
+            cwd: None,
+            env: Vec::new(),
+            timeout: None,
+            capture: true,
+        }
     }
 }
 
@@ -113,7 +118,10 @@ impl CommandQueue {
     }
 
     pub fn with_opts(opts: ExecOptions) -> Self {
-        Self { opts: Some(opts), ..Default::default() }
+        Self {
+            opts: Some(opts),
+            ..Default::default()
+        }
     }
 
     pub fn push(&mut self, cmd: impl Into<String>) {
@@ -258,9 +266,15 @@ mod tests {
     fn command_queue_runs_in_order() {
         let mut q = CommandQueue::new();
         #[cfg(target_os = "windows")]
-        { q.push("echo a"); q.push("echo b"); }
+        {
+            q.push("echo a");
+            q.push("echo b");
+        }
         #[cfg(not(target_os = "windows"))]
-        { q.push("echo a"); q.push("echo b"); }
+        {
+            q.push("echo a");
+            q.push("echo b");
+        }
         let results = q.flush(true);
         assert_eq!(results.len(), 2);
         assert!(results.iter().all(|r| r.success));

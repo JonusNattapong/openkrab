@@ -17,19 +17,20 @@ pub struct CreateTypingParams {
 pub fn create_typing_callbacks(params: CreateTypingParams) -> TypingCallbacks {
     let start = params.start.clone();
     let on_start_error = params.on_start_error.clone();
-    let on_reply_start: Arc<dyn Fn() -> BoxFuture<'static, Result<(), String>> + Send + Sync> = Arc::new(move || {
-        let start = start.clone();
-        let on_start_error = on_start_error.clone();
-        Box::pin(async move {
-            match (start)().await {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    (on_start_error)(e.clone());
-                    Err(e)
+    let on_reply_start: Arc<dyn Fn() -> BoxFuture<'static, Result<(), String>> + Send + Sync> =
+        Arc::new(move || {
+            let start = start.clone();
+            let on_start_error = on_start_error.clone();
+            Box::pin(async move {
+                match (start)().await {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        (on_start_error)(e.clone());
+                        Err(e)
+                    }
                 }
-            }
-        }) as BoxFuture<'static, Result<(), String>>
-    });
+            }) as BoxFuture<'static, Result<(), String>>
+        });
 
     let fire_stop = params.stop.map(|stop| {
         let on_stop_error = params.on_stop_error.clone();

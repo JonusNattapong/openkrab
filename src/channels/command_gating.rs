@@ -45,7 +45,11 @@ pub fn resolve_control_command_gate(
     has_control_command: bool,
     mode_when_off: Option<CommandGatingModeWhenAccessGroupsOff>,
 ) -> ControlCommandGateResult {
-    let command_authorized = resolve_command_authorized_from_authorizers(use_access_groups, authorizers, mode_when_off);
+    let command_authorized =
+        resolve_command_authorized_from_authorizers(use_access_groups, authorizers, mode_when_off);
     let should_block = allow_text_commands && has_control_command && !command_authorized;
-    ControlCommandGateResult { command_authorized, should_block }
+    ControlCommandGateResult {
+        command_authorized,
+        should_block,
+    }
 }

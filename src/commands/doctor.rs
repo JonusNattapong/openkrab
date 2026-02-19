@@ -1,9 +1,7 @@
 //! doctor — Comprehensive system health check and repair command.
 //! Ported from `openclaw/src/commands/doctor.ts` (Phase 6).
 
-use crate::commands::{
-    doctor_auth, doctor_gateway, doctor_sandbox, doctor_security,
-};
+use crate::commands::{doctor_auth, doctor_gateway, doctor_sandbox, doctor_security};
 use crate::config::AppConfig;
 
 /// Doctor check result.
@@ -20,15 +18,15 @@ pub async fn doctor_command(cfg: &AppConfig, auto_fix: bool) -> DoctorResult {
     let mut repairs = Vec::new();
     let mut warnings = Vec::new();
     let mut errors = Vec::new();
-    
+
     // 1. Auth health check
     let auth_health = doctor_auth::build_auth_health_summary(cfg);
     let auth_warnings = doctor_auth::note_auth_profile_health(cfg);
-    
+
     if !auth_warnings.is_empty() {
         warnings.extend(auth_warnings);
     }
-    
+
     // Check for Anthropic OAuth profile repair
     let (needs_repair, changes) = doctor_auth::check_anthropic_oauth_profile_repair(cfg);
     if needs_repair {
@@ -41,14 +39,16 @@ pub async fn doctor_command(cfg: &AppConfig, auto_fix: bool) -> DoctorResult {
             ));
         }
     }
-    
+
     // 2. Gateway health check
     let gateway_health = doctor_gateway::check_gateway_health(cfg, None).await;
     if !gateway_health.healthy {
         errors.push(format!("Gateway: {}", gateway_health.message));
     } else if !gateway_health.channel_issues.is_empty() {
         for issue in &gateway_health.channel_issues {
-            let fix_str = issue.fix.as_ref()
+            let fix_str = issue
+                .fix
+                .as_ref()
                 .map(|f| format!(" (fix: {})", f))
                 .unwrap_or_default();
             warnings.push(format!(
@@ -57,7 +57,7 @@ pub async fn doctor_command(cfg: &AppConfig, auto_fix: bool) -> DoctorResult {
             ));
         }
     }
-    
+
     // 3. Sandbox health check
     let sandbox_health = doctor_sandbox::check_sandbox_health(cfg);
     if !sandbox_health.docker_available {
@@ -67,11 +67,11 @@ pub async fn doctor_command(cfg: &AppConfig, auto_fix: bool) -> DoctorResult {
             warnings.push(format!("Sandbox: {}", issue));
         }
     }
-    
+
     // Sandbox scope warnings
     let sandbox_warnings = doctor_sandbox::note_sandbox_scope_warnings(cfg);
     warnings.extend(sandbox_warnings);
-    
+
     // 4. Security checks
     let security_notes = doctor_security::note_security_warnings(cfg);
     for note in &security_notes {
@@ -81,9 +81,9 @@ pub async fn doctor_command(cfg: &AppConfig, auto_fix: bool) -> DoctorResult {
             warnings.push(note.clone());
         }
     }
-    
+
     let healthy = errors.is_empty() && (auto_fix || repairs.is_empty());
-    
+
     DoctorResult {
         healthy,
         repairs_made: repairs,
@@ -95,34 +95,34 @@ pub async fn doctor_command(cfg: &AppConfig, auto_fix: bool) -> DoctorResult {
 /// Format doctor result for display.
 pub fn format_doctor_result(result: &DoctorResult) -> String {
     let mut lines = Vec::new();
-    
+
     if result.healthy && result.errors.is_empty() {
         lines.push("✅ All doctor checks passed".to_string());
     } else {
         lines.push("⚠️  Doctor found issues".to_string());
     }
-    
+
     if !result.repairs_made.is_empty() {
         lines.push("\n🔧 Repairs made:".to_string());
         for repair in &result.repairs_made {
             lines.push(format!("  ✓ {}", repair));
         }
     }
-    
+
     if !result.warnings.is_empty() {
         lines.push("\n⚠️  Warnings:".to_string());
         for warning in &result.warnings {
             lines.push(format!("  - {}", warning));
         }
     }
-    
+
     if !result.errors.is_empty() {
         lines.push("\n❌ Errors:".to_string());
         for error in &result.errors {
             lines.push(format!("  ✗ {}", error));
         }
     }
-    
+
     lines.join("\n")
 }
 
@@ -143,7 +143,7 @@ mod tests {
             warnings: vec![],
             errors: vec![],
         };
-        
+
         let output = format_doctor_result(&result);
         assert!(output.contains("✅ All doctor checks passed"));
     }
@@ -156,7 +156,7 @@ mod tests {
             warnings: vec!["Docker not available".to_string()],
             errors: vec![],
         };
-        
+
         let output = format_doctor_result(&result);
         assert!(output.contains("⚠️  Doctor found issues"));
         assert!(output.contains("Warnings:"));
@@ -170,7 +170,7 @@ mod tests {
             warnings: vec![],
             errors: vec![],
         };
-        
+
         let output = format_doctor_result(&result);
         assert!(output.contains("🔧 Repairs made:"));
         assert!(output.contains("Migrated auth profile"));

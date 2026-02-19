@@ -1,13 +1,13 @@
-use sha2::{Sha256, Digest};
-use walkdir::WalkDir;
-use std::path::{Path, PathBuf};
-use anyhow::Result;
-use crate::memory::store::MemoryStore;
 use crate::memory::embeddings::EmbeddingProvider;
-use notify::{Watcher, RecursiveMode, Config, Event};
+use crate::memory::store::MemoryStore;
+use anyhow::Result;
+use futures_util::StreamExt;
+use notify::{Config, Event, RecursiveMode, Watcher};
+use sha2::{Digest, Sha256};
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::sync::mpsc;
-use futures_util::StreamExt;
+use walkdir::WalkDir;
 
 pub struct MemoryChunk {
     pub start_line: i32,
@@ -35,7 +35,7 @@ pub fn chunk_markdown(content: &str, max_chars: usize) -> Vec<MemoryChunk> {
 
     for (i, line) in lines.iter().enumerate() {
         let line_len = line.len() + 1; // +1 for newline
-        
+
         if current_chars + line_len > max_chars && !current_lines.is_empty() {
             let text = current_lines.join("\n");
             chunks.push(MemoryChunk {
@@ -95,14 +95,21 @@ impl MemoryManager {
         Self { store, provider }
     }
 
-    pub fn from_config(store: MemoryStore, config: crate::memory::config::MemoryConfig) -> Result<Self> {
+    pub fn from_config(
+        store: MemoryStore,
+        config: crate::memory::config::MemoryConfig,
+    ) -> Result<Self> {
         let provider = config.create_provider()?;
         Ok(Self { store, provider })
     }
 
-    pub async fn search_hybrid(&self, query: &str, opts: HybridSearchOptions) -> Result<Vec<SearchResult>> {
+    pub async fn search_hybrid(
+        &self,
+        query: &str,
+        opts: HybridSearchOptions,
+    ) -> Result<Vec<SearchResult>> {
         let model = self.provider.model();
-        
+
         // 1. Keyword search (FTS5)
         let keyword_results = self.store.search_fts(query, model, opts.max_results * 2)?;
 
@@ -139,7 +146,8 @@ impl MemoryManager {
     pub async fn index_file(&self, workspace_dir: &Path, abs_path: &Path) -> Result<()> {
         let content = std::fs::read_to_string(abs_path)?;
         let chunks = chunk_markdown(&content, 2000); // 2000 chars roughly 500 tokens
-        let rel_path = abs_path.strip_prefix(workspace_dir)?
+        let rel_path = abs_path
+            .strip_prefix(workspace_dir)?
             .to_string_lossy()
             .replace("\\", "/");
 
@@ -147,16 +155,20 @@ impl MemoryManager {
         let model = self.provider.model().to_string();
 
         // Clean up old entries
-        self.store.delete_chunks_by_path(&rel_path, source, &model)?;
+        self.store
+            .delete_chunks_by_path(&rel_path, source, &model)?;
 
         for chunk in chunks {
             let embedding_vec = self.provider.embed_query(&chunk.text).await?;
-            
+
             // Ensure vector index exists with these dimensions
             self.store.ensure_vector_index(embedding_vec.len())?;
-            
-            let chunk_id = hash_text(&format!("{}:{}:{}:{}", rel_path, chunk.start_line, chunk.end_line, model));
-            
+
+            let chunk_id = hash_text(&format!(
+                "{}:{}:{}:{}",
+                rel_path, chunk.start_line, chunk.end_line, model
+            ));
+
             self.store.insert_chunk(
                 &chunk_id,
                 &rel_path,
@@ -206,17 +218,20 @@ impl MemoryManager {
     pub async fn watch_workspace(self: Arc<Self>, workspace_dir: PathBuf) -> Result<()> {
         let (tx, mut rx) = mpsc::channel(100);
 
-        let mut watcher = notify::RecommendedWatcher::new(move |res: notify::Result<Event>| {
-            if let Ok(event) = res {
-                if event.kind.is_modify() || event.kind.is_create() {
-                    for path in event.paths {
-                        if path.extension().map_or(false, |ext| ext == "md") {
-                            let _ = tx.blocking_send(path);
+        let mut watcher = notify::RecommendedWatcher::new(
+            move |res: notify::Result<Event>| {
+                if let Ok(event) = res {
+                    if event.kind.is_modify() || event.kind.is_create() {
+                        for path in event.paths {
+                            if path.extension().map_or(false, |ext| ext == "md") {
+                                let _ = tx.blocking_send(path);
+                            }
                         }
                     }
                 }
-            }
-        }, Config::default())?;
+            },
+            Config::default(),
+        )?;
 
         watcher.watch(&workspace_dir, RecursiveMode::Recursive)?;
         println!("Watching for changes in: {:?}", workspace_dir);
@@ -224,11 +239,11 @@ impl MemoryManager {
         // Background task to handle events
         let manager = self.clone();
         let ws_dir = workspace_dir.clone();
-        
+
         tokio::spawn(async move {
             // Keep watcher alive by moving it into the task
-            let _watcher = watcher; 
-            
+            let _watcher = watcher;
+
             while let Some(path) = rx.recv().await {
                 println!("File changed: {:?}", path);
                 // Simple debounce/delay to let file write finish

@@ -54,12 +54,12 @@ pub fn ensure_schema(conn: &Connection) -> Result<()> {
         "CREATE INDEX IF NOT EXISTS idx_embedding_cache_updated_at ON embedding_cache(updated_at)",
         [],
     )?;
-    
+
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_chunks_path ON chunks(path)",
         [],
     )?;
-    
+
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_chunks_source ON chunks(source)",
         [],

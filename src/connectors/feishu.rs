@@ -34,10 +34,16 @@ impl Default for FeishuConfig {
 }
 
 impl FeishuConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
-        if self.app_id.is_empty() { bail!("FEISHU_APP_ID is required"); }
-        if self.app_secret.is_empty() { bail!("FEISHU_APP_SECRET is required"); }
+        if self.app_id.is_empty() {
+            bail!("FEISHU_APP_ID is required");
+        }
+        if self.app_secret.is_empty() {
+            bail!("FEISHU_APP_SECRET is required");
+        }
         Ok(())
     }
 }
@@ -77,9 +83,9 @@ pub struct FeishuMessage {
     pub thread_id: Option<String>,
     pub create_time: Option<String>,
     pub chat_id: Option<String>,
-    pub chat_type: Option<String>, // "p2p" | "group"
+    pub chat_type: Option<String>,    // "p2p" | "group"
     pub message_type: Option<String>, // "text" | "image" | etc.
-    pub content: Option<String>, // JSON string
+    pub content: Option<String>,      // JSON string
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -109,23 +115,33 @@ pub struct ParsedFeishuMessage {
 
 pub fn parse_event(cb: &FeishuEventCallback) -> Option<ParsedFeishuMessage> {
     // URL verification — not a real message
-    if cb.challenge.is_some() { return None; }
+    if cb.challenge.is_some() {
+        return None;
+    }
 
     let header = cb.header.as_ref()?;
-    if header.event_type.as_deref() != Some("im.message.receive_v1") { return None; }
+    if header.event_type.as_deref() != Some("im.message.receive_v1") {
+        return None;
+    }
 
     let ev = cb.event.as_ref()?;
     let msg = ev.message.as_ref()?;
-    if msg.message_type.as_deref() != Some("text") { return None; }
+    if msg.message_type.as_deref() != Some("text") {
+        return None;
+    }
 
     // content is a JSON string: {"text": "hello"}
     let content_str = msg.content.as_deref().unwrap_or("{}");
     let content: serde_json::Value = serde_json::from_str(content_str).unwrap_or_default();
     let text = content["text"].as_str().unwrap_or("").trim().to_string();
-    if text.is_empty() { return None; }
+    if text.is_empty() {
+        return None;
+    }
 
     let sender = ev.sender.as_ref()?;
-    let sender_open_id = sender.sender_id.as_ref()
+    let sender_open_id = sender
+        .sender_id
+        .as_ref()
         .and_then(|id| id.open_id.as_deref())
         .unwrap_or("")
         .to_string();
@@ -145,7 +161,11 @@ pub fn parse_event(cb: &FeishuEventCallback) -> Option<ParsedFeishuMessage> {
 pub const FEISHU_API_BASE: &str = "https://open.feishu.cn/open-apis";
 
 /// Build a text message payload.
-pub fn build_text_payload(receive_id: &str, text: &str, receive_id_type: &str) -> serde_json::Value {
+pub fn build_text_payload(
+    receive_id: &str,
+    text: &str,
+    receive_id_type: &str,
+) -> serde_json::Value {
     serde_json::json!({
         "receive_id": receive_id,
         "msg_type": "text",
@@ -161,7 +181,10 @@ pub async fn send_message(
     text: &str,
     receive_id_type: &str,
 ) -> Result<serde_json::Value> {
-    let url = format!("{}/im/v1/messages?receive_id_type={}", FEISHU_API_BASE, receive_id_type);
+    let url = format!(
+        "{}/im/v1/messages?receive_id_type={}",
+        FEISHU_API_BASE, receive_id_type
+    );
     let payload = build_text_payload(receive_id, text, receive_id_type);
     let resp = client
         .post(&url)
@@ -183,9 +206,16 @@ pub async fn get_tenant_access_token(
         "app_id": cfg.app_id,
         "app_secret": cfg.app_secret
     });
-    let resp: serde_json::Value = client.post(&url).json(&payload)
-        .send().await?.error_for_status()?.json().await?;
-    resp["tenant_access_token"].as_str()
+    let resp: serde_json::Value = client
+        .post(&url)
+        .json(&payload)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    resp["tenant_access_token"]
+        .as_str()
         .map(|t| t.to_string())
         .ok_or_else(|| anyhow::anyhow!("missing tenant_access_token in response"))
 }
@@ -222,7 +252,8 @@ mod tests {
                 sender: Some(FeishuSender {
                     sender_id: Some(FeishuSenderId {
                         open_id: Some("ou_abc".into()),
-                        user_id: None, union_id: None,
+                        user_id: None,
+                        union_id: None,
                     }),
                     sender_type: Some("user".into()),
                     tenant_key: None,
@@ -253,7 +284,9 @@ mod tests {
     #[test]
     fn parse_challenge_returns_none() {
         let cb = FeishuEventCallback {
-            schema: None, header: None, event: None,
+            schema: None,
+            header: None,
+            event: None,
             challenge: Some("abc123".into()),
         };
         assert!(parse_event(&cb).is_none());
@@ -261,7 +294,10 @@ mod tests {
 
     #[test]
     fn config_validate_missing_app_id() {
-        let cfg = FeishuConfig { app_id: "".into(), ..Default::default() };
+        let cfg = FeishuConfig {
+            app_id: "".into(),
+            ..Default::default()
+        };
         assert!(cfg.validate().is_err());
     }
 
@@ -275,9 +311,12 @@ mod tests {
     #[test]
     fn normalize_inbound_test() {
         let msg = ParsedFeishuMessage {
-            message_id: "m1".into(), chat_id: "c1".into(),
-            sender_open_id: "ou_1".into(), text: "hi".into(),
-            is_p2p: true, thread_id: None,
+            message_id: "m1".into(),
+            chat_id: "c1".into(),
+            sender_open_id: "ou_1".into(),
+            text: "hi".into(),
+            is_p2p: true,
+            thread_id: None,
         };
         let m = normalize_inbound(&msg);
         assert!(m.id.starts_with("feishu:"));

@@ -1,5 +1,5 @@
-use dialoguer::{Input, Select, theme::ColorfulTheme};
 use crate::config::AppConfig;
+use dialoguer::{theme::ColorfulTheme, Input, Select};
 
 /// Non-interactive configure input for scripting / testing.
 #[derive(Debug, Clone, Default)]
@@ -61,4 +61,3 @@ pub fn configure_command_interactive() -> String {
         toml
     )
 }
-

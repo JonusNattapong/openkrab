@@ -60,7 +60,8 @@ pub struct InputFileSource {
     pub filename: Option<String>,
 }
 
-pub const DEFAULT_INPUT_IMAGE_MIMES: &[&str] = &["image/jpeg", "image/png", "image/gif", "image/webp"];
+pub const DEFAULT_INPUT_IMAGE_MIMES: &[&str] =
+    &["image/jpeg", "image/png", "image/gif", "image/webp"];
 pub const DEFAULT_INPUT_FILE_MIMES: &[&str] = &[
     "text/plain",
     "text/markdown",
@@ -81,7 +82,11 @@ pub const DEFAULT_INPUT_PDF_MIN_TEXT_CHARS: usize = 200;
 pub fn normalize_mime_type(value: Option<&str>) -> Option<String> {
     value.and_then(|v| {
         let cleaned = v.split(';').next()?.trim().to_lowercase();
-        if cleaned.is_empty() { None } else { Some(cleaned) }
+        if cleaned.is_empty() {
+            None
+        } else {
+            Some(cleaned)
+        }
     })
 }
 
@@ -93,7 +98,7 @@ pub fn parse_content_type(value: Option<&str>) -> (Option<String>, Option<String
 
     let parts: Vec<&str> = value.split(';').map(|p| p.trim()).collect();
     let mime_type = normalize_mime_type(parts.first().copied());
-    
+
     let charset = parts.iter().skip(1).find_map(|part| {
         let part = part.trim();
         if let Some(stripped) = part.strip_prefix("charset=") {
@@ -107,8 +112,14 @@ pub fn parse_content_type(value: Option<&str>) -> (Option<String>, Option<String
 }
 
 pub fn normalize_mime_list(values: Option<&[String]>, fallback: &[&str]) -> HashSet<String> {
-    let input = values.filter(|v| !v.is_empty()).map(|v| v as &[_]).unwrap_or(fallback);
-    input.iter().filter_map(|v| normalize_mime_type(Some(v))).collect()
+    let input = values
+        .filter(|v| !v.is_empty())
+        .map(|v| v as &[_])
+        .unwrap_or(fallback);
+    input
+        .iter()
+        .filter_map(|v| normalize_mime_type(Some(v)))
+        .collect()
 }
 
 pub fn resolve_input_file_limits(
@@ -139,7 +150,7 @@ pub fn resolve_input_file_limits(
 
 fn decode_text_content(buffer: &[u8], charset: Option<&str>) -> String {
     let encoding = charset.unwrap_or("utf-8");
-    
+
     match encoding.to_lowercase().as_str() {
         "utf-8" | "utf8" => String::from_utf8_lossy(buffer).to_string(),
         "utf-16" | "utf16" | "utf-16le" => {
@@ -170,21 +181,27 @@ pub async fn extract_file_content_from_source(
     source: &InputFileSource,
     limits: &InputFileLimits,
 ) -> Result<InputFileExtractResult> {
-    let filename = source.filename.clone().unwrap_or_else(|| "file".to_string());
+    let filename = source
+        .filename
+        .clone()
+        .unwrap_or_else(|| "file".to_string());
 
     let buffer: Vec<u8>;
     let mime_type: Option<String>;
     let charset: Option<String>;
 
     if source.source_type == "base64" {
-        let data = source.data.as_ref().ok_or_else(|| anyhow!("Missing base64 data"))?;
+        let data = source
+            .data
+            .as_ref()
+            .ok_or_else(|| anyhow!("Missing base64 data"))?;
         buffer = base64_decode(data)?;
         let (mt, cs) = parse_content_type(source.media_type.as_deref());
         mime_type = mt;
         charset = cs;
     } else if source.source_type == "url" {
         let url = source.url.as_ref().ok_or_else(|| anyhow!("Missing URL"))?;
-        
+
         if !limits.allow_url {
             return Err(anyhow!("URL sources are disabled"));
         }
@@ -207,11 +224,15 @@ pub async fn extract_file_content_from_source(
     }
 
     if buffer.len() > limits.max_bytes {
-        return Err(anyhow!("File too large: {} bytes (limit: {})", buffer.len(), limits.max_bytes));
+        return Err(anyhow!(
+            "File too large: {} bytes (limit: {})",
+            buffer.len(),
+            limits.max_bytes
+        ));
     }
 
     let final_mime = mime_type.ok_or_else(|| anyhow!("Missing media type"))?;
-    
+
     if !limits.allowed_mimes.contains(&final_mime) {
         return Err(anyhow!("Unsupported MIME type: {}", final_mime));
     }
@@ -225,7 +246,10 @@ pub async fn extract_file_content_from_source(
         });
     }
 
-    let text = clamp_text(&decode_text_content(&buffer, charset.as_deref()), limits.max_chars);
+    let text = clamp_text(
+        &decode_text_content(&buffer, charset.as_deref()),
+        limits.max_chars,
+    );
     Ok(InputFileExtractResult {
         filename,
         text: Some(text),
@@ -234,11 +258,15 @@ pub async fn extract_file_content_from_source(
 }
 
 fn extract_pdf_text(buffer: &[u8], limits: &InputFileLimits) -> Result<String> {
-    Ok(format!("[PDF content: {} bytes, max {} pages]", buffer.len(), limits.pdf.max_pages))
+    Ok(format!(
+        "[PDF content: {} bytes, max {} pages]",
+        buffer.len(),
+        limits.pdf.max_pages
+    ))
 }
 
 fn base64_decode(data: &str) -> Result<Vec<u8>> {
-    use base64::{Engine as _, engine::general_purpose};
+    use base64::{engine::general_purpose, Engine as _};
     general_purpose::STANDARD
         .decode(data)
         .map_err(|e| anyhow!("Base64 decode error: {}", e))
@@ -250,8 +278,14 @@ mod tests {
 
     #[test]
     fn test_normalize_mime_type() {
-        assert_eq!(normalize_mime_type(Some("image/png")), Some("image/png".to_string()));
-        assert_eq!(normalize_mime_type(Some("image/png; charset=utf-8")), Some("image/png".to_string()));
+        assert_eq!(
+            normalize_mime_type(Some("image/png")),
+            Some("image/png".to_string())
+        );
+        assert_eq!(
+            normalize_mime_type(Some("image/png; charset=utf-8")),
+            Some("image/png".to_string())
+        );
         assert_eq!(normalize_mime_type(None), None);
     }
 

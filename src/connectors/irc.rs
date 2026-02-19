@@ -38,16 +38,24 @@ impl Default for IrcConfig {
                 .map(|s| s.trim().to_string())
                 .collect(),
             password: std::env::var("IRC_PASSWORD").ok(),
-            tls: std::env::var("IRC_TLS").map(|v| v == "1" || v == "true").unwrap_or(false),
+            tls: std::env::var("IRC_TLS")
+                .map(|v| v == "1" || v == "true")
+                .unwrap_or(false),
         }
     }
 }
 
 impl IrcConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> anyhow::Result<()> {
-        if self.server.is_empty() { anyhow::bail!("IRC_SERVER is required"); }
-        if self.nick.is_empty() { anyhow::bail!("IRC_NICK is required"); }
+        if self.server.is_empty() {
+            anyhow::bail!("IRC_SERVER is required");
+        }
+        if self.nick.is_empty() {
+            anyhow::bail!("IRC_NICK is required");
+        }
         Ok(())
     }
 }
@@ -65,18 +73,31 @@ pub struct IrcMessage {
 /// Parse a raw IRC PRIVMSG line.
 /// Format: `:nick!user@host PRIVMSG #channel :message text`
 pub fn parse_privmsg(raw: &str, bot_nick: &str) -> Option<IrcMessage> {
-    if !raw.contains("PRIVMSG") { return None; }
+    if !raw.contains("PRIVMSG") {
+        return None;
+    }
 
     let from_nick = raw.strip_prefix(':')?.split('!').next()?.to_string();
     let parts: Vec<&str> = raw.splitn(4, ' ').collect();
-    if parts.len() < 4 { return None; }
+    if parts.len() < 4 {
+        return None;
+    }
 
     let target = parts[2];
     let text = parts[3].strip_prefix(':').unwrap_or(parts[3]).to_string();
     let is_private = target == bot_nick;
-    let channel = if is_private { from_nick.clone() } else { target.to_string() };
+    let channel = if is_private {
+        from_nick.clone()
+    } else {
+        target.to_string()
+    };
 
-    Some(IrcMessage { from_nick, channel, text, is_private })
+    Some(IrcMessage {
+        from_nick,
+        channel,
+        text,
+        is_private,
+    })
 }
 
 /// Build a raw IRC PRIVMSG command.
@@ -149,7 +170,10 @@ mod tests {
 
     #[test]
     fn config_validate_missing_server() {
-        let cfg = IrcConfig { server: "".into(), ..IrcConfig::default() };
+        let cfg = IrcConfig {
+            server: "".into(),
+            ..IrcConfig::default()
+        };
         assert!(cfg.validate().is_err());
     }
 }

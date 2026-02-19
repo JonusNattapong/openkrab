@@ -28,7 +28,8 @@ pub struct TlonConfig {
 impl Default for TlonConfig {
     fn default() -> Self {
         Self {
-            ship_url: std::env::var("TLON_SHIP_URL").unwrap_or_else(|_| "http://localhost:8080".into()),
+            ship_url: std::env::var("TLON_SHIP_URL")
+                .unwrap_or_else(|_| "http://localhost:8080".into()),
             ship_name: std::env::var("TLON_SHIP_NAME").unwrap_or_default(),
             access_code: std::env::var("TLON_ACCESS_CODE").unwrap_or_default(),
             group: std::env::var("TLON_GROUP").ok(),
@@ -38,10 +39,16 @@ impl Default for TlonConfig {
 }
 
 impl TlonConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
-        if self.ship_name.is_empty() { bail!("TLON_SHIP_NAME is required (e.g. ~sampel-palnet)"); }
-        if self.access_code.is_empty() { bail!("TLON_ACCESS_CODE is required"); }
+        if self.ship_name.is_empty() {
+            bail!("TLON_SHIP_NAME is required (e.g. ~sampel-palnet)");
+        }
+        if self.access_code.is_empty() {
+            bail!("TLON_ACCESS_CODE is required");
+        }
         Ok(())
     }
 }
@@ -99,7 +106,8 @@ pub struct ParsedTlonMessage {
 }
 
 pub fn extract_text(contents: &[UrbitContent]) -> String {
-    contents.iter()
+    contents
+        .iter()
         .filter_map(|c| match c {
             UrbitContent::Text { text } => Some(text.as_str()),
             _ => None,
@@ -110,11 +118,19 @@ pub fn extract_text(contents: &[UrbitContent]) -> String {
         .to_string()
 }
 
-pub fn parse_graph_entry(entry: &UrbitGraphEntry, resource: Option<&str>) -> Option<ParsedTlonMessage> {
+pub fn parse_graph_entry(
+    entry: &UrbitGraphEntry,
+    resource: Option<&str>,
+) -> Option<ParsedTlonMessage> {
     let text = extract_text(&entry.post.contents);
-    if text.is_empty() { return None; }
+    if text.is_empty() {
+        return None;
+    }
 
-    let has_url = entry.post.contents.iter()
+    let has_url = entry
+        .post
+        .contents
+        .iter()
         .any(|c| matches!(c, UrbitContent::Url { .. }));
 
     Some(ParsedTlonMessage {
@@ -178,7 +194,12 @@ pub async fn send_message(
         "mark": "graph-update-3",
         "json": build_text_post(&cfg.ship_name, resource, text)
     }]);
-    client.put(&poke_url).json(&payload).send().await?.error_for_status()?;
+    client
+        .put(&poke_url)
+        .json(&payload)
+        .send()
+        .await?
+        .error_for_status()?;
     Ok(())
 }
 
@@ -222,9 +243,15 @@ mod tests {
     #[test]
     fn extract_text_multi_content() {
         let contents = vec![
-            UrbitContent::Text { text: "hello".into() },
-            UrbitContent::Url { url: "https://example.com".into() },
-            UrbitContent::Text { text: "world".into() },
+            UrbitContent::Text {
+                text: "hello".into(),
+            },
+            UrbitContent::Url {
+                url: "https://example.com".into(),
+            },
+            UrbitContent::Text {
+                text: "world".into(),
+            },
         ];
         assert_eq!(extract_text(&contents), "hello world");
     }
@@ -238,15 +265,22 @@ mod tests {
 
     #[test]
     fn config_validate_missing_ship() {
-        let cfg = TlonConfig { ship_name: "".into(), ..Default::default() };
+        let cfg = TlonConfig {
+            ship_name: "".into(),
+            ..Default::default()
+        };
         assert!(cfg.validate().is_err());
     }
 
     #[test]
     fn normalize_inbound_test() {
         let msg = ParsedTlonMessage {
-            author: "~zod".into(), index: "/1234".into(),
-            time_sent: 0, text: "hi".into(), has_url: false, resource: None,
+            author: "~zod".into(),
+            index: "/1234".into(),
+            time_sent: 0,
+            text: "hi".into(),
+            has_url: false,
+            resource: None,
         };
         let m = normalize_inbound(&msg);
         assert!(m.id.starts_with("tlon:"));

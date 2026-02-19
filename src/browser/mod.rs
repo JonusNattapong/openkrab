@@ -86,7 +86,10 @@ fn resolve_profile(name: &str) -> Result<BrowserProfile> {
         return Ok(p);
     }
 
-    let env_key = format!("BROWSER_CDP_URL_{}", key.to_ascii_uppercase().replace('-', "_"));
+    let env_key = format!(
+        "BROWSER_CDP_URL_{}",
+        key.to_ascii_uppercase().replace('-', "_")
+    );
     let fallback = std::env::var(&env_key)
         .ok()
         .or_else(|| std::env::var("BROWSER_CDP_URL").ok())
@@ -123,8 +126,8 @@ fn load_profiles() -> Result<HashMap<String, BrowserProfile>> {
     }
     let raw = fs::read_to_string(&path)
         .with_context(|| format!("failed to read browser profiles: {}", path.display()))?;
-    let parsed: HashMap<String, BrowserProfile> =
-        serde_json::from_str(&raw).with_context(|| format!("invalid browser profiles JSON: {}", path.display()))?;
+    let parsed: HashMap<String, BrowserProfile> = serde_json::from_str(&raw)
+        .with_context(|| format!("invalid browser profiles JSON: {}", path.display()))?;
     Ok(parsed)
 }
 
@@ -155,13 +158,21 @@ pub async fn list_tabs(profile: &str) -> Result<Vec<BrowserTab>> {
     Ok(raw
         .into_iter()
         .map(|t| BrowserTab {
-            id: t.get("id").and_then(Value::as_str).unwrap_or_default().to_string(),
+            id: t
+                .get("id")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
             title: t
                 .get("title")
                 .and_then(Value::as_str)
                 .unwrap_or_default()
                 .to_string(),
-            url: t.get("url").and_then(Value::as_str).unwrap_or_default().to_string(),
+            url: t
+                .get("url")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
             websocket_debugger_url: t
                 .get("webSocketDebuggerUrl")
                 .and_then(Value::as_str)
@@ -173,7 +184,11 @@ pub async fn list_tabs(profile: &str) -> Result<Vec<BrowserTab>> {
 pub async fn open_tab(profile: &str, url: &str) -> Result<BrowserTab> {
     let p = resolve_profile(profile)?;
     let encoded = urlencoding::encode(url);
-    let endpoint = format!("{}/json/new?{}", p.cdp_http_url.trim_end_matches('/'), encoded);
+    let endpoint = format!(
+        "{}/json/new?{}",
+        p.cdp_http_url.trim_end_matches('/'),
+        encoded
+    );
     let v: Value = Client::new()
         .put(&endpoint)
         .send()
@@ -184,13 +199,21 @@ pub async fn open_tab(profile: &str, url: &str) -> Result<BrowserTab> {
         .await?;
 
     Ok(BrowserTab {
-        id: v.get("id").and_then(Value::as_str).unwrap_or_default().to_string(),
+        id: v
+            .get("id")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string(),
         title: v
             .get("title")
             .and_then(Value::as_str)
             .unwrap_or_default()
             .to_string(),
-        url: v.get("url").and_then(Value::as_str).unwrap_or_default().to_string(),
+        url: v
+            .get("url")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string(),
         websocket_debugger_url: v
             .get("webSocketDebuggerUrl")
             .and_then(Value::as_str)
@@ -277,12 +300,7 @@ pub async fn upload_files(profile: &str, selector: &str, files: &[String]) -> Re
         .and_then(Value::as_str)
         .ok_or_else(|| anyhow!("upload failed; selector not found: {selector}"))?;
 
-    let node = cdp_call(
-        &ws,
-        "DOM.requestNode",
-        json!({ "objectId": object_id }),
-    )
-    .await?;
+    let node = cdp_call(&ws, "DOM.requestNode", json!({ "objectId": object_id })).await?;
     let node_id = node
         .get("result")
         .and_then(|r| r.get("nodeId"))
@@ -327,7 +345,10 @@ pub async fn snapshot(profile: &str) -> Result<BrowserSnapshot> {
         .unwrap_or_else(|| json!({}));
 
     Ok(BrowserSnapshot {
-        url: value.get("url").and_then(Value::as_str).map(ToString::to_string),
+        url: value
+            .get("url")
+            .and_then(Value::as_str)
+            .map(ToString::to_string),
         title: value
             .get("title")
             .and_then(Value::as_str)

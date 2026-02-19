@@ -33,7 +33,11 @@ impl Default for TwitchConfig {
                 .filter(|s| !s.is_empty())
                 .map(|s| {
                     let s = s.trim().to_string();
-                    if s.starts_with('#') { s } else { format!("#{}", s) }
+                    if s.starts_with('#') {
+                        s
+                    } else {
+                        format!("#{}", s)
+                    }
                 })
                 .collect(),
             client_id: std::env::var("TWITCH_CLIENT_ID").ok(),
@@ -42,16 +46,26 @@ impl Default for TwitchConfig {
 }
 
 impl TwitchConfig {
-    pub fn from_env() -> Self { Self::default() }
+    pub fn from_env() -> Self {
+        Self::default()
+    }
     pub fn validate(&self) -> Result<()> {
-        if self.username.is_empty() { bail!("TWITCH_USERNAME is required"); }
-        if self.oauth_token.is_empty() { bail!("TWITCH_OAUTH_TOKEN is required"); }
+        if self.username.is_empty() {
+            bail!("TWITCH_USERNAME is required");
+        }
+        if self.oauth_token.is_empty() {
+            bail!("TWITCH_OAUTH_TOKEN is required");
+        }
         Ok(())
     }
 
     /// IRC server for Twitch chat.
-    pub fn irc_server() -> &'static str { "irc.chat.twitch.tv" }
-    pub fn irc_port() -> u16 { 6697 }
+    pub fn irc_server() -> &'static str {
+        "irc.chat.twitch.tv"
+    }
+    pub fn irc_port() -> u16 {
+        6697
+    }
 }
 
 // ─── Twitch IRC message ───────────────────────────────────────────────────────
@@ -70,7 +84,9 @@ pub struct TwitchMessage {
 /// Parse a Twitch IRC PRIVMSG line (with Twitch tags).
 /// Format: `@badge-info=...;display-name=Alice;... :alice!alice@alice.tmi.twitch.tv PRIVMSG #channel :text`
 pub fn parse_privmsg(raw: &str) -> Option<TwitchMessage> {
-    if !raw.contains("PRIVMSG") { return None; }
+    if !raw.contains("PRIVMSG") {
+        return None;
+    }
 
     // Split tags from rest
     let (tags_part, rest) = if raw.starts_with('@') {
@@ -91,18 +107,32 @@ pub fn parse_privmsg(raw: &str) -> Option<TwitchMessage> {
 
     let from = rest.strip_prefix(':')?.split('!').next()?.to_string();
     let parts: Vec<&str> = rest.splitn(4, ' ').collect();
-    if parts.len() < 4 { return None; }
+    if parts.len() < 4 {
+        return None;
+    }
 
     let channel = parts[2].to_string();
     let text = parts[3].strip_prefix(':').unwrap_or(parts[3]).to_string();
 
-    let display_name = tags.get("display-name").filter(|s| !s.is_empty()).map(|s| s.to_string());
+    let display_name = tags
+        .get("display-name")
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string());
     let badges = tags.get("badges").copied().unwrap_or("");
-    let is_subscriber = badges.contains("subscriber") || tags.get("subscriber").copied() == Some("1");
+    let is_subscriber =
+        badges.contains("subscriber") || tags.get("subscriber").copied() == Some("1");
     let is_moderator = badges.contains("moderator") || tags.get("mod").copied() == Some("1");
     let bits = tags.get("bits").and_then(|b| b.parse().ok());
 
-    Some(TwitchMessage { from, channel, text, display_name, is_subscriber, is_moderator, bits })
+    Some(TwitchMessage {
+        from,
+        channel,
+        text,
+        display_name,
+        is_subscriber,
+        is_moderator,
+        bits,
+    })
 }
 
 /// Build a Twitch chat PRIVMSG.
@@ -156,7 +186,8 @@ mod tests {
 
     #[test]
     fn parse_bits_message() {
-        let raw = "@bits=100;display-name=Bob :bob!bob@bob.tmi.twitch.tv PRIVMSG #chan :cheer100 nice";
+        let raw =
+            "@bits=100;display-name=Bob :bob!bob@bob.tmi.twitch.tv PRIVMSG #chan :cheer100 nice";
         let msg = parse_privmsg(raw).unwrap();
         assert_eq!(msg.bits, Some(100));
     }

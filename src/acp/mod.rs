@@ -31,13 +31,28 @@ pub struct AcpMessage {
 
 impl AcpMessage {
     pub fn user(content: impl Into<String>) -> Self {
-        Self { role: AcpRole::User, content: content.into(), name: None, tool_call_id: None }
+        Self {
+            role: AcpRole::User,
+            content: content.into(),
+            name: None,
+            tool_call_id: None,
+        }
     }
     pub fn assistant(content: impl Into<String>) -> Self {
-        Self { role: AcpRole::Assistant, content: content.into(), name: None, tool_call_id: None }
+        Self {
+            role: AcpRole::Assistant,
+            content: content.into(),
+            name: None,
+            tool_call_id: None,
+        }
     }
     pub fn system(content: impl Into<String>) -> Self {
-        Self { role: AcpRole::System, content: content.into(), name: None, tool_call_id: None }
+        Self {
+            role: AcpRole::System,
+            content: content.into(),
+            name: None,
+            tool_call_id: None,
+        }
     }
 }
 
@@ -55,7 +70,13 @@ pub struct AcpSession {
 impl AcpSession {
     pub fn new(id: impl Into<String>) -> Self {
         let now = unix_now();
-        Self { id: id.into(), messages: Vec::new(), metadata: HashMap::new(), created_at: now, updated_at: now }
+        Self {
+            id: id.into(),
+            messages: Vec::new(),
+            metadata: HashMap::new(),
+            created_at: now,
+            updated_at: now,
+        }
     }
 
     pub fn push(&mut self, msg: AcpMessage) {
@@ -64,7 +85,9 @@ impl AcpSession {
     }
 
     pub fn last_user_message(&self) -> Option<&str> {
-        self.messages.iter().rev()
+        self.messages
+            .iter()
+            .rev()
             .find(|m| m.role == AcpRole::User)
             .map(|m| m.content.as_str())
     }
@@ -72,7 +95,10 @@ impl AcpSession {
 
 fn unix_now() -> i64 {
     use std::time::{SystemTime, UNIX_EPOCH};
-    SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_secs() as i64
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs() as i64
 }
 
 // ─── Commands ─────────────────────────────────────────────────────────────────
@@ -93,11 +119,25 @@ pub enum AcpCommand {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum AcpEvent {
-    SessionCreated { session_id: String },
-    SessionEnded { session_id: String },
-    ChatReply { session_id: String, content: String, done: bool },
-    Error { message: String },
-    Status { version: String, sessions: usize, uptime_secs: u64 },
+    SessionCreated {
+        session_id: String,
+    },
+    SessionEnded {
+        session_id: String,
+    },
+    ChatReply {
+        session_id: String,
+        content: String,
+        done: bool,
+    },
+    Error {
+        message: String,
+    },
+    Status {
+        version: String,
+        sessions: usize,
+        uptime_secs: u64,
+    },
 }
 
 // ─── Request / Response (HTTP transport) ─────────────────────────────────────
@@ -124,10 +164,20 @@ pub struct AcpResponse {
 
 impl AcpResponse {
     pub fn ok(event: AcpEvent) -> Self {
-        Self { ok: true, event: Some(event), error: None, request_id: None }
+        Self {
+            ok: true,
+            event: Some(event),
+            error: None,
+            request_id: None,
+        }
     }
     pub fn err(msg: impl Into<String>) -> Self {
-        Self { ok: false, event: None, error: Some(msg.into()), request_id: None }
+        Self {
+            ok: false,
+            event: None,
+            error: Some(msg.into()),
+            request_id: None,
+        }
     }
     pub fn with_request_id(mut self, id: impl Into<String>) -> Self {
         self.request_id = Some(id.into());
@@ -145,7 +195,9 @@ pub struct SessionMapper {
 }
 
 impl SessionMapper {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn map(&mut self, channel_id: impl Into<String>, session_id: impl Into<String>) {
         let ch = channel_id.into();
@@ -173,7 +225,10 @@ impl SessionMapper {
 
 /// Convert a connector inbound message string into an ACP command.
 pub fn inbound_to_command(session_id: &str, text: &str) -> AcpCommand {
-    AcpCommand::Chat { session_id: session_id.to_string(), message: text.to_string() }
+    AcpCommand::Chat {
+        session_id: session_id.to_string(),
+        message: text.to_string(),
+    }
 }
 
 /// Convert an ACP event into a plain text reply string.
@@ -206,7 +261,11 @@ mod tests {
 
     #[test]
     fn acp_response_ok_err() {
-        let r = AcpResponse::ok(AcpEvent::Status { version: "1.0".into(), sessions: 0, uptime_secs: 10 });
+        let r = AcpResponse::ok(AcpEvent::Status {
+            version: "1.0".into(),
+            sessions: 0,
+            uptime_secs: 10,
+        });
         assert!(r.ok);
         let e = AcpResponse::err("bad request");
         assert!(!e.ok);
@@ -227,7 +286,10 @@ mod tests {
     fn inbound_to_command_test() {
         let cmd = inbound_to_command("s1", "What's the weather?");
         match cmd {
-            AcpCommand::Chat { session_id, message } => {
+            AcpCommand::Chat {
+                session_id,
+                message,
+            } => {
                 assert_eq!(session_id, "s1");
                 assert!(message.contains("weather"));
             }
@@ -237,9 +299,15 @@ mod tests {
 
     #[test]
     fn event_to_reply_text_test() {
-        let e = AcpEvent::ChatReply { session_id: "s1".into(), content: "hello".into(), done: true };
+        let e = AcpEvent::ChatReply {
+            session_id: "s1".into(),
+            content: "hello".into(),
+            done: true,
+        };
         assert_eq!(event_to_reply_text(&e), Some("hello".to_string()));
-        let err = AcpEvent::Error { message: "oops".into() };
+        let err = AcpEvent::Error {
+            message: "oops".into(),
+        };
         assert!(event_to_reply_text(&err).unwrap().contains("oops"));
     }
 

@@ -5,10 +5,10 @@ use anyhow::{bail, Result};
 use once_cell::sync::Lazy;
 use serde_json::{json, Value};
 
-/// iOS native module (Swift)
-pub mod ios;
 /// Android native module (Kotlin)
 pub mod android;
+/// iOS native module (Swift)
+pub mod ios;
 
 /// Mobile device capabilities for iOS/Android nodes
 pub mod mobile {
@@ -17,7 +17,7 @@ pub mod mobile {
     /// Camera capture options
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct CameraOptions {
-        pub camera: Option<String>, // "front" or "back"
+        pub camera: Option<String>,  // "front" or "back"
         pub quality: Option<String>, // "low", "medium", "high"
         pub flash: Option<bool>,
     }
@@ -283,12 +283,12 @@ fn camera_snap(payload: &Value) -> Result<Value> {
     let node = nodes
         .get_mut(&node_id)
         .ok_or_else(|| anyhow::anyhow!("unknown node_id: {node_id}"))?;
-    
+
     // Validate platform supports camera
     if node.platform != "ios" && node.platform != "android" {
         bail!("camera snap only supported on ios/android platforms");
     }
-    
+
     node.camera_snaps += 1;
 
     Ok(json!({
@@ -337,12 +337,12 @@ fn screen_record(payload: &Value) -> Result<Value> {
     let node = nodes
         .get_mut(&node_id)
         .ok_or_else(|| anyhow::anyhow!("unknown node_id: {node_id}"))?;
-    
+
     // Validate platform supports screen recording
     if node.platform != "ios" && node.platform != "android" {
         bail!("screen recording only supported on ios/android platforms");
     }
-    
+
     node.screen_recordings += 1;
 
     Ok(json!({
@@ -386,12 +386,12 @@ fn location_get(payload: &Value) -> Result<Value> {
     let node = nodes
         .get_mut(&node_id)
         .ok_or_else(|| anyhow::anyhow!("unknown node_id: {node_id}"))?;
-    
+
     // Validate platform supports location
     if node.platform != "ios" && node.platform != "android" {
         bail!("location only supported on ios/android platforms");
     }
-    
+
     node.location_requests += 1;
 
     // Return mock location data for demonstration

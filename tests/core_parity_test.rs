@@ -48,4 +48,3 @@ fn memory_supported_provider_list_parity() {
     assert!(providers.contains(&"ollama"));
     assert!(!providers.contains(&"minimax"));
 }
-

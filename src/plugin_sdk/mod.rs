@@ -24,7 +24,11 @@ pub struct PluginContext {
 
 impl PluginContext {
     pub fn new(session_id: impl Into<String>, connector: impl Into<String>) -> Self {
-        Self { session_id: session_id.into(), connector: connector.into(), metadata: HashMap::new() }
+        Self {
+            session_id: session_id.into(),
+            connector: connector.into(),
+            metadata: HashMap::new(),
+        }
     }
 
     pub fn set_meta(&mut self, key: impl Into<String>, val: impl Serialize) {
@@ -34,7 +38,9 @@ impl PluginContext {
     }
 
     pub fn get_meta<T: for<'de> Deserialize<'de>>(&self, key: &str) -> Option<T> {
-        self.metadata.get(key).and_then(|v| serde_json::from_value(v.clone()).ok())
+        self.metadata
+            .get(key)
+            .and_then(|v| serde_json::from_value(v.clone()).ok())
     }
 }
 
@@ -64,14 +70,25 @@ impl PluginTool {
         }
     }
 
-    pub fn with_param(mut self, name: &str, type_: &str, description: &str, required: bool) -> Self {
+    pub fn with_param(
+        mut self,
+        name: &str,
+        type_: &str,
+        description: &str,
+        required: bool,
+    ) -> Self {
         let props = self.parameters["properties"].as_object_mut().unwrap();
-        props.insert(name.to_string(), serde_json::json!({
-            "type": type_,
-            "description": description
-        }));
+        props.insert(
+            name.to_string(),
+            serde_json::json!({
+                "type": type_,
+                "description": description
+            }),
+        );
         if required {
-            self.parameters["required"].as_array_mut().unwrap()
+            self.parameters["required"]
+                .as_array_mut()
+                .unwrap()
                 .push(serde_json::json!(name));
         }
         self
@@ -83,11 +100,8 @@ impl PluginTool {
 pub trait PluginToolHandler: Send + Sync {
     fn tool(&self) -> &PluginTool;
 
-    async fn call(
-        &self,
-        args: serde_json::Value,
-        ctx: &PluginContext,
-    ) -> Result<serde_json::Value>;
+    async fn call(&self, args: serde_json::Value, ctx: &PluginContext)
+        -> Result<serde_json::Value>;
 }
 
 // ─── Plugin route ─────────────────────────────────────────────────────────────
@@ -105,10 +119,18 @@ pub struct PluginRoute {
 
 impl PluginRoute {
     pub fn post(path: impl Into<String>) -> Self {
-        Self { method: "POST".into(), path: path.into(), description: None }
+        Self {
+            method: "POST".into(),
+            path: path.into(),
+            description: None,
+        }
     }
     pub fn get(path: impl Into<String>) -> Self {
-        Self { method: "GET".into(), path: path.into(), description: None }
+        Self {
+            method: "GET".into(),
+            path: path.into(),
+            description: None,
+        }
     }
 }
 
@@ -137,7 +159,11 @@ pub struct PluginDeclaration {
 
 impl PluginDeclaration {
     pub fn new(name: impl Into<String>, version: impl Into<String>) -> Self {
-        Self { name: name.into(), version: version.into(), ..Default::default() }
+        Self {
+            name: name.into(),
+            version: version.into(),
+            ..Default::default()
+        }
     }
 
     pub fn with_tool(mut self, tool: PluginTool) -> Self {
@@ -189,11 +215,18 @@ mod tests {
 
     #[test]
     fn plugin_tool_builder() {
-        let t = PluginTool::new("search", "Search the web")
-            .with_param("query", "string", "The search query", true);
+        let t = PluginTool::new("search", "Search the web").with_param(
+            "query",
+            "string",
+            "The search query",
+            true,
+        );
         assert_eq!(t.name, "search");
         assert!(t.parameters["properties"]["query"]["type"].as_str() == Some("string"));
-        assert!(t.parameters["required"].as_array().unwrap().contains(&serde_json::json!("query")));
+        assert!(t.parameters["required"]
+            .as_array()
+            .unwrap()
+            .contains(&serde_json::json!("query")));
     }
 
     #[test]

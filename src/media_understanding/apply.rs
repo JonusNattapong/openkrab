@@ -1,9 +1,15 @@
-use crate::media_understanding::{MediaUnderstandingProvider, MediaUnderstandingDecision, MediaUnderstandingOutput, MediaCapability};
 use crate::media_understanding::attachments::{MediaAttachment, MediaAttachmentCache};
-use crate::media_understanding::resolve::{resolve_scope_decision, resolve_prompt, resolve_max_bytes, resolve_timeout_ms, resolve_concurrency, MediaContext as ResolveMediaContext};
+use crate::media_understanding::resolve::{
+    resolve_concurrency, resolve_max_bytes, resolve_prompt, resolve_scope_decision,
+    resolve_timeout_ms, MediaContext as ResolveMediaContext,
+};
 use crate::media_understanding::types::{MediaAnalysis, MediaUnderstandingError};
-use std::collections::HashMap;
+use crate::media_understanding::{
+    MediaCapability, MediaUnderstandingDecision, MediaUnderstandingOutput,
+    MediaUnderstandingProvider,
+};
 use futures::future::join_all;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct MediaContext {
@@ -27,9 +33,16 @@ pub async fn apply_media_understanding(
     attachments: &[MediaAttachment],
     cache: &MediaAttachmentCache,
     provider_registry: &HashMap<String, Box<dyn MediaUnderstandingProvider>>,
-    config: &HashMap<MediaCapability, crate::media_understanding::resolve::MediaUnderstandingConfig>,
+    config: &HashMap<
+        MediaCapability,
+        crate::media_understanding::resolve::MediaUnderstandingConfig,
+    >,
 ) -> Result<ApplyMediaUnderstandingResult, MediaUnderstandingError> {
-    let capabilities = vec![MediaCapability::Image, MediaCapability::Audio, MediaCapability::Video];
+    let capabilities = vec![
+        MediaCapability::Image,
+        MediaCapability::Audio,
+        MediaCapability::Video,
+    ];
 
     let mut all_outputs = Vec::new();
     let mut all_decisions = Vec::new();
@@ -43,7 +56,15 @@ pub async fn apply_media_understanding(
     let tasks: Vec<_> = capabilities
         .into_iter()
         .map(|capability| async move {
-            run_capability(capability, ctx, attachments, cache, provider_registry, config.get(&capability)).await
+            run_capability(
+                capability,
+                ctx,
+                attachments,
+                cache,
+                provider_registry,
+                config.get(&capability),
+            )
+            .await
         })
         .collect();
 
@@ -143,34 +164,60 @@ async fn run_capability(
                 continue;
             }
 
-            let buffer_result = cache.get_buffer(
-                attachment.index,
-                resolve_max_bytes(config, 0, config, None),
-                resolve_timeout_ms(Some(config.timeout_seconds.unwrap_or(30.0)), 30.0) as u64,
-            ).await?;
+            let buffer_result = cache
+                .get_buffer(
+                    attachment.index,
+                    resolve_max_bytes(config, 0, config, None),
+                    resolve_timeout_ms(Some(config.timeout_seconds.unwrap_or(30.0)), 30.0) as u64,
+                )
+                .await?;
 
             let prompt = resolve_prompt(capability, config.prompt.as_deref(), Some(500));
 
             let analysis_result = match capability {
-                MediaCapability::Image => provider.analyse_image(&buffer_result.buffer, Some(&prompt)).await,
+                MediaCapability::Image => {
+                    provider
+                        .analyse_image(&buffer_result.buffer, Some(&prompt))
+                        .await
+                }
                 MediaCapability::Audio => provider.transcribe_audio(&buffer_result.buffer).await,
-                MediaCapability::Video => provider.describe_video(&buffer_result.buffer, Some(&prompt)).await,
+                MediaCapability::Video => {
+                    provider
+                        .describe_video(&buffer_result.buffer, Some(&prompt))
+                        .await
+                }
             };
 
             match analysis_result {
                 Ok(analysis) => {
                     let output = match capability {
-                        MediaCapability::Image => MediaUnderstandingOutput::image_description(analysis.description, attachment.index),
-                        MediaCapability::Audio => MediaUnderstandingOutput::audio_transcription(analysis.transcript.unwrap_or_default(), attachment.index),
-                        MediaCapability::Video => MediaUnderstandingOutput::video_description(analysis.description, attachment.index),
+                        MediaCapability::Image => MediaUnderstandingOutput::image_description(
+                            analysis.description,
+                            attachment.index,
+                        ),
+                        MediaCapability::Audio => MediaUnderstandingOutput::audio_transcription(
+                            analysis.transcript.unwrap_or_default(),
+                            attachment.index,
+                        ),
+                        MediaCapability::Video => MediaUnderstandingOutput::video_description(
+                            analysis.description,
+                            attachment.index,
+                        ),
                     };
 
-                    attempts.push(crate::media_understanding::types::ModelDecision::success_provider(provider.id(), None));
+                    attempts.push(
+                        crate::media_understanding::types::ModelDecision::success_provider(
+                            provider.id(),
+                            None,
+                        ),
+                    );
                     outputs.push(output);
                     break;
                 }
                 Err(e) => {
-                    attempts.push(crate::media_understanding::types::ModelDecision::failed(&format!("{:?}", e)));
+                    attempts.push(crate::media_understanding::types::ModelDecision::failed(
+                        &format!("{:?}", e),
+                    ));
                 }
             }
         }
@@ -211,9 +258,13 @@ mod tests {
         let config = HashMap::new();
         let mut provider_registry = HashMap::new();
         let provider = MockMediaProvider;
-        provider_registry.insert("mock".to_string(), Box::new(provider) as Box<dyn MediaUnderstandingProvider>);
+        provider_registry.insert(
+            "mock".to_string(),
+            Box::new(provider) as Box<dyn MediaUnderstandingProvider>,
+        );
 
-        let result = apply_media_understanding(&ctx, &[], &cache, &provider_registry, &config).await;
+        let result =
+            apply_media_understanding(&ctx, &[], &cache, &provider_registry, &config).await;
         assert!(result.is_ok());
         let result = result.unwrap();
         assert_eq!(result.outputs.len(), 0);

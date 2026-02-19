@@ -37,11 +37,13 @@ pub struct SignalConfig {
 impl Default for SignalConfig {
     fn default() -> Self {
         let phone_number = std::env::var("SIGNAL_PHONE_NUMBER").unwrap_or_default();
-        let api_base = std::env::var("SIGNAL_API_URL")
-            .unwrap_or_else(|_| "http://localhost:8080".to_string());
+        let api_base =
+            std::env::var("SIGNAL_API_URL").unwrap_or_else(|_| "http://localhost:8080".to_string());
         let account = None;
         let cli_path = Some("signal-cli".to_string());
-        let auto_start = Some(api_base.starts_with("http://localhost") || api_base.starts_with("http://127.0.0.1"));
+        let auto_start = Some(
+            api_base.starts_with("http://localhost") || api_base.starts_with("http://127.0.0.1"),
+        );
         let startup_timeout_ms = Some(30_000);
         let send_read_receipts = Some(false);
 
