@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 use krabkrab::commands::{
     configure_command_interactive, memory_search_command, memory_sync_command, slack_send_command,
     status_command, telegram_send_command, models_list_command, discord_send_command, discord_send_dry_run_command,
+    doctor_command, onboard_command,
 };
 
 #[derive(Parser)]
@@ -15,6 +16,11 @@ struct Opts {
 enum CliCommand {
     Hello,
     Status,
+    Doctor,
+    Onboard {
+        #[arg(long, default_value = "default")]
+        profile: String,
+    },
     Telegram {
         #[arg(long)]
         text: String,
@@ -87,6 +93,8 @@ async fn main() -> anyhow::Result<()> {
     match opts.command.unwrap_or(CliCommand::Hello) {
         CliCommand::Hello => println!("{}", krabkrab::hello().message),
         CliCommand::Status => println!("{}", status_command()),
+        CliCommand::Doctor => println!("{}", doctor_command()),
+        CliCommand::Onboard { profile } => println!("{}", onboard_command(&profile)),
         CliCommand::Telegram { text } => println!("{}", telegram_send_command(&text)),
         CliCommand::Slack { text } => println!("{}", slack_send_command(&text)),
         CliCommand::Discord { to, text, dry_run } => {

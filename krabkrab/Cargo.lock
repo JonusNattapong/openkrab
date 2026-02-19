@@ -1256,7 +1256,7 @@ dependencies = [
 
 [[package]]
 name = "krabkrab"
-version = "0.1.0"
+version = "2026.2.19"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1294,7 +1294,7 @@ dependencies = [
 
 [[package]]
 name = "krabkrab-cli"
-version = "0.1.0"
+version = "2026.2.19"
 dependencies = [
  "anyhow",
  "clap",
