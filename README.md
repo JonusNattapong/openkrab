@@ -1,54 +1,60 @@
-# 🦀 krabkrab (Rust) — Personal AI Assistant
+# 🦞 OpenKrab — Personal AI Assistant
 
 <p align="center">
-    <strong>Rust port of the krabkrab personal AI assistant</strong>
+  <strong>EXFOLIATE! EXFOLIATE!</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/openkrab/krabkrab/actions"><img src="https://img.shields.io/github/actions/workflow/status/openkrab/krabkrab/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://crates.io/crates/krabkrab"><img src="https://img.shields.io/crates/v/krabkrab?style=for-the-badge" alt="Crates.io"></a>
+  <a href="https://github.com/JonusNattapong/openkrab/actions/workflows/rust.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/JonusNattapong/openkrab/rust.yml?branch=main&style=for-the-badge" alt="CI status"></a>
+  <a href="https://github.com/JonusNattapong/openkrab/releases"><img src="https://img.shields.io/github/v/release/JonusNattapong/openkrab?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/Rust-1.75+-orange?style=for-the-badge" alt="Rust">
 </p>
 
-**krabkrab** is a _personal AI assistant_ written in Rust. It answers you on the channels you already use (Telegram, Slack, Discord, Signal, Matrix, BlueBubbles, and more), with improved performance and lower memory footprint compared to the TypeScript version.
+**OpenKrab** is a _personal AI assistant_ you run on your own devices — rewritten in Rust.
+It answers you on the channels you already use (Telegram, Slack, Discord, Signal, Matrix, BlueBubbles, Google Chat, IRC, Microsoft Teams, WebChat), with native Rust speed, lower memory footprint, and single-binary deployment.
 
-This is a Rust port of the original [krabkrab](https://github.com/krabkrab/krabkrab) TypeScript/Node.js project.
+This is a Rust port of [OpenClaw](https://github.com/openclaw/openclaw) (TypeScript/Node.js).
+
+[Porting Status](PORTING.md) · [Quick Start](#quick-start-tldr) · [Architecture](#how-it-works-short) · [Channels](#channels) · [Providers](#providers)
 
 ## Why Rust?
 
-- **Performance**: Faster startup, lower memory usage, and better resource efficiency
-- **Safety**: Memory safety guarantees without garbage collection
-- **Single binary**: No Node.js runtime required, easier deployment
-- **Cross-platform**: Compile for Linux, macOS, Windows, ARM, and more
+- **Single binary** — compile once, run anywhere (no Node.js runtime needed)
+- **Low memory footprint** — no GC pauses, efficient async with Tokio
+- **Fast startup** — native binary, instant cold start
+- **Type safety** — Rust's ownership model prevents entire classes of bugs
+- **Zero-cost abstractions** — performance without sacrifice
 
-## Installation
-
-### From crates.io
-
-```bash
-cargo install krabkrab
-```
-
-### From source
+## Install (recommended)
 
 ```bash
-git clone https://github.com/openkrab/krabkrab.git
-cd krabkrab
+# From source
+git clone https://github.com/JonusNattapong/openkrab.git
+cd openkrab
+
 cargo build --release
 
 # Binary at: target/release/krabkrab
+./target/release/krabkrab --help
 ```
 
-### Requirements
+Pre-built binaries: [Releases](https://github.com/JonusNattapong/openkrab/releases)
 
-- Rust 1.75+ (for building from source)
-- No runtime dependencies
-
-## Quick Start
+## Quick start (TL;DR)
 
 ```bash
 # Start the gateway
-krabkrab gateway start
+krabkrab gateway --port 18789
+
+# Send a message (Telegram)
+krabkrab telegram --to @username --text "Hello from OpenKrab"
+
+# Send a message (Discord)
+krabkrab discord --to 123456789 --text "Hello from OpenKrab"
+
+# Talk to the assistant
+krabkrab ask "What's on my calendar today?"
 
 # Check status
 krabkrab status
@@ -56,91 +62,111 @@ krabkrab status
 # Configure interactively
 krabkrab configure
 
-# Send a message (Telegram)
-krabkrab telegram --text "Hello from krabkrab"
-
-# Send a message (Slack)
-krabkrab slack --text "Hello from krabkrab"
-
-# Send a message (Discord)
-krabkrab discord --to 123456789 --text "Hello from krabkrab"
-
 # Memory operations
 krabkrab memory sync --path ./docs
 krabkrab memory search "query text"
-
-# Ask LLM directly
-krabkrab ask "What is Rust?"
 ```
 
-## Supported Channels
+## Development channels
+
+- **stable**: tagged releases (`vYYYY.M.D`), GitHub Releases
+- **beta**: prerelease tags (`vYYYY.M.D-beta.N`)
+- **dev**: moving head of `main`
+
+## From source (development)
+
+```bash
+git clone https://github.com/JonusNattapong/openkrab.git
+cd openkrab
+
+cargo build
+cargo test
+
+# Run CLI
+cargo run -- --help
+```
+
+## How it works (short)
+
+```
+Telegram / Slack / Discord / Signal / Matrix / BlueBubbles / Google Chat / IRC / MSTeams / WebChat
+               │
+               ▼
+┌───────────────────────────────┐
+│            Gateway            │
+│     (Tokio async runtime)     │
+│     127.0.0.1:18789           │
+└──────────────┬────────────────┘
+               │
+               ├─ LLM Providers (OpenAI, Gemini, Ollama, Copilot, MiniMax, Qwen)
+               ├─ CLI (krabkrab …)
+               ├─ Memory (SQLite + vector embeddings)
+               └─ Tools (shell, media, web)
+```
+
+## Channels
 
 | Channel | Status | Notes |
 |---------|--------|-------|
-| Telegram | ✅ Full | Bot API polling |
-| Slack | ✅ Full | Webhook + Socket Mode |
-| Discord | ✅ Full | Gateway WebSocket + HTTP API |
-| Signal | ✅ Full | signal-cli REST API |
-| Matrix | ✅ Full | Client API |
-| BlueBubbles | ✅ Full | iMessage bridge |
-| IRC | ✅ Full | Basic IRC protocol |
-| MSTeams | ✅ Full | Bot Framework |
-| Mattermost | ✅ Full | Webhook |
-| Twitch | ✅ Full | IRC-based |
-| Zalo | ✅ Full | Webhook |
-| GoogleChat | ✅ Full | Webhook |
-| Feishu | ✅ Full | Webhook |
-| Nextcloud Talk | ✅ Full | API |
-| Nostr | ✅ Full | Relay-based |
-| Tlon | ✅ Full | Urbit |
-| WhatsApp | ⚠️ Basic | Use JS layer for full support |
-| LINE | ⚠️ Basic | Use JS layer for full support |
-| iMessage | ✅ Via BlueBubbles | Recommended path |
+| [Telegram](src/connectors/telegram.rs) | ✅ | Bot API HTTP polling |
+| [Slack](src/connectors/slack.rs) | ✅ | Bolt-style events |
+| [Discord](src/connectors/discord.rs) | ✅ | Serenity gateway + HTTP API |
+| [Google Chat](src/connectors/googlechat.rs) | ✅ | Chat API |
+| [IRC](src/connectors/irc.rs) | ✅ | Basic IRC protocol |
+| [Matrix](src/matrix/mod.rs) | ✅ | Matrix.org |
+| [Signal](src/signal/mod.rs) | ✅ | signal-cli integration |
+| [Microsoft Teams](src/connectors/msteams.rs) | ✅ | Bot Framework |
+| [BlueBubbles](src/connectors/bluebubbles.rs) | ✅ | iMessage via BlueBubbles |
+| [Mattermost](src/connectors/mattermost.rs) | ✅ | Webhook-based |
+| [Twitch](src/connectors/twitch.rs) | ✅ | IRC + API |
+| [Zalo](src/connectors/zalo.rs) | ✅ | Zalo API |
+| [Feishu](src/connectors/feishu.rs) | ✅ | Lark/Feishu |
+| [Nextcloud Talk](src/connectors/nextcloud_talk.rs) | ✅ | API |
+| [Nostr](src/connectors/nostr.rs) | ✅ | Nostr protocol |
+| [Tlon](src/connectors/tlon.rs) | ✅ | Urbit |
+| WhatsApp | ⚠️ | Requires vendor SDK — see ts-layer/ |
+| LINE | ⚠️ | Requires vendor SDK — see ts-layer/ |
 
-## Supported Providers
+## Providers
 
-| Provider | Status | Auth Methods |
-|----------|--------|--------------|
-| OpenAI | ✅ Full | API Key |
-| Anthropic (Claude) | ✅ Full | API Key |
-| Google Gemini | ✅ Full | API Key, CLI credentials |
-| Ollama | ✅ Full | Local server |
-| MiniMax | ✅ Full | OAuth (device code) |
-| Qwen | ✅ Full | OAuth |
-| GitHub Copilot | ✅ Full | OAuth token chain |
+| Provider | Status | Auth Method |
+|----------|--------|-------------|
+| OpenAI | ✅ | API Key |
+| Anthropic (Claude) | ✅ | API Key |
+| Gemini | ✅ | API Key / OAuth (CLI credentials) |
+| Ollama | ✅ | Local server |
+| GitHub Copilot | ✅ | OAuth token chain |
+| MiniMax | ✅ | Device-code OAuth |
+| Qwen | ✅ | Portal OAuth |
+
+## Highlights
+
+- **[Gateway control plane](src/gateway.rs)** — Tokio-based async runtime with sessions, channels, and events
+- **[Multi-channel inbox](src/channels/)** — unified messaging across all platforms
+- **[Multi-agent routing](src/routing/)** — route channels/accounts to isolated agents
+- **[Memory + vector search](src/memory/)** — SQLite-backed storage with embeddings
+- **[TUI](src/tui/mod.rs)** — Terminal UI with ratatui
+- **[Security](src/security.rs)** — DM pairing, allowlists, PKCE OAuth
 
 ## Configuration
 
-Configuration is stored in TOML format at `~/.config/krabkrab/krabkrab.toml`:
+OpenKrab uses TOML configuration at `~/.config/krabkrab/krabkrab.toml`:
 
 ```toml
 [agent]
-model = "anthropic/claude-opus-4"
+model = "anthropic/claude-opus-4-6"
 
 [providers.openai]
 api_key = "sk-..."
 model = "gpt-4"
 
-[providers.gemini]
-api_key = "..."
-model = "gemini-pro"
-
-[providers.ollama]
-base_url = "http://localhost:11434"
-model = "llama2"
-
 [channels.telegram]
 enabled = true
 bot_token = "..."
 
-[channels.slack]
-enabled = true
-bot_token = "..."
-app_token = "..."
-
 [channels.discord]
 enabled = true
-bot_token = "..."
+token = "..."
 
 [channels.bluebubbles]
 enabled = true
@@ -148,128 +174,129 @@ server_url = "http://..."
 password = "..."
 ```
 
-## Gateway Architecture
+## Security model (important)
 
-```
-┌─────────────────────────────────────────────────────┐
-│               Messaging Channels                      │
-│  Telegram │ Slack │ Discord │ Signal │ Matrix │ ... │
-└───────────────────────┬─────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│                   Gateway                            │
-│              (WebSocket Control Plane)               │
-│            ws://127.0.0.1:3000                       │
-└───────────────────────┬─────────────────────────────┘
-                        │
-          ┌─────────────┼─────────────┐
-          │             │             │
-          ▼             ▼             ▼
-     ┌─────────┐  ┌──────────┐  ┌──────────┐
-     │  Agent  │  │   CLI    │  │  Web UI  │
-     │  (LLM)  │  │ (krabkrab)│  │(dashboard)│
-     └─────────┘  └──────────┘  └──────────┘
-```
+- **Default:** tools run on the host for the **main** session
+- **DM pairing** — unknown senders receive a pairing code
+- **Allowlists** — control who can interact via `allowFrom`
+- **Sandbox mode** — run non-main sessions in Docker (opt-in)
 
-## Key Features
-
-### Core Platform
-- **Gateway WebSocket control plane** — single control point for sessions, channels, and events
-- **Multi-channel inbox** — unified messaging across all platforms
-- **Multi-agent routing** — route channels/accounts to isolated agents
-- **Session management** — context, memory, and transcript handling
-
-### Memory & Context
-- **Hybrid search** — vector + recency-based memory retrieval
-- **Document sync** — sync and search local documents
-- **Session transcripts** — persistent conversation history
-
-### Discord-Specific (Phase 17)
-- Gateway lifecycle with reconnect/backoff
-- Inbound/outbound message handling
-- Polls, reactions, threads, embeds
-- Guild actions (channels, members, roles)
-- Moderation (timeout, kick, ban)
-
-### Security
-- **DM pairing** — unknown senders require approval
-- **PKCE OAuth** — secure authentication flows
-- **Webhook signature verification** — for LINE, Slack, etc.
+Details: [Security](src/security.rs)
 
 ## Development
 
 ### Build & Test
 
 ```bash
-# Build
-cargo build
-
-# Run all tests
-cargo test --workspace
-
-# Run with verbose output
-cargo test -- --nocapture
-
-# Run specific test
-cargo test discord:: --lib
+cargo build              # Debug build
+cargo build --release    # Optimized build
+cargo test               # Run all 410+ tests
+cargo test --lib         # Lib tests only
+cargo clippy             # Lint
+cargo fmt                # Format
 ```
 
-### Test Coverage
+### Project Structure
 
-- **410+ tests** — unit + integration
-- **0 failures** — all tests passing
-- Comprehensive coverage of all modules
+```
+src/
+├── acp/              ← ACP protocol types & routing
+├── agents/           ← Agent runner loop
+├── auto_reply/       ← Keyword auto-reply engine
+├── broadcast/        ← Fan-out message broadcast
+├── channels/         ← Channel registry & config
+├── commands/         ← CLI sub-commands
+├── compat/           ← Legacy API compatibility shims
+├── connectors/       ← Platform connectors
+├── cron/             ← Cron/scheduled task engine
+├── daemon.rs         ← Background service manager
+├── gateway.rs        ← Gateway routing logic
+├── memory/           ← Conversation memory
+├── oauth/            ← OAuth 2.0 PKCE helper
+├── providers/        ← LLM providers
+├── routing/          ← Message routing rules
+├── sessions/         ← Conversation sessions
+├── signal/           ← Signal connector
+├── slack/            ← Slack blocks & threading
+├── tools/            ← Tool integrations
+├── tui/              ← Terminal UI
+├── voice/            ← Voice wake/talk mode
+└── web_connector/    ← Web/HTTP gateway
+```
+
+## Porting Status
+
+OpenKrab is a port of [OpenClaw](https://github.com/openclaw/openclaw) from TypeScript to Rust.
+
+**Status: Phase 20 complete ✅**
+
+| Phase | Module(s) | Status |
+|-------|-----------|--------|
+| 1-4 | Core (common, config, channels) | ✅ |
+| 5-6 | Connectors + Commands | ✅ |
+| 7-8 | Providers + Gateway | ✅ |
+| 9-10 | Memory + Media | ✅ |
+| 11-12 | Agents + Infrastructure | ✅ |
+| 13-14 | Signal/Matrix + OAuth | ✅ |
+| 15-16 | Provider auth wiring | ✅ |
+| 17-18 | Discord + Security hardening | ✅ |
+| 19-20 | BlueBubbles + Release | ✅ |
+
+**Total tests: 410 unit + integration, 0 failures**
+
+See [PORTING.md](PORTING.md) for detailed progress and module map.
 
 ## What's NOT Ported (Intentional)
 
-| Area | Reason | Alternative |
-|------|--------|-------------|
-| `apps/ios`, `apps/macos`, `apps/android` | Platform-native (Swift/Kotlin) | Use original JS project |
-| `browser/`, `canvas-host/` | Browser automation | Use JS layer |
-| `macos/` | macOS-specific APIs | Use JS layer |
-| `tui/` | Replaced | Use `terminal` module |
-| Full WhatsApp/LINE | Vendor SDKs | Use JS layer |
+| Area | Reason |
+|------|--------|
+| `apps/ios`, `apps/macos`, `apps/android` | Swift/Kotlin — platform-native, out of scope |
+| `assets/chrome-extension/` | Browser extension JS |
+| `src/browser/`, `src/canvas-host/` | Browser automation — kept in ts-layer/ |
+| Docker / fly.toml / render.yaml | Infrastructure config |
+| WhatsApp, LINE connectors | Require vendor SDKs — see ts-layer/ |
 
-## Migration from TypeScript
+## TypeScript Interop (ts-layer/)
 
-If migrating from the original `openclaw` TypeScript version:
+For features requiring JavaScript/TypeScript runtime:
+
+```bash
+cd ts-layer
+npm install
+npm run bridge
+```
+
+## Migration from OpenClaw
 
 1. **Config format**: JSON → TOML
 2. **Config location**: `~/.clawdbot/` → `~/.config/krabkrab/`
-3. **CLI commands**: Minor changes (see `MIGRATION_NOTES.md`)
-4. **Most connectors**: Compatible with same tokens/webhooks
+3. **Most connectors**: Compatible with same tokens/webhooks
 
-See [MIGRATION_NOTES.md](MIGRATION_NOTES.md) for detailed migration guide.
+See [PORTING.md](PORTING.md) for detailed migration guide.
 
-## Documentation
+## Docs
 
 - [PORTING.md](PORTING.md) — Porting status and module map
-- [RELEASE_READINESS.md](RELEASE_READINESS.md) — Release checklist
-- [MIGRATION_NOTES.md](MIGRATION_NOTES.md) — Migration from TypeScript
 - [AGENT.md](AGENT.md) — Agent development guide
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
 
-## Related Projects
+## Star History
 
-- [krabkrab (TypeScript)](https://github.com/krabkrab/krabkrab) — Original implementation
-- [openclaw](https://github.com/openkrab/openclaw) — Source for this port
+[![Star History Chart](https://api.star-history.com/svg?repos=JonusNattapong/openkrab&type=date)](https://www.star-history.com/#JonusNattapong/openkrab&type=date)
+
+## Community
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Molty
+
+OpenKrab was built for **Molty**, a space lobster AI assistant. 🦞
+
+This is a Rust port of [OpenClaw](https://github.com/openclaw/openclaw), originally by Peter Steinberger and the community.
+
+- [openclaw.ai](https://openclaw.ai)
+- [@openclaw](https://x.com/openclaw)
 
 ## License
 
 MIT License — see [LICENSE](LICENSE)
-
-## Contributing
-
-Contributions welcome! This is an active port project.
-
-1. Check [PORTING.md](PORTING.md) for current status
-2. Look for modules marked as incomplete
-3. Follow Rust best practices
-4. Add tests for new functionality
-5. Submit a PR
-
----
-
-**krabkrab** — EXFOLIATE! EXFOLIATE! 🦀
-
-Built with ❤️ in Rust, ported from the original TypeScript project.
