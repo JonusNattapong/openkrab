@@ -1,6 +1,10 @@
 # OpenKrab — Personal AI Assistant (Rust Edition)
 
 <p align="center">
+  <img src="logo/logo-long.png" alt="OpenKrab Logo" width="600">
+</p>
+
+<p align="center">
   <a href="https://github.com/openkrab/openkrab/actions/workflows/rust.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/openkrab/openkrab/rust.yml?branch=main&style=for-the-badge" alt="CI status"></a>
   <a href="https://github.com/openkrab/openkrab/releases"><img src="https://img.shields.io/github/v/release/openkrab/openkrab?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
@@ -11,6 +15,7 @@
 **OpenKrab** is a personal AI assistant designed for self-hosted use across your own devices. The project is implemented in **Rust** to provide strong performance, predictable resource usage, and memory safety.
 
 OpenKrab integrates with familiar messaging channels (**Telegram, Slack, Discord, Signal, WhatsApp, iMessage/BlueBubbles, Matrix, Google Chat, IRC, Microsoft Teams, WebChat**) and provides:
+
 - **Native Rust performance** with low startup overhead
 - **Efficient memory profile** for long-running workloads
 - **Single-binary deployment** across supported platforms
@@ -25,6 +30,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 ## ✨ Features
 
 ### 🤖 AI Capabilities
+
 - **Multi-agent system** — Route different channels to different AI personalities
 - **Tool use** — AI can execute shell commands, browse web, process media
 - **Streaming responses** — Real-time token streaming for natural feel
@@ -32,6 +38,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **Memory system** — AI remembers facts across conversations (vector + text search)
 
 ### 🧠 Advanced Memory & Search
+
 - **Hybrid search** — Combine vector similarity + full-text search
 - **MMR reranking** — Maximal Marginal Relevance for diverse results
 - **Temporal decay** — Older memories fade naturally
@@ -39,6 +46,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **Embeddings** — OpenAI, Gemini, Voyage, Ollama providers
 
 ### 🔒 Enterprise Security
+
 - **DM pairing** — Unknown senders get pairing codes
 - **Allowlists** — `allow_from` controls who can interact
 - **Rate limiting** — Per-user and global rate limits
@@ -48,6 +56,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **MFA/OAuth2** — Enterprise authentication support
 
 ### 🎙️ Voice System
+
 - **Voice wake mode** — "Hey KrabKrab" activation
 - **Talk mode** — Continuous conversation with auto-sleep
 - **VAD** — Voice Activity Detection
@@ -56,6 +65,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **Microphone capture** — Real-time audio input
 
 ### 🔌 Plugin System
+
 - **WASM runtime** — Cross-platform plugin execution via Wasmtime
 - **Hot reload** — Development workflow with auto-reload
 - **Sandboxing** — Security isolation (4 levels)
@@ -63,6 +73,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **Hook system** — Event-driven plugin architecture
 
 ### 🌐 Browser Automation
+
 - **CDP (Chrome DevTools Protocol)** — Full browser control
 - **Connection pooling** — Efficient session management
 - **Multi-tab support** — Handle multiple browser tabs
@@ -70,6 +81,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **Network interception** — Monitor and modify requests
 
 ### 🎨 Canvas/A2UI
+
 - **Agent-to-UI protocol** — Render dynamic interfaces
 - **Surface management** — Multiple canvas surfaces
 - **Component system** — Reusable UI components
@@ -110,6 +122,7 @@ cargo build --release
 ### Pre-built Binaries
 
 Download from [GitHub Releases](https://github.com/openkrab/openkrab/releases) for your platform:
+
 - Linux (x64, ARM64)
 - macOS (Intel, Apple Silicon)
 - Windows (x64)
@@ -304,6 +317,7 @@ krabkrab plugin watch ./plugins
 ### Creating Plugins
 
 Create `plugin.json`:
+
 ```json
 {
   "name": "my-plugin",
@@ -416,6 +430,7 @@ cargo run -- ask "Hello world"
 4. **Most connectors**: Compatible with same tokens/webhooks
 
 Migration tool:
+
 ```bash
 krabkrab migrate --from-openclaw ~/.clawdbot/config.json
 ```
