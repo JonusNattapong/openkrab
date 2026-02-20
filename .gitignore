@@ -12,3 +12,29 @@ pnpm-lock.yaml
 test_out.txt
 !LICENSE.txt
 **/Cargo.lock
+
+# Environment and secrets
+.env
+.env.*
+!*.example
+!*.template
+
+# User specific files
+IDENTITY.md
+USER.md
+.local/
+docs/.local/
+
+# Local state and credentials
+.agent/*.json
+!.agent/workflows/
+/local/
+
+# OpenKrab specific storage
+/workspace/
+~/.openkrab/
+
+# Python / Scripts
+.venv/
+__pycache__/
+*.pyc
