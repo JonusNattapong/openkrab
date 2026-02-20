@@ -1,5 +1,5 @@
 //! sessions — Session state management.
-//! Ported from `openclaw/src/sessions/` (Phase 6).
+//! Ported from `openkrab/src/sessions/` (Phase 6).
 //!
 //! Tracks per-conversation state including model overrides, verbosity level
 //! overrides, send policy, and a basic session transcript.

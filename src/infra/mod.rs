@@ -1,5 +1,5 @@
 //! infra — Infrastructure helpers: env vars, paths, workspace discovery.
-//! Ported from `openclaw/src/infra/` (Phase 7).
+//! Ported from `openkrab/src/infra/` (Phase 7).
 //!
 //! Centralises all OS-level path resolution so the rest of the codebase
 //! never hardcodes `~/.config` or `./memory` directly.

@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/model-param-b.ts`
+//! Port of `openkrab/src/shared/model-param-b.ts`
 //!
 //! Infer the parameter count (in billions, "B") from a model ID or display name.
 //! For example, `"llama-3.1-70b-instruct"` → `70.0`.

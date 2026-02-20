@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/node-list-types.ts` + `node-list-parse.ts`
+//! Port of `openkrab/src/shared/node-list-types.ts` + `node-list-parse.ts`
 //!
 //! Types and parsers for the node (device) list used by the pairing protocol.
 

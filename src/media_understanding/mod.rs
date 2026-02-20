@@ -1,5 +1,5 @@
 //! media_understanding — AI-powered media analysis abstraction.
-//! Ported from `openclaw/src/media-understanding/` (Phase 7).
+//! Ported from `openkrab/src/media-understanding/` (Phase 7).
 //!
 //! Provides a unified trait for analysing image, audio and video content
 //! using an underlying vision / multimodal LLM.

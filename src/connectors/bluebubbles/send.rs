@@ -1,5 +1,5 @@
 //! BlueBubbles send functionality.
-//! Ported from openclaw/extensions/bluebubbles/src/send.ts
+//! Ported from openkrab/extensions/bluebubbles/src/send.ts
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

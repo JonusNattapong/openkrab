@@ -1,5 +1,5 @@
 //! connectors::discord — Discord channel connector.
-//! Ported from `openclaw/extensions/discord/src/channel.ts` (Phase 17).
+//! Ported from `openkrab/extensions/discord/src/channel.ts` (Phase 17).
 //!
 //! Provides Discord connector config types, capability declarations,
 //! account resolution, DM policy helpers, action gates, message actions,
@@ -230,7 +230,7 @@ impl Default for ReplyToMode {
     }
 }
 
-// ─── Action Config (port of openclaw/src/config/types.discord.ts:DiscordActionConfig) ───────
+// ─── Action Config (port of openkrab/src/config/types.discord.ts:DiscordActionConfig) ───────
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiscordActionConfig {
@@ -304,7 +304,7 @@ impl Default for DiscordActionConfig {
     }
 }
 
-// ─── Action Gate (port of openclaw/src/discord/accounts.ts:createDiscordActionGate) ───────
+// ─── Action Gate (port of openkrab/src/discord/accounts.ts:createDiscordActionGate) ───────
 
 pub fn create_action_gate(
     base_actions: Option<&DiscordActionConfig>,
@@ -354,7 +354,7 @@ pub fn create_action_gate(
     }
 }
 
-// ─── Message Actions (port of openclaw/src/channels/plugins/actions/discord.ts) ─────────────
+// ─── Message Actions (port of openkrab/src/channels/plugins/actions/discord.ts) ─────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]

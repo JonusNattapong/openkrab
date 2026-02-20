@@ -1,5 +1,5 @@
 //! BlueBubbles media/attachment sending.
-//! Ported from openclaw/extensions/bluebubbles/src/media-send.ts
+//! Ported from openkrab/extensions/bluebubbles/src/media-send.ts
 
 use serde::{Deserialize, Serialize};
 

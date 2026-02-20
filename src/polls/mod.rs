@@ -1,5 +1,5 @@
 //! polls — Long-polling and short-polling utilities.
-//! Ported from `openclaw/src/polls.ts` (Phase 7).
+//! Ported from `openkrab/src/polls.ts` (Phase 7).
 //!
 //! Provides a generic polling loop with exponential back-off, jitter,
 //! and a stop signal. Used by connector update loops (e.g. Telegram getUpdates).

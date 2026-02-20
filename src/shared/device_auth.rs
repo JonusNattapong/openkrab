@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/device-auth.ts`
+//! Port of `openkrab/src/shared/device-auth.ts`
 //!
 //! Types and helpers for the device-auth token store used by the pairing
 //! protocol.

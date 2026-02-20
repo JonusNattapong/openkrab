@@ -1,5 +1,5 @@
 //! media — Media type definitions and handling utilities.
-//! Ported from `openclaw/src/media/` (Phase 5).
+//! Ported from `openkrab/src/media/` (Phase 5).
 //!
 //! Provides normalised representations for images, audio, video, files,
 //! and documents that can flow through the agent pipeline.

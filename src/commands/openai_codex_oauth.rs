@@ -1,4 +1,4 @@
-//! OpenAI Codex OAuth flow — port of `openclaw/src/commands/openai-codex-oauth.ts`
+//! OpenAI Codex OAuth flow — port of `openkrab/src/commands/openai-codex-oauth.ts`
 
 use anyhow::{anyhow, bail, Result};
 use reqwest::blocking::Client;

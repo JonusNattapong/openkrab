@@ -1,5 +1,5 @@
 //! setup — Initial setup command.
-//! Ported from `openclaw/src/commands/setup.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/setup.ts` (Phase 6).
 
 use crate::config::AppConfig;
 use std::path::PathBuf;

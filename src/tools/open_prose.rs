@@ -1,12 +1,12 @@
 //! tools::open_prose — OpenProse VM skill command router.
-//! Ported from `openclaw/extensions/open-prose/` (Phase 21).
+//! Ported from `openkrab/extensions/open-prose/` (Phase 21).
 //!
 //! OpenProse is a programming language for AI sessions.
 //! This module provides command routing, target resolution, and workspace
 //! migration helpers. The actual VM semantics live in the `prose.md` skill
 //! document; this module handles the structural / path-resolution layer.
 //!
-//! Reference: `openclaw/extensions/open-prose/skills/prose/SKILL.md`
+//! Reference: `openkrab/extensions/open-prose/skills/prose/SKILL.md`
 
 use anyhow::{bail, Result};
 use std::path::{Path, PathBuf};

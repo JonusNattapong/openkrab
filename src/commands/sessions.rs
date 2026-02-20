@@ -1,5 +1,5 @@
 //! sessions — Session management commands.
-//! Ported from `openclaw/src/commands/sessions.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/sessions.ts` (Phase 6).
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

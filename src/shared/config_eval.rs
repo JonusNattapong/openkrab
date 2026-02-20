@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/config-eval.ts`
+//! Port of `openkrab/src/shared/config-eval.ts`
 //!
 //! Configuration evaluation utilities: truthiness checks, dot-path resolution,
 //! runtime requirement evaluation, and binary lookup on `$PATH`.

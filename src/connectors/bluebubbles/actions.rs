@@ -1,5 +1,5 @@
 //! BlueBubbles message actions (react, edit, unsend, reply, effects, group management).
-//! Ported from openclaw/extensions/bluebubbles/src/actions.ts
+//! Ported from openkrab/extensions/bluebubbles/src/actions.ts
 
 use serde::{Deserialize, Serialize};
 

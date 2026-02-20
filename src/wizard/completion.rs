@@ -1,5 +1,5 @@
 //! Shell completion setup during onboarding.
-//! Ported from `openclaw/src/wizard/onboarding.completion.ts`
+//! Ported from `openkrab/src/wizard/onboarding.completion.ts`
 
 use anyhow::Result;
 

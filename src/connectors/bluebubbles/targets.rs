@@ -1,5 +1,5 @@
 //! BlueBubbles target parsing and normalization.
-//! Ported from openclaw/extensions/bluebubbles/src/targets.ts
+//! Ported from openkrab/extensions/bluebubbles/src/targets.ts
 
 use crate::connectors::bluebubbles::types::{looks_like_target_id, BlueBubblesSendTarget};
 

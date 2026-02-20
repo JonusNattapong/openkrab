@@ -1,5 +1,5 @@
 //! signal — Signal messenger connector.
-//! Ported from `openclaw/extensions/signal/` (Phase 10, 13).
+//! Ported from `openkrab/extensions/signal/` (Phase 10, 13).
 
 use anyhow::{bail, Result};
 use rand::Rng;

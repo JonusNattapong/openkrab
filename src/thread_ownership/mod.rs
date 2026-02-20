@@ -1,5 +1,5 @@
 //! thread_ownership — Thread ownership tracking.
-//! Ported from `openclaw/extensions/thread-ownership/` (Phase 12).
+//! Ported from `openkrab/extensions/thread-ownership/` (Phase 12).
 //!
 //! Tracks which bot / agent instance "owns" a conversation thread,
 //! preventing duplicate responses when multiple agents are active.

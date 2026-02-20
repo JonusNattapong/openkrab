@@ -1,5 +1,5 @@
 //! BlueBubbles server probe and Private API detection.
-//! Ported from openclaw/extensions/bluebubbles/src/probe.ts
+//! Ported from openkrab/extensions/bluebubbles/src/probe.ts
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

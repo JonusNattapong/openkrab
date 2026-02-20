@@ -1,5 +1,5 @@
 //! matrix::credentials — Matrix token storage and management.
-//! Ported from `openclaw/extensions/matrix/src/matrix/credentials.ts` (Phase 13).
+//! Ported from `openkrab/extensions/matrix/src/matrix/credentials.ts` (Phase 13).
 
 use std::fs;
 use std::path::PathBuf;

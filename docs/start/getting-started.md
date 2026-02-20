@@ -1,5 +1,5 @@
 ---
-summary: "Get OpenClaw installed and run your first chat in minutes."
+summary: "Get OpenKrab installed and run your first chat in minutes."
 read_when:
   - First time setup from zero
   - You want the fastest path to a working chat
@@ -11,125 +11,127 @@ title: "Getting Started"
 Goal: go from zero to a first working chat with minimal setup.
 
 <Info>
-Fastest chat: open the Control UI (no channel setup needed). Run `openclaw dashboard`
+Fastest chat: open the Web Dashboard (no channel setup needed). Run `krabkrab dashboard`
 and chat in the browser, or open `http://127.0.0.1:18789/` on the
-<Tooltip headline="Gateway host" tip="The machine running the OpenClaw gateway service.">gateway host</Tooltip>.
-Docs: [Dashboard](/web/dashboard) and [Control UI](/web/control-ui).
+<Tooltip headline="Gateway host" tip="The machine running the OpenKrab gateway service.">gateway host</Tooltip>.
+Docs: [Dashboard](/web/dashboard).
 </Info>
 
 ## Prereqs
 
-- Node 22 or newer
+- Rust 1.75+ (for building from source)
+- Or download pre-built binary
 
 <Tip>
-Check your Node version with `node --version` if you are unsure.
+Check your Rust version with `rustc --version` if building from source.
 </Tip>
 
 ## Quick setup (CLI)
 
 <Steps>
-  <Step title="Install OpenClaw (recommended)">
+  <Step title="Install OpenKrab">
     <Tabs>
-      <Tab title="macOS/Linux">
+      <Tab title="From Source">
         ```bash
-        curl -fsSL https://openclaw.ai/install.sh | bash
+        git clone https://github.com/openkrab/openkrab.git
+        cd openkrab
+        cargo build --release
         ```
-        <img
-  src="/assets/install-script.svg"
-  alt="Install Script Process"
-  className="rounded-lg"
-/>
+        <Note>
+        Binary will be at `target/release/krabkrab`
+        </Note>
       </Tab>
-      <Tab title="Windows (PowerShell)">
-        ```powershell
-        iwr -useb https://openclaw.ai/install.ps1 | iex
-        ```
+      <Tab title="Pre-built Binary">
+        Download from [GitHub Releases](https://github.com/openkrab/openkrab/releases) for your platform:
+        - Linux (x64, ARM64)
+        - macOS (Intel, Apple Silicon)
+        - Windows (x64)
       </Tab>
     </Tabs>
 
     <Note>
-    Other install methods and requirements: [Install](/install).
+    Other install methods: [Install](/install).
     </Note>
 
   </Step>
-  <Step title="Run the onboarding wizard">
+  <Step title="Configure your AI provider">
     ```bash
-    openclaw onboard --install-daemon
+    krabkrab config set providers.openai.api_key "sk-..."
     ```
 
-    The wizard configures auth, gateway settings, and optional channels.
-    See [Onboarding Wizard](/start/wizard) for details.
+    Or use other providers (Anthropic, Gemini, Ollama, etc.)
 
   </Step>
-  <Step title="Check the Gateway">
-    If you installed the service, it should already be running:
-
+  <Step title="Start the Gateway">
     ```bash
-    openclaw gateway status
+    krabkrab gateway --port 18789
     ```
 
   </Step>
-  <Step title="Open the Control UI">
+  <Step title="Open the Dashboard">
     ```bash
-    openclaw dashboard
+    krabkrab dashboard
     ```
+    Or open `http://127.0.0.1:18789/` in your browser.
   </Step>
 </Steps>
 
 <Check>
-If the Control UI loads, your Gateway is ready for use.
+If the Dashboard loads, your Gateway is ready for use.
 </Check>
 
 ## Optional checks and extras
 
 <AccordionGroup>
-  <Accordion title="Run the Gateway in the foreground">
-    Useful for quick tests or troubleshooting.
-
-    ```bash
-    openclaw gateway --port 18789
-    ```
-
-  </Accordion>
   <Accordion title="Send a test message">
     Requires a configured channel.
 
     ```bash
-    openclaw message send --target +15555550123 --message "Hello from OpenClaw"
+    krabkrab telegram --to @username --text "Hello from OpenKrab!"
+    krabkrab ask "What's the weather today?"
     ```
 
+  </Accordion>
+  <Accordion title="Check system status">
+    ```bash
+    krabkrab doctor         # check for config issues
+    krabkrab status         # gateway status
+    ```
   </Accordion>
 </AccordionGroup>
 
 ## Useful environment variables
 
-If you run OpenClaw as a service account or want custom config/state locations:
+If you want custom config/state locations:
 
-- `OPENCLAW_HOME` sets the home directory used for internal path resolution.
-- `OPENCLAW_STATE_DIR` overrides the state directory.
-- `OPENCLAW_CONFIG_PATH` overrides the config file path.
+- `KRABKRAB_CONFIG_DIR` sets the config directory (default: `~/.config/krabkrab/`)
+- `KRABKRAB_DATA_DIR` sets the data directory
 
 Full environment variable reference: [Environment vars](/help/environment).
 
 ## Go deeper
 
 <Columns>
-  <Card title="Onboarding Wizard (details)" href="/start/wizard">
-    Full CLI wizard reference and advanced options.
+  <Card title="Configuration" href="/gateway/configuration">
+    Core Gateway settings, tokens, and provider config.
   </Card>
-  <Card title="macOS app onboarding" href="/start/onboarding">
-    First run flow for the macOS app.
+  <Card title="Channels" href="/channels">
+    Connect Telegram, Slack, Discord, WhatsApp, and more.
+  </Card>
+  <Card title="Voice System" href="/tools/voice">
+    Setup wake word detection and talk mode.
   </Card>
 </Columns>
 
 ## What you will have
 
 - A running Gateway
-- Auth configured
-- Control UI access or a connected channel
+- AI provider configured
+- Dashboard access or a connected channel
 
 ## Next steps
 
 - DM safety and approvals: [Pairing](/channels/pairing)
 - Connect more channels: [Channels](/channels)
-- Advanced workflows and from source: [Setup](/start/setup)
+- Memory system: [Memory](/concepts/memory)
+- Plugin system: [Plugins](/tools/plugin)

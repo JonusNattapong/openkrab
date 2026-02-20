@@ -1,4 +1,4 @@
-//! Channel subsystem (partial port from openclaw/src/channels)
+//! Channel subsystem (partial port from openkrab/src/channels)
 
 use anyhow::Result;
 

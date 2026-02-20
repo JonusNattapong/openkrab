@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/subagents-format.ts`
+//! Port of `openkrab/src/shared/subagents-format.ts`
 //!
 //! Formatting utilities for sub-agent status display: compact durations,
 //! short token counts, truncated lines, and token usage summaries.

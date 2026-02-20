@@ -1,5 +1,5 @@
 //! providers::copilot_proxy — Local Copilot Proxy (VS Code LM) provider.
-//! Ported from `openclaw/extensions/copilot-proxy/index.ts` (Phase 21).
+//! Ported from `openkrab/extensions/copilot-proxy/index.ts` (Phase 21).
 //!
 //! Bridges requests to a locally-running Copilot Proxy VS Code extension that
 //! exposes an OpenAI-compatible `/v1/chat/completions` endpoint.

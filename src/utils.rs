@@ -184,9 +184,9 @@ pub fn resolve_user_path(input: &str) -> String {
 }
 
 pub fn resolve_config_dir() -> String {
-    let override_dir = env::var("krabkrab_STATE_DIR")
+    let override_dir = env::var("KRABKRAB_STATE_DIR")
         .ok()
-        .or_else(|| env::var("CLAWDBOT_STATE_DIR").ok());
+        .or_else(|| env::var("KRABBOT_STATE_DIR").ok());
     if let Some(o) = override_dir
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty())
@@ -200,12 +200,12 @@ pub fn resolve_config_dir() -> String {
 
 fn resolve_home_display_prefix() -> Option<(String, String)> {
     let home = dirs::home_dir()?.to_string_lossy().to_string();
-    let explicit_home = env::var("krabkrab_HOME")
+    let explicit_home = env::var("KRABKRAB_HOME")
         .ok()
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty());
     if explicit_home.is_some() {
-        return Some((home, "$krabkrab_HOME".to_string()));
+        return Some((home, "$KRABKRAB_HOME".to_string()));
     }
     Some((home, "~".to_string()))
 }

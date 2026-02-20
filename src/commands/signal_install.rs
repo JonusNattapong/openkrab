@@ -1,5 +1,5 @@
 //! signal_install — Signal CLI installation helper.
-//! Ported from `openclaw/src/commands/signal-install.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/signal-install.ts` (Phase 6).
 
 use std::process::Command;
 

@@ -1,5 +1,5 @@
 //! status_summary — Status summary formatting for status command.
-//! Ported from `openclaw/src/commands/status.summary.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/status.summary.ts` (Phase 6).
 
 use crate::config::AppConfig;
 use serde::{Deserialize, Serialize};

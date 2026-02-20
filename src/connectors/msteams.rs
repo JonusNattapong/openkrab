@@ -1,5 +1,5 @@
 //! msteams — Microsoft Teams connector.
-//! Ported from `openclaw/extensions/msteams/` (Phase 11).
+//! Ported from `openkrab/extensions/msteams/` (Phase 11).
 //!
 //! Uses the Bot Framework / Incoming Webhook API.
 

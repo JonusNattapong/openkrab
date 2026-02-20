@@ -1,4 +1,4 @@
-//! Config validation — port of `openclaw/src/config/validation.ts` (Phase 1-4 schema validation)
+//! Config validation — port of `openkrab/src/config/validation.ts` (Phase 1-4 schema validation)
 
 use crate::openkrab_config::OpenKrabConfig;
 use anyhow::{bail, Result};

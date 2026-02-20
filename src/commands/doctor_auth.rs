@@ -1,5 +1,5 @@
 //! doctor-auth — Auth profile health checks and repairs for doctor command.
-//! Ported from `openclaw/src/commands/doctor-auth.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/doctor-auth.ts` (Phase 6).
 
 use crate::config::AppConfig;
 

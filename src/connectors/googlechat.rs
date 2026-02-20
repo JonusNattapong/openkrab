@@ -1,5 +1,5 @@
 //! googlechat — Google Chat connector.
-//! Ported from `openclaw/extensions/googlechat/` (Phase 12).
+//! Ported from `openkrab/extensions/googlechat/` (Phase 12).
 //!
 //! Uses Google Chat Events API (Pub/Sub or HTTP webhook).
 //! Reference: https://developers.google.com/chat/api/reference/rest

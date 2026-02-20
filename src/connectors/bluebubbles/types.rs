@@ -1,5 +1,5 @@
 //! BlueBubbles type definitions.
-//! Ported from openclaw/extensions/bluebubbles/src/types.ts
+//! Ported from openkrab/extensions/bluebubbles/src/types.ts
 
 use serde::{Deserialize, Serialize};
 

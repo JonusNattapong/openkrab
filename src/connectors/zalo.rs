@@ -1,5 +1,5 @@
 //! zalo — Zalo messaging connector (Vietnamese market).
-//! Ported from `openclaw/extensions/zalo/` + `zalouser/` (Phase 11).
+//! Ported from `openkrab/extensions/zalo/` + `zalouser/` (Phase 11).
 //!
 //! Uses the Zalo Official Account (OA) API v3.
 //! Reference: https://developers.zalo.me/docs/official-account/

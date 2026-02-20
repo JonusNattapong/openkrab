@@ -1,5 +1,5 @@
 //! auto_reply — Auto-reply dispatch engine.
-//! Ported from `openclaw/src/auto-reply/` (Phase 6).
+//! Ported from `openkrab/src/auto-reply/` (Phase 6).
 //!
 //! Implements the core inbound message → agent response pipeline:
 //! command detection, activation gating, heartbeat handling,

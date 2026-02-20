@@ -1,5 +1,5 @@
 //! signal::daemon — Signal-cli daemon auto-start/management.
-//! Ported from `openclaw/src/signal/daemon.ts` (Phase 13).
+//! Ported from `openkrab/src/signal/daemon.ts` (Phase 13).
 
 use std::process::Stdio;
 use std::sync::Arc;

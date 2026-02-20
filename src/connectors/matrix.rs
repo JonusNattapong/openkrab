@@ -1,5 +1,5 @@
 //! matrix — Matrix channel connector.
-//! Ported from `openclaw/extensions/matrix/` (Phase 5-6).
+//! Ported from `openkrab/extensions/matrix/` (Phase 5-6).
 
 use crate::common::{Message, UserId};
 use serde::{Deserialize, Serialize};

@@ -1,5 +1,5 @@
 //! BlueBubbles configuration schema.
-//! Ported from openclaw/extensions/bluebubbles/src/config-schema.ts
+//! Ported from openkrab/extensions/bluebubbles/src/config-schema.ts
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

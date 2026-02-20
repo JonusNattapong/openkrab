@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/chat-envelope.ts`
+//! Port of `openkrab/src/shared/chat-envelope.ts`
 //!
 //! Utilities for stripping channel-envelope prefixes and `[message_id: …]` hints
 //! from chat messages. These prefixes are added by multi-channel routing so the

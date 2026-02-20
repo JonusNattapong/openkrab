@@ -1,5 +1,5 @@
 //! wizard — Onboarding wizard for first-time setup.
-//! Ported from `openclaw/src/wizard/` (TypeScript).
+//! Ported from `openkrab/src/wizard/` (TypeScript).
 
 pub mod prompts;
 pub mod session;

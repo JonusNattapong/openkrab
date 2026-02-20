@@ -1,5 +1,5 @@
 //! Gateway configuration step of the onboarding wizard.
-//! Ported from `openclaw/src/wizard/onboarding.gateway-config.ts`
+//! Ported from `openkrab/src/wizard/onboarding.gateway-config.ts`
 
 use anyhow::Result;
 use rand::Rng;

@@ -1,5 +1,5 @@
 //! tlon — Tlon/Urbit messaging connector.
-//! Ported from `openclaw/extensions/tlon/` (Phase 13).
+//! Ported from `openkrab/extensions/tlon/` (Phase 13).
 //!
 //! Connects to a Urbit ship's Eyre HTTP interface to send/receive messages
 //! via Landscape groups (channels) or DMs.

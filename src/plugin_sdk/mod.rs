@@ -1,5 +1,5 @@
 //! plugin_sdk — Developer-facing Plugin SDK types and helpers.
-//! Ported from `openclaw/src/plugin-sdk/` (Phase 10).
+//! Ported from `openkrab/src/plugin-sdk/` (Phase 10).
 //!
 //! This module exposes the stable API surface that external krabkrab plugins
 //! use to integrate with the core runtime: hooks, tools, providers, routes.

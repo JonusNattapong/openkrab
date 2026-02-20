@@ -1,5 +1,5 @@
 //! providers::qwen_oauth — Qwen Portal OAuth token refresh.
-//! Ported from `openclaw/src/providers/qwen-portal-oauth.ts` (Phase 16).
+//! Ported from `openkrab/src/providers/qwen-portal-oauth.ts` (Phase 16).
 //!
 //! Refreshes a Qwen Portal access token using a stored refresh token.
 

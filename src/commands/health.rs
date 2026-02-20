@@ -1,5 +1,5 @@
 //! health — Health check commands.
-//! Ported from `openclaw/src/commands/health.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/health.ts` (Phase 6).
 
 use crate::config::AppConfig;
 use serde::{Deserialize, Serialize};

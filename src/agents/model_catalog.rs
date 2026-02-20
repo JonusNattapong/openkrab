@@ -1,5 +1,5 @@
 //! agents::model_catalog — Model catalog with capability detection.
-//! Ported from `openclaw/src/agents/model-catalog.ts` (Phase 16).
+//! Ported from `openkrab/src/agents/model-catalog.ts` (Phase 16).
 
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};

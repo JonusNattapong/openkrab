@@ -1,5 +1,5 @@
 //! mattermost — Mattermost connector.
-//! Ported from `openclaw/extensions/mattermost/` (Phase 11).
+//! Ported from `openkrab/extensions/mattermost/` (Phase 11).
 //!
 //! Uses the Mattermost REST API v4 and Incoming Webhooks.
 

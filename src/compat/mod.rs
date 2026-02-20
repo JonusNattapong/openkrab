@@ -1,5 +1,5 @@
 //! compat — Compatibility layer: legacy name mappings and feature flags.
-//! Ported from `openclaw/src/compat/legacy-names.ts` (Phase 8).
+//! Ported from `openkrab/src/compat/legacy-names.ts` (Phase 8).
 //!
 //! Provides canonical name resolution for connectors and providers
 //! that shipped under different names in earlier openclaw versions,

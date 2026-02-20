@@ -1,5 +1,5 @@
 //! terminal — ANSI terminal utilities: colours, tables, progress, themes.
-//! Ported from `openclaw/src/terminal/` (Phase 8).
+//! Ported from `openkrab/src/terminal/` (Phase 8).
 //!
 //! Provides a minimal, zero-dependency terminal formatting layer for
 //! the krabkrab-cli output.

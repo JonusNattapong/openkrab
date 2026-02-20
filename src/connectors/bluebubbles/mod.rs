@@ -1,5 +1,5 @@
 //! BlueBubbles connector - iMessage via macOS server.
-//! Ported from openclaw/extensions/bluebubbles/
+//! Ported from openkrab/extensions/bluebubbles/
 //!
 //! This module provides full BlueBubbles integration including:
 //! - Account configuration and resolution

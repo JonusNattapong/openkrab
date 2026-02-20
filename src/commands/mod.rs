@@ -1,4 +1,4 @@
-//! krabkrab commands module — port of `openclaw/src/commands`
+//! krabkrab commands module — port of `openkrab/src/commands`
 
 pub mod admin;
 pub mod ask;

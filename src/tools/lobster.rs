@@ -1,5 +1,5 @@
 //! tools::lobster — Lobster workflow pipeline runner.
-//! Ported from `openclaw/extensions/lobster/src/lobster-tool.ts` (Phase 14).
+//! Ported from `openkrab/extensions/lobster/src/lobster-tool.ts` (Phase 14).
 //!
 //! Invokes the `lobster` binary as a sandboxed subprocess with:
 //! - CWD containment (relative paths only, must stay within workspace)

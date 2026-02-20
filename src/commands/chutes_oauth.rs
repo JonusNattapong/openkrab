@@ -1,4 +1,4 @@
-//! Chutes OAuth flow — port of `openclaw/src/commands/chutes-oauth.ts`
+//! Chutes OAuth flow — port of `openkrab/src/commands/chutes-oauth.ts`
 
 use anyhow::{anyhow, bail, Result};
 use reqwest::blocking::Client;

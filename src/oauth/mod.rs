@@ -1,5 +1,5 @@
 //! oauth — Generic OAuth 2.0 PKCE helper.
-//! Ported from `openclaw/extensions/google-antigravity-auth/index.ts` (Phase 14).
+//! Ported from `openkrab/extensions/google-antigravity-auth/index.ts` (Phase 14).
 //!
 //! Provides PKCE (Proof Key for Code Exchange) helpers, authorization URL builder,
 //! callback URL parser, and token exchange — usable for Google, MiniMax, Qwen etc.

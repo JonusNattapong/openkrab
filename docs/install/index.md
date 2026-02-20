@@ -1,5 +1,5 @@
 ---
-summary: "Install OpenClaw — installer script, npm/pnpm, from source, Docker, and more"
+summary: "Install OpenKrab — from source, pre-built binaries, Docker, and more"
 read_when:
   - You need an install method other than the Getting Started quickstart
   - You want to deploy to a cloud platform
@@ -13,132 +13,81 @@ Already followed [Getting Started](/start/getting-started)? You're all set — t
 
 ## System requirements
 
-- **[Node 22+](/install/node)** (the [installer script](#install-methods) will install it if missing)
+- **Rust 1.75+** (if building from source)
 - macOS, Linux, or Windows
-- `pnpm` only if you build from source
+- For pre-built binaries: No additional requirements
 
 <Note>
-On Windows, we strongly recommend running OpenClaw under [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install).
+On Windows, we strongly recommend running OpenKrab under [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) for best compatibility.
 </Note>
 
 ## Install methods
 
 <Tip>
-The **installer script** is the recommended way to install OpenClaw. It handles Node detection, installation, and onboarding in one step.
+Building from source is the recommended way to install OpenKrab. It provides the best performance and compatibility.
 </Tip>
 
-<Warning>
-For VPS/cloud hosts, avoid third-party "1-click" marketplace images when possible. Prefer a clean base OS image (for example Ubuntu LTS), then install OpenClaw yourself with the installer script.
-</Warning>
-
 <AccordionGroup>
-  <Accordion title="Installer script" icon="rocket" defaultOpen>
-    Downloads the CLI, installs it globally via npm, and launches the onboarding wizard.
+  <Accordion title="From Source" icon="github" defaultOpen>
+    Clone the [OpenKrab repo](https://github.com/openkrab/openkrab) and build:
 
-    <Tabs>
-      <Tab title="macOS / Linux / WSL2">
-        ```bash
-        curl -fsSL https://openclaw.ai/install.sh | bash
-        ```
-      </Tab>
-      <Tab title="Windows (PowerShell)">
-        ```powershell
-        iwr -useb https://openclaw.ai/install.ps1 | iex
-        ```
-      </Tab>
-    </Tabs>
+    ```bash
+    git clone https://github.com/openkrab/openkrab.git
+    cd openkrab
+    cargo build --release
+    ```
 
-    That's it — the script handles Node detection, installation, and onboarding.
+    The binary will be at `target/release/krabkrab`.
 
-    To skip onboarding and just install the binary:
+    To install globally:
+    ```bash
+    cargo install --path .
+    ```
 
-    <Tabs>
-      <Tab title="macOS / Linux / WSL2">
-        ```bash
-        curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard
-        ```
-      </Tab>
-      <Tab title="Windows (PowerShell)">
-        ```powershell
-        & ([scriptblock]::Create((iwr -useb https://openclaw.ai/install.ps1))) -NoOnboard
-        ```
-      </Tab>
-    </Tabs>
-
-    For all flags, env vars, and CI/automation options, see [Installer internals](/install/installer).
+    Or copy the binary to your PATH:
+    ```bash
+    cp target/release/krabkrab /usr/local/bin/
+    ```
 
   </Accordion>
 
-  <Accordion title="npm / pnpm" icon="package">
-    If you already have Node 22+ and prefer to manage the install yourself:
+  <Accordion title="Pre-built Binaries" icon="package">
+    Download from [GitHub Releases](https://github.com/openkrab/openkrab/releases) for your platform:
 
-    <Tabs>
-      <Tab title="npm">
-        ```bash
-        npm install -g openclaw@latest
-        openclaw onboard --install-daemon
-        ```
+    - Linux (x64, ARM64)
+    - macOS (Intel, Apple Silicon)
+    - Windows (x64)
 
-        <Accordion title="sharp build errors?">
-          If you have libvips installed globally (common on macOS via Homebrew) and `sharp` fails, force prebuilt binaries:
-
-          ```bash
-          SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install -g openclaw@latest
-          ```
-
-          If you see `sharp: Please add node-gyp to your dependencies`, either install build tooling (macOS: Xcode CLT + `npm install -g node-gyp`) or use the env var above.
-        </Accordion>
-      </Tab>
-      <Tab title="pnpm">
-        ```bash
-        pnpm add -g openclaw@latest
-        pnpm approve-builds -g        # approve openclaw, node-llama-cpp, sharp, etc.
-        openclaw onboard --install-daemon
-        ```
-
-        <Note>
-        pnpm requires explicit approval for packages with build scripts. After the first install shows the "Ignored build scripts" warning, run `pnpm approve-builds -g` and select the listed packages.
-        </Note>
-      </Tab>
-    </Tabs>
-
-  </Accordion>
-
-  <Accordion title="From source" icon="github">
-    For contributors or anyone who wants to run from a local checkout.
-
-    <Steps>
-      <Step title="Clone and build">
-        Clone the [OpenClaw repo](https://github.com/openclaw/openclaw) and build:
-
-        ```bash
-        git clone https://github.com/openclaw/openclaw.git
-        cd openclaw
-        pnpm install
-        pnpm ui:build
-        pnpm build
-        ```
-      </Step>
-      <Step title="Link the CLI">
-        Make the `openclaw` command available globally:
-
-        ```bash
-        pnpm link --global
-        ```
-
-        Alternatively, skip the link and run commands via `pnpm openclaw ...` from inside the repo.
-      </Step>
-      <Step title="Run onboarding">
-        ```bash
-        openclaw onboard --install-daemon
-        ```
-      </Step>
-    </Steps>
-
-    For deeper development workflows, see [Setup](/start/setup).
+    Extract and place the binary in your PATH.
 
   </Accordion>
 </AccordionGroup>
+
+## Build options
+
+### Debug build (faster compile, slower runtime)
+```bash
+cargo build
+```
+
+### Release build (slower compile, optimized runtime)
+```bash
+cargo build --release
+```
+
+### Run tests
+```bash
+cargo test                    # All tests
+cargo test --lib             # Library tests only
+cargo test --release         # Release mode tests
+```
+
+### Code quality
+```bash
+cargo clippy                 # Linting
+cargo fmt                    # Formatting
+cargo doc --open             # Generate docs
+```
 
 ## Other install methods
 
@@ -147,16 +96,7 @@ For VPS/cloud hosts, avoid third-party "1-click" marketplace images when possibl
     Containerized or headless deployments.
   </Card>
   <Card title="Podman" href="/install/podman" icon="container">
-    Rootless container: run `setup-podman.sh` once, then the launch script.
-  </Card>
-  <Card title="Nix" href="/install/nix" icon="snowflake">
-    Declarative install via Nix.
-  </Card>
-  <Card title="Ansible" href="/install/ansible" icon="server">
-    Automated fleet provisioning.
-  </Card>
-  <Card title="Bun" href="/install/bun" icon="zap">
-    CLI-only usage via the Bun runtime.
+    Rootless container deployment.
   </Card>
 </CardGroup>
 
@@ -165,54 +105,49 @@ For VPS/cloud hosts, avoid third-party "1-click" marketplace images when possibl
 Verify everything is working:
 
 ```bash
-openclaw doctor         # check for config issues
-openclaw status         # gateway status
-openclaw dashboard      # open the browser UI
+krabkrab doctor         # check for config issues
+krabkrab status         # gateway status
+krabkrab dashboard      # open the browser UI
 ```
 
 If you need custom runtime paths, use:
 
-- `OPENCLAW_HOME` for home-directory based internal paths
-- `OPENCLAW_STATE_DIR` for mutable state location
-- `OPENCLAW_CONFIG_PATH` for config file location
+- `KRABKRAB_CONFIG_DIR` for config directory
+- `KRABKRAB_DATA_DIR` for data directory
 
 See [Environment vars](/help/environment) for precedence and full details.
 
-## Troubleshooting: `openclaw` not found
+## Troubleshooting: `krabkrab` not found
 
 <Accordion title="PATH diagnosis and fix">
   Quick diagnosis:
 
 ```bash
-node -v
-npm -v
-npm prefix -g
+which krabkrab
 echo "$PATH"
 ```
 
-If `$(npm prefix -g)/bin` (macOS/Linux) or `$(npm prefix -g)` (Windows) is **not** in your `$PATH`, your shell can't find global npm binaries (including `openclaw`).
+If the directory containing `krabkrab` is **not** in your `$PATH`, your shell can't find the binary.
 
 Fix — add it to your shell startup file (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
-export PATH="$(npm prefix -g)/bin:$PATH"
+export PATH="/path/to/krabkrab:$PATH"
 ```
 
-On Windows, add the output of `npm prefix -g` to your PATH.
-
-Then open a new terminal (or `rehash` in zsh / `hash -r` in bash).
+Then open a new terminal (or `source ~/.zshrc` / `source ~/.bashrc`).
 </Accordion>
 
 ## Update / uninstall
 
 <CardGroup cols={3}>
   <Card title="Updating" href="/install/updating" icon="refresh-cw">
-    Keep OpenClaw up to date.
+    Keep OpenKrab up to date.
   </Card>
   <Card title="Migrating" href="/install/migrating" icon="arrow-right">
     Move to a new machine.
   </Card>
   <Card title="Uninstall" href="/install/uninstall" icon="trash-2">
-    Remove OpenClaw completely.
+    Remove OpenKrab completely.
   </Card>
 </CardGroup>

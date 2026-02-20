@@ -1,5 +1,5 @@
 //! signal — Signal channel connector.
-//! Ported from `openclaw/extensions/signal/` (Phase 5-6).
+//! Ported from `openkrab/extensions/signal/` (Phase 5-6).
 
 use crate::common::{Message, UserId};
 use serde::{Deserialize, Serialize};

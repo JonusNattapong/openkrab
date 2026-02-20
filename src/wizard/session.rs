@@ -1,5 +1,5 @@
 //! Wizard session — drives the step-by-step wizard via a push/pull model.
-//! Ported from `openclaw/src/wizard/session.ts`
+//! Ported from `openkrab/src/wizard/session.ts`
 //!
 //! The session allows the wizard logic (which calls `prompter.select()`, etc.)
 //! to be driven externally — e.g. from a gateway protocol that sends steps

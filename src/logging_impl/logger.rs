@@ -109,7 +109,7 @@ fn resolve_settings() -> LoggerResolvedSettings {
     let cfg = override_settings.as_ref();
 
     let default_level = if std::env::var("VITEST").ok().as_deref() == Some("true")
-        && std::env::var("OPENCLAW_TEST_FILE_LOG").ok().as_deref() != Some("1")
+        && std::env::var("OPENKRAB_TEST_FILE_LOG").ok().as_deref() != Some("1")
     {
         LogLevel::Silent
     } else {

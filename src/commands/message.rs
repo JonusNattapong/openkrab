@@ -1,5 +1,5 @@
 //! message — Message sending commands.
-//! Ported from `openclaw/src/commands/message.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/message.ts` (Phase 6).
 
 use crate::common::Message;
 

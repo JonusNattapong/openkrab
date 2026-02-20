@@ -1,5 +1,5 @@
 //! llm_task — LLM task execution extension.
-//! Ported from `openclaw/extensions/llm-task/` (Phase 12).
+//! Ported from `openkrab/extensions/llm-task/` (Phase 12).
 //!
 //! Provides structured LLM task definitions with typed inputs/outputs,
 //! retry logic, and result caching for agentic workflows.

@@ -1,5 +1,5 @@
 //! BlueBubbles reaction handling.
-//! Ported from openclaw/extensions/bluebubbles/src/reactions.ts
+//! Ported from openkrab/extensions/bluebubbles/src/reactions.ts
 
 use serde::{Deserialize, Serialize};
 

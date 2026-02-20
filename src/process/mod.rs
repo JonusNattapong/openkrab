@@ -1,5 +1,5 @@
 //! process — Subprocess execution, command queue, and process supervision.
-//! Ported from `openclaw/src/process/` (Phase 8).
+//! Ported from `openkrab/src/process/` (Phase 8).
 //!
 //! Provides safe subprocess spawning, a sequential command queue,
 //! kill-tree utilities, and a simple supervisor for restarting crashed children.

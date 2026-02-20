@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/entry-status.ts`
+//! Port of `openkrab/src/shared/entry-status.ts`
 //!
 //! Evaluates entry metadata requirements for plugins/extensions, combining
 //! emoji/homepage resolution with requirement checks.

@@ -1,5 +1,5 @@
 //! providers::copilot_models — GitHub Copilot model list and definition builder.
-//! Ported from `openclaw/src/providers/github-copilot-models.ts` (Phase 16).
+//! Ported from `openkrab/src/providers/github-copilot-models.ts` (Phase 16).
 //!
 //! Provides the default Copilot model IDs and a builder for OpenAI-compatible
 //! model definitions with Copilot-specific cost/context defaults.

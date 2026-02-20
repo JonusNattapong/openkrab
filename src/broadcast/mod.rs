@@ -1,5 +1,5 @@
 //! broadcast — Broadcast group management.
-//! Ported from `openclaw/src/web/auto-reply.broadcast-groups.*` (Phase 10).
+//! Ported from `openkrab/src/web/auto-reply.broadcast-groups.*` (Phase 10).
 //!
 //! Allows the agent to fan-out a single message to multiple recipient groups
 //! across multiple connectors in a configurable order.

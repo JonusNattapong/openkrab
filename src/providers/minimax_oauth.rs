@@ -1,5 +1,5 @@
 //! providers::minimax_oauth — MiniMax Portal device-code OAuth.
-//! Ported from `openclaw/extensions/minimax-portal-auth/oauth.ts` (Phase 15).
+//! Ported from `openkrab/extensions/minimax-portal-auth/oauth.ts` (Phase 15).
 //!
 //! MiniMax uses a device-code–style flow:
 //!   1. Request a `user_code` + `verification_uri` from the code endpoint.

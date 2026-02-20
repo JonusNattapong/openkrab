@@ -1,5 +1,5 @@
 //! plugins — Plugin system: manifest, registry, loader, hooks.
-//! Ported from `openclaw/src/plugins/` (Phase 9).
+//! Ported from `openkrab/src/plugins/` (Phase 9).
 
 use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};

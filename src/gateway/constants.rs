@@ -16,7 +16,7 @@ pub fn get_max_chat_history_messages_bytes() -> usize {
 
 #[cfg(test)]
 pub fn __set_max_chat_history_messages_bytes_for_test(value: Option<usize>) {
-    if std::env::var("VITEST").is_ok() || std::env::var("OPENCLAW_TEST").is_ok() {
+    if std::env::var("VITEST").is_ok() || std::env::var("OPENKRAB_TEST").is_ok() {
         let mut lock = MAX_CHAT_HISTORY_MESSAGES_BYTES.lock().unwrap();
         *lock = value.unwrap_or(DEFAULT_MAX_CHAT_HISTORY_MESSAGES_BYTES);
     }
@@ -25,8 +25,8 @@ pub fn __set_max_chat_history_messages_bytes_for_test(value: Option<usize>) {
 pub const DEFAULT_HANDSHAKE_TIMEOUT_MS: u64 = 10_000;
 
 pub fn get_handshake_timeout_ms() -> u64 {
-    if cfg!(test) && std::env::var("OPENCLAW_TEST_HANDSHAKE_TIMEOUT_MS").is_ok() {
-        if let Ok(parsed) = std::env::var("OPENCLAW_TEST_HANDSHAKE_TIMEOUT_MS")
+    if cfg!(test) && std::env::var("OPENKRAB_TEST_HANDSHAKE_TIMEOUT_MS").is_ok() {
+        if let Ok(parsed) = std::env::var("OPENKRAB_TEST_HANDSHAKE_TIMEOUT_MS")
             .unwrap()
             .parse::<u64>()
         {

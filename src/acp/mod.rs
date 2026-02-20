@@ -1,5 +1,5 @@
 //! acp — Agent Communication Protocol types, client and server stubs.
-//! Ported from `openclaw/src/acp/` (Phase 9).
+//! Ported from `openkrab/src/acp/` (Phase 9).
 //!
 //! ACP provides a structured JSON-over-HTTP/WS protocol so external processes
 //! (e.g. desktop apps, mobile apps) can communicate with a running krabkrab

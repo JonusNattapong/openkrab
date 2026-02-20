@@ -1,5 +1,5 @@
 //! status_daemon — Daemon status checking for status command.
-//! Ported from `openclaw/src/commands/status.daemon.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/status.daemon.ts` (Phase 6).
 
 use std::process::Command;
 

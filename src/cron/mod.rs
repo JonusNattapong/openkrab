@@ -1,5 +1,5 @@
 //! cron — Cron job scheduler.
-//! Ported from `openclaw/src/cron/` (Phase 6).
+//! Ported from `openkrab/src/cron/` (Phase 6).
 //!
 //! Provides a persistent cron-like scheduler for recurring agent tasks.
 //! Jobs are stored in `memory/schedule.json` and evaluated against the

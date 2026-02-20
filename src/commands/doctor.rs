@@ -1,5 +1,5 @@
 //! doctor — Comprehensive system health check and repair command.
-//! Ported from `openclaw/src/commands/doctor.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/doctor.ts` (Phase 6).
 
 use crate::commands::{doctor_auth, doctor_gateway, doctor_sandbox, doctor_security};
 use crate::config::AppConfig;

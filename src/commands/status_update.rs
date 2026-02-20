@@ -1,5 +1,5 @@
 //! status_update — Update checking for status command.
-//! Ported from `openclaw/src/commands/status.update.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/status.update.ts` (Phase 6).
 
 use serde::{Deserialize, Serialize};
 

@@ -1,5 +1,5 @@
 //! connectors::zalouser — Zalo Personal Account connector via `zca` CLI.
-//! Ported from `openclaw/extensions/zalouser/` (Phase 21).
+//! Ported from `openkrab/extensions/zalouser/` (Phase 21).
 //!
 //! Wraps the `zca` CLI (https://zca-cli.dev) to provide Zalo personal account
 //! messaging, presence monitoring, directory lookup, and agent tool support.

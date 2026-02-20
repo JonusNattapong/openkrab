@@ -1,4 +1,4 @@
-//! Discord HTTP API client — ported from `openclaw/src/discord/send.*.ts`.
+//! Discord HTTP API client — ported from `openkrab/src/discord/send.*.ts`.
 //!
 //! Provides comprehensive Discord API functionality:
 //! - Message send/edit/delete/pin/fetch

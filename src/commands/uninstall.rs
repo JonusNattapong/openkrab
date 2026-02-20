@@ -1,5 +1,5 @@
 //! uninstall — Uninstall krabkrab command.
-//! Ported from `openclaw/src/commands/uninstall.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/uninstall.ts` (Phase 6).
 
 use std::path::PathBuf;
 

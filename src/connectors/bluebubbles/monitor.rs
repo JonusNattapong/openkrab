@@ -1,5 +1,5 @@
 //! BlueBubbles webhook monitor.
-//! Ported from openclaw/extensions/bluebubbles/src/monitor.ts
+//! Ported from openkrab/extensions/bluebubbles/src/monitor.ts
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

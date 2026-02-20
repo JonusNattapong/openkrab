@@ -1,5 +1,5 @@
 //! signal::monitor — Signal message monitor with daemon management.
-//! Ported from `openclaw/src/signal/monitor.ts` (Phase 13).
+//! Ported from `openkrab/src/signal/monitor.ts` (Phase 13).
 
 use anyhow::Result;
 use futures_util::StreamExt;

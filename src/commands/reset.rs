@@ -1,5 +1,5 @@
 //! reset — Reset/cleanup command.
-//! Ported from `openclaw/src/commands/reset.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/reset.ts` (Phase 6).
 
 use std::path::PathBuf;
 

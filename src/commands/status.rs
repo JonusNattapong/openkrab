@@ -1,5 +1,5 @@
 //! status — System status command with comprehensive health checks.
-//! Ported from `openclaw/src/commands/status.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/status.ts` (Phase 6).
 
 use crate::commands::{
     status_daemon::{

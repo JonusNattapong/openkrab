@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/chat-content.ts`
+//! Port of `openkrab/src/shared/chat-content.ts`
 //!
 //! Extract plain text from chat completion content blocks.
 //! Content may be a plain string *or* an array of `{ type: "text", text: "..." }` blocks

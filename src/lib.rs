@@ -1,4 +1,4 @@
-//! krabkrab — incremental Rust port of `openclaw` (TypeScript → Rust).
+//! krabkrab — incremental Rust port of `openkrab` (TypeScript → Rust).
 
 pub mod acp;
 pub mod agents;

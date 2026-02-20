@@ -1,8 +1,8 @@
 # OpenKrab — Personal AI Assistant (Rust Edition)
 
 <p align="center">
-  <a href="https://github.com/JonusNattapong/openkrab/actions/workflows/rust.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/JonusNattapong/openkrab/rust.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://github.com/JonusNattapong/openkrab/releases"><img src="https://img.shields.io/github/v/release/JonusNattapong/openkrab?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
+  <a href="https://github.com/openkrab/openkrab/actions/workflows/rust.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/openkrab/openkrab/rust.yml?branch=main&style=for-the-badge" alt="CI status"></a>
+  <a href="https://github.com/openkrab/openkrab/releases"><img src="https://img.shields.io/github/v/release/openkrab/openkrab?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/Rust-1.75+-orange?style=for-the-badge" alt="Rust">
   <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=for-the-badge" alt="Status">
@@ -40,7 +40,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 
 ### 🔒 Enterprise Security
 - **DM pairing** — Unknown senders get pairing codes
-- **Allowlists** — `allowFrom` controls who can interact
+- **Allowlists** — `allow_from` controls who can interact
 - **Rate limiting** — Per-user and global rate limits
 - **Input sanitization** — XSS prevention, content filtering
 - **Sandbox mode** — Docker isolation for non-main sessions
@@ -56,11 +56,24 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **Microphone capture** — Real-time audio input
 
 ### 🔌 Plugin System
-- **WASM runtime** — Cross-platform plugin execution
+- **WASM runtime** — Cross-platform plugin execution via Wasmtime
 - **Hot reload** — Development workflow with auto-reload
 - **Sandboxing** — Security isolation (4 levels)
 - **Dynamic loading** — Native libraries + WASM
 - **Hook system** — Event-driven plugin architecture
+
+### 🌐 Browser Automation
+- **CDP (Chrome DevTools Protocol)** — Full browser control
+- **Connection pooling** — Efficient session management
+- **Multi-tab support** — Handle multiple browser tabs
+- **Screenshots & snapshots** — Visual testing and debugging
+- **Network interception** — Monitor and modify requests
+
+### 🎨 Canvas/A2UI
+- **Agent-to-UI protocol** — Render dynamic interfaces
+- **Surface management** — Multiple canvas surfaces
+- **Component system** — Reusable UI components
+- **Theme support** — Customizable appearance
 
 ---
 
@@ -84,7 +97,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 
 ```bash
 # Clone the repository
-git clone https://github.com/JonusNattapong/openkrab.git
+git clone https://github.com/openkrab/openkrab.git
 cd openkrab
 
 # Build optimized release binary
@@ -96,7 +109,7 @@ cargo build --release
 
 ### Pre-built Binaries
 
-Download from [GitHub Releases](https://github.com/JonusNattapong/openkrab/releases) for your platform:
+Download from [GitHub Releases](https://github.com/openkrab/openkrab/releases) for your platform:
 - Linux (x64, ARM64)
 - macOS (Intel, Apple Silicon)
 - Windows (x64)
@@ -141,6 +154,10 @@ krabkrab configure
 krabkrab memory sync --path ./docs
 krabkrab memory search "machine learning concepts"
 krabkrab memory index --recursive ./knowledge-base
+
+# Browser automation
+krabkrab browser open https://example.com
+krabkrab browser screenshot
 ```
 
 ---
@@ -151,7 +168,7 @@ The system is organized around a gateway control plane that receives channel eve
 
 ```mermaid
 flowchart TB
-    subgraph Clients["Clients"]
+    subgraph Clients["Messaging Channels"]
         Telegram["Telegram"]
         Slack["Slack"]
         Discord["Discord"]
@@ -161,22 +178,23 @@ flowchart TB
         WebChat["WebChat"]
     end
 
-    subgraph GatewayPlane["Gateway"]
-        GatewayCore["WebSocket and HTTP Server (Tokio)"]
+    subgraph GatewayPlane["Gateway (Rust/Tokio)"]
+        GatewayCore["WebSocket and HTTP Server"]
         Sessions["Sessions Manager"]
         Channels["Channels Registry"]
-        Auth["Authentication and Rate Control"]
+        Auth["Authentication & Rate Control"]
     end
 
     subgraph Runtime["Core Runtime"]
-        Agents["Agents - AI loop and orchestration"]
-        Memory["Memory - vector and full-text search"]
+        Agents["AI Agents"]
+        Memory["Memory - Vector + Full-text Search"]
         Providers["Model Providers"]
-        Tools["Tools - shell, web, media, browser"]
+        Tools["Tools - Shell, Web, Media, Browser"]
+        Voice["Voice - Wake/VAD/TTS"]
     end
 
-    subgraph Plugins["Plugin System"]
-        WASM["WASM Runtime"]
+    subgraph Plugins["Plugin System (WASM)"]
+        WASM["Wasmtime Runtime"]
         HotReload["Hot Reload"]
         Sandbox["Sandbox Security"]
     end
@@ -193,38 +211,39 @@ flowchart TB
     GatewayCore --> Memory
     GatewayCore --> Providers
     GatewayCore --> Tools
+    GatewayCore --> Voice
 
     Agents --> Plugins
 ```
 
 ---
 
-## 📱 Supported Channels
+## 📱 Supported Channels (18 Platforms)
 
-| Channel | Status | Features | File |
-|---------|--------|----------|------|
-| **Telegram** | ✅ Complete | Bot API, polling, webhooks, media | [`telegram.rs`](src/connectors/telegram.rs) |
-| **Discord** | ✅ Complete | Gateway, threads, reactions, presence | [`discord.rs`](src/connectors/discord.rs) |
-| **Slack** | ✅ Complete | Bolt events, blocks, threading | [`slack/`](src/slack/) |
-| **WhatsApp** | ✅ Complete | Cloud API, Business API | [`whatsapp/`](src/whatsapp/) |
-| **Signal** | ✅ Complete | signal-cli integration | [`signal/`](src/signal/) |
-| **iMessage** | ✅ Complete | BlueBubbles bridge | [`bluebubbles/`](src/connectors/bluebubbles/) |
-| **Matrix** | ✅ Complete | Matrix.org protocol | [`matrix/`](src/matrix/) |
-| **Google Chat** | ✅ Complete | Chat API | [`googlechat.rs`](src/connectors/googlechat.rs) |
-| **IRC** | ✅ Complete | IRC protocol | [`irc.rs`](src/connectors/irc.rs) |
-| **Microsoft Teams** | ✅ Complete | Bot Framework | [`msteams.rs`](src/connectors/msteams.rs) |
-| **Mattermost** | ✅ Complete | Webhooks | [`mattermost.rs`](src/connectors/mattermost.rs) |
-| **Twitch** | ✅ Complete | IRC + API | [`twitch.rs`](src/connectors/twitch.rs) |
-| **Zalo** | ✅ Complete | Zalo API | [`zalo.rs`](src/connectors/zalo.rs) |
-| **Feishu/Lark** | ✅ Complete | Lark API | [`feishu.rs`](src/connectors/feishu.rs) |
-| **Nextcloud Talk** | ✅ Complete | Talk API | [`nextcloud_talk.rs`](src/connectors/nextcloud_talk.rs) |
-| **Nostr** | ✅ Complete | Nostr protocol | [`nostr.rs`](src/connectors/nostr.rs) |
-| **LINE** | ✅ Complete | LINE API | [`line.rs`](src/connectors/line.rs) |
-| **WebChat** | ✅ Complete | WebSocket/HTTP | [`web_connector/`](src/web_connector/) |
+| Channel | Status | Features | Lines |
+|---------|--------|----------|-------|
+| **Telegram** | ✅ Complete | Bot API, polling, webhooks, media | ~1,200 |
+| **Discord** | ✅ Complete | Gateway, threads, reactions, moderation | ~2,500 |
+| **Slack** | ✅ Complete | Bolt events, blocks, threading | ~1,800 |
+| **WhatsApp** | ✅ Complete | Cloud API, Business API | ~1,500 |
+| **Signal** | ✅ Complete | signal-cli integration | ~800 |
+| **iMessage** | ✅ Complete | BlueBubbles bridge | ~1,200 |
+| **Matrix** | ✅ Complete | Matrix.org protocol | ~900 |
+| **Google Chat** | ✅ Complete | Chat API | ~600 |
+| **IRC** | ✅ Complete | IRC protocol | ~500 |
+| **Microsoft Teams** | ✅ Complete | Bot Framework | ~700 |
+| **Mattermost** | ✅ Complete | Webhooks | ~400 |
+| **Twitch** | ✅ Complete | IRC + API | ~600 |
+| **Zalo** | ✅ Complete | Zalo API | ~500 |
+| **Feishu/Lark** | ✅ Complete | Lark API | ~450 |
+| **Nextcloud Talk** | ✅ Complete | Talk API | ~400 |
+| **Nostr** | ✅ Complete | Nostr protocol | ~550 |
+| **LINE** | ✅ Complete | LINE API | ~600 |
+| **WebChat** | ✅ Complete | WebSocket/HTTP | ~800 |
 
 ---
 
-## 🤖 AI Providers
+## 🤖 AI Providers (7+ Providers)
 
 | Provider | Status | Auth | Models |
 |----------|--------|------|--------|
@@ -315,26 +334,48 @@ Create `plugin.json`:
 
 ---
 
-## 📊 Porting Status
+## 🌐 Browser Automation
 
-**Status: Complete — all planned porting phases finalized.**
+```bash
+# Browser control
+krabkrab browser open https://example.com
+krabkrab browser tabs
+krabkrab browser navigate https://example.com
+krabkrab browser click "#button"
+krabkrab browser type "#input" "Hello World"
+krabkrab browser screenshot
+krabkrab browser snapshot
 
-| Phase | Module(s) | Lines | Status |
-|-------|-----------|-------|--------|
-| **1-4** | Core (common, config, channels, CLI) | ~10,000 | ✅ Complete |
-| **5-6** | Agents + Tools | ~8,000 | ✅ Complete |
-| **7-8** | Gateway + Providers | ~12,000 | ✅ Complete |
-| **9-10** | Memory + Media | ~10,000 | ✅ Complete |
-| **11-12** | Infrastructure + Commands | ~6,000 | ✅ Complete |
-| **13-14** | Signal/Matrix + OAuth | ~5,000 | ✅ Complete |
-| **15-16** | Provider auth wiring | ~3,000 | ✅ Complete |
-| **17-18** | Discord + Security hardening | ~5,000 | ✅ Complete |
-| **19-20** | BlueBubbles + Release | ~3,000 | ✅ Complete |
-| **Enhancements** | Voice + Plugin System | ~56,276 | ✅ Complete |
+# Profile management
+krabkrab browser profiles
+krabkrab browser create-profile --name my-profile
+```
 
-**Total: 56,276 lines of Rust** (vs 27,139 lines of TypeScript)
+---
 
-**Test Coverage: 410+ tests, 0 failures**
+## 📊 Codebase Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Total Lines** | ~56,276 lines of Rust |
+| **Test Coverage** | 410+ tests, 0 failures |
+| **Porting Phases** | 24/24 complete |
+| **Channels** | 18 messaging platforms |
+| **AI Providers** | 7+ LLM providers |
+| **Core Modules** | 62 Rust modules |
+
+### Module Breakdown
+
+| Module | Lines | Description |
+|--------|-------|-------------|
+| Browser | 2,708 | CDP automation with pooling |
+| Canvas/A2UI | 452 | Agent-to-UI protocol |
+| Hooks | 177 | Event system |
+| Voice | ~5,000 | Wake/VAD/TTS pipeline |
+| Memory | ~10,000 | Vector + text search |
+| Plugins | ~6,000 | WASM runtime |
+| Gateway | ~12,000 | WebSocket/HTTP server |
+| Agents | ~8,000 | AI runtime + tools |
 
 ---
 
@@ -379,20 +420,24 @@ Migration tool:
 krabkrab migrate --from-openclaw ~/.clawdbot/config.json
 ```
 
+See [Migration Guide](docs/install/migrating.md) for detailed instructions.
+
 ---
 
 ## 📚 Documentation
 
+- [Migration Guide](docs/install/migrating.md) — Migrating from OpenClaw
 - [PORTING.md](PORTING.md) — Detailed porting status
 - [AGENT.md](AGENT.md) — Agent development guide
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
 - [SECURITY.md](SECURITY.md) — Security practices
+- [CHANGELOG.md](CHANGELOG.md) — Release history
 
 ---
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=JonusNattapong/openkrab&type=date)](https://www.star-history.com/#JonusNattapong/openkrab&type=date)
+[![Star History Chart](https://api.star-history.com/svg?repos=openkrab/openkrab&type=date)](https://www.star-history.com/#openkrab/openkrab&type=date)
 
 ---
 

@@ -1,5 +1,5 @@
 //! markdown — Markdown processing and chunking utilities.
-//! Ported from `openclaw/src/markdown/` (Phase 6).
+//! Ported from `openkrab/src/markdown/` (Phase 6).
 //!
 //! Provides heading-aware chunking (used by the memory indexer),
 //! front-matter extraction, and basic text utilities for Markdown content.

@@ -1,5 +1,5 @@
 //! nostr — Nostr decentralized messaging connector.
-//! Ported from `openclaw/extensions/nostr/` (Phase 12).
+//! Ported from `openkrab/extensions/nostr/` (Phase 12).
 //!
 //! Uses NIP-01 (basic protocol) and NIP-04 (encrypted DMs).
 //! Reference: https://github.com/nostr-protocol/nostr

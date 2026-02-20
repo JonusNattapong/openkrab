@@ -1,5 +1,5 @@
 //! routing — Message routing and dispatch logic.
-//! Ported from `openclaw/src/routing/` (Phase 5).
+//! Ported from `openkrab/src/routing/` (Phase 5).
 //!
 //! Responsible for deciding which connector / channel should handle an
 //! inbound message and where the reply should be delivered.

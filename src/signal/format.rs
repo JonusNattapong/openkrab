@@ -1,5 +1,5 @@
 //! signal::format — Signal text formatting and markdown conversion.
-//! Ported from `openclaw/src/signal/format.ts` (Phase 13).
+//! Ported from `openkrab/src/signal/format.ts` (Phase 13).
 
 /// Signal text style types.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

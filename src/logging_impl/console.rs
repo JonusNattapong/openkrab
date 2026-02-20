@@ -52,7 +52,7 @@ const SUPPRESSED_CONSOLE_PREFIXES: &[&str] = &[
 ];
 
 fn is_verbose() -> bool {
-    std::env::var("OPENCLAW_VERBOSE")
+    std::env::var("OPENKRAB_VERBOSE")
         .map(|v| v == "1" || v.to_lowercase() == "true")
         .unwrap_or(false)
 }
@@ -62,7 +62,7 @@ fn normalize_console_level(level: Option<&str>) -> LogLevel {
         return LogLevel::Debug;
     }
     if std::env::var("VITEST").ok().as_deref() == Some("true")
-        && std::env::var("OPENCLAW_TEST_CONSOLE").ok().as_deref() != Some("1")
+        && std::env::var("OPENKRAB_TEST_CONSOLE").ok().as_deref() != Some("1")
     {
         return LogLevel::Silent;
     }

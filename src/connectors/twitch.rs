@@ -1,5 +1,5 @@
 //! twitch — Twitch chat connector (IRC-based).
-//! Ported from `openclaw/extensions/twitch/` (Phase 11).
+//! Ported from `openkrab/extensions/twitch/` (Phase 11).
 //!
 //! Twitch chat uses IRC over TLS (irc.chat.twitch.tv:6697).
 //! Authentication is done with an OAuth token as the password.

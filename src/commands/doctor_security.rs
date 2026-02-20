@@ -1,5 +1,5 @@
 //! doctor_security — Security checks for doctor command.
-//! Ported from `openclaw/src/commands/doctor-security.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/doctor-security.ts` (Phase 6).
 
 use crate::config::AppConfig;
 use crate::security::{validate_sandbox_security, SandboxConfig};

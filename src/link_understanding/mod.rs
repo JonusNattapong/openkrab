@@ -1,5 +1,5 @@
 //! link_understanding — URL preview and link metadata extraction.
-//! Ported from `openclaw/src/link-understanding/` (Phase 7).
+//! Ported from `openkrab/src/link-understanding/` (Phase 7).
 //!
 //! Fetches and parses Open Graph / Twitter Card / title metadata from URLs
 //! so the agent can produce rich link previews.

@@ -1,5 +1,5 @@
 //! Wizard prompter trait and common types.
-//! Ported from `openclaw/src/wizard/prompts.ts`
+//! Ported from `openkrab/src/wizard/prompts.ts`
 
 use std::fmt;
 

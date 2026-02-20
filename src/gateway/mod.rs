@@ -1,5 +1,5 @@
 //! gateway — WebSocket + HTTP server for real-time communication.
-//! Ported from `openclaw/src/gateway/` (Phase 7-8).
+//! Ported from `openkrab/src/gateway/` (Phase 7-8).
 //!
 //! Core infrastructure for real-time communication and API services.
 

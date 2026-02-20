@@ -1,5 +1,5 @@
 //! pairing — Device pairing / multi-device account management.
-//! Ported from `openclaw/src/pairing/` (Phase 7).
+//! Ported from `openkrab/src/pairing/` (Phase 7).
 //!
 //! Manages short-lived pairing tokens so users can link a new device
 //! (e.g. a phone) to an existing krabkrab agent account.

@@ -1,5 +1,5 @@
 //! doctor_sandbox — Sandbox health checks for doctor command.
-//! Ported from `openclaw/src/commands/doctor-sandbox.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/doctor-sandbox.ts` (Phase 6).
 
 use crate::config::AppConfig;
 use std::process::Command;

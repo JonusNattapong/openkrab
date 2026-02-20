@@ -1,5 +1,5 @@
 //! hooks — Plugin / hook registry.
-//! Ported from `openclaw/src/hooks/` (Phase 6).
+//! Ported from `openkrab/src/hooks/` (Phase 6).
 //!
 //! Provides a lightweight synchronous hook system that allows modules to
 //! register callbacks for named lifecycle events without tight coupling.

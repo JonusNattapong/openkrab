@@ -1,5 +1,5 @@
 //! providers::gemini_cli_auth — Gemini CLI credential extractor.
-//! Ported from `openclaw/extensions/google-gemini-cli-auth/oauth.ts` (Phase 15).
+//! Ported from `openkrab/extensions/google-gemini-cli-auth/oauth.ts` (Phase 15).
 //!
 //! Locates the installed `gemini` binary, finds the bundled `oauth2.js` file,
 //! and regex-extracts the embedded OAuth client_id / client_secret.

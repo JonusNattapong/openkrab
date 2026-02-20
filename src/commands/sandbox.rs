@@ -1,5 +1,5 @@
 //! sandbox — Sandbox management commands.
-//! Ported from `openclaw/src/commands/sandbox.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/sandbox.ts` (Phase 6).
 
 use crate::commands::doctor_sandbox::{
     docker_image_exists, is_docker_available, DEFAULT_SANDBOX_BROWSER_IMAGE,

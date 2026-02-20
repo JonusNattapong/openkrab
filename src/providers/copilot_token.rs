@@ -1,5 +1,5 @@
 //! providers::copilot_token — GitHub Copilot session token resolver.
-//! Ported from `openclaw/src/providers/github-copilot-token.ts` (Phase 15).
+//! Ported from `openkrab/src/providers/github-copilot-token.ts` (Phase 15).
 //!
 //! Fetches a short-lived Copilot API token from GitHub using a stored OAuth token,
 //! with file-based caching and `proxy-ep=` base-URL derivation.

@@ -1,5 +1,5 @@
 //! BlueBubbles chat operations (group management).
-//! Ported from openclaw/extensions/bluebubbles/src/chat.ts
+//! Ported from openkrab/extensions/bluebubbles/src/chat.ts
 
 use serde::{Deserialize, Serialize};
 

@@ -1,5 +1,5 @@
 //! providers — LLM provider registry and trait.
-//! Ported from `openclaw/src/providers/` (Phase 5).
+//! Ported from `openkrab/src/providers/` (Phase 5).
 //!
 //! Provides a unified `LlmProvider` trait and a `ProviderRegistry` for
 //! selecting chat / embedding backends by name at runtime.

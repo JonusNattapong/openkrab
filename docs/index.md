@@ -1,71 +1,110 @@
 ---
-summary: "OpenClaw is a multi-channel gateway for AI agents that runs on any OS."
+summary: "OpenKrab is a personal AI assistant in Rust with multi-channel gateway capabilities."
 read_when:
-  - Introducing OpenClaw to newcomers
-title: "OpenClaw"
+  - Introducing OpenKrab to newcomers
+title: "OpenKrab"
 ---
 
-# OpenClaw 🦞
+# OpenKrab 🦀
 
 <p align="center">
     <img
-        src="/assets/openclaw-logo-text-dark.png"
-        alt="OpenClaw"
+        src="/assets/openkrab-logo-text-dark.png"
+        alt="OpenKrab"
         width="500"
         class="dark:hidden"
     />
     <img
-        src="/assets/openclaw-logo-text.png"
-        alt="OpenClaw"
+        src="/assets/openkrab-logo-text.png"
+        alt="OpenKrab"
         width="500"
         class="hidden dark:block"
     />
 </p>
 
-> _"EXFOLIATE! EXFOLIATE!"_ — A space lobster, probably
+> _"EXFOLIATE! EXFOLIATE!"_ — Molty, a space lobster
 
 <p align="center">
-  <strong>Any OS gateway for AI agents across WhatsApp, Telegram, Discord, iMessage, and more.</strong><br />
-  Send a message, get an agent response from your pocket. Plugins add Mattermost and more.
+  <strong>High-performance AI assistant in Rust with multi-channel gateway.</strong><br />
+  Connect Telegram, Slack, Discord, WhatsApp, Signal, iMessage, and more to your personal AI.
 </p>
 
 <Columns>
   <Card title="Get Started" href="/start/getting-started" icon="rocket">
-    Install OpenClaw and bring up the Gateway in minutes.
+    Install OpenKrab and bring up the Gateway in minutes.
   </Card>
-  <Card title="Run the Wizard" href="/start/wizard" icon="sparkles">
-    Guided setup with `openclaw onboard` and pairing flows.
+  <Card title="Configure" href="/start/configuration" icon="settings">
+    Set up your AI providers and messaging channels.
   </Card>
-  <Card title="Open the Control UI" href="/web/control-ui" icon="layout-dashboard">
+  <Card title="Web Dashboard" href="/web/dashboard" icon="layout-dashboard">
     Launch the browser dashboard for chat, config, and sessions.
   </Card>
 </Columns>
 
-## What is OpenClaw?
+## What is OpenKrab?
 
-OpenClaw is a **self-hosted gateway** that connects your favorite chat apps — WhatsApp, Telegram, Discord, iMessage, and more — to AI coding agents like Pi. You run a single Gateway process on your own machine (or a server), and it becomes the bridge between your messaging apps and an always-available AI assistant.
+OpenKrab is a **personal AI assistant** written in **Rust** that connects your favorite chat apps — Telegram, Slack, Discord, WhatsApp, Signal, iMessage, and more — to AI agents. It provides native performance, memory safety, and efficient resource usage for self-hosted deployment.
 
-**Who is it for?** Developers and power users who want a personal AI assistant they can message from anywhere — without giving up control of their data or relying on a hosted service.
+**Who is it for?** Developers and power users who want a fast, secure, personal AI assistant they can message from anywhere — without giving up control of their data or relying on hosted services.
 
 **What makes it different?**
 
-- **Self-hosted**: runs on your hardware, your rules
-- **Multi-channel**: one Gateway serves WhatsApp, Telegram, Discord, and more simultaneously
-- **Agent-native**: built for coding agents with tool use, sessions, memory, and multi-agent routing
+- **Rust-powered**: Native performance, memory safety, single binary deployment
+- **Multi-channel**: One Gateway serves Telegram, Slack, Discord, WhatsApp, Signal, and more simultaneously
+- **AI-native**: Built for AI agents with tool use, sessions, memory (vector + text search), and multi-agent routing
+- **Voice-enabled**: Wake word detection, talk mode, VAD, and audio processing
+- **Plugin system**: WASM runtime with hot reload and sandboxing
 - **Open source**: MIT licensed, community-driven
 
-**What do you need?** Node 22+, an API key (Anthropic recommended), and 5 minutes.
+**What do you need?** Rust 1.75+ (or pre-built binary), an API key (OpenAI/Anthropic/Gemini), and 5 minutes.
 
 ## How it works
 
 ```mermaid
-flowchart LR
-  A["Chat apps + plugins"] --> B["Gateway"]
-  B --> C["Pi agent"]
-  B --> D["CLI"]
-  B --> E["Web Control UI"]
-  B --> F["macOS app"]
-  B --> G["iOS and Android nodes"]
+flowchart TB
+    subgraph Clients["Messaging Channels"]
+        Telegram["Telegram"]
+        Slack["Slack"]
+        Discord["Discord"]
+        WhatsApp["WhatsApp"]
+        Signal["Signal"]
+        iMessage["iMessage"]
+        WebChat["WebChat"]
+    end
+
+    subgraph GatewayPlane["Gateway (Rust/Tokio)"]
+        GatewayCore["WebSocket and HTTP Server"]
+        Sessions["Sessions Manager"]
+        Channels["Channels Registry"]
+        Auth["Authentication & Rate Control"]
+    end
+
+    subgraph Runtime["Core Runtime"]
+        Agents["AI Agents"]
+        Memory["Memory (Vector + Text Search)"]
+        Providers["Model Providers"]
+        Tools["Tools (shell, web, media)"]
+    end
+
+    subgraph Plugins["Plugin System"]
+        WASM["WASM Runtime"]
+        HotReload["Hot Reload"]
+    end
+
+    Telegram --> GatewayCore
+    Slack --> GatewayCore
+    Discord --> GatewayCore
+    WhatsApp --> GatewayCore
+    Signal --> GatewayCore
+    iMessage --> GatewayCore
+    WebChat --> GatewayCore
+
+    GatewayCore --> Agents
+    GatewayCore --> Memory
+    GatewayCore --> Providers
+    GatewayCore --> Tools
+
+    Agents --> Plugins
 ```
 
 The Gateway is the single source of truth for sessions, routing, and channel connections.
@@ -74,42 +113,49 @@ The Gateway is the single source of truth for sessions, routing, and channel con
 
 <Columns>
   <Card title="Multi-channel gateway" icon="network">
-    WhatsApp, Telegram, Discord, and iMessage with a single Gateway process.
+    Telegram, Slack, Discord, WhatsApp, Signal, iMessage with a single Gateway process.
   </Card>
-  <Card title="Plugin channels" icon="plug">
-    Add Mattermost and more with extension packages.
+  <Card title="Rust performance" icon="zap">
+    Native compiled binary, <100MB memory, instant startup.
   </Card>
   <Card title="Multi-agent routing" icon="route">
     Isolated sessions per agent, workspace, or sender.
   </Card>
-  <Card title="Media support" icon="image">
-    Send and receive images, audio, and documents.
+  <Card title="Memory system" icon="brain">
+    Hybrid vector + full-text search with temporal decay.
   </Card>
-  <Card title="Web Control UI" icon="monitor">
-    Browser dashboard for chat, config, sessions, and nodes.
+  <Card title="Voice system" icon="mic">
+    Wake word detection, VAD, talk mode, audio processing.
   </Card>
-  <Card title="Mobile nodes" icon="smartphone">
-    Pair iOS and Android nodes with Canvas support.
+  <Card title="Plugin system" icon="plug">
+    WASM runtime with hot reload and sandboxing.
   </Card>
 </Columns>
 
 ## Quick start
 
 <Steps>
-  <Step title="Install OpenClaw">
+  <Step title="Install OpenKrab">
     ```bash
-    npm install -g openclaw@latest
+    # From source
+    git clone https://github.com/openkrab/openkrab.git
+    cd openkrab
+    cargo build --release
     ```
   </Step>
-  <Step title="Onboard and install the service">
+  <Step title="Configure and start the Gateway">
     ```bash
-    openclaw onboard --install-daemon
+    # Set your AI provider
+    krabkrab config set providers.openai.api_key "sk-..."
+    
+    # Start the gateway
+    krabkrab gateway --port 18789
     ```
   </Step>
-  <Step title="Pair WhatsApp and start the Gateway">
+  <Step title="Send messages">
     ```bash
-    openclaw channels login
-    openclaw gateway --port 18789
+    krabkrab telegram --to @username --text "Hello from OpenKrab!"
+    krabkrab ask "What's on my calendar today?"
     ```
   </Step>
 </Steps>
@@ -118,34 +164,32 @@ Need the full install and dev setup? See [Quick start](/start/quickstart).
 
 ## Dashboard
 
-Open the browser Control UI after the Gateway starts.
+Open the browser dashboard after the Gateway starts.
 
 - Local default: [http://127.0.0.1:18789/](http://127.0.0.1:18789/)
 - Remote access: [Web surfaces](/web) and [Tailscale](/gateway/tailscale)
 
-<p align="center">
-  <img src="whatsapp-openclaw.jpg" alt="OpenClaw" width="420" />
-</p>
+## Configuration
 
-## Configuration (optional)
+Config lives at `~/.config/krabkrab/config.toml`.
 
-Config lives at `~/.openclaw/openclaw.json`.
-
-- If you **do nothing**, OpenClaw uses the bundled Pi binary in RPC mode with per-sender sessions.
-- If you want to lock it down, start with `channels.whatsapp.allowFrom` and (for groups) mention rules.
+- If you **do nothing**, OpenKrab uses default settings with OpenAI provider.
+- If you want to lock it down, start with `channels.telegram.allow_from` and rate limiting.
 
 Example:
 
-```json5
-{
-  channels: {
-    whatsapp: {
-      allowFrom: ["+15555550123"],
-      groups: { "*": { requireMention: true } },
-    },
-  },
-  messages: { groupChat: { mentionPatterns: ["@openclaw"] } },
-}
+```toml
+[channels.telegram]
+allow_from = ["@username"]
+rate_limit = 100
+
+[providers.openai]
+api_key = "sk-..."
+model = "gpt-4o"
+
+[memory]
+enabled = true
+embedding_provider = "openai"
 ```
 
 ## Start here
@@ -161,10 +205,10 @@ Example:
     SSH and tailnet access patterns.
   </Card>
   <Card title="Channels" href="/channels/telegram" icon="message-square">
-    Channel-specific setup for WhatsApp, Telegram, Discord, and more.
+    Channel-specific setup for Telegram, Slack, Discord, and more.
   </Card>
-  <Card title="Nodes" href="/nodes" icon="smartphone">
-    iOS and Android nodes with pairing and Canvas.
+  <Card title="Voice System" href="/tools/voice" icon="mic">
+    Wake word, talk mode, VAD, and audio processing.
   </Card>
   <Card title="Help" href="/help" icon="life-buoy">
     Common fixes and troubleshooting entry point.
@@ -175,16 +219,19 @@ Example:
 
 <Columns>
   <Card title="Full feature list" href="/concepts/features" icon="list">
-    Complete channel, routing, and media capabilities.
+    Complete channel, routing, memory, and voice capabilities.
+  </Card>
+  <Card title="Memory System" href="/concepts/memory" icon="brain">
+    Hybrid search, embeddings, and knowledge base.
   </Card>
   <Card title="Multi-agent routing" href="/concepts/multi-agent" icon="route">
     Workspace isolation and per-agent sessions.
   </Card>
   <Card title="Security" href="/gateway/security" icon="shield">
-    Tokens, allowlists, and safety controls.
+    Tokens, allowlists, sandboxing, and safety controls.
   </Card>
-  <Card title="Troubleshooting" href="/gateway/troubleshooting" icon="wrench">
-    Gateway diagnostics and common errors.
+  <Card title="Plugin System" href="/tools/plugin" icon="puzzle">
+    WASM runtime, hot reload, and sandboxing.
   </Card>
   <Card title="About and credits" href="/reference/credits" icon="info">
     Project origins, contributors, and license.

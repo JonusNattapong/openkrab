@@ -1,5 +1,5 @@
 //! Wizard types — shared type definitions for the onboarding wizard.
-//! Ported from `openclaw/src/wizard/onboarding.types.ts`
+//! Ported from `openkrab/src/wizard/onboarding.types.ts`
 
 use serde::{Deserialize, Serialize};
 
@@ -161,7 +161,10 @@ mod tests {
 
     #[test]
     fn gateway_bind_display() {
-        assert_eq!(GatewayBindMode::Loopback.to_string(), "Loopback (127.0.0.1)");
+        assert_eq!(
+            GatewayBindMode::Loopback.to_string(),
+            "Loopback (127.0.0.1)"
+        );
         assert_eq!(GatewayBindMode::Lan.to_string(), "LAN (0.0.0.0)");
     }
 

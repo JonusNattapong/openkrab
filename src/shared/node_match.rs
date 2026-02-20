@@ -1,4 +1,4 @@
-//! Port of `openclaw/src/shared/node-match.ts`
+//! Port of `openkrab/src/shared/node-match.ts`
 //!
 //! Node matching utilities for the pairing / device management layer.
 //! Given a query string, find matching nodes by ID, display name, or IP.

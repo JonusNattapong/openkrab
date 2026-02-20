@@ -1,5 +1,5 @@
 //! Onboarding wizard — the main flow that guides users through first-time setup.
-//! Ported from `openclaw/src/wizard/onboarding.ts`
+//! Ported from `openkrab/src/wizard/onboarding.ts`
 
 use anyhow::Result;
 use std::sync::Arc;

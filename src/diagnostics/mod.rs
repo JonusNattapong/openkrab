@@ -1,5 +1,5 @@
 //! diagnostics — Lightweight observability module.
-//! Ported from `openclaw/extensions/diagnostics-otel/` (Phase 13).
+//! Ported from `openkrab/extensions/diagnostics-otel/` (Phase 13).
 //!
 //! Provides span tracing, metric recording, and structured event logging
 //! without requiring the full OpenTelemetry SDK.

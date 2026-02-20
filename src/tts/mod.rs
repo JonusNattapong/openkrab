@@ -1,5 +1,5 @@
 //! tts — Text-to-Speech abstraction.
-//! Ported from `openclaw/src/tts/` (Phase 5).
+//! Ported from `openkrab/src/tts/` (Phase 5).
 //!
 //! Provides platform-aware TTS so the agent can speak replies on the host OS.
 //! On Windows: PowerShell `Add-Type`/`SpeakAsync`.

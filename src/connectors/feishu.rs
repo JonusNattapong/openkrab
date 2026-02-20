@@ -1,5 +1,5 @@
 //! feishu — Feishu/Lark connector.
-//! Ported from `openclaw/extensions/feishu/` (Phase 12).
+//! Ported from `openkrab/extensions/feishu/` (Phase 12).
 //!
 //! Uses the Feishu Open Platform API.
 //! Reference: https://open.feishu.cn/document/home/index

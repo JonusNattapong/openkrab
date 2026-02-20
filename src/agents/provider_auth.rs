@@ -1,5 +1,5 @@
 //! agents::provider_auth — Provider authentication wiring.
-//! Ported from `openclaw/src/agents/model-auth.ts` (Phase 15).
+//! Ported from `openkrab/src/agents/model-auth.ts` (Phase 15).
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

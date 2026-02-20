@@ -1,4 +1,4 @@
-//! WhatsApp send command — port of `openclaw/extensions/whatsapp/src/send.ts`
+//! WhatsApp send command — port of `openkrab/extensions/whatsapp/src/send.ts`
 
 use anyhow::{bail, Result};
 

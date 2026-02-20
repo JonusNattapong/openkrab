@@ -1,5 +1,5 @@
 //! signal::identity — Signal sender identity and allowlist helpers.
-//! Ported from `openclaw/src/signal/identity.ts` (Phase 13).
+//! Ported from `openkrab/src/signal/identity.ts` (Phase 13).
 
 use std::collections::HashSet;
 

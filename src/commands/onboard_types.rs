@@ -1,5 +1,5 @@
 //! onboard_types — Types for onboard command.
-//! Ported from `openclaw/src/commands/onboard-types.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/onboard-types.ts` (Phase 6).
 
 use serde::{Deserialize, Serialize};
 

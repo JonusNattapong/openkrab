@@ -1,4 +1,4 @@
-//! WhatsApp connector monitor — port of `openclaw/extensions/whatsapp/src/monitorWebChannel`
+//! WhatsApp connector monitor — port of `openkrab/extensions/whatsapp/src/monitorWebChannel`
 
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};

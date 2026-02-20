@@ -1,5 +1,5 @@
 //! Finalize step of the onboarding wizard.
-//! Ported from `openclaw/src/wizard/onboarding.finalize.ts`
+//! Ported from `openkrab/src/wizard/onboarding.finalize.ts`
 
 use anyhow::Result;
 use std::path::Path;

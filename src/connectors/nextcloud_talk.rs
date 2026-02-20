@@ -1,5 +1,5 @@
 //! nextcloud_talk — Nextcloud Talk connector.
-//! Ported from `openclaw/extensions/nextcloud-talk/` (Phase 12).
+//! Ported from `openkrab/extensions/nextcloud-talk/` (Phase 12).
 //!
 //! Uses the Nextcloud Talk API (spreed).
 //! Reference: https://nextcloud-talk.readthedocs.io/en/latest/

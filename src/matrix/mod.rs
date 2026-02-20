@@ -1,5 +1,5 @@
 //! matrix — Matrix messaging connector.
-//! Ported from `openclaw/extensions/matrix/` (Phase 10, 13).
+//! Ported from `openkrab/extensions/matrix/` (Phase 10, 13).
 //! Uses Matrix Client-Server API directly instead of the SDK.
 
 pub mod credentials;

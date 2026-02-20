@@ -1,5 +1,5 @@
 //! doctor_gateway — Gateway health checks for doctor command.
-//! Ported from `openclaw/src/commands/doctor-gateway-health.ts` (Phase 6).
+//! Ported from `openkrab/src/commands/doctor-gateway-health.ts` (Phase 6).
 
 use crate::config::AppConfig;
 

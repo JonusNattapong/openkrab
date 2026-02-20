@@ -1,5 +1,5 @@
 //! irc — IRC messaging connector.
-//! Ported from `openclaw/extensions/irc/` (Phase 11).
+//! Ported from `openkrab/extensions/irc/` (Phase 11).
 
 use crate::common::{Message, UserId};
 use serde::{Deserialize, Serialize};

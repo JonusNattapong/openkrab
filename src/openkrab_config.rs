@@ -1,11 +1,11 @@
-//! OpenKrabConfig — port of `openclaw/src/config/types.openclaw.ts` (Phase 1-4 core config)
+//! OpenKrabConfig — port of `openkrab/src/config/types.openkrab.ts` (Phase 1-4 core config)
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub use crate::secure::{generate_encryption_key, EncryptedValue, SecretBox};
 
-/// Main OpenKrab configuration structure (equivalent to TypeScript OpenClawConfig)
+/// Main OpenKrab configuration structure (equivalent to TypeScript OpenKrabConfig)
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct OpenKrabConfig {
     /// Metadata about config version and last modification

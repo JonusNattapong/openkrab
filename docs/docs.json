@@ -1,14 +1,14 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "OpenClaw",
-  "description": "Self-hosted gateway that connects WhatsApp, Telegram, Discord, iMessage, and more to AI coding agents. Run a single Gateway process on your own machine and message your AI assistant from anywhere.",
+  "name": "OpenKrab",
+  "description": "Personal AI assistant in Rust with multi-channel gateway. Connect Telegram, Slack, Discord, WhatsApp, Signal, iMessage and more to your AI. High-performance, memory-safe, single binary deployment.",
   "theme": "mint",
   "icons": {
     "library": "lucide"
   },
   "logo": {
-    "light": "/assets/pixel-lobster.svg",
-    "dark": "/assets/pixel-lobster.svg"
+    "light": "/assets/openkrab-logo.svg",
+    "dark": "/assets/openkrab-logo.svg"
   },
   "fonts": {
     "body": {
@@ -18,7 +18,7 @@
       "family": "DM Sans"
     }
   },
-  "favicon": "/assets/pixel-lobster.svg",
+  "favicon": "/assets/openkrab-logo.svg",
   "colors": {
     "primary": "#FF5A36",
     "dark": "#FF5A36",
@@ -36,12 +36,12 @@
     "links": [
       {
         "label": "GitHub",
-        "href": "https://github.com/openclaw/openclaw",
+        "href": "https://github.com/openkrab/openkrab",
         "icon": "github"
       },
       {
         "label": "Releases",
-        "href": "https://github.com/openclaw/openclaw/releases",
+        "href": "https://github.com/openkrab/openkrab/releases",
         "icon": "package"
       }
     ]

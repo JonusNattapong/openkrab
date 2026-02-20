@@ -1,5 +1,5 @@
 //! web_connector — Multi-platform web-based connector core.
-//! Ported from `openclaw/src/web/` (Phase 9).
+//! Ported from `openkrab/src/web/` (Phase 9).
 //!
 //! Provides inbound/outbound message normalisation, session management,
 //! account handling, and reconnection logic for web-socket based connectors
