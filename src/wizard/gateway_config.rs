@@ -17,6 +17,7 @@ use super::types::{
 const DEFAULT_GATEWAY_PORT: u16 = 4120;
 
 /// High-risk node commands that are denied by default on fresh installs.
+#[allow(dead_code)]
 const DEFAULT_DANGEROUS_NODE_DENY_COMMANDS: &[&str] = &[
     "camera.snap",
     "camera.clip",

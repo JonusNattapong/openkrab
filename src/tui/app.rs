@@ -8,16 +8,17 @@ use crossterm::{
 };
 use ratatui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
     text::Line,
     widgets::{Block, Borders, List, ListItem, Paragraph, Tabs},
-    Frame, Terminal,
+    Terminal,
 };
 use std::io;
 
 pub struct TuiApp {
     terminal: Terminal<CrosstermBackend<io::Stdout>>,
+    #[allow(dead_code)]
     config: TuiConfig,
     messages: Vec<String>,
     input: String,

@@ -194,7 +194,7 @@ fn run_voice_action(action: &str, payload: &Value) -> Result<Value> {
                 .get("sample_rate")
                 .and_then(Value::as_u64)
                 .unwrap_or(16000) as u32;
-            let sample_count = (bytes.len() - 44) / 2;
+            let _sample_count = (bytes.len() - 44) / 2;
             let samples: Vec<i16> = bytes[44..]
                 .chunks_exact(2)
                 .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]))
@@ -319,7 +319,7 @@ fn run_voice_action(action: &str, payload: &Value) -> Result<Value> {
                 .get("sample_rate")
                 .and_then(Value::as_u64)
                 .unwrap_or(16000) as u32;
-            let sample_count = (bytes.len().saturating_sub(44)) / 2;
+            let _sample_count = (bytes.len().saturating_sub(44)) / 2;
             let samples: Vec<i16> = bytes
                 .get(44..)
                 .map(|data| {

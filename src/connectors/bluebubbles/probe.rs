@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
-use super::types::{BlueBubblesProbeResult, BlueBubblesServerInfo, DEFAULT_TIMEOUT_MS};
+use super::types::{BlueBubblesServerInfo, DEFAULT_TIMEOUT_MS};
 
 static SERVER_INFO_CACHE: once_cell::sync::Lazy<
     Arc<Mutex<HashMap<String, BlueBubblesServerInfo>>>,

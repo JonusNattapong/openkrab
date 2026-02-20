@@ -4,6 +4,8 @@
 //! Tracks per-conversation state including model overrides, verbosity level
 //! overrides, send policy, and a basic session transcript.
 
+pub mod transcript_events;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -88,6 +90,26 @@ impl TranscriptEntry {
             role: "system".to_string(),
             text: text.into(),
             timestamp: Utc::now(),
+        }
+    }
+}
+
+impl From<TranscriptEntry> for crate::agents::chat::ChatMessage {
+    fn from(entry: TranscriptEntry) -> Self {
+        match entry.role.as_str() {
+            "user" => crate::agents::chat::ChatMessage::User {
+                content: crate::agents::chat::UserContent::Text(entry.text),
+            },
+            "assistant" => crate::agents::chat::ChatMessage::Assistant {
+                content: Some(entry.text),
+                tool_calls: None,
+            },
+            "system" => crate::agents::chat::ChatMessage::System {
+                content: entry.text,
+            },
+            _ => crate::agents::chat::ChatMessage::System {
+                content: entry.text,
+            },
         }
     }
 }
@@ -177,6 +199,7 @@ impl Session {
 // ─── Session registry ─────────────────────────────────────────────────────────
 
 /// Thread-safe registry of active sessions.
+#[derive(Debug)]
 pub struct SessionRegistry {
     sessions: HashMap<String, Session>,
 }
@@ -209,6 +232,11 @@ impl SessionRegistry {
 
     pub fn count(&self) -> usize {
         self.sessions.len()
+    }
+
+    /// Iterate over all sessions (id, session) pairs.
+    pub fn iter(&self) -> impl Iterator<Item = (&String, &Session)> {
+        self.sessions.iter()
     }
 
     /// Remove sessions that have been inactive for longer than `max_age_secs`.

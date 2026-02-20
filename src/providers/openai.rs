@@ -10,6 +10,7 @@ use serde_json::json;
 // ─── Request / Response types ─────────────────────────────────────────────────
 
 #[derive(Serialize)]
+#[allow(dead_code)]
 struct ChatCompletionRequest<'a> {
     model: &'a str,
     messages: Vec<serde_json::Value>,

@@ -3,7 +3,6 @@
 
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 /// Model catalog entry with capabilities.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

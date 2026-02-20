@@ -1,7 +1,6 @@
 use crate::memory::embeddings::EmbeddingProvider;
 use crate::memory::store::MemoryStore;
 use anyhow::Result;
-use futures_util::StreamExt;
 use notify::{Config, Event, RecursiveMode, Watcher};
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};

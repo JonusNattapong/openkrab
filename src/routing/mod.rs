@@ -4,6 +4,10 @@
 //! Responsible for deciding which connector / channel should handle an
 //! inbound message and where the reply should be delivered.
 
+pub mod bindings;
+pub mod role_routing;
+pub mod session_key;
+
 use serde::{Deserialize, Serialize};
 
 // ─── Delivery target ──────────────────────────────────────────────────────────
@@ -71,6 +75,12 @@ pub struct RouteContext {
     pub channel_id: Option<String>,
     pub chat_type: String,
     pub text: String,
+    /// Role IDs of the sender (for role-based routing).
+    pub member_role_ids: Vec<String>,
+    /// Thread or topic identifier.
+    pub thread_id: Option<String>,
+    /// Parent peer (for threaded/nested conversations).
+    pub parent_peer: Option<String>,
 }
 
 impl RouteContext {
@@ -85,6 +95,9 @@ impl RouteContext {
             channel_id: None,
             chat_type: "direct".to_string(),
             text: text.into(),
+            member_role_ids: Vec::new(),
+            thread_id: None,
+            parent_peer: None,
         }
     }
 }
@@ -150,6 +163,53 @@ impl RoutingRule for EchoRoutingRule {
     fn evaluate(&self, ctx: &RouteContext) -> RouteDecision {
         let target = DeliveryTarget::new(ctx.connector.clone(), ctx.from.clone());
         RouteDecision::Deliver(target)
+    }
+}
+
+/// Route based on configured agent bindings.
+pub struct BindingsRoutingRule {
+    pub bindings: Vec<crate::routing::bindings::AgentBinding>,
+}
+
+impl RoutingRule for BindingsRoutingRule {
+    fn name(&self) -> &str {
+        "bindings"
+    }
+
+    fn evaluate(&self, ctx: &RouteContext) -> RouteDecision {
+        let channel = ctx.channel_id.as_deref().unwrap_or("");
+        let account = ""; // We don't have explicit account_id in RouteContext yet
+
+        if let Some(agent_id) = crate::routing::bindings::resolve_agent_binding(
+            &self.bindings,
+            &ctx.connector,
+            channel,
+            account,
+        ) {
+            RouteDecision::Deliver(DeliveryTarget::new("agent", agent_id))
+        } else {
+            RouteDecision::Fallthrough
+        }
+    }
+}
+
+/// Route based on sender roles.
+pub struct PersistentRoleRoutingRule {
+    pub rule: crate::routing::role_routing::RoleRoutingRule,
+    pub target: DeliveryTarget,
+}
+
+impl RoutingRule for PersistentRoleRoutingRule {
+    fn name(&self) -> &str {
+        "role"
+    }
+
+    fn evaluate(&self, ctx: &RouteContext) -> RouteDecision {
+        if self.rule.matches(&ctx.member_role_ids) {
+            RouteDecision::Deliver(self.target.clone())
+        } else {
+            RouteDecision::Fallthrough
+        }
     }
 }
 

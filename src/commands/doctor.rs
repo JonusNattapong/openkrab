@@ -20,7 +20,7 @@ pub async fn doctor_command(cfg: &AppConfig, auto_fix: bool) -> DoctorResult {
     let mut errors = Vec::new();
 
     // 1. Auth health check
-    let auth_health = doctor_auth::build_auth_health_summary(cfg);
+    let _auth_health = doctor_auth::build_auth_health_summary(cfg);
     let auth_warnings = doctor_auth::note_auth_profile_health(cfg);
 
     if !auth_warnings.is_empty() {

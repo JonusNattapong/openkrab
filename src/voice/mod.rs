@@ -1091,7 +1091,6 @@ pub struct VoiceSessionInfo {
 pub mod microphone {
     use super::*;
     use std::collections::VecDeque;
-    use std::io::Read;
     use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
     use std::sync::Arc;
     use std::sync::Mutex;
@@ -1231,8 +1230,8 @@ pub mod microphone {
         fn start_platform_capture(&self) -> Result<()> {
             use std::process::Command;
 
-            let sample_rate = self.sample_rate;
-            let buffer_size = self.buffer_size;
+            let _sample_rate = self.sample_rate;
+            let _buffer_size = self.buffer_size;
 
             std::thread::spawn(move || {
                 let _ = Command::new("powershell")
@@ -1368,9 +1367,9 @@ pub mod microphone {
                 .output();
 
             if let Ok(output) = output {
-                if let Ok(json) =
-                    serde_json::from_str::<serde_json::Value>(&String::from_utf8_lossy(&output.stdout))
-                {
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(
+                    &String::from_utf8_lossy(&output.stdout),
+                ) {
                     let sound_devices = json.as_array();
                     if let Some(devices_arr) = sound_devices {
                         for device in devices_arr {
@@ -1438,6 +1437,7 @@ pub struct FrequencyBand {
     pub name: &'static str,
 }
 
+#[allow(dead_code)]
 pub struct WakeWordDetector {
     config: VoiceWakeConfig,
     preprocessor: AudioPreprocessor,
@@ -1582,13 +1582,14 @@ impl WakeWordDetector {
         let voice_range_energy: f32 = bands[1..5].iter().sum::<f32>() / 4.0;
 
         let low_freq_energy = bands[0];
-        let high_freq_energy = bands[5..].iter().sum::<f32>() / bands[5..].len() as f32;
+        let _high_freq_energy = bands[5..].iter().sum::<f32>() / bands[5..].len() as f32;
 
         let voice_ratio = voice_range_energy - low_freq_energy;
 
         voice_ratio > 5.0 && voice_range_energy > -40.0
     }
 
+    #[allow(dead_code)]
     fn process_samples<'a>(&self, samples: &'a mut [i16], sample_rate: u32) -> &'a mut [i16] {
         self.preprocessor.process(samples, sample_rate);
         samples
@@ -1709,6 +1710,7 @@ impl BeepGenerator {
         wav
     }
 
+    #[allow(dead_code)]
     fn wrap_in_wav(&self, samples: Vec<i16>) -> Vec<u8> {
         let data_size = samples.len() * 2;
         let file_size = 36 + data_size;

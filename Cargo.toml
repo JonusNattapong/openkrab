@@ -25,7 +25,7 @@ regex = "1.10"
 futures = "0.3"
 futures-util = "0.3"
 # reqwest 0.11 uses native-tls by default — no aws-lc-sys / NASM needed
-reqwest = { version = "0.11", features = ["json", "blocking", "rustls-tls", "multipart"] }
+reqwest = { version = "0.11", features = ["json", "blocking", "rustls-tls", "multipart", "stream"] }
 reqwest-middleware = "0.2"
 reqwest-retry = "0.2"
 tokio = { version = "1", features = ["full"] }

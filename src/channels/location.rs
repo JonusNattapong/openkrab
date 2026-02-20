@@ -101,22 +101,22 @@ pub fn format_location_text(location: &NormalizedLocation) -> String {
 pub fn to_location_context(location: &NormalizedLocation) -> LocationContext {
     let resolved = resolve_location(location);
     LocationContext {
-        LocationLat: resolved.latitude,
-        LocationLon: resolved.longitude,
-        LocationAccuracy: resolved.accuracy,
-        LocationName: resolved.name,
-        LocationAddress: resolved.address,
-        LocationSource: resolved.source,
-        LocationIsLive: resolved.is_live,
+        location_lat: resolved.latitude,
+        location_lon: resolved.longitude,
+        location_accuracy: resolved.accuracy,
+        location_name: resolved.name,
+        location_address: resolved.address,
+        location_source: resolved.source,
+        location_is_live: resolved.is_live,
     }
 }
 
 pub struct LocationContext {
-    pub LocationLat: f64,
-    pub LocationLon: f64,
-    pub LocationAccuracy: Option<f64>,
-    pub LocationName: Option<String>,
-    pub LocationAddress: Option<String>,
-    pub LocationSource: LocationSource,
-    pub LocationIsLive: bool,
+    pub location_lat: f64,
+    pub location_lon: f64,
+    pub location_accuracy: Option<f64>,
+    pub location_name: Option<String>,
+    pub location_address: Option<String>,
+    pub location_source: LocationSource,
+    pub location_is_live: bool,
 }

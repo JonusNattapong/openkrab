@@ -95,6 +95,7 @@ impl Default for SessionConfig {
 // ============================================================================
 
 /// Internal CDP message types
+#[allow(dead_code)]
 #[derive(Debug)]
 enum CdpMessage {
     Request {
@@ -119,6 +120,7 @@ pub struct CdpSession {
     config: SessionConfig,
     pending_requests: Arc<RwLock<HashMap<i64, oneshot::Sender<Result<Value>>>>>,
     event_handlers: Arc<RwLock<HashMap<String, Vec<mpsc::UnboundedSender<Value>>>>>,
+    write_tx: mpsc::UnboundedSender<Message>,
     shutdown_tx: Option<oneshot::Sender<()>>,
 }
 
@@ -142,11 +144,12 @@ impl CdpSession {
 
         let (mut write, mut read) = ws_stream.split();
         let (shutdown_tx, mut shutdown_rx) = oneshot::channel::<()>();
+        let (write_tx, mut write_rx) = mpsc::unbounded_channel::<Message>();
 
         let pending_clone = pending_requests.clone();
         let handlers_clone = event_handlers.clone();
 
-        // Spawn message handling task
+        // Spawn read task
         tokio::spawn(async move {
             loop {
                 tokio::select! {
@@ -158,18 +161,18 @@ impl CdpSession {
                                 }
                             }
                             Some(Ok(Message::Close(_))) => {
-                                tracing::info!("CDP WebSocket closed");
+                                tracing::info!("CDP WebSocket closed (read)");
                                 break;
                             }
                             Some(Err(e)) => {
-                                tracing::error!("CDP WebSocket error: {}", e);
+                                tracing::error!("CDP WebSocket error (read): {}", e);
                                 break;
                             }
                             _ => {}
                         }
                     }
                     _ = &mut shutdown_rx => {
-                        tracing::info!("CDP session shutting down");
+                        tracing::info!("CDP session shutting down (read)");
                         break;
                     }
                 }
@@ -177,9 +180,20 @@ impl CdpSession {
 
             // Clean up pending requests
             let mut pending = pending_clone.write().await;
-            for (id, tx) in pending.drain() {
+            for (_id, tx) in pending.drain() {
                 let _ = tx.send(Err(anyhow!("Session closed")));
             }
+        });
+
+        // Spawn write task
+        tokio::spawn(async move {
+            while let Some(msg) = write_rx.recv().await {
+                if let Err(e) = write.send(msg).await {
+                    tracing::error!("CDP WebSocket error (write): {}", e);
+                    break;
+                }
+            }
+            tracing::info!("CDP session write task finished");
         });
 
         let mut session = Self {
@@ -187,6 +201,7 @@ impl CdpSession {
             config,
             pending_requests,
             event_handlers,
+            write_tx,
             shutdown_tx: Some(shutdown_tx),
         };
 
@@ -254,8 +269,17 @@ impl CdpSession {
             pending.insert(id, tx);
         }
 
-        // Send the request (would need to store write half - simplified here)
-        // In full implementation, we'd have a channel to the write task
+        let req = json!({
+            "id": id,
+            "method": method,
+            "params": params
+        });
+
+        if let Err(e) = self.write_tx.send(Message::Text(req.to_string().into())) {
+            let mut pending = self.pending_requests.write().await;
+            pending.remove(&id);
+            bail!("Failed to send CDP request: {}", e);
+        }
 
         // Wait for response with timeout
         let result = timeout(
@@ -320,27 +344,55 @@ impl BrowserManager {
     }
 
     /// Get or create a session for a tab
-    pub async fn get_session(&self, tab_id: &str) -> Result<Arc<RwLock<CdpSession>>> {
+    pub async fn get_session(&self, tab_id: &str) -> Result<Arc<CdpSession>> {
         let mut sessions = self.sessions.write().await;
 
-        if !sessions.contains_key(tab_id) {
-            let tabs = list_tabs(&self.profile.name).await?;
-            let tab = tabs
-                .into_iter()
-                .find(|t| t.id == tab_id)
-                .ok_or_else(|| anyhow!("Tab not found: {}", tab_id))?;
-
-            let ws_url = tab
-                .websocket_debugger_url
-                .ok_or_else(|| anyhow!("Tab has no debug URL"))?;
-
-            let session = CdpSession::new(&ws_url, SessionConfig::default()).await?;
-            sessions.insert(tab_id.to_string(), session);
+        if let Some(session) = sessions.get(tab_id) {
+            // Check if connection is alive (simplistic check)
+            // In a more complex version, we could ping/pong
+            return Ok(Arc::new(CdpSession {
+                ws_url: session.ws_url.clone(),
+                config: session.config.clone(),
+                pending_requests: session.pending_requests.clone(),
+                event_handlers: session.event_handlers.clone(),
+                write_tx: session.write_tx.clone(),
+                shutdown_tx: None, // Only the master session in map owns shutdown
+            }));
         }
 
-        // Return Arc<RwLock<>> for shared access
-        // In real implementation, we'd wrap properly
-        Err(anyhow!("Session management requires additional implementation"))
+        let tabs = list_tabs(&self.profile.name).await?;
+        let tab = tabs
+            .into_iter()
+            .find(|t| t.id == tab_id)
+            .ok_or_else(|| anyhow!("Tab not found: {}", tab_id))?;
+
+        let ws_url = tab
+            .websocket_debugger_url
+            .ok_or_else(|| anyhow!("Tab has no debug URL"))?;
+
+        let session = CdpSession::new(&ws_url, SessionConfig::default()).await?;
+        let shared_session = Arc::new(session);
+        
+        // We need to store it in a way we can clone handles
+        // Since CdpSession has shutdown_tx, we store the original and return clones
+        let master_session = Arc::try_unwrap(shared_session).map_err(|_| anyhow!("Arc error"))?;
+        
+        let ws_url_clone = master_session.ws_url.clone();
+        let config_clone = master_session.config.clone();
+        let pending = master_session.pending_requests.clone();
+        let handlers = master_session.event_handlers.clone();
+        let write_tx = master_session.write_tx.clone();
+
+        sessions.insert(tab_id.to_string(), master_session);
+
+        Ok(Arc::new(CdpSession {
+            ws_url: ws_url_clone,
+            config: config_clone,
+            pending_requests: pending,
+            event_handlers: handlers,
+            write_tx,
+            shutdown_tx: None,
+        }))
     }
 
     /// List all tabs
@@ -355,18 +407,10 @@ impl BrowserManager {
 
     /// Navigate to URL
     pub async fn navigate(&self, tab_id: &str, url: &str) -> Result<()> {
-        // Simplified - would use session in full implementation
-        let ws_url = self.resolve_tab_ws_url(tab_id).await?;
-        let _session = CdpSession::new(&ws_url, SessionConfig::default()).await?;
+        let session = self.get_session(tab_id).await?;
 
-        // Use Page.navigate instead of Runtime.evaluate for better reliability
-        let result = self
-            .call_cdp(
-                &ws_url,
-                "Page.navigate",
-                json!({ "url": url }),
-            )
-            .await?;
+        // Use Page.navigate
+        let result = session.call("Page.navigate", json!({ "url": url })).await?;
 
         // Wait for navigation to complete
         if let Some(error) = result.get("error") {
@@ -378,12 +422,10 @@ impl BrowserManager {
 
     /// Click element by selector
     pub async fn click(&self, tab_id: &str, selector: &str) -> Result<()> {
-        let ws_url = self.resolve_tab_ws_url(tab_id).await?;
+        let session = self.get_session(tab_id).await?;
 
         // First try: Use DOM.querySelector + DOM.click
-        let result = self
-            .call_cdp(&ws_url, "DOM.getDocument", json!({ "depth": 0 }))
-            .await?;
+        let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
 
         let root_node_id = result
             .get("result")
@@ -392,9 +434,8 @@ impl BrowserManager {
             .and_then(Value::as_i64)
             .ok_or_else(|| anyhow!("Failed to get document root"))?;
 
-        let query_result = self
-            .call_cdp(
-                &ws_url,
+        let query_result = session
+            .call(
                 "DOM.querySelector",
                 json!({
                     "nodeId": root_node_id,
@@ -410,16 +451,16 @@ impl BrowserManager {
             .ok_or_else(|| anyhow!("Element not found: {}", selector))?;
 
         // Scroll into view and click
-        self.call_cdp(
-            &ws_url,
-            "DOM.scrollIntoViewIfNeeded",
-            json!({ "nodeId": node_id }),
-        )
-        .await?;
+        session
+            .call(
+                "DOM.scrollIntoViewIfNeeded",
+                json!({ "nodeId": node_id }),
+            )
+            .await?;
 
         // Get box model for click coordinates
-        let box_result = self
-            .call_cdp(&ws_url, "DOM.getBoxModel", json!({ "nodeId": node_id }))
+        let box_result = session
+            .call("DOM.getBoxModel", json!({ "nodeId": node_id }))
             .await?;
 
         let model = box_result
@@ -436,31 +477,31 @@ impl BrowserManager {
             let x = content[0].as_f64().unwrap_or(0.0) + 5.0;
             let y = content[1].as_f64().unwrap_or(0.0) + 5.0;
 
-            self.call_cdp(
-                &ws_url,
-                "Input.dispatchMouseEvent",
-                json!({
-                    "type": "mousePressed",
-                    "x": x,
-                    "y": y,
-                    "button": "left",
-                    "clickCount": 1
-                }),
-            )
-            .await?;
+            session
+                .call(
+                    "Input.dispatchMouseEvent",
+                    json!({
+                        "type": "mousePressed",
+                        "x": x,
+                        "y": y,
+                        "button": "left",
+                        "clickCount": 1
+                    }),
+                )
+                .await?;
 
-            self.call_cdp(
-                &ws_url,
-                "Input.dispatchMouseEvent",
-                json!({
-                    "type": "mouseReleased",
-                    "x": x,
-                    "y": y,
-                    "button": "left",
-                    "clickCount": 1
-                }),
-            )
-            .await?;
+            session
+                .call(
+                    "Input.dispatchMouseEvent",
+                    json!({
+                        "type": "mouseReleased",
+                        "x": x,
+                        "y": y,
+                        "button": "left",
+                        "clickCount": 1
+                    }),
+                )
+                .await?;
         }
 
         Ok(())
@@ -468,12 +509,10 @@ impl BrowserManager {
 
     /// Type text into element
     pub async fn type_text(&self, tab_id: &str, selector: &str, text: &str) -> Result<()> {
-        let ws_url = self.resolve_tab_ws_url(tab_id).await?;
+        let session = self.get_session(tab_id).await?;
 
         // Focus the element first
-        let result = self
-            .call_cdp(&ws_url, "DOM.getDocument", json!({ "depth": 0 }))
-            .await?;
+        let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
 
         let root_node_id = result
             .get("result")
@@ -482,9 +521,8 @@ impl BrowserManager {
             .and_then(Value::as_i64)
             .ok_or_else(|| anyhow!("Failed to get document root"))?;
 
-        let query_result = self
-            .call_cdp(
-                &ws_url,
+        let query_result = session
+            .call(
                 "DOM.querySelector",
                 json!({
                     "nodeId": root_node_id,
@@ -500,32 +538,31 @@ impl BrowserManager {
             .ok_or_else(|| anyhow!("Element not found: {}", selector))?;
 
         // Focus element
-        self.call_cdp(&ws_url, "DOM.focus", json!({ "nodeId": node_id }))
-            .await?;
+        session.call("DOM.focus", json!({ "nodeId": node_id })).await?;
 
         // Type each character
         for ch in text.chars() {
             let key = ch.to_string();
-            self.call_cdp(
-                &ws_url,
-                "Input.dispatchKeyEvent",
-                json!({
-                    "type": "keyDown",
-                    "text": key,
-                    "unmodifiedText": key,
-                }),
-            )
-            .await?;
+            session
+                .call(
+                    "Input.dispatchKeyEvent",
+                    json!({
+                        "type": "keyDown",
+                        "text": key,
+                        "unmodifiedText": key,
+                    }),
+                )
+                .await?;
 
-            self.call_cdp(
-                &ws_url,
-                "Input.dispatchKeyEvent",
-                json!({
-                    "type": "keyUp",
-                    "text": key,
-                }),
-            )
-            .await?;
+            session
+                .call(
+                    "Input.dispatchKeyEvent",
+                    json!({
+                        "type": "keyUp",
+                        "text": key,
+                    }),
+                )
+                .await?;
         }
 
         Ok(())
@@ -533,7 +570,7 @@ impl BrowserManager {
 
     /// Take screenshot
     pub async fn screenshot(&self, tab_id: &str, full_page: bool) -> Result<String> {
-        let ws_url = self.resolve_tab_ws_url(tab_id).await?;
+        let session = self.get_session(tab_id).await?;
 
         let params = if full_page {
             json!({
@@ -548,7 +585,7 @@ impl BrowserManager {
             })
         };
 
-        let result = self.call_cdp(&ws_url, "Page.captureScreenshot", params).await?;
+        let result = session.call("Page.captureScreenshot", params).await?;
 
         result
             .get("result")
@@ -560,17 +597,14 @@ impl BrowserManager {
 
     /// Get page snapshot with DOM elements
     pub async fn snapshot(&self, tab_id: &str) -> Result<BrowserSnapshot> {
-        let ws_url = self.resolve_tab_ws_url(tab_id).await?;
+        let session = self.get_session(tab_id).await?;
 
         // Get document info
-        let doc_result = self
-            .call_cdp(&ws_url, "DOM.getDocument", json!({ "depth": 2 }))
-            .await?;
+        let _doc_result = session.call("DOM.getDocument", json!({ "depth": 2 })).await?;
 
         // Get page info via Runtime.evaluate
-        let info_result = self
-            .call_cdp(
-                &ws_url,
+        let info_result = session
+            .call(
                 "Runtime.evaluate",
                 json!({
                     "expression": "({ title: document.title, url: location.href, text: document.body ? document.body.innerText : '' })",
@@ -580,9 +614,8 @@ impl BrowserManager {
             .await?;
 
         // Get screenshot
-        let shot_result = self
-            .call_cdp(
-                &ws_url,
+        let shot_result = session
+            .call(
                 "Page.captureScreenshot",
                 json!({ "format": "png", "fromSurface": true }),
             )
@@ -619,11 +652,10 @@ impl BrowserManager {
 
     /// Execute JavaScript with proper error handling
     pub async fn evaluate(&self, tab_id: &str, script: &str) -> Result<Value> {
-        let ws_url = self.resolve_tab_ws_url(tab_id).await?;
+        let session = self.get_session(tab_id).await?;
 
-        let result = self
-            .call_cdp(
-                &ws_url,
+        let result = session
+            .call(
                 "Runtime.evaluate",
                 json!({
                     "expression": script,
@@ -661,13 +693,11 @@ impl BrowserManager {
         selector: &str,
         timeout_ms: u64,
     ) -> Result<()> {
-        let ws_url = self.resolve_tab_ws_url(tab_id).await?;
+        let session = self.get_session(tab_id).await?;
         let start = std::time::Instant::now();
 
         loop {
-            let result = self
-                .call_cdp(&ws_url, "DOM.getDocument", json!({ "depth": 0 }))
-                .await?;
+            let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
 
             let root_node_id = result
                 .get("result")
@@ -676,9 +706,8 @@ impl BrowserManager {
                 .and_then(Value::as_i64)
                 .ok_or_else(|| anyhow!("Failed to get document root"))?;
 
-            let query_result = self
-                .call_cdp(
-                    &ws_url,
+            let query_result = session
+                .call(
                     "DOM.querySelector",
                     json!({
                         "nodeId": root_node_id,
@@ -714,46 +743,13 @@ impl BrowserManager {
 
     // Helper methods
 
+    #[allow(dead_code)]
     async fn resolve_tab_ws_url(&self, tab_id: &str) -> Result<String> {
         let tabs = list_tabs(&self.profile.name).await?;
         tabs.into_iter()
             .find(|t| t.id == tab_id)
             .and_then(|t| t.websocket_debugger_url)
             .ok_or_else(|| anyhow!("Tab not found or not debuggable: {}", tab_id))
-    }
-
-    async fn call_cdp(&self, ws_url: &str, method: &str, params: Value) -> Result<Value> {
-        // Create temporary session for this call
-        // In full implementation, we'd reuse sessions
-        let (mut ws, _) = timeout(
-            Duration::from_millis(WS_CONNECT_TIMEOUT_MS),
-            connect_async(ws_url),
-        )
-        .await
-        .with_context(|| format!("WebSocket connection timeout to {ws_url}"))??;
-
-        let id = MESSAGE_ID.fetch_add(1, Ordering::SeqCst);
-        let req = json!({ "id": id, "method": method, "params": params });
-
-        ws.send(Message::Text(req.to_string())).await?;
-
-        while let Some(msg) = ws.next().await {
-            match msg {
-                Ok(Message::Text(text)) => {
-                    let v: Value = serde_json::from_str(&text)?;
-                    if v.get("id").and_then(Value::as_i64) == Some(id) {
-                        if let Some(err) = v.get("error") {
-                            bail!("cdp {} failed: {}", method, err);
-                        }
-                        return Ok(v);
-                    }
-                }
-                Ok(_) => continue,
-                Err(e) => return Err(anyhow!("cdp websocket error: {e}")),
-            }
-        }
-
-        Err(anyhow!("cdp {} failed: websocket closed", method))
     }
 }
 

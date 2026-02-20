@@ -1,7 +1,6 @@
 //! setup — Initial setup command.
 //! Ported from `openkrab/src/commands/setup.ts` (Phase 6).
 
-use crate::config::AppConfig;
 use std::path::PathBuf;
 
 /// Setup options.

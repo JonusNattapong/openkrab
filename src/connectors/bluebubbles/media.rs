@@ -4,7 +4,6 @@
 use serde::{Deserialize, Serialize};
 
 use super::config::resolve_account;
-use super::send::send_message;
 use super::targets::extract_handle_from_chat_guid;
 use super::types::{
     build_api_url, extract_message_id, normalize_handle, BlueBubblesConfig, BlueBubblesSendResult,
@@ -206,11 +205,7 @@ fn send_media_bytes(
     if !response.status().is_success() {
         let status = response.status();
         let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "media send failed ({}): {}",
-            status,
-            error_text
-        ));
+        return Err(format!("media send failed ({}): {}", status, error_text));
     }
 
     let json: serde_json::Value = response.json().map_err(|e| format!("parse error: {}", e))?;

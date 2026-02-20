@@ -40,6 +40,7 @@ fn now_ms() -> u64 {
 // ─── Token exchange response ───────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct TokenApiResponse {
     token: Option<String>,
     expires_at: Option<serde_json::Value>,

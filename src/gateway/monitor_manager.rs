@@ -75,7 +75,7 @@ impl MonitorManager {
     pub fn get_status(&self) -> HashMap<String, serde_json::Value> {
         let mut status = HashMap::new();
 
-        for (key, monitor) in &self.monitors {
+        for (key, _monitor) in &self.monitors {
             // In real implementation, would get actual status from monitor
             status.insert(
                 key.clone(),

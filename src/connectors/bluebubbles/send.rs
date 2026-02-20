@@ -4,8 +4,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use super::config::{resolve_account, ResolvedBlueBubblesAccount};
-use super::probe::probe_server;
+use super::config::resolve_account;
 use super::targets::{extract_handle_from_chat_guid, is_dm_chat_guid, ParsedTarget};
 use super::types::{
     build_api_url, extract_message_id, normalize_handle, BlueBubblesConfig, BlueBubblesSendResult,
@@ -345,11 +344,7 @@ fn send_to_chat(
     if !response.status().is_success() {
         let status = response.status();
         let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "send failed ({}): {}",
-            status,
-            error_text
-        ));
+        return Err(format!("send failed ({}): {}", status, error_text));
     }
 
     let json: serde_json::Value = response.json().map_err(|e| format!("parse error: {}", e))?;
@@ -392,11 +387,7 @@ pub fn create_new_chat(
         if error_text.to_lowercase().contains("private api") {
             return Err("Cannot create new chat: Private API must be enabled".to_string());
         }
-        return Err(format!(
-            "create chat failed ({}): {}",
-            status,
-            error_text
-        ));
+        return Err(format!("create chat failed ({}): {}", status, error_text));
     }
 
     let json: serde_json::Value = response.json().map_err(|e| format!("parse error: {}", e))?;

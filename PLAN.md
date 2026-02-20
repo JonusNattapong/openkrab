@@ -23,6 +23,18 @@ This document outlines the planned features and roadmap for OpenKrab.
 - ✅ Web dashboard
 - ✅ CLI commands (40+)
 
+### Recently Completed (2026-02-20)
+
+- ✅ Transcript compaction (`agents/compaction.rs`) — context window management
+- ✅ Block/tool streaming (`agents/streaming.rs`) — paragraph-aware response streaming
+- ✅ Binding system (`routing/bindings.rs`) — channel-to-agent mapping
+- ✅ Complex session keys (`routing/session_key.rs`) — composite agent:id:rest format with DM scoping
+- ✅ Role-based routing (`routing/role_routing.rs`) — allowlist/blocklist/priority role rules
+- ✅ Session management tools (`agents/session_tools.rs`) — spawn/send/list/history
+- ✅ Heartbeat runner (`gateway/heartbeat.rs`) — periodic health checks
+- ✅ Gateway config hot reload (`gateway/config_reload.rs`) — file-watch with diff-based reload plans
+- ✅ Transcript update events (`sessions/transcript_events.rs`) — pub/sub event bus
+
 ---
 
 ## Future Releases
@@ -37,11 +49,12 @@ This document outlines the planned features and roadmap for OpenKrab.
 
 #### Deployment & Distribution
 
-- [ ] Docker container images
-- [ ] Cross-compiled binaries for more platforms
-  - [ ] ARM32 (Raspberry Pi)
-  - [ ] FreeBSD
-  - [ ] OpenBSD
+- [x] Docker container images (multi-arch: amd64 + arm64)
+- [x] Cross-compiled binaries for more platforms
+  - [x] ARM32 (Raspberry Pi — armv7)
+  - [x] FreeBSD (x86_64)
+  - [x] OpenBSD (x86_64 compat via static musl)
+  - [x] Linux musl (fully static binary)
 
 #### Voice & Communication
 
@@ -76,8 +89,8 @@ This document outlines the planned features and roadmap for OpenKrab.
 
 ### v2026.3.x (Q1 2026)
 
-- Docker container images
-- Cross-compilation for ARM32
+- ✅ Docker container images (Dockerfile + docker-compose)
+- ✅ Cross-compilation for ARM32, FreeBSD, OpenBSD
 - Native macOS notifications
 
 ### v2026.4.x (Q2 2026)
@@ -125,7 +138,7 @@ Want to help implement these features? See [CONTRIBUTING.md](CONTRIBUTING.md) fo
 
 Priority areas for contributors:
 
-1. Docker containerization
+1. ~~Docker containerization~~ ✅
 2. WebRTC implementation
 3. Additional channel connectors
 4. Plugin SDK improvements

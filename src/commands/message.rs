@@ -15,7 +15,7 @@ pub struct MessageSendOptions {
 
 /// Send a message to a channel.
 pub async fn message_send_command(opts: MessageSendOptions) -> anyhow::Result<String> {
-    let message = Message {
+    let _message = Message {
         id: format!("{}:{}", opts.channel, uuid::Uuid::new_v4()),
         text: opts.text.clone(),
         from: None,
@@ -41,31 +41,31 @@ pub async fn message_send_command(opts: MessageSendOptions) -> anyhow::Result<St
 }
 
 /// Send message via Slack.
-async fn send_slack_message(opts: &MessageSendOptions) -> anyhow::Result<String> {
+async fn send_slack_message(_opts: &MessageSendOptions) -> anyhow::Result<String> {
     // In real implementation, would use slack_client
     Ok(format!("slack-msg-{}", uuid::Uuid::new_v4()))
 }
 
 /// Send message via Telegram.
-async fn send_telegram_message(opts: &MessageSendOptions) -> anyhow::Result<String> {
+async fn send_telegram_message(_opts: &MessageSendOptions) -> anyhow::Result<String> {
     // In real implementation, would use telegram_client
     Ok(format!("telegram-msg-{}", uuid::Uuid::new_v4()))
 }
 
 /// Send message via Discord.
-async fn send_discord_message(opts: &MessageSendOptions) -> anyhow::Result<String> {
+async fn send_discord_message(_opts: &MessageSendOptions) -> anyhow::Result<String> {
     // In real implementation, would use discord_client
     Ok(format!("discord-msg-{}", uuid::Uuid::new_v4()))
 }
 
 /// Send message via LINE.
-async fn send_line_message(opts: &MessageSendOptions) -> anyhow::Result<String> {
+async fn send_line_message(_opts: &MessageSendOptions) -> anyhow::Result<String> {
     // In real implementation, would use line_client
     Ok(format!("line-msg-{}", uuid::Uuid::new_v4()))
 }
 
 /// Send message via WhatsApp.
-async fn send_whatsapp_message(opts: &MessageSendOptions) -> anyhow::Result<String> {
+async fn send_whatsapp_message(_opts: &MessageSendOptions) -> anyhow::Result<String> {
     // In real implementation, would use whatsapp_client
     Ok(format!("whatsapp-msg-{}", uuid::Uuid::new_v4()))
 }

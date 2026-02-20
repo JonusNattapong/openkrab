@@ -19,7 +19,7 @@ pub async fn send_whatsapp_message(
 pub async fn send_whatsapp_media(
     to: &str,
     text: Option<&str>,
-    media_url: &str,
+    _media_url: &str,
     access_token: &str,
     phone_number_id: &str,
 ) -> Result<serde_json::Value> {

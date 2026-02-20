@@ -1,5 +1,4 @@
 use futures_util::{SinkExt, StreamExt};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio_tungstenite::{connect_async, tungstenite::Message};
 use url::Url;
@@ -41,6 +40,7 @@ pub struct GatewayConnection {
                 + Send,
         >,
     >,
+    #[allow(dead_code)]
     pending_requests: HashMap<String, tokio::sync::oneshot::Sender<GatewayMessage>>,
 }
 

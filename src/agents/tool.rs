@@ -578,7 +578,7 @@ impl Tool for TaskTool {
         // But since they are async and need &self, we just inline or call them.
         // Wait, TaskTool struct implementation is separate from Tool trait impl.
 
-        let task_file = self.workspace_root.join("memory/tasks.md");
+        let _task_file = self.workspace_root.join("memory/tasks.md");
 
         match action {
             "add" => {

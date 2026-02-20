@@ -127,7 +127,7 @@ pub fn read_string_param(
         }
     };
 
-    let mut result = if options.trim {
+    let result = if options.trim {
         string_value.trim().to_string()
     } else {
         string_value

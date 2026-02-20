@@ -54,6 +54,7 @@ impl TtsBackend {
     }
 }
 
+#[allow(dead_code)]
 fn which_exists(cmd: &str) -> bool {
     Command::new("which")
         .arg(cmd)
@@ -109,7 +110,7 @@ impl TtsSpeaker {
 
     fn speak_windows(&self, text: &str) -> Result<()> {
         let rate = self.rate.unwrap_or(0);
-        let script = format!(
+        let _script = format!(
             "Add-Type -AssemblyName System.Speech; \
              $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; \
              $s.Rate = {}; \

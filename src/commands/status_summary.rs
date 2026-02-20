@@ -3,7 +3,6 @@
 
 use crate::config::AppConfig;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 /// Status summary for display.
 #[derive(Debug, Clone, Serialize, Deserialize)]

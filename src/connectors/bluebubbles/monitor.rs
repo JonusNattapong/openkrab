@@ -6,13 +6,15 @@ use std::sync::{Arc, Mutex};
 
 use serde::{Deserialize, Serialize};
 
-use super::config::{resolve_account, resolve_webhook_path, ResolvedBlueBubblesAccount};
+use super::config::ResolvedBlueBubblesAccount;
 use super::types::{
     BlueBubblesAttachment, BlueBubblesConfig, NormalizedWebhookMessage, NormalizedWebhookReaction,
-    WebhookPayload, DEFAULT_TIMEOUT_MS,
+    WebhookPayload,
 };
 
+#[allow(dead_code)]
 const DEFAULT_WEBHOOK_PATH: &str = "/webhook/bluebubbles";
+#[allow(dead_code)]
 const DEFAULT_INBOUND_DEBOUNCE_MS: u64 = 500;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -192,7 +192,7 @@ pub fn extract_handle_from_chat_guid(chat_guid: &str) -> Option<String> {
 
 pub fn normalize_handle(raw: &str) -> String {
     let trimmed = raw.trim();
-    let without_prefix = trimmed
+    let _without_prefix = trimmed
         .strip_prefix("+")
         .unwrap_or(trimmed)
         .replace(|c: char| !c.is_alphanumeric(), "");

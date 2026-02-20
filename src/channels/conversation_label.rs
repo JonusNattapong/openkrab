@@ -25,19 +25,19 @@ fn should_append_id(id: &str) -> bool {
 
 #[derive(Debug, Default)]
 pub struct MsgContext {
-    pub ConversationLabel: Option<String>,
-    pub ThreadLabel: Option<String>,
-    pub ChatType: Option<String>,
-    pub SenderName: Option<String>,
-    pub From: Option<String>,
-    pub GroupChannel: Option<String>,
-    pub GroupSubject: Option<String>,
-    pub GroupSpace: Option<String>,
+    pub conversation_label: Option<String>,
+    pub thread_label: Option<String>,
+    pub chat_type: Option<String>,
+    pub sender_name: Option<String>,
+    pub from: Option<String>,
+    pub group_channel: Option<String>,
+    pub group_subject: Option<String>,
+    pub group_space: Option<String>,
 }
 
 pub fn resolve_conversation_label(ctx: &MsgContext) -> Option<String> {
     if let Some(explicit) = ctx
-        .ConversationLabel
+        .conversation_label
         .as_ref()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
@@ -45,7 +45,7 @@ pub fn resolve_conversation_label(ctx: &MsgContext) -> Option<String> {
         return Some(explicit.to_string());
     }
     if let Some(thread_label) = ctx
-        .ThreadLabel
+        .thread_label
         .as_ref()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
@@ -53,10 +53,10 @@ pub fn resolve_conversation_label(ctx: &MsgContext) -> Option<String> {
         return Some(thread_label.to_string());
     }
 
-    let chat_type = crate::channels::chat_type::normalize_chat_type(ctx.ChatType.as_deref());
+    let chat_type = crate::channels::chat_type::normalize_chat_type(ctx.chat_type.as_deref());
     if matches!(chat_type, Some(ChatType::Direct)) {
         if let Some(name) = ctx
-            .SenderName
+            .sender_name
             .as_ref()
             .map(|s| s.trim())
             .filter(|s| !s.is_empty())
@@ -64,7 +64,7 @@ pub fn resolve_conversation_label(ctx: &MsgContext) -> Option<String> {
             return Some(name.to_string());
         }
         if let Some(from) = ctx
-            .From
+            .from
             .as_ref()
             .map(|s| s.trim())
             .filter(|s| !s.is_empty())
@@ -76,28 +76,28 @@ pub fn resolve_conversation_label(ctx: &MsgContext) -> Option<String> {
 
     // Build base from group/channel/space/from in order
     let base = if let Some(v) = ctx
-        .GroupChannel
+        .group_channel
         .as_ref()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
     {
         v.to_string()
     } else if let Some(v) = ctx
-        .GroupSubject
+        .group_subject
         .as_ref()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
     {
         v.to_string()
     } else if let Some(v) = ctx
-        .GroupSpace
+        .group_space
         .as_ref()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
     {
         v.to_string()
     } else if let Some(v) = ctx
-        .From
+        .from
         .as_ref()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
@@ -111,7 +111,7 @@ pub fn resolve_conversation_label(ctx: &MsgContext) -> Option<String> {
         return None;
     }
 
-    let id = extract_conversation_id(ctx.From.as_deref());
+    let id = extract_conversation_id(ctx.from.as_deref());
     if id.is_none() {
         return Some(base);
     }

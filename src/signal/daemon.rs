@@ -94,7 +94,7 @@ pub async fn spawn_daemon(
 ) -> Result<DaemonHandle, Box<dyn std::error::Error + Send + Sync>> {
     let args = build_daemon_args(&opts);
 
-    let mut child = Command::new(&opts.cli_path)
+    let child = Command::new(&opts.cli_path)
         .args(&args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())

@@ -5,10 +5,9 @@ use anyhow::Result;
 use futures_util::StreamExt;
 use reqwest::Client;
 use std::sync::Arc;
-use tokio::sync::mpsc;
 use tokio_tungstenite::{connect_async, tungstenite::Message};
 
-use super::client::{health_check, SseEvent};
+use super::client::health_check;
 use super::daemon::{
     daemon_opts_from_config, should_auto_start, spawn_daemon, wait_for_daemon_ready, DaemonHandle,
 };

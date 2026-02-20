@@ -1,0 +1,32 @@
+# Cross-compilation configuration for krabkrab
+# Used by `cross` (https://github.com/cross-rs/cross)
+# Install: cargo install cross --git https://github.com/cross-rs/cross
+# Usage:   cross build --release --target <target>
+
+[build.env]
+passthrough = [
+    "RUST_LOG",
+    "KRABKRAB_DATA_DIR",
+]
+
+# ── ARM32 (Raspberry Pi) ────────────────────────────────────────────
+[target.armv7-unknown-linux-gnueabihf]
+image = "ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf:main"
+
+[target.arm-unknown-linux-gnueabihf]
+image = "ghcr.io/cross-rs/arm-unknown-linux-gnueabihf:main"
+
+# ── ARM64 (modern RPi, AWS Graviton) ────────────────────────────────
+[target.aarch64-unknown-linux-gnu]
+image = "ghcr.io/cross-rs/aarch64-unknown-linux-gnu:main"
+
+[target.aarch64-unknown-linux-musl]
+image = "ghcr.io/cross-rs/aarch64-unknown-linux-musl:main"
+
+# ── x86_64 musl (fully static binary) ──────────────────────────────
+[target.x86_64-unknown-linux-musl]
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-musl:main"
+
+# ── FreeBSD ─────────────────────────────────────────────────────────
+[target.x86_64-unknown-freebsd]
+image = "ghcr.io/cross-rs/x86_64-unknown-freebsd:main"

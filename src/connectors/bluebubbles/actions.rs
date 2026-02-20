@@ -9,9 +9,7 @@ use super::chat::{
 };
 use super::config::resolve_account;
 use super::probe::is_private_api_enabled;
-use super::reactions::{
-    map_emoji_to_reaction, parse_reaction_action, remove_reaction, send_reaction,
-};
+use super::reactions::{map_emoji_to_reaction, send_reaction};
 use super::send::send_message;
 use super::types::BlueBubblesConfig;
 
@@ -149,8 +147,8 @@ fn execute_unsend(
 }
 
 fn execute_reply(
-    base_url: &str,
-    password: &str,
+    _base_url: &str,
+    _password: &str,
     ctx: &ActionContext,
     config: &BlueBubblesConfig,
 ) -> Result<ActionResult, String> {
@@ -188,8 +186,8 @@ fn execute_reply(
 }
 
 fn execute_effect(
-    base_url: &str,
-    password: &str,
+    _base_url: &str,
+    _password: &str,
     ctx: &ActionContext,
 ) -> Result<ActionResult, String> {
     if !is_private_api_enabled("default") {

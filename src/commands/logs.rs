@@ -1,7 +1,7 @@
 //! Logs command - View and tail gateway logs
 
 use std::fs::File;
-use std::io::{BufRead, BufReader, Seek, SeekFrom};
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 fn get_log_path() -> PathBuf {
@@ -9,7 +9,7 @@ fn get_log_path() -> PathBuf {
     home.join("krabkrab").join("logs")
 }
 
-pub fn logs_tail_command(lines: Option<usize>, follow: bool, json: bool) -> String {
+pub fn logs_tail_command(lines: Option<usize>, _follow: bool, json: bool) -> String {
     let log_dir = get_log_path();
     let log_file = log_dir.join("gateway.log");
 

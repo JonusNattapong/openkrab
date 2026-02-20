@@ -1,7 +1,7 @@
 //! Config validation — port of `openkrab/src/config/validation.ts` (Phase 1-4 schema validation)
 
 use crate::openkrab_config::OpenKrabConfig;
-use anyhow::{bail, Result};
+use anyhow::Result;
 use serde_json::Value;
 
 /// Validation error
@@ -72,12 +72,6 @@ pub fn validate_config_schema(config: &OpenKrabConfig) -> ValidationResult<()> {
                 errors.push(ValidationError {
                     field: "gateway.port".to_string(),
                     message: "must not be 0".to_string(),
-                });
-            }
-            if port > 65535 {
-                errors.push(ValidationError {
-                    field: "gateway.port".to_string(),
-                    message: "must be <= 65535".to_string(),
                 });
             }
         }

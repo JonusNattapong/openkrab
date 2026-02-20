@@ -224,7 +224,7 @@ pub fn login_minimax_oauth(region: Option<&str>) -> Result<QwenCredentials> {
         _ => MiniMaxRegion::Global,
     };
 
-    let mut login = crate::providers::minimax_oauth::MiniMaxPkce::generate();
+    let login = crate::providers::minimax_oauth::MiniMaxPkce::generate();
 
     // Step 1: Request device code
     let body = minimax_oauth::build_code_request_body(&login.challenge, &login.state, region);

@@ -212,7 +212,7 @@ where
     } else {
         docs_link(meta.docs_path.as_deref().unwrap_or(""), Some(docs_label))
     };
-    let extras = meta
+    let _extras = meta
         .selection_extras
         .as_ref()
         .map(|v| v.join(" "))

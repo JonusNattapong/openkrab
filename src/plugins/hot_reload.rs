@@ -2,8 +2,8 @@
 //!
 //! Watches plugin directories for changes and automatically reloads plugins.
 
-use anyhow::{Context, Result};
-use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
+use anyhow::Result;
+use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -15,6 +15,7 @@ use crate::plugins::loader::{PluginLoader, PluginManager};
 use crate::plugins::{PluginRegistry, PluginStatus};
 
 /// Debounce duration to avoid rapid reloads
+#[allow(dead_code)]
 const DEBOUNCE_MS: u64 = 500;
 
 /// Minimum time between reloads of the same plugin
@@ -269,7 +270,7 @@ impl HotReloadManager {
         }
 
         // Step 3: Discover
-        let discovered = {
+        let _discovered = {
             let mgr = manager.lock().await;
             mgr.loader.discover().map_err(|e| anyhow::anyhow!("Failed to discover: {}", e))?
         };
@@ -312,7 +313,7 @@ impl HotReloadManager {
     }
 
     /// Classify a file system event into a hot reload event
-    fn classify_event(path: &Path, event: &Event) -> Option<HotReloadEvent> {
+    fn classify_event(path: &Path, _event: &Event) -> Option<HotReloadEvent> {
         let file_name = path.file_name()?.to_str()?;
 
         // Check if it's a manifest file
@@ -388,18 +389,19 @@ impl HotReloadManager {
 
 /// Lightweight version of HotReloadManager for background tasks
 struct HotReloadTask {
+    #[allow(dead_code)]
     last_reload: Arc<RwLock<HashMap<String, Instant>>>,
     event_rx: Option<mpsc::Receiver<HotReloadEvent>>,
     enabled: bool,
 }
 
 impl HotReloadTask {
-    async fn process_events(&mut self, manager: &Arc<Mutex<PluginManager>>) -> Result<HotReloadSummary> {
+    async fn process_events(&mut self, _manager: &Arc<Mutex<PluginManager>>) -> Result<HotReloadSummary> {
         if !self.enabled {
             return Ok(HotReloadSummary::default());
         }
 
-        let mut summary = HotReloadSummary::default();
+        let summary = HotReloadSummary::default();
 
         if let Some(ref mut rx) = self.event_rx {
             while let Ok(event) = rx.try_recv() {

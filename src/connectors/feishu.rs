@@ -164,7 +164,7 @@ pub const FEISHU_API_BASE: &str = "https://open.feishu.cn/open-apis";
 pub fn build_text_payload(
     receive_id: &str,
     text: &str,
-    receive_id_type: &str,
+    _receive_id_type: &str,
 ) -> serde_json::Value {
     serde_json::json!({
         "receive_id": receive_id,

@@ -2,9 +2,7 @@
 //! Ported from `openkrab/extensions/signal/` (Phase 10, 13).
 
 use anyhow::{bail, Result};
-use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 use tokio::sync::mpsc;
 
 pub mod client;

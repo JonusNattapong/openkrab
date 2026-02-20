@@ -45,6 +45,48 @@ pub struct GatewaySessionRow {
     pub last_account_id: Option<String>,
 }
 
+impl From<&crate::sessions::Session> for GatewaySessionRow {
+    fn from(s: &crate::sessions::Session) -> Self {
+        Self {
+            key: s.id.clone(),
+            kind: SessionKind::Unknown,
+            label: s.label.clone(),
+            display_name: None,
+            derived_title: None,
+            last_message_preview: s.transcript.last().map(|e| e.text.clone()),
+            channel: None,
+            subject: None,
+            group_channel: None,
+            space: None,
+            chat_type: None,
+            updated_at: Some(s.last_active.timestamp()),
+            session_id: None,
+            system_sent: None,
+            aborted_last_run: None,
+            thinking_level: None,
+            verbose_level: Some(s.verbosity.as_str().to_string()),
+            reasoning_level: None,
+            elevated_level: if s.elevated {
+                Some("elevated".to_string())
+            } else {
+                None
+            },
+            send_policy: None,
+            input_tokens: None,
+            output_tokens: None,
+            total_tokens: None,
+            total_tokens_fresh: None,
+            response_usage: None,
+            model_provider: None,
+            model: s.model_override.clone(),
+            context_tokens: None,
+            last_channel: None,
+            last_to: None,
+            last_account_id: None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SessionKind {

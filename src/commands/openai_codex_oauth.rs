@@ -54,7 +54,7 @@ impl Default for OAuthHandlers {
 pub fn create_vps_aware_oauth_handlers(
     is_remote: bool,
     local_browser_message: &str,
-    manual_prompt_message: &str,
+    _manual_prompt_message: &str,
 ) -> OAuthHandlers {
     if is_remote {
         OAuthHandlers {

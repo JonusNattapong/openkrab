@@ -66,8 +66,10 @@ pub fn level_to_min_level(level: LogLevel) -> u8 {
     }
 }
 
+#[allow(dead_code)]
 static LOG_LEVEL_STRS: OnceLock<Vec<&'static str>> = OnceLock::new();
 
+#[allow(dead_code)]
 pub fn allowed_log_levels() -> &'static Vec<&'static str> {
     LOG_LEVEL_STRS.get_or_init(|| ALLOWED_LOG_LEVELS.to_vec())
 }

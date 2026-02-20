@@ -8,7 +8,12 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
+  # ─── Create GitHub Release ───────────────────────────────────────────
   create-release:
     runs-on: ubuntu-latest
     outputs:
@@ -31,17 +36,6 @@ jobs:
             echo "path=" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: 'src -> target/release/build'
-
-      - name: Build
-        run: cargo build --workspace --release
-
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -53,7 +47,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-linux:
+  # ─── Linux x86_64 ───────────────────────────────────────────────────
+  build-linux-x86_64:
     runs-on: ubuntu-latest
     needs: create-release
     steps:
@@ -64,19 +59,221 @@ jobs:
         with:
           targets: x86_64-unknown-linux-gnu
 
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
       - name: Build
-        run: cargo build --release --target x86_64-unknown-linux-gnu
+        run: cargo build --workspace --release --target x86_64-unknown-linux-gnu
+
+      - name: Package
+        run: |
+          cd target/x86_64-unknown-linux-gnu/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64.tar.gz krabkrab-cli
+          cd ../../..
+          sha256sum krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64.tar.gz.sha256
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/x86_64-unknown-linux-gnu/release/krabkrab
-          asset_name: krabkrab-linux-x86_64
-          asset_content_type: application/octet-stream
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # ─── Linux x86_64 (musl static) ────────────────────────────────────
+  build-linux-musl:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+
+      - name: Install musl tools
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build (static)
+        run: cargo build --workspace --release --target x86_64-unknown-linux-musl
+
+      - name: Package
+        run: |
+          cd target/x86_64-unknown-linux-musl/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64-static.tar.gz krabkrab-cli
+          cd ../../..
+          sha256sum krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64-static.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64-static.tar.gz.sha256
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64-static.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-x86_64-static.tar.gz.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── Linux ARM64 (aarch64) ─────────────────────────────────────────
+  build-linux-arm64:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build with cross
+        run: cross build --workspace --release --target aarch64-unknown-linux-gnu
+
+      - name: Package
+        run: |
+          cd target/aarch64-unknown-linux-gnu/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-linux-arm64.tar.gz krabkrab-cli
+          cd ../../..
+          sha256sum krabkrab-v${{ needs.create-release.outputs.version }}-linux-arm64.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-linux-arm64.tar.gz.sha256
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-arm64.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-arm64.tar.gz.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── Linux ARM32 (Raspberry Pi) ────────────────────────────────────
+  build-linux-arm32:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build with cross (armv7 — RPi 2/3/4)
+        run: cross build --workspace --release --target armv7-unknown-linux-gnueabihf
+
+      - name: Package
+        run: |
+          cd target/armv7-unknown-linux-gnueabihf/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-linux-armv7.tar.gz krabkrab-cli
+          cd ../../..
+          sha256sum krabkrab-v${{ needs.create-release.outputs.version }}-linux-armv7.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-linux-armv7.tar.gz.sha256
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-armv7.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-linux-armv7.tar.gz.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── FreeBSD x86_64 ────────────────────────────────────────────────
+  build-freebsd:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build with cross (FreeBSD)
+        run: cross build --workspace --release --target x86_64-unknown-freebsd
+
+      - name: Package
+        run: |
+          cd target/x86_64-unknown-freebsd/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-freebsd-x86_64.tar.gz krabkrab-cli
+          cd ../../..
+          sha256sum krabkrab-v${{ needs.create-release.outputs.version }}-freebsd-x86_64.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-freebsd-x86_64.tar.gz.sha256
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-freebsd-x86_64.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-freebsd-x86_64.tar.gz.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── OpenBSD x86_64 (cross-compiled via Zig) ───────────────────────
+  build-openbsd:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+
+      - name: Install musl tools and Zig
+        run: |
+          sudo apt-get update && sudo apt-get install -y musl-tools
+          # Install Zig for cross-compilation linker
+          ZIG_VERSION="0.13.0"
+          wget -q "https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
+          tar xf "zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
+          sudo mv "zig-linux-x86_64-${ZIG_VERSION}" /opt/zig
+          echo "/opt/zig" >> $GITHUB_PATH
+
+      - name: Install cargo-zigbuild
+        run: cargo install cargo-zigbuild
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build for OpenBSD-compatible (musl static)
+        run: |
+          # OpenBSD lacks official Rust target. Build a fully-static musl
+          # binary that runs under OpenBSD's Linux compat layer.
+          cargo zigbuild --workspace --release --target x86_64-unknown-linux-musl
+
+      - name: Package
+        run: |
+          cd target/x86_64-unknown-linux-musl/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-openbsd-x86_64-compat.tar.gz krabkrab-cli
+          cd ../../..
+          sha256sum krabkrab-v${{ needs.create-release.outputs.version }}-openbsd-x86_64-compat.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-openbsd-x86_64-compat.tar.gz.sha256
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-openbsd-x86_64-compat.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-openbsd-x86_64-compat.tar.gz.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── Windows x86_64 ────────────────────────────────────────────────
   build-windows:
     runs-on: windows-latest
     needs: create-release
@@ -88,19 +285,31 @@ jobs:
         with:
           targets: x86_64-pc-windows-msvc
 
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
       - name: Build
-        run: cargo build --release --target x86_64-pc-windows-msvc
+        run: cargo build --workspace --release --target x86_64-pc-windows-msvc
+
+      - name: Package
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "target/x86_64-pc-windows-msvc/release/krabkrab-cli.exe" `
+            -DestinationPath "krabkrab-v${{ needs.create-release.outputs.version }}-windows-x86_64.zip"
+          Get-FileHash "krabkrab-v${{ needs.create-release.outputs.version }}-windows-x86_64.zip" -Algorithm SHA256 |
+            Select-Object -ExpandProperty Hash |
+            Out-File "krabkrab-v${{ needs.create-release.outputs.version }}-windows-x86_64.zip.sha256"
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/x86_64-pc-windows-msvc/release/krabkrab.exe
-          asset_name: krabkrab-windows-x86_64.exe
-          asset_content_type: application/octet-stream
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-windows-x86_64.zip
+            krabkrab-v${{ needs.create-release.outputs.version }}-windows-x86_64.zip.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # ─── macOS (ARM + Intel universal) ─────────────────────────────────
   build-macos:
     runs-on: macos-latest
     needs: create-release
@@ -112,28 +321,89 @@ jobs:
         with:
           targets: aarch64-apple-darwin, x86_64-apple-darwin
 
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
       - name: Build (ARM)
-        run: cargo build --release --target aarch64-apple-darwin
+        run: cargo build --workspace --release --target aarch64-apple-darwin
 
       - name: Build (Intel)
-        run: cargo build --release --target x86_64-apple-darwin
+        run: cargo build --workspace --release --target x86_64-apple-darwin
 
-      - name: Upload ARM to Release
+      - name: Package ARM
+        run: |
+          cd target/aarch64-apple-darwin/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz krabkrab-cli
+          cd ../../..
+          shasum -a 256 krabkrab-v${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz.sha256
+
+      - name: Package Intel
+        run: |
+          cd target/x86_64-apple-darwin/release
+          tar czf ../../../krabkrab-v${{ needs.create-release.outputs.version }}-macos-x86_64.tar.gz krabkrab-cli
+          cd ../../..
+          shasum -a 256 krabkrab-v${{ needs.create-release.outputs.version }}-macos-x86_64.tar.gz > krabkrab-v${{ needs.create-release.outputs.version }}-macos-x86_64.tar.gz.sha256
+
+      - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/aarch64-apple-darwin/release/krabkrab
-          asset_name: krabkrab-macos-arm64
-          asset_content_type: application/octet-stream
+          files: |
+            krabkrab-v${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-macos-arm64.tar.gz.sha256
+            krabkrab-v${{ needs.create-release.outputs.version }}-macos-x86_64.tar.gz
+            krabkrab-v${{ needs.create-release.outputs.version }}-macos-x86_64.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Intel to Release
-        uses: softprops/action-gh-release@v2
+  # ─── Docker Container Images ───────────────────────────────────────
+  docker:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (for multi-arch builds)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/x86_64-apple-darwin/release/krabkrab
-          asset_name: krabkrab-macos-x86_64
-          asset_content_type: application/octet-stream
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+            type=raw,value=latest
+
+      - name: Build and push (amd64 + arm64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            FEATURES=default
+            PROFILE=release

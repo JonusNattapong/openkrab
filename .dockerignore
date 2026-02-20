@@ -1,0 +1,54 @@
+# Build artifacts
+target/
+**/*.rs.bk
+
+# VCS
+.git/
+.github/
+
+# Documentation and non-build files
+docs/
+logo/
+skills/
+*.md
+!README.md
+LICENSE
+
+# IDE
+.idea/
+.vscode/
+.claude/
+.prompt/
+
+# Local state
+.env
+.env.*
+.local/
+local/
+workspace/
+*.log
+*.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+test_out.txt
+cargo_errors.txt
+check_out.txt
+final_check*.txt
+warnings*.txt
+
+# Node / JS (if any)
+node_modules/
+dist/
+pnpm-lock.yaml
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Agent state
+.agent/*.json

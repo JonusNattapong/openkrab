@@ -1,5 +1,5 @@
 use axum::{
-    extract::{ws::Message, ws::WebSocket, ws::WebSocketUpgrade, State},
+    extract::{ws::Message, ws::WebSocketUpgrade, State},
     response::Response,
     routing::get,
     Router,
@@ -11,7 +11,6 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tower_http::cors::CorsLayer;
 
-use crate::gateway::constants::*;
 use crate::gateway::types::*;
 
 pub type ClientId = String;
@@ -26,6 +25,12 @@ pub struct GatewayServer {
     // Agent for processing messages
     pub agent: Option<Arc<crate::agents::Agent>>,
     pub memory: Option<Arc<crate::memory::MemoryManager>>,
+    /// Thread-safe session registry
+    pub sessions: Arc<RwLock<crate::sessions::SessionRegistry>>,
+    /// Heartbeat runner for channel health monitoring
+    pub heartbeat_runner: Arc<RwLock<Option<crate::gateway::heartbeat::HeartbeatRunner>>>,
+    /// Handle for config hot-reloading
+    pub config_reloader: Arc<RwLock<Option<crate::gateway::config_reload::ConfigReloaderHandle>>>,
 }
 
 impl std::fmt::Debug for GatewayServer {
@@ -74,6 +79,9 @@ impl GatewayServer {
             next_connection_id: Arc::new(RwLock::new(1)),
             agent: None,
             memory: None,
+            sessions: Arc::new(RwLock::new(crate::sessions::SessionRegistry::new())),
+            heartbeat_runner: Arc::new(RwLock::new(None)),
+            config_reloader: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -180,20 +188,84 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
                     Ok(GatewayMessage::Chat {
                         session_key,
                         message,
-                        attachments,
+                        attachments: _,
                     }) => {
                         tracing::info!("Chat message from {}: {}", session_key, message);
 
-                        // Send acknowledgment
-                        let response = GatewayMessage::Status {
-                            sessions: vec![], // Placeholder
-                            agents: vec![],   // Placeholder
+                        // Emit Inbound Hook
+                        let mut payload = crate::hooks::HookPayload::new();
+                        payload.set("session_key", session_key.clone());
+                        payload.set("message", message.clone());
+                        payload.set("connection_id", connection_id as i64);
+                        crate::hooks::emit(crate::hooks::events::MESSAGE_INBOUND, &payload);
+
+                        if let Some(agent) = &server.agent {
+                            // Get or create session
+                            let mut sessions_lock = server.sessions.write().await;
+                            let session = sessions_lock.get_or_create(&session_key);
+                            session.append_transcript(crate::sessions::TranscriptEntry::user(&message));
+                            
+                            // Drop lock before async call
+                            drop(sessions_lock);
+
+                            // Process message
+                            let mut sessions_lock = server.sessions.write().await;
+                            let reply = agent.answer_session(sessions_lock.get_or_create(&session_key), None).await;
+                            drop(sessions_lock);
+
+                            match reply {
+                                Ok(text) => {
+                                    // Emit Outbound Hook
+                                    let mut out_payload = crate::hooks::HookPayload::new();
+                                    out_payload.set("session_key", session_key.clone());
+                                    out_payload.set("reply", text.clone());
+                                    crate::hooks::emit(crate::hooks::events::MESSAGE_OUTBOUND, &out_payload);
+
+                                    let response = GatewayMessage::Chat {
+                                        session_key: session_key.clone(),
+                                        message: text,
+                                        attachments: None,
+                                    };
+                                    if let Ok(json) = serde_json::to_string(&response) {
+                                        let _ = sender.send(Message::Text(json.into())).await;
+                                    }
+                                }
+                                Err(e) => {
+                                    tracing::error!("Agent error: {}", e);
+                                    let error_msg = GatewayMessage::Error {
+                                        code: "agent_error".to_string(),
+                                        message: e.to_string(),
+                                    };
+                                    if let Ok(json) = serde_json::to_string(&error_msg) {
+                                        let _ = sender.send(Message::Text(json.into())).await;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Ok(GatewayMessage::Status { .. }) => {
+                        let sessions_registry = server.sessions.read().await;
+                        let sessions: Vec<GatewaySessionRow> = sessions_registry.iter().map(|(_, s)| GatewaySessionRow::from(s)).collect();
+                        
+                        let agents = if let Some(agent) = &server.agent {
+                            vec![GatewayAgentRow {
+                                id: agent.identity.name.clone().to_lowercase(),
+                                name: Some(agent.identity.name.clone()),
+                                identity: Some(crate::gateway::types::AgentIdentity {
+                                    name: Some(agent.identity.name.clone()),
+                                    theme: None,
+                                    emoji: Some(agent.identity.emoji.clone()),
+                                    avatar: None,
+                                    avatar_url: None,
+                                }),
+                            }]
+                        } else {
+                            vec![]
                         };
 
+                        let response = GatewayMessage::Status { sessions, agents };
                         if let Ok(json) = serde_json::to_string(&response) {
-                            if sender.send(Message::Text(json.into())).await.is_err() {
-                                break;
-                            }
+                            let _ = sender.send(Message::Text(json.into())).await;
                         }
                     }
                     _ => {
@@ -245,7 +317,7 @@ pub async fn start_gateway_server(
     tracing::info!("Starting gateway server on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
-    let server_handle = tokio::spawn(async move { axum::serve(listener, app).await });
+    let _server_handle = tokio::spawn(async move { axum::serve(listener, app).await });
 
     // In a real implementation, we'd return a handle to stop the server
     // For now, just return the GatewayServer instance

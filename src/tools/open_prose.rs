@@ -8,7 +8,7 @@
 //!
 //! Reference: `openkrab/extensions/open-prose/skills/prose/SKILL.md`
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use std::path::{Path, PathBuf};
 
 // ─── Command kind ────────────────────────────────────────────────────────────

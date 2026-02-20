@@ -3,14 +3,12 @@
 //! Provides resource limits, filesystem isolation, and network controls
 //! for safely executing third-party plugins.
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::time::Duration;
 use tokio::sync::RwLock;
-use tracing::{debug, error, info, warn};
 
 /// Sandbox security level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

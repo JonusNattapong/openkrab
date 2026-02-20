@@ -1,5 +1,4 @@
 use super::console::ConsoleSettings;
-use super::levels::LogLevel;
 use super::logger::{LoggerResolvedSettings, LoggerSettings};
 use std::sync::{Mutex, RwLock};
 

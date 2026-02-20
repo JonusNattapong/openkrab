@@ -123,7 +123,7 @@ pub fn sandbox_build_command(browser: bool, common: bool) -> String {
 }
 
 /// Recreate sandbox containers.
-pub fn sandbox_recreate_command(cfg: &AppConfig, force: bool) -> String {
+pub fn sandbox_recreate_command(_cfg: &AppConfig, force: bool) -> String {
     if !is_docker_available() {
         return "Docker is not available. Install Docker to use sandbox features.".to_string();
     }

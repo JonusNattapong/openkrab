@@ -1,7 +1,6 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use reqwest::Response;
 use std::path::Path;
-use tokio::io::AsyncWriteExt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MediaFetchErrorCode {
@@ -136,7 +135,7 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
         .into());
     }
 
-    let content_length = res.content_length();
+    let _content_length = res.content_length();
     let final_url = res.url().clone();
     let content_disposition = res
         .headers()

@@ -2,7 +2,6 @@
 //! Ported from `openkrab/src/agents/model-auth.ts` (Phase 15).
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::env;
 
 /// Provider authentication configuration.

@@ -2,7 +2,6 @@
 //! Ported from openkrab/extensions/bluebubbles/src/config-schema.ts
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 use super::types::{BlueBubblesAccountConfig, BlueBubblesActionConfig, BlueBubblesConfig};
 

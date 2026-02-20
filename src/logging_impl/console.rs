@@ -1,5 +1,4 @@
 use super::levels::{normalize_log_level, LogLevel};
-use super::logger::LoggerSettings;
 use super::state::get_logging_state;
 use serde::{Deserialize, Serialize};
 
@@ -184,6 +183,7 @@ pub fn format_console_timestamp(style: ConsoleStyle) -> String {
     }
 }
 
+#[allow(dead_code)]
 pub fn has_timestamp_prefix(value: &str) -> bool {
     let re = regex::Regex::new(
         r"^(?:\d{2}:\d{2}:\d{2}|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?)"
@@ -191,6 +191,7 @@ pub fn has_timestamp_prefix(value: &str) -> bool {
     re.is_match(value)
 }
 
+#[allow(dead_code)]
 pub fn is_json_payload(value: &str) -> bool {
     let trimmed = value.trim();
     if !trimmed.starts_with('{') && !trimmed.starts_with('[') {

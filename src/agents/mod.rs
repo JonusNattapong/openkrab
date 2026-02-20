@@ -1,8 +1,11 @@
 pub mod chat;
+pub mod compaction;
 pub mod core;
 pub mod identity;
 pub mod model_catalog;
 pub mod provider_auth;
+pub mod session_tools;
+pub mod streaming;
 pub mod tool;
 
 pub use chat::{ChatMessage, ChatProvider, OpenAiChatProvider};

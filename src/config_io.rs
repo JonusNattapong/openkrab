@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, RwLock};
-use std::time::{Duration, SystemTime};
+use std::sync::RwLock;
+use std::time::SystemTime;
 
 static CONFIG_CACHE: Lazy<RwLock<Option<CachedConfig>>> = Lazy::new(|| RwLock::new(None));
 
@@ -140,6 +140,17 @@ fn parse_config_json5(content: &str) -> Result<OpenKrabConfig> {
     Ok(config)
 }
 
+/// Load configuration as raw JSON value (used for hot-reloading)
+pub fn load_config_value() -> Result<serde_json::Value> {
+    let path = resolve_config_path()?;
+    if !path.exists() {
+        return Ok(serde_json::json!({}));
+    }
+    let content = fs::read_to_string(path)?;
+    let val: serde_json::Value = serde_json::from_str(&content)?;
+    Ok(val)
+}
+
 /// Process config includes (#include directives)
 fn process_config_includes(config: &OpenKrabConfig) -> Result<OpenKrabConfig> {
     // TODO: Implement #include processing
@@ -177,7 +188,7 @@ pub fn apply_env_substitution(config: &mut OpenKrabConfig) -> Result<()> {
 }
 
 /// Apply shell environment variables
-fn apply_shell_env(config: &mut OpenKrabConfig, timeout_ms: u64) -> Result<()> {
+fn apply_shell_env(_config: &mut OpenKrabConfig, _timeout_ms: u64) -> Result<()> {
     // This would require shell execution, simplified for now
     // TODO: Implement actual shell env import
     Ok(())
@@ -185,7 +196,7 @@ fn apply_shell_env(config: &mut OpenKrabConfig, timeout_ms: u64) -> Result<()> {
 
 /// Apply inline environment variables
 fn apply_inline_env_vars(
-    config: &mut OpenKrabConfig,
+    _config: &mut OpenKrabConfig,
     vars: &HashMap<String, String>,
 ) -> Result<()> {
     for (key, value) in vars {

@@ -242,7 +242,7 @@ fn resolve_custom_paths(
     let mut collections = Vec::new();
 
     if let Some(paths) = raw_paths {
-        for (index, entry) in paths.into_iter().enumerate() {
+        for (_index, entry) in paths.into_iter().enumerate() {
             let trimmed_path = entry.path.trim();
             if trimmed_path.is_empty() {
                 continue;

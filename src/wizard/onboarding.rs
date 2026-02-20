@@ -2,15 +2,14 @@
 //! Ported from `openkrab/src/wizard/onboarding.ts`
 
 use anyhow::Result;
-use std::sync::Arc;
 
 use super::prompts::{
     WizardCancelledError, WizardConfirmParams, WizardPrompter,
     WizardSelectOption, WizardSelectParams, WizardTextParams,
 };
 use super::types::{
-    GatewayAuthChoice, GatewayBindMode, OnboardMode, OnboardOptions,
-    QuickstartGatewayDefaults, ResetScope, TailscaleMode, WizardFlow,
+    GatewayAuthChoice, OnboardMode, OnboardOptions,
+    WizardFlow,
 };
 
 /// Default gateway port.

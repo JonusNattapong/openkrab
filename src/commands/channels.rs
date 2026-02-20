@@ -50,7 +50,7 @@ pub fn channels_status_command() -> String {
     channels_list_command()
 }
 
-pub fn channels_add_command(channel: &str, token: Option<&str>) -> String {
+pub fn channels_add_command(channel: &str, _token: Option<&str>) -> String {
     format!("Adding channel: {} with token...", channel)
 }
 

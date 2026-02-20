@@ -5,7 +5,6 @@
 
 use std::collections::HashMap;
 use std::env;
-use std::fs;
 use std::path::{Path, PathBuf};
 
 use serde_json::Value;

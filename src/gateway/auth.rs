@@ -1,3 +1,4 @@
+use base64::{engine::general_purpose::STANDARD, Engine as _};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -216,7 +217,7 @@ impl Authenticator for PasswordAuth {
 
         if let Some(header) = auth_header {
             if let Some(credentials) = header.strip_prefix("Basic ") {
-                if let Ok(decoded) = base64::decode(credentials) {
+                if let Ok(decoded) = STANDARD.decode(credentials) {
                     if let Ok(creds_str) = String::from_utf8(decoded) {
                         let parts: Vec<&str> = creds_str.split(':').collect();
                         if parts.len() == 2 {
@@ -358,7 +359,7 @@ mod tests {
     #[test]
     fn test_password_auth_success() {
         let auth = PasswordAuth::new("admin".to_string(), "password".to_string());
-        let credentials = base64::encode("admin:password");
+        let credentials = STANDARD.encode("admin:password");
         let ctx = AuthContext::new().with_header("authorization", format!("Basic {}", credentials));
         let result = auth.authenticate(&ctx);
         assert!(result.ok);

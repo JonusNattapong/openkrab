@@ -6,7 +6,7 @@ pub const DEFAULT_MAX_CHARS: usize = 100000;
 
 pub fn resolve_timeout_ms(seconds: Option<f64>, fallback_seconds: f64) -> u64 {
     let value = seconds.unwrap_or(fallback_seconds);
-    ((value.max(1.0) * 1000.0) as u64)
+    (value.max(1.0) * 1000.0) as u64
 }
 
 pub fn resolve_max_bytes(bytes: Option<usize>, fallback: usize) -> usize {

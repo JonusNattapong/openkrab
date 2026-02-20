@@ -32,7 +32,7 @@ pub enum CheckStatus {
 
 /// Run health checks.
 pub async fn health_command(cfg: &AppConfig, timeout_ms: u64) -> HealthResult {
-    let start = std::time::Instant::now();
+    let _start = std::time::Instant::now();
     let mut checks = Vec::new();
 
     // Check 1: Config load

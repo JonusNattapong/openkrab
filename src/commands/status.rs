@@ -5,8 +5,8 @@ use crate::commands::{
     status_daemon::{
         format_agent_local_status, format_daemon_status, get_agent_local_status, get_daemon_status,
     },
-    status_summary::{build_status_summary, format_status_summary, StatusSummary},
-    status_update::{check_for_updates, format_update_one_liner, UpdateCheckResult},
+    status_summary::{build_status_summary, format_status_summary},
+    status_update::{check_for_updates, format_update_one_liner},
 };
 use crate::config::AppConfig;
 

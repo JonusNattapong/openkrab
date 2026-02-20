@@ -2,11 +2,11 @@ use regex::Regex;
 
 #[derive(Debug, Default)]
 pub struct MsgContext {
-    pub ChatType: Option<String>,
-    pub SenderId: Option<String>,
-    pub SenderName: Option<String>,
-    pub SenderUsername: Option<String>,
-    pub SenderE164: Option<String>,
+    pub chat_type: Option<String>,
+    pub sender_id: Option<String>,
+    pub sender_name: Option<String>,
+    pub sender_username: Option<String>,
+    pub sender_e164: Option<String>,
 }
 
 fn normalize_chat_type(t: Option<&str>) -> String {
@@ -19,13 +19,13 @@ fn normalize_chat_type(t: Option<&str>) -> String {
 pub fn validate_sender_identity(ctx: &MsgContext) -> Vec<String> {
     let mut issues: Vec<String> = Vec::new();
 
-    let chat_type = normalize_chat_type(ctx.ChatType.as_deref());
+    let chat_type = normalize_chat_type(ctx.chat_type.as_deref());
     let is_direct = chat_type == "direct";
 
-    let sender_id = ctx.SenderId.as_deref().unwrap_or("").trim();
-    let sender_name = ctx.SenderName.as_deref().unwrap_or("").trim();
-    let sender_username = ctx.SenderUsername.as_deref().unwrap_or("").trim();
-    let sender_e164 = ctx.SenderE164.as_deref().unwrap_or("").trim();
+    let sender_id = ctx.sender_id.as_deref().unwrap_or("").trim();
+    let sender_name = ctx.sender_name.as_deref().unwrap_or("").trim();
+    let sender_username = ctx.sender_username.as_deref().unwrap_or("").trim();
+    let sender_e164 = ctx.sender_e164.as_deref().unwrap_or("").trim();
 
     if !is_direct {
         if sender_id.is_empty()
@@ -34,7 +34,7 @@ pub fn validate_sender_identity(ctx: &MsgContext) -> Vec<String> {
             && sender_e164.is_empty()
         {
             issues.push(
-                "missing sender identity (SenderId/SenderName/SenderUsername/SenderE164)"
+                "missing sender identity (sender_id/sender_name/sender_username/sender_e164)"
                     .to_string(),
             );
         }
@@ -62,8 +62,8 @@ pub fn validate_sender_identity(ctx: &MsgContext) -> Vec<String> {
         }
     }
 
-    if ctx.SenderId.is_some() && sender_id.is_empty() {
-        issues.push("SenderId is set but empty".to_string());
+    if ctx.sender_id.is_some() && sender_id.is_empty() {
+        issues.push("sender_id is set but empty".to_string());
     }
 
     issues

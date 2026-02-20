@@ -1,6 +1,3 @@
-use anyhow::Result;
-use std::path::Path;
-
 #[derive(Debug, Clone, Copy)]
 pub struct ImageMetadata {
     pub width: u32,

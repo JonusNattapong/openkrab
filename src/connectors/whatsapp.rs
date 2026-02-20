@@ -1,5 +1,5 @@
 use crate::common::{Message, UserId};
-use crate::gateway::{GatewayServer, GatewayState};
+use crate::gateway::GatewayState;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::sync::Arc;

@@ -1,10 +1,9 @@
 use super::console::ConsoleStyle;
 use super::levels::{level_to_min_level, normalize_log_level, LogLevel};
 use super::state::get_logging_state;
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
-use std::sync::RwLock;
 use tracing::{debug, error, info, trace, warn};
 
 const LOG_PREFIX: &str = "krabkrab";
@@ -21,6 +20,7 @@ pub fn default_log_dir() -> PathBuf {
     }
 }
 
+#[allow(dead_code)]
 pub fn default_log_file() -> PathBuf {
     default_log_dir().join(format!("{}{}", LOG_PREFIX, LOG_SUFFIX))
 }

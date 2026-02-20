@@ -1,6 +1,5 @@
 use encoding_rs;
 use regex::Regex;
-use std::collections::HashMap;
 
 lazy_static::lazy_static! {
     static ref WORDISH_CHAR: Regex = Regex::new(r"[\p{L}\p{N}]").unwrap();

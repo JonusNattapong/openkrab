@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::sync::Arc;
 
-use crate::gateway::{GatewayServer, GatewayState};
+use crate::gateway::GatewayState;
 use crate::memory::HybridSearchOptions;
 
 // ─── Request / Response types ─────────────────────────────────────────────────

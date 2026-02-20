@@ -108,6 +108,33 @@ impl Default for HookRegistry {
     }
 }
 
+// ─── Global instance ──────────────────────────────────────────────────────────
+lazy_static::lazy_static! {
+    static ref GLOBAL_HOOKS: Arc<RwLock<HookRegistry>> = Arc::new(RwLock::new(HookRegistry::new()));
+}
+
+use std::sync::RwLock;
+use std::sync::Arc;
+
+/// Get the global hook registry.
+pub fn global_hooks() -> Arc<RwLock<HookRegistry>> {
+    GLOBAL_HOOKS.clone()
+}
+
+/// Emit an event on the global hook registry.
+pub fn emit(event: &str, payload: &HookPayload) {
+    if let Ok(reg) = GLOBAL_HOOKS.read() {
+        reg.emit(event, payload);
+    }
+}
+
+/// Register a listener on the global hook registry.
+pub fn on(event: impl Into<String>, cb: HookFn) {
+    if let Ok(mut reg) = GLOBAL_HOOKS.write() {
+        reg.on(event, cb);
+    }
+}
+
 // ─── Internal hooks (built-in) ────────────────────────────────────────────────
 
 /// Built-in hook that logs every emitted event to stdout (for debugging).

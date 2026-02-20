@@ -1,8 +1,6 @@
 //! signal::identity — Signal sender identity and allowlist helpers.
 //! Ported from `openkrab/src/signal/identity.ts` (Phase 13).
 
-use std::collections::HashSet;
-
 /// Signal sender identity (phone or UUID).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SignalSender {

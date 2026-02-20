@@ -7,9 +7,11 @@ use std::io::{Read, Write};
 use std::net::TcpListener;
 use std::time::Duration;
 
+#[allow(dead_code)]
 const CHUTES_OAUTH_ISSUER: &str = "https://api.chutes.ai";
 const CHUTES_AUTHORIZE_ENDPOINT: &str = "https://api.chutes.ai/idp/authorize";
 const CHUTES_TOKEN_ENDPOINT: &str = "https://api.chutes.ai/idp/token";
+#[allow(dead_code)]
 const CHUTES_USERINFO_ENDPOINT: &str = "https://api.chutes.ai/idp/userinfo";
 const DEFAULT_REDIRECT_URI: &str = "http://127.0.0.1:1456/oauth/callback";
 

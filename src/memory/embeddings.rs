@@ -110,6 +110,7 @@ impl GeminiProvider {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Serialize)]
 struct GeminiEmbedRequest<'a> {
     content: GeminiContent<'a>,
@@ -117,11 +118,13 @@ struct GeminiEmbedRequest<'a> {
     task_type: &'a str,
 }
 
+#[allow(dead_code)]
 #[derive(Serialize)]
 struct GeminiContent<'a> {
     parts: Vec<GeminiPart<'a>>,
 }
 
+#[allow(dead_code)]
 #[derive(Serialize)]
 struct GeminiPart<'a> {
     text: &'a str,
@@ -152,6 +155,7 @@ struct GeminiPartOwned {
 
 #[derive(Deserialize)]
 struct GeminiEmbedResponse {
+#[allow(dead_code)]
     embedding: Option<GeminiEmbedding>,
 }
 
