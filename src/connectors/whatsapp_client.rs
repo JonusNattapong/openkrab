@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use anyhow::Result;
-use reqwest::Client;
+use reqwest_middleware::ClientWithMiddleware as Client;
 use serde_json::json;
 
 const WHATSAPP_API_BASE: &str = "https://graph.facebook.com/v19.0";

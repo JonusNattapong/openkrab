@@ -46,14 +46,17 @@ impl Monitor {
         let path = target.path.clone();
         let targets = Arc::clone(&self.targets);
 
-        let mut targets_lock = targets.lock().unwrap();
-        targets_lock
-            .entry(path.clone())
-            .or_insert_with(Vec::new)
-            .push(target);
-
-        Box::new(move || {
+        {
             let mut targets_lock = targets.lock().unwrap();
+            targets_lock
+                .entry(path.clone())
+                .or_insert_with(Vec::new)
+                .push(target);
+        }
+
+        let targets_for_closure = Arc::clone(&targets);
+        Box::new(move || {
+            let mut targets_lock = targets_for_closure.lock().unwrap();
             if let Some(vec) = targets_lock.get_mut(&path) {
                 vec.retain(|t| t.path != path);
             }

@@ -112,18 +112,22 @@ pub fn parse_content_type(value: Option<&str>) -> (Option<String>, Option<String
 }
 
 pub fn normalize_mime_list(values: Option<&[String]>, fallback: &[&str]) -> HashSet<String> {
-    let input = values
-        .filter(|v| !v.is_empty())
-        .map(|v| v as &[_])
-        .unwrap_or(fallback);
-    input
-        .iter()
-        .filter_map(|v| normalize_mime_type(Some(v)))
-        .collect()
+    match values {
+        Some(v) if !v.is_empty() => {
+            v.iter()
+                .filter_map(|s| normalize_mime_type(Some(s)))
+                .collect()
+        }
+        _ => fallback
+            .iter()
+            .filter_map(|s| normalize_mime_type(Some(s)))
+            .collect(),
+    }
 }
 
 pub fn resolve_input_file_limits(
     allow_url: Option<bool>,
+    url_allowlist: Option<&[String]>,
     allowed_mimes: Option<&[String]>,
     max_bytes: Option<usize>,
     max_chars: Option<usize>,
@@ -135,6 +139,7 @@ pub fn resolve_input_file_limits(
 ) -> InputFileLimits {
     InputFileLimits {
         allow_url: allow_url.unwrap_or(true),
+        url_allowlist: url_allowlist.map(|v| v.to_vec()),
         allowed_mimes: normalize_mime_list(allowed_mimes, DEFAULT_INPUT_FILE_MIMES),
         max_bytes: max_bytes.unwrap_or(DEFAULT_INPUT_FILE_MAX_BYTES),
         max_chars: max_chars.unwrap_or(DEFAULT_INPUT_FILE_MAX_CHARS),
@@ -154,15 +159,15 @@ fn decode_text_content(buffer: &[u8], charset: Option<&str>) -> String {
     match encoding.to_lowercase().as_str() {
         "utf-8" | "utf8" => String::from_utf8_lossy(buffer).to_string(),
         "utf-16" | "utf16" | "utf-16le" => {
-            let (cow, _had_errors) = encoding_rs::UTF_16LE.decode(buffer);
+            let (cow, _, _) = encoding_rs::UTF_16LE.decode(buffer);
             cow.to_string()
         }
         "utf-16be" => {
-            let (cow, _had_errors) = encoding_rs::UTF_16BE.decode(buffer);
+            let (cow, _, _) = encoding_rs::UTF_16BE.decode(buffer);
             cow.to_string()
         }
         "iso-8859-1" | "latin1" | "latin-1" => {
-            let (cow, _had_errors) = encoding_rs::WINDOWS_1252.decode(buffer);
+            let (cow, _, _) = encoding_rs::WINDOWS_1252.decode(buffer);
             cow.to_string()
         }
         _ => String::from_utf8_lossy(buffer).to_string(),

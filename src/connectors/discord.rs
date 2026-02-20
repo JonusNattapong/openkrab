@@ -150,7 +150,7 @@ fn resolve_http_channel_target(normalized: &str) -> Result<String> {
 ///
 /// This helper validates and normalizes target before dispatch.
 pub async fn send_outbound_message(
-    client: &reqwest::Client,
+    client: &reqwest_middleware::ClientWithMiddleware,
     token: &str,
     to: Option<&str>,
     text: &str,
@@ -821,7 +821,16 @@ impl EventHandler for DiscordEventHandler {
         tracing::debug!("[discord] inbound={:?}", inbound);
 
         mark_inbound();
-        let answer = self.state.agent.answer(&inbound.text).await;
+        
+        let agent = match &self.state.agent {
+            Some(agent) => agent,
+            None => {
+                let _ = msg.channel_id.say(&ctx.http, "Agent not available").await;
+                return;
+            }
+        };
+        
+        let answer = agent.answer(&inbound.text).await;
         match answer {
             Ok(text) => {
                 let chunks = chunk_text(&text, TEXT_CHUNK_LIMIT);

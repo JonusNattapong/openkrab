@@ -23,7 +23,7 @@ pub async fn slack_send_command(to: &str, text: &str, thread_ts: Option<&str>) -
     let channel = normalize_target(to)?;
     let token = std::env::var("SLACK_BOT_TOKEN")
         .map_err(|_| anyhow!("Missing SLACK_BOT_TOKEN environment variable"))?;
-    let client = reqwest::Client::new();
+    let client = crate::infra::retry_http::build_retrying_client();
     let response =
         crate::connectors::slack_client::send_message(&client, &token, &channel, text, thread_ts)
             .await?;

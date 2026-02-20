@@ -1,5 +1,5 @@
 use axum::{
-    extract::{ws::WebSocketUpgrade, State},
+    extract::{ws::Message, ws::WebSocket, ws::WebSocketUpgrade, State},
     response::Response,
     routing::get,
     Router,
@@ -9,7 +9,6 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tokio_tungstenite::tungstenite::Message;
 use tower_http::cors::CorsLayer;
 
 use crate::gateway::constants::*;
@@ -18,15 +17,27 @@ use crate::gateway::types::*;
 pub type ClientId = String;
 pub type ConnectionId = u64;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct GatewayServer {
     pub port: u16,
     pub bind_host: String,
     pub clients: Arc<RwLock<HashMap<ConnectionId, ClientConnection>>>,
     pub next_connection_id: Arc<RwLock<ConnectionId>>,
-    // Stub fields for compatibility
-    pub agent: Option<Arc<crate::agents::AgentIdentity>>,
+    // Agent for processing messages
+    pub agent: Option<Arc<crate::agents::Agent>>,
     pub memory: Option<Arc<crate::memory::MemoryManager>>,
+}
+
+impl std::fmt::Debug for GatewayServer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GatewayServer")
+            .field("port", &self.port)
+            .field("bind_host", &self.bind_host)
+            .field("clients", &"<async RwLock>")
+            .field("agent", &self.agent.is_some())
+            .field("memory", &self.memory.is_some())
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -153,7 +164,7 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
     };
 
     if let Ok(json) = serde_json::to_string(&hello) {
-        if sender.send(Message::Text(json)).await.is_err() {
+        if sender.send(Message::Text(json.into())).await.is_err() {
             tracing::warn!("Failed to send hello message to client {}", connection_id);
         }
     }
@@ -180,7 +191,7 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
                         };
 
                         if let Ok(json) = serde_json::to_string(&response) {
-                            if sender.send(Message::Text(json)).await.is_err() {
+                            if sender.send(Message::Text(json.into())).await.is_err() {
                                 break;
                             }
                         }

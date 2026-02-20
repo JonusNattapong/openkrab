@@ -3,6 +3,7 @@
 use anyhow::{anyhow, bail, Result};
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
+use std::io::{Read, Write};
 use std::net::TcpListener;
 use std::time::Duration;
 
@@ -207,39 +208,73 @@ fn wait_for_local_callback(
     }
 
     let listener = TcpListener::bind(format!("{}:{}", hostname, port))?;
-    listener.set_nonblocking(false)?;
+    listener.set_nonblocking(true)?;
 
     println!("Waiting for OAuth callback on {}...", redirect_uri);
 
-    for stream in listener.incoming() {
-        let mut stream = stream?;
-        let mut buf = [0u8; 1024];
-        let n = stream.read(&mut buf)?;
+    let start = std::time::Instant::now();
+    let timeout = Duration::from_millis(timeout_ms);
 
-        let request = String::from_utf8_lossy(&buf[..n]);
-        if request.contains("GET ") && request.contains("code=") && request.contains("state=") {
-            let url_line = request
-                .lines()
-                .find(|line| line.starts_with("GET "))
-                .and_then(|line| line.split_whitespace().nth(1))
-                .ok_or_else(|| anyhow!("No URL found in request"))?;
+    while start.elapsed() < timeout {
+        match listener.accept() {
+            Ok((mut stream, _)) => {
+                let mut buf = [0u8; 1024];
+                match stream.read(&mut buf) {
+                    Ok(n) if n > 0 => {
+                        let request = String::from_utf8_lossy(&buf[..n]);
+                        if request.contains("GET ")
+                            && request.contains("code=")
+                            && request.contains("state=")
+                        {
+                            let url_line = request
+                                .lines()
+                                .find(|line| line.starts_with("GET "))
+                                .and_then(|line| line.split_whitespace().nth(1))
+                                .ok_or_else(|| anyhow!("No URL found in request"))?;
 
-            let full_url = format!("http://{}{}", hostname, url_line);
-            let (code, _) = parse_oauth_callback_input(&full_url, expected_state)?;
+                            let full_url = format!("http://{}{}", hostname, url_line);
+                            let (code, state) =
+                                parse_oauth_callback_input(&full_url, expected_state)?;
 
-            // Send success response
-            let response = "HTTP/1.1 200 OK\r\n\
-                Content-Type: text/html\r\n\
-                \r\n\
-                <!DOCTYPE html><html><head><meta charset='utf-8'/></head>\
-                <body><h2>Authentication Complete</h2><p>You may close this window.</p></body></html>";
-            stream.write_all(response.as_bytes())?;
+                            // Constant-time state comparison (defense in depth)
+                            if !constant_time_compare(&state, expected_state) {
+                                let response = "HTTP/1.1 400 Bad Request\r\n\
+                                    Content-Type: text/html\r\n\
+                                    \r\n\
+                                    <!DOCTYPE html><html><head><meta charset='utf-8'/></head>\
+                                    <body><h2>Invalid State</h2><p>State mismatch. Please retry.</p></body></html>";
+                                let _ = stream.write_all(response.as_bytes());
+                                continue;
+                            }
 
-            return Ok(code);
+                            // Send success response
+                            let response = "HTTP/1.1 200 OK\r\n\
+                                Content-Type: text/html\r\n\
+                                \r\n\
+                                <!DOCTYPE html><html><head><meta charset='utf-8'/></head>\
+                                <body><h2>Authentication Complete</h2><p>You may close this window.</p></body></html>";
+                            stream.write_all(response.as_bytes())?;
+
+                            return Ok(code);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                std::thread::sleep(Duration::from_millis(100));
+                continue;
+            }
+            Err(_) => break,
         }
     }
 
-    Err(anyhow!("OAuth callback timeout or error"))
+    Err(anyhow!("OAuth callback timeout after {}ms", timeout_ms))
+}
+
+fn constant_time_compare(a: &str, b: &str) -> bool {
+    use subtle::ConstantTimeEq;
+    a.as_bytes().ct_eq(b.as_bytes()).unwrap_u8() != 0
 }
 
 fn generate_random_hex(len: usize) -> String {
@@ -274,16 +309,6 @@ fn url_encode(s: &str) -> String {
             }
         })
         .collect()
-}
-
-impl std::io::Write for std::net::TcpStream {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        std::io::Write::write(self, buf)
-    }
-
-    fn flush(&mut self) -> std::io::Result<()> {
-        std::io::Write::flush(self)
-    }
 }
 
 #[cfg(test)]

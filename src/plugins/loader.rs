@@ -31,6 +31,16 @@ pub struct PluginLoaderConfig {
     pub hot_reload: bool,
     /// File extensions to consider as plugins.
     pub extensions: Vec<String>,
+    /// SECURITY: Require code signatures for all plugins
+    pub require_signatures: bool,
+    /// SECURITY: Allow native plugins (default: false, WASM only)
+    pub allow_native_plugins: bool,
+    /// SECURITY: Trusted public keys for signature verification
+    pub trusted_keys: Vec<String>,
+    /// SECURITY: Default sandbox level for plugins
+    pub default_sandbox_level: crate::plugins::sandbox::SandboxLevel,
+    /// SECURITY: Maximum plugin file size (default: 50MB)
+    pub max_plugin_size: usize,
 }
 
 impl Default for PluginLoaderConfig {
@@ -43,16 +53,17 @@ impl Default for PluginLoaderConfig {
                     .unwrap_or_else(|| PathBuf::from("./plugins")),
             ],
             hot_reload: false,
+            // SECURITY: WASM only by default, native plugins require explicit opt-in
             extensions: vec![
                 #[cfg(feature = "wasm-plugins")]
                 "wasm".to_string(),
-                #[cfg(all(feature = "native-plugins", target_os = "linux"))]
-                "so".to_string(),
-                #[cfg(all(feature = "native-plugins", target_os = "macos"))]
-                "dylib".to_string(),
-                #[cfg(all(feature = "native-plugins", target_os = "windows"))]
-                "dll".to_string(),
+                // Native extensions only loaded if allow_native_plugins = true
             ],
+            require_signatures: true, // SECURITY: Require signatures by default
+            allow_native_plugins: false, // SECURITY: WASM only by default
+            trusted_keys: Vec::new(),
+            default_sandbox_level: crate::plugins::sandbox::SandboxLevel::Strict,
+            max_plugin_size: 50 * 1024 * 1024, // 50MB
         }
     }
 }
@@ -328,11 +339,32 @@ impl PluginLoader {
     }
 
     /// Load a native dynamic library plugin.
+    /// 
+    /// SECURITY: This requires explicit opt-in via config.allow_native_plugins
     #[cfg(feature = "native-plugins")]
     async fn load_native_plugin(
         &self,
         path: &Path,
     ) -> Result<(PluginInstance, Option<PluginDeclaration>)> {
+        // SECURITY: Check if native plugins are allowed
+        if !self.config.allow_native_plugins {
+            bail!(
+                "Native plugins are disabled. Set allow_native_plugins=true to enable (not recommended). \
+                 Consider using WASM plugins instead for better security."
+            );
+        }
+
+        // SECURITY: Log native plugin load attempt
+        crate::security_audit::audit().log(
+            crate::security_audit::SecurityEvent::new(
+                crate::security_audit::SecurityEventType::PluginLoadAttempt,
+                crate::security_audit::SecuritySeverity::Warning,
+                "plugin_loader",
+                format!("Loading native plugin: {}", path.display()),
+            )
+            .with_subject(path.to_string_lossy().to_string())
+        ).await;
+
         unsafe {
             let lib = libloading::Library::new(path)
                 .with_context(|| format!("Failed to load native library from {}", path.display()))?;
@@ -350,6 +382,18 @@ impl PluginLoader {
                 crate::plugin_sdk::ABI_DECLARATION_SYMBOL,
             )
             .ok();
+            
+            // SECURITY: Log successful load
+            crate::security_audit::audit().log(
+                crate::security_audit::SecurityEvent::new(
+                    crate::security_audit::SecurityEventType::PluginLoadSuccess,
+                    crate::security_audit::SecuritySeverity::Warning,
+                    "plugin_loader",
+                    format!("Native plugin loaded: {}", path.display()),
+                )
+                .with_subject(path.to_string_lossy().to_string())
+            ).await;
+            
             Ok((PluginInstance::Native(lib), declaration))
         }
     }
@@ -630,7 +674,7 @@ impl PluginManager {
     }
 
     /// Create loader config from app plugins config.
-    pub fn config_from_plugins_config(cfg: Option<&crate::openclaw_config::PluginsConfig>) -> PluginLoaderConfig {
+    pub fn config_from_plugins_config(cfg: Option<&crate::openkrab_config::PluginsConfig>) -> PluginLoaderConfig {
         let mut out = PluginLoaderConfig::default();
         if let Some(c) = cfg {
             if let Some(dirs) = &c.plugin_dirs {
@@ -652,7 +696,7 @@ impl PluginManager {
 
     /// Bootstrap plugin manager from configuration and keep it globally alive.
     pub async fn bootstrap_from_config(
-        cfg: Option<&crate::openclaw_config::PluginsConfig>,
+        cfg: Option<&crate::openkrab_config::PluginsConfig>,
     ) -> Result<Option<PluginBootstrapSummary>> {
         let Some(plugin_cfg) = cfg else {
             return Ok(None);

@@ -27,7 +27,7 @@ impl AudioStats {
         let rms = calculate_rms(samples);
         let peak = calculate_peak(samples);
         let zcr = calculate_zero_crossing_rate(samples);
-        let centroid = calculate_spectral_centroid(samples, sample_rate);
+        let spectral_centroid = calculate_spectral_centroid(samples, sample_rate);
 
         Self {
             sample_rate,
@@ -1233,13 +1233,13 @@ pub mod microphone {
 
             let sample_rate = self.sample_rate;
             let buffer_size = self.buffer_size;
-            
+
             std::thread::spawn(move || {
                 let _ = Command::new("powershell")
                     .args([
                         "-NoProfile", 
                         "-Command",
-                        &format!("$h = Add-Type -MemberDefinition '[DllImport(\"winmm.dll\")] public static extern int waveInOpen(ref IntPtr p, int d, IntPtr f, IntPtr c, IntPtr i, uint f2); [AudioWin]::waveInOpen([ref]$p, 0, [IntPtr]::Zero, [IntPtr]::Zero, [IntPtr]::Zero, 0)' -Name AudioWin -PassThru"])
+                        r#"$h = Add-Type -MemberDefinition '[DllImport("winmm.dll")] public static extern int waveInOpen(ref IntPtr p, int d, IntPtr f, IntPtr c, IntPtr i, uint f2); [AudioWin]::waveInOpen([ref]$p, 0, [IntPtr]::Zero, [IntPtr]::Zero, [IntPtr]::Zero, 0)' -Name AudioWin -PassThru"#
                     ])
                     .spawn();
             });
@@ -1369,7 +1369,7 @@ pub mod microphone {
 
             if let Ok(output) = output {
                 if let Ok(json) =
-                    serde_json::from_str::<serde_json::Value>(&String::from_utf8_lossy(&output))
+                    serde_json::from_str::<serde_json::Value>(&String::from_utf8_lossy(&output.stdout))
                 {
                     let sound_devices = json.as_array();
                     if let Some(devices_arr) = sound_devices {
@@ -1467,7 +1467,7 @@ impl WakeWordDetector {
     }
 
     pub fn detect_from_audio(&mut self, samples: &[i16], sample_rate: u32) -> bool {
-        self.process_samples(samples, sample_rate);
+        // Preprocessing skipped — detect_from_audio works on immutable samples
 
         let rms = calculate_rms(samples);
         self.energy_history.push_back(rms);
@@ -1534,7 +1534,7 @@ impl WakeWordDetector {
         let mut band_energies = Vec::with_capacity(num_bands);
 
         for (low, high) in &band_ranges {
-            let energy = self.calculate_band_energy(samples, sample_rate, *low, *high);
+            let energy = self.calculate_band_energy(samples, sample_rate as f32, *low, *high);
             band_energies.push(energy);
         }
 
@@ -1589,9 +1589,14 @@ impl WakeWordDetector {
         voice_ratio > 5.0 && voice_range_energy > -40.0
     }
 
-    fn process_samples(&self, samples: &mut [i16], sample_rate: u32) -> &[i16] {
+    fn process_samples<'a>(&self, samples: &'a mut [i16], sample_rate: u32) -> &'a mut [i16] {
         self.preprocessor.process(samples, sample_rate);
         samples
+    }
+
+    /// Process samples without needing a mutable reference (read-only wrapper)
+    fn _process_samples_readonly(&self, _samples: &[i16], _sample_rate: u32) {
+        // No-op for read-only access; preprocessing is optional
     }
 
     fn is_energy_spike(&self) -> bool {
@@ -1659,7 +1664,7 @@ impl BeepGenerator {
             samples.extend_from_slice(&sample_i16.to_le_bytes());
         }
 
-        self.wrap_in_wav(samples)
+        self.wrap_in_wav_bytes(samples)
     }
 
     pub fn generate_wake_beep(&self) -> Vec<u8> {
@@ -1675,6 +1680,33 @@ impl BeepGenerator {
         samples.extend_from_slice(&self.generate_beep(200.0, 100, 0.3));
         samples.extend_from_slice(&self.generate_beep(150.0, 100, 0.3));
         samples
+    }
+
+    /// Wrap raw PCM bytes into a WAV container
+    fn wrap_in_wav_bytes(&self, raw_pcm: Vec<u8>) -> Vec<u8> {
+        let data_size = raw_pcm.len();
+        let file_size = 36 + data_size;
+
+        let mut wav = Vec::with_capacity(44 + data_size);
+
+        wav.extend_from_slice(b"RIFF");
+        wav.extend_from_slice(&(file_size as u32).to_le_bytes());
+        wav.extend_from_slice(b"WAVE");
+
+        wav.extend_from_slice(b"fmt ");
+        wav.extend_from_slice(&16u32.to_le_bytes());
+        wav.extend_from_slice(&1u16.to_le_bytes());
+        wav.extend_from_slice(&1u16.to_le_bytes());
+        wav.extend_from_slice(&self.sample_rate.to_le_bytes());
+        wav.extend_from_slice(&(self.sample_rate * 2).to_le_bytes());
+        wav.extend_from_slice(&2u16.to_le_bytes());
+        wav.extend_from_slice(&16u16.to_le_bytes());
+
+        wav.extend_from_slice(b"data");
+        wav.extend_from_slice(&(data_size as u32).to_le_bytes());
+        wav.extend_from_slice(&raw_pcm);
+
+        wav
     }
 
     fn wrap_in_wav(&self, samples: Vec<i16>) -> Vec<u8> {

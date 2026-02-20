@@ -26,6 +26,8 @@ futures = "0.3"
 futures-util = "0.3"
 # reqwest 0.11 uses native-tls by default — no aws-lc-sys / NASM needed
 reqwest = { version = "0.11", features = ["json", "blocking", "rustls-tls", "multipart"] }
+reqwest-middleware = "0.2"
+reqwest-retry = "0.2"
 tokio = { version = "1", features = ["full"] }
 rusqlite = { version = "0.31", features = ["bundled", "load_extension"] }
 chrono = { version = "0.4", features = ["serde"] }
@@ -36,7 +38,7 @@ rand = "0.8"
 hex = "0.4"
 sqlite-vec = "0.1"
 axum = { version = "0.7", features = ["ws"] }
-tower-http = { version = "0.5", features = ["cors"] }
+tower-http = { version = "0.6", features = ["cors"] }
 notify = "6.1"
 dialoguer = "0.12.0"
 toml = "1.0.2"
@@ -56,6 +58,9 @@ thiserror = "2.0"
 lazy_static = "1.4"
 tower = "0.4"
 portable-pty = "0.9"
+aes-gcm = "0.10"
+subtle = "2.5"
+which = "6.0"
 nix = { version = "0.28", features = ["signal", "process"], optional = true }
  
 # Discord: serenity with native_tls_backend avoids rustls/aws-lc-sys

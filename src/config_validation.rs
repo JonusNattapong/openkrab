@@ -1,6 +1,6 @@
 //! Config validation — port of `openclaw/src/config/validation.ts` (Phase 1-4 schema validation)
 
-use crate::openclaw_config::OpenClawConfig;
+use crate::openkrab_config::OpenKrabConfig;
 use anyhow::{bail, Result};
 use serde_json::Value;
 
@@ -14,8 +14,8 @@ pub struct ValidationError {
 /// Validation result
 pub type ValidationResult<T> = Result<T, Vec<ValidationError>>;
 
-/// Validate OpenClawConfig against schema
-pub fn validate_config_schema(config: &OpenClawConfig) -> ValidationResult<()> {
+/// Validate OpenKrabConfig against schema
+pub fn validate_config_schema(config: &OpenKrabConfig) -> ValidationResult<()> {
     let mut errors = Vec::new();
 
     // Validate meta
@@ -102,13 +102,51 @@ pub fn validate_config_schema(config: &OpenClawConfig) -> ValidationResult<()> {
 
 /// Validate channels configuration
 fn validate_channels_config(
-    channels: &crate::openclaw_config::ChannelsConfig,
+    channels: &crate::openkrab_config::ChannelsConfig,
     errors: &mut Vec<ValidationError>,
 ) {
-    let channel_types = [
-        ("telegram", &channels.telegram),
+    // Validate Telegram accounts (Option<TelegramConfig>)
+    if let Some(tc) = &channels.telegram {
+        for (name, acct) in &tc.accounts {
+            if name.trim().is_empty() {
+                errors.push(ValidationError {
+                    field: format!("channels.telegram.accounts.{}.name", name),
+                    message: "account name must not be empty".to_string(),
+                });
+            }
+            if acct.enabled && acct.token.is_none() {
+                errors.push(ValidationError {
+                    field: format!("channels.telegram.accounts.{}.token", name),
+                    message: "token is required when account is enabled".to_string(),
+                });
+            }
+        }
+    }
+
+    // Validate Discord accounts (Option<DiscordConfig>)
+    if let Some(dc) = &channels.discord {
+        for (name, acct) in &dc.accounts {
+            if name.trim().is_empty() {
+                errors.push(ValidationError {
+                    field: format!("channels.discord.accounts.{}.name", name),
+                    message: "account name must not be empty".to_string(),
+                });
+            }
+            if acct.enabled && acct.token.is_none() {
+                errors.push(ValidationError {
+                    field: format!("channels.discord.accounts.{}.token", name),
+                    message: "token is required when account is enabled".to_string(),
+                });
+            }
+        }
+    }
+
+    // Validate HashMap-based channels
+    let channel_types: &[(
+        &str,
+        &std::collections::HashMap<String, crate::openkrab_config::ChannelConfig>,
+    )] = &[
         ("slack", &channels.slack),
-        ("discord", &channels.discord),
         ("whatsapp", &channels.whatsapp),
         ("signal", &channels.signal),
         ("imessage", &channels.imessage),
@@ -117,7 +155,7 @@ fn validate_channels_config(
     ];
 
     for (channel_type, configs) in channel_types {
-        for (name, config) in configs {
+        for (name, config) in *configs {
             if name.trim().is_empty() {
                 errors.push(ValidationError {
                     field: format!("channels.{}.{}.name", channel_type, name),
@@ -137,41 +175,43 @@ fn validate_channels_config(
 
 /// Validate models configuration
 fn validate_models_config(
-    models: &crate::openclaw_config::ModelsConfig,
+    models: &crate::openkrab_config::ModelsConfig,
     errors: &mut Vec<ValidationError>,
 ) {
-    for (provider, config) in &models.providers {
-        if provider.trim().is_empty() {
-            errors.push(ValidationError {
-                field: format!("models.providers.{}", provider),
-                message: "provider name must not be empty".to_string(),
-            });
-        }
+    if let Some(providers) = &models.providers {
+        for (provider, config) in providers {
+            if provider.trim().is_empty() {
+                errors.push(ValidationError {
+                    field: format!("models.providers.{}", provider),
+                    message: "provider name must not be empty".to_string(),
+                });
+            }
 
-        if config.enabled && config.api_key.is_none() {
-            errors.push(ValidationError {
-                field: format!("models.providers.{}.api_key", provider),
-                message: "API key is required when provider is enabled".to_string(),
-            });
+            if config.enabled && config.api_key.is_none() {
+                errors.push(ValidationError {
+                    field: format!("models.providers.{}.api_key", provider),
+                    message: "API key is required when provider is enabled".to_string(),
+                });
+            }
         }
     }
 }
 
 /// Validate config object with plugins (full validation)
-pub fn validate_config_object_with_plugins(config: &OpenClawConfig) -> ValidationResult<()> {
+pub fn validate_config_object_with_plugins(config: &OpenKrabConfig) -> ValidationResult<()> {
     // For now, just do basic schema validation
     // TODO: Add plugin-based validation
     validate_config_schema(config)
 }
 
 /// Validate config object (raw validation without plugins)
-pub fn validate_config_object_raw(config: &OpenClawConfig) -> ValidationResult<()> {
+pub fn validate_config_object_raw(config: &OpenKrabConfig) -> ValidationResult<()> {
     validate_config_schema(config)
 }
 
 /// Validate config from JSON value
 pub fn validate_config_json(json: &Value) -> ValidationResult<()> {
-    let config: OpenClawConfig = serde_json::from_value(json.clone()).map_err(|e| {
+    let config: OpenKrabConfig = serde_json::from_value(json.clone()).map_err(|e| {
         vec![ValidationError {
             field: "root".to_string(),
             message: format!("Invalid JSON structure: {}", e),
@@ -193,14 +233,15 @@ pub fn format_validation_errors(errors: &[ValidationError]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openclaw_config::*;
+    use crate::openkrab_config::*;
 
     #[test]
     fn validate_valid_config() {
-        let config = OpenClawConfig {
+        let config = OpenKrabConfig {
             logging: Some(LoggingConfig {
                 level: "info".to_string(),
                 file: None,
+                ..Default::default()
             }),
             gateway: Some(GatewayConfig {
                 enabled: true,
@@ -215,10 +256,11 @@ mod tests {
 
     #[test]
     fn validate_invalid_log_level() {
-        let config = OpenClawConfig {
+        let config = OpenKrabConfig {
             logging: Some(LoggingConfig {
                 level: "invalid".to_string(),
                 file: None,
+                ..Default::default()
             }),
             ..Default::default()
         };
@@ -230,7 +272,7 @@ mod tests {
 
     #[test]
     fn validate_invalid_gateway_port() {
-        let config = OpenClawConfig {
+        let config = OpenKrabConfig {
             gateway: Some(GatewayConfig {
                 enabled: true,
                 port: Some(0),
@@ -247,17 +289,21 @@ mod tests {
     #[test]
     fn validate_channel_requires_token_when_enabled() {
         let mut channels = ChannelsConfig::default();
-        channels.telegram.insert(
+        let mut tc = TelegramConfig::default();
+        tc.accounts.insert(
             "test".to_string(),
-            ChannelConfig {
+            TelegramAccountConfig {
                 enabled: true,
                 token: None,
+                token_encrypted: None,
                 allowlist: vec![],
                 webhook_secret: None,
+                webhook_secret_encrypted: None,
             },
         );
+        channels.telegram = Some(tc);
 
-        let config = OpenClawConfig {
+        let config = OpenKrabConfig {
             channels: Some(channels),
             ..Default::default()
         };
@@ -279,7 +325,7 @@ mod tests {
             },
         );
 
-        let config = OpenClawConfig {
+        let config = OpenKrabConfig {
             models: Some(ModelsConfig {
                 providers,
                 aliases: std::collections::HashMap::new(),

@@ -24,18 +24,17 @@ pub fn build_status_summary(cfg: &AppConfig) -> StatusSummary {
     let mut warnings = Vec::new();
 
     // Count channels
-    let channels_configured = cfg.channels.slack.accounts.len()
-        + cfg.channels.telegram.accounts.len()
-        + cfg.channels.discord.accounts.len();
+    let channels_configured =
+        cfg.channels.slack.len() + cfg.channels.telegram.len() + cfg.channels.discord.len();
 
     // Estimate healthy channels (simplified)
     let channels_healthy = channels_configured; // Would check actual health in real impl
 
     // Count auth profiles
-    let auth_profiles = cfg.auth.as_ref().map(|a| a.profiles.len()).unwrap_or(0);
+    let auth_profiles = cfg.auth.profiles.len();
 
     // Check memory
-    let memory_enabled = cfg.memory.enabled;
+    let memory_enabled = cfg.memory.enabled.unwrap_or(false);
 
     // Check sandbox (simplified)
     let sandbox_ready = crate::commands::doctor_sandbox::is_docker_available();
@@ -59,7 +58,11 @@ pub fn build_status_summary(cfg: &AppConfig) -> StatusSummary {
     StatusSummary {
         version: env!("CARGO_PKG_VERSION").to_string(),
         gateway_running: false, // Would check actual gateway status
-        gateway_mode: cfg.gateway.mode.clone(),
+        gateway_mode: cfg
+            .gateway
+            .mode
+            .clone()
+            .unwrap_or_else(|| "local".to_string()),
         channels_configured,
         channels_healthy,
         auth_profiles,

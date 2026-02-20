@@ -106,13 +106,14 @@ pub async fn monitor_whatsapp_provider(
                 }
                 result = monitor_loop(&client, &status_clone, &message_handler_clone, &options) => {
                     if let Err(e) = result {
-                        let mut status = status_clone.lock().unwrap();
-                        status.last_error = Some(e.to_string());
-                        status.connected = false;
-
-                        // Exponential backoff for reconnects
-                        let backoff_ms = calculate_backoff(status.reconnect_attempts);
-                        status.reconnect_attempts += 1;
+                        let backoff_ms = {
+                            let mut status = status_clone.lock().unwrap();
+                            status.last_error = Some(e.to_string());
+                            status.connected = false;
+                            let backoff = calculate_backoff(status.reconnect_attempts);
+                            status.reconnect_attempts += 1;
+                            backoff
+                        };
 
                         println!("WhatsApp monitor error: {}. Reconnecting in {}ms...", e, backoff_ms);
                         sleep(Duration::from_millis(backoff_ms)).await;
@@ -181,10 +182,11 @@ async fn monitor_loop(
         match poll_messages(client, options).await {
             Ok(messages) => {
                 for message in messages {
-                    let mut status_guard = status.lock().unwrap();
-                    status_guard.last_message_at = Some(std::time::SystemTime::now());
-                    status_guard.last_event_at = Some(std::time::SystemTime::now());
-                    drop(status_guard);
+                    {
+                        let mut status_guard = status.lock().unwrap();
+                        status_guard.last_message_at = Some(std::time::SystemTime::now());
+                        status_guard.last_event_at = Some(std::time::SystemTime::now());
+                    } // guard dropped here before .await
 
                     // Handle the message
                     let message_value =

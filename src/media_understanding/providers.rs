@@ -501,8 +501,9 @@ impl MediaUnderstandingProvider for DeepgramProvider {
             .await
             .map_err(|e| MediaUnderstandingError::ProviderError(e.to_string()))?;
 
-        let transcript = data
-            .results
+        let results = data.results;
+        let transcript = results
+            .as_ref()
             .and_then(|r| r.channels.first())
             .and_then(|c| c.alternatives.first())
             .map(|a| a.transcript.trim().to_string())

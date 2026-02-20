@@ -79,10 +79,18 @@ pub struct MediaBufferResult {
     pub size: usize,
 }
 
-#[derive(Debug)]
 pub struct MediaPathResult {
     pub path: PathBuf,
     pub cleanup: Option<Box<dyn std::future::Future<Output = ()> + Send>>,
+}
+
+impl std::fmt::Debug for MediaPathResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MediaPathResult")
+            .field("path", &self.path)
+            .field("cleanup", &"...")
+            .finish()
+    }
 }
 
 pub struct MediaAttachmentCache {

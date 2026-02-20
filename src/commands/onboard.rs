@@ -25,6 +25,25 @@ pub struct AgentConfig {
     pub emoji: String,
     pub personality: String,
     pub system_prompt: Option<String>,
+    pub workspace: Option<String>,
+    pub agent_dir: Option<String>,
+    pub list: Vec<AgentDefinition>,
+    pub subagents: SubagentsConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentDefinition {
+    pub name: String,
+    pub model: Option<String>,
+    pub system_prompt: Option<String>,
+    pub tools: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SubagentsConfig {
+    pub enabled: bool,
+    pub max_concurrent: Option<u32>,
+    pub agents: Vec<AgentDefinition>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -59,6 +78,27 @@ pub struct DashboardConfig {
     pub bind: String,
 }
 
+impl Default for AgentDefinition {
+    fn default() -> Self {
+        Self {
+            name: String::new(),
+            model: None,
+            system_prompt: None,
+            tools: None,
+        }
+    }
+}
+
+impl Default for SubagentsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            max_concurrent: Some(3),
+            agents: Vec::new(),
+        }
+    }
+}
+
 impl Default for OnboardingConfig {
     fn default() -> Self {
         Self {
@@ -68,6 +108,10 @@ impl Default for OnboardingConfig {
                 emoji: "🦀".to_string(),
                 personality: "A helpful and precise AI assistant.".to_string(),
                 system_prompt: None,
+                workspace: None,
+                agent_dir: None,
+                list: Vec::new(),
+                subagents: SubagentsConfig::default(),
             },
             channels: ChannelsConfig {
                 enabled_channels: vec![],

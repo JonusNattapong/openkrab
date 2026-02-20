@@ -12,6 +12,19 @@ pub struct ChatResult {
     pub error: Option<String>,
 }
 
+/// Helper: check response status and return Err with formatted message on failure.
+fn check_response(
+    response: reqwest::blocking::Response,
+    action: &str,
+) -> Result<reqwest::blocking::Response, String> {
+    if !response.status().is_success() {
+        let status = response.status();
+        let error_text = response.text().unwrap_or_default();
+        return Err(format!("{} failed ({}): {}", action, status, error_text));
+    }
+    Ok(response)
+}
+
 pub fn rename_chat(
     base_url: &str,
     password: &str,
@@ -39,14 +52,7 @@ pub fn rename_chat(
         .send()
         .map_err(|e| format!("request failed: {}", e))?;
 
-    if !response.status().is_success() {
-        let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "rename failed ({}): {}",
-            response.status(),
-            error_text
-        ));
-    }
+    check_response(response, "rename")?;
 
     Ok(ChatResult {
         chat_guid: Some(chat_guid.to_string()),
@@ -73,13 +79,13 @@ pub fn set_group_icon(
     let image_data =
         std::fs::read(image_path).map_err(|e| format!("failed to read image: {}", e))?;
 
-    let part = reqwest::multipart::Part::bytes(image_data)
+    let part = reqwest::blocking::multipart::Part::bytes(image_data)
         .file_name("icon.jpg")
         .mime_str("image/jpeg")
         .map_err(|e| format!("mime error: {}", e))?;
 
-    let form = reqwest::multipart::Form::new()
-        .text("chatGuid", chat_guid)
+    let form = reqwest::blocking::multipart::Form::new()
+        .text("chatGuid", chat_guid.to_string())
         .part("icon", part);
 
     let response = client
@@ -88,14 +94,7 @@ pub fn set_group_icon(
         .send()
         .map_err(|e| format!("request failed: {}", e))?;
 
-    if !response.status().is_success() {
-        let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "set icon failed ({}): {}",
-            response.status(),
-            error_text
-        ));
-    }
+    check_response(response, "set icon")?;
 
     Ok(ChatResult {
         chat_guid: Some(chat_guid.to_string()),
@@ -131,14 +130,7 @@ pub fn add_participant(
         .send()
         .map_err(|e| format!("request failed: {}", e))?;
 
-    if !response.status().is_success() {
-        let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "add participant failed ({}): {}",
-            response.status(),
-            error_text
-        ));
-    }
+    check_response(response, "add participant")?;
 
     Ok(ChatResult {
         chat_guid: Some(chat_guid.to_string()),
@@ -174,14 +166,7 @@ pub fn remove_participant(
         .send()
         .map_err(|e| format!("request failed: {}", e))?;
 
-    if !response.status().is_success() {
-        let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "remove participant failed ({}): {}",
-            response.status(),
-            error_text
-        ));
-    }
+    check_response(response, "remove participant")?;
 
     Ok(ChatResult {
         chat_guid: Some(chat_guid.to_string()),
@@ -215,14 +200,7 @@ pub fn leave_chat(
         .send()
         .map_err(|e| format!("request failed: {}", e))?;
 
-    if !response.status().is_success() {
-        let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "leave chat failed ({}): {}",
-            response.status(),
-            error_text
-        ));
-    }
+    check_response(response, "leave chat")?;
 
     Ok(ChatResult {
         chat_guid: Some(chat_guid.to_string()),
@@ -258,14 +236,7 @@ pub fn edit_message(
         .send()
         .map_err(|e| format!("request failed: {}", e))?;
 
-    if !response.status().is_success() {
-        let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "edit message failed ({}): {}",
-            response.status(),
-            error_text
-        ));
-    }
+    let response = check_response(response, "edit message")?;
 
     let json: serde_json::Value = response.json().map_err(|e| format!("parse error: {}", e))?;
 
@@ -306,14 +277,7 @@ pub fn unsend_message(
         .send()
         .map_err(|e| format!("request failed: {}", e))?;
 
-    if !response.status().is_success() {
-        let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "unsend failed ({}): {}",
-            response.status(),
-            error_text
-        ));
-    }
+    check_response(response, "unsend")?;
 
     Ok(ChatResult {
         chat_guid: Some(chat_guid.to_string()),

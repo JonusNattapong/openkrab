@@ -1,19 +1,54 @@
+# Dependabot configuration
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
 version: 2
+
 updates:
-  - package-ecosystem: "cargo"
-    directory: "/"
+  # Cargo dependencies (Rust)
+  - package-ecosystem: cargo
+    directory: /
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "rust"
-    commit-message:
-      prefix: "deps"
+      interval: weekly
+    cooldown:
+      default-days: 7
     groups:
-      dev-dependencies:
+      production:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      development:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+    open-pull-requests-limit: 10
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
         patterns:
           - "*"
-        dependency-type: "development"
-      production-dependencies:
-        dependency-type: "production"
+        update-types:
+          - minor
+          - patch
+    open-pull-requests-limit: 5
+
+  # Docker base images (if any)
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5

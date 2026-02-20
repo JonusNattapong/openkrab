@@ -30,13 +30,10 @@ pub fn check_security(cfg: &AppConfig) -> SecurityCheckResult {
     }
 
     // Check for insecure gateway settings
-    if let Some(gateway) = &cfg.gateway {
-        if gateway.auth_token.is_some() && gateway.auth_token.as_ref().unwrap().len() < 32 {
-            warnings.push(
-                "Gateway auth token is short. Consider using a longer, more secure token."
-                    .to_string(),
-            );
-        }
+    if cfg.gateway.auth_token.is_some() && cfg.gateway.auth_token.as_ref().unwrap().len() < 32 {
+        warnings.push(
+            "Gateway auth token is short. Consider using a longer, more secure token.".to_string(),
+        );
     }
 
     // Check for exposed sensitive paths in config

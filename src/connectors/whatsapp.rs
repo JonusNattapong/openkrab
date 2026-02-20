@@ -49,6 +49,7 @@ pub mod signature {
 }
 
 const WHATSAPP_MAX_TEXT_CHARS: usize = 4096;
+const MAX_PAYLOAD_SIZE: usize = 1024 * 1024; // 1MB limit
 
 pub fn format_outbound(text: &str) -> String {
     format!("[whatsapp] {text}")
@@ -146,7 +147,16 @@ pub async fn handle_web_bridge_event(
         }
     };
 
-    match state.agent.answer(&inbound.text).await {
+    let agent = match state.agent.as_ref() {
+        Some(a) => a,
+        None => {
+            return json!({
+                "type": "error",
+                "error": "agent-not-available"
+            })
+        }
+    };
+    match agent.answer(&inbound.text).await {
         Ok(answer) => {
             let outbound = WhatsAppWebOutbound {
                 event_type: "send".to_string(),
@@ -396,8 +406,24 @@ pub fn parse_messages(payload: &serde_json::Value) -> Vec<WhatsAppMessage> {
     out
 }
 
+fn validate_payload_size(payload: &serde_json::Value) -> Result<(), String> {
+    let size = serde_json::to_vec(payload)
+        .map_err(|e| format!("JSON serialization error: {}", e))?
+        .len();
+    
+    if size > MAX_PAYLOAD_SIZE {
+        return Err(format!("Payload too large: {} bytes (max: {})", size, MAX_PAYLOAD_SIZE));
+    }
+    Ok(())
+}
+
 /// Handle incoming WhatsApp webhook events: parse → agent → reply.
 pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value) {
+    if let Err(e) = validate_payload_size(&payload) {
+        tracing::warn!("[whatsapp] Payload validation failed: {}", e);
+        return;
+    }
+
     let messages = parse_messages(&payload);
 
     for msg in messages {
@@ -425,7 +451,7 @@ pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value)
                 return;
             }
 
-            let client = reqwest::Client::new();
+            let client = crate::infra::retry_http::build_retrying_client();
 
             if !message_id.is_empty() {
                 let _ = crate::connectors::whatsapp_client::mark_as_read(
@@ -437,7 +463,14 @@ pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value)
                 .await;
             }
 
-            match state_clone.agent.answer(&text).await {
+            let agent = match state_clone.agent.as_ref() {
+                Some(a) => a,
+                None => {
+                    tracing::error!("[whatsapp] Agent not available");
+                    return;
+                }
+            };
+            match agent.answer(&text).await {
                 Ok(answer) => {
                     for chunk in split_outbound_chunks(&answer, WHATSAPP_MAX_TEXT_CHARS) {
                         if let Err(e) = crate::connectors::whatsapp_client::send_message(

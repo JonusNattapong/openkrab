@@ -13,7 +13,7 @@ pub fn discord_send_dry_run_command(to: &str, text: &str) -> Result<String> {
 pub async fn discord_send_command(to: &str, text: &str) -> Result<String> {
     let token = std::env::var("DISCORD_BOT_TOKEN")
         .map_err(|_| anyhow!("Missing DISCORD_BOT_TOKEN environment variable"))?;
-    let client = reqwest::Client::new();
+    let client = crate::infra::retry_http::build_retrying_client();
     let response =
         crate::connectors::discord::send_outbound_message(&client, &token, Some(to), text).await?;
     Ok(format!(

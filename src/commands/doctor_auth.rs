@@ -26,10 +26,8 @@ pub fn check_anthropic_oauth_profile_repair(cfg: &AppConfig) -> (bool, Vec<Strin
     let mut changes = Vec::new();
 
     // Check for legacy profile ID "anthropic:default"
-    if let Some(auth) = &cfg.auth {
-        if auth.profiles.contains_key("anthropic:default") {
-            changes.push("Migrate anthropic:default → anthropic".to_string());
-        }
+    if cfg.auth.profiles.contains_key("anthropic:default") {
+        changes.push("Migrate anthropic:default → anthropic".to_string());
     }
 
     (changes.len() > 0, changes)
@@ -75,19 +73,19 @@ pub fn prune_auth_order(
 pub fn build_auth_health_summary(cfg: &AppConfig) -> String {
     let mut lines = Vec::new();
 
-    if let Some(auth) = &cfg.auth {
-        lines.push(format!("Profiles: {}", auth.profiles.len()));
+    lines.push(format!("Profiles: {}", cfg.auth.profiles.len()));
 
-        for (id, profile) in &auth.profiles {
-            let status = if profile.provider == "anthropic" && id == "anthropic:default" {
-                "⚠️ legacy ID".to_string()
-            } else {
-                "✓".to_string()
-            };
-            lines.push(format!("  {}: {}", id, status));
-        }
-    } else {
-        lines.push("No auth profiles configured".to_string());
+    for (id, profile) in &cfg.auth.profiles {
+        let provider = profile
+            .get("provider")
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown");
+        let status = if provider == "anthropic" && id == "anthropic:default" {
+            "⚠️ legacy ID".to_string()
+        } else {
+            "✓".to_string()
+        };
+        lines.push(format!("  {}: {}", id, status));
     }
 
     lines.join("\n")
@@ -97,20 +95,18 @@ pub fn build_auth_health_summary(cfg: &AppConfig) -> String {
 pub fn note_auth_profile_health(cfg: &AppConfig) -> Vec<String> {
     let mut warnings = Vec::new();
 
-    if let Some(auth) = &cfg.auth {
-        // Check for empty profiles
-        if auth.profiles.is_empty() {
-            warnings.push("Auth profiles section exists but is empty".to_string());
-        }
+    // Check for empty profiles
+    if cfg.auth.profiles.is_empty() {
+        warnings.push("Auth profiles section exists but is empty".to_string());
+    }
 
-        // Check for legacy profile IDs
-        for id in auth.profiles.keys() {
-            if id == "anthropic:default" {
-                warnings.push(format!(
-                    "Legacy profile ID '{}' found. Run 'krabkrab doctor' to migrate.",
-                    id
-                ));
-            }
+    // Check for legacy profile IDs
+    for id in cfg.auth.profiles.keys() {
+        if id == "anthropic:default" {
+            warnings.push(format!(
+                "Legacy profile ID '{}' found. Run 'krabkrab doctor' to migrate.",
+                id
+            ));
         }
     }
 

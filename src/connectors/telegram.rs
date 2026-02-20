@@ -19,10 +19,7 @@ pub fn format_outbound(text: &str) -> String {
 /// Simple long-polling loop for Telegram updates.
 /// This runs indefinitely until an error occurs or the process stops.
 pub async fn monitor(state: std::sync::Arc<crate::gateway::GatewayState>, token: String) {
-    let client = reqwest::Client::builder()
-        .timeout(Duration::from_secs(40))
-        .build()
-        .unwrap_or_else(|_| reqwest::Client::new());
+    let client = crate::infra::retry_http::build_retrying_client();
 
     let mut offset: Option<i64> = None;
     println!("[telegram] Starting monitor loop...");
@@ -66,7 +63,20 @@ pub async fn monitor(state: std::sync::Arc<crate::gateway::GatewayState>, token:
 
                                 tokio::spawn(async move {
                                     println!("[telegram] Processing with agent: {}", text_owned);
-                                    match state_clone.agent.answer(&text_owned).await {
+                                    let agent = match state_clone.agent.as_ref() {
+                                        Some(a) => a,
+                                        None => {
+                                            let _ = telegram_client::send_message(
+                                                &client_clone,
+                                                &token_clone,
+                                                &chat_id_str,
+                                                "Agent not available",
+                                                None,
+                                            ).await;
+                                            return;
+                                        }
+                                    };
+                                    match agent.answer(&text_owned).await {
                                         Ok(answer) => {
                                             if let Err(e) = telegram_client::send_message(
                                                 &client_clone,

@@ -5,6 +5,7 @@
 //! selecting chat / embedding backends by name at runtime.
 
 pub mod copilot_models;
+pub mod copilot_proxy;
 pub mod copilot_token;
 pub mod gemini;
 pub mod gemini_cli_auth;
@@ -89,6 +90,9 @@ pub fn default_registry_from_env() -> ProviderRegistry {
     if std::env::var("GITHUB_TOKEN").is_ok() {
         // Copilot provider requires GitHub token - will be resolved at runtime
     }
+    if let Some(p) = crate::providers::copilot_proxy::CopilotProxyProvider::from_env() {
+        registry.register(Box::new(p));
+    }
     if std::env::var("QWEN_ACCESS_TOKEN").is_ok() {
         // Qwen provider requires access token - will be resolved at runtime
     }
@@ -117,6 +121,10 @@ pub fn known_model_ids(provider: &str) -> Vec<String> {
             .into_iter()
             .map(|m| m.to_string())
             .collect(),
+        ProviderKind::CopilotProxy => crate::providers::copilot_proxy::DEFAULT_MODEL_IDS
+            .iter()
+            .map(|m| m.to_string())
+            .collect(),
         ProviderKind::QwenPortal | ProviderKind::Custom(_) => Vec::new(),
     }
 }
@@ -141,6 +149,7 @@ pub enum ProviderKind {
     Gemini,
     Ollama,
     Copilot,
+    CopilotProxy,
     QwenPortal,
     Custom(String),
 }
@@ -152,6 +161,7 @@ impl ProviderKind {
             "gemini" | "google" => ProviderKind::Gemini,
             "ollama" => ProviderKind::Ollama,
             "copilot" | "github-copilot" => ProviderKind::Copilot,
+            "copilot-proxy" => ProviderKind::CopilotProxy,
             "qwen" | "qwen-portal" => ProviderKind::QwenPortal,
             other => ProviderKind::Custom(other.to_string()),
         }
@@ -163,6 +173,7 @@ impl ProviderKind {
             ProviderKind::Gemini => "gemini",
             ProviderKind::Ollama => "ollama",
             ProviderKind::Copilot => "copilot",
+            ProviderKind::CopilotProxy => "copilot-proxy",
             ProviderKind::QwenPortal => "qwen-portal",
             ProviderKind::Custom(s) => s.as_str(),
         }

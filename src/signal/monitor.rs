@@ -2,6 +2,7 @@
 //! Ported from `openclaw/src/signal/monitor.ts` (Phase 13).
 
 use anyhow::Result;
+use futures_util::StreamExt;
 use reqwest::Client;
 use std::sync::Arc;
 use tokio::sync::mpsc;
@@ -68,8 +69,8 @@ impl Monitor {
         }
 
         // Check if signal-cli API is available
-        match health_check(&self.client, &self.config.api_base, Some(5000)).await {
-            Ok(check) if check.ok => {
+        match health_check(&self.config.api_base).await {
+            Ok(check) if check.status == "ok" => {
                 let _ = event_tx.send(SignalEvent::Connected).await;
             }
             _ => {
@@ -82,10 +83,11 @@ impl Monitor {
         // Start SSE monitoring
         let config = self.config.clone();
         let event_tx_clone = event_tx.clone();
+        let event_tx_for_error = event_tx.clone();
 
         tokio::spawn(async move {
             if let Err(e) = Self::run_sse_monitor(&config, event_tx_clone).await {
-                let _ = event_tx_clone
+                let _ = event_tx_for_error
                     .send(SignalEvent::Error(format!("SSE monitor error: {}", e)))
                     .await;
             }

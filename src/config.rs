@@ -1,13 +1,144 @@
 use serde::{Deserialize, Serialize};
 
-/// Re-export OpenClawConfig as the main config type
-pub use crate::openclaw_config::OpenClawConfig;
+fn map_openkrab_channel_config(c: &crate::openkrab_config::ChannelConfig) -> ChannelConfig {
+    ChannelConfig {
+        enabled: c.enabled,
+        allowlist: c.allowlist.clone(),
+        token: c.token.clone(),
+        token_encrypted: c.token_encrypted.clone(),
+        webhook_secret: c.webhook_secret.clone(),
+        webhook_secret_encrypted: c.webhook_secret_encrypted.clone(),
+    }
+}
+
+fn map_openkrab_channels(
+    channels: Option<&crate::openkrab_config::ChannelsConfig>,
+) -> ChannelsConfig {
+    let Some(channels) = channels else {
+        return ChannelsConfig::default();
+    };
+
+    // Telegram: flatten accounts from TelegramConfig into HashMap
+    let telegram = channels
+        .telegram
+        .as_ref()
+        .map(|tc| {
+            tc.accounts
+                .iter()
+                .map(|(k, acct)| {
+                    (
+                        k.clone(),
+                        ChannelConfig {
+                            enabled: acct.enabled,
+                            allowlist: acct.allowlist.clone(),
+                            token: acct.token.clone(),
+                            token_encrypted: acct.token_encrypted.clone(),
+                            webhook_secret: acct.webhook_secret.clone(),
+                            webhook_secret_encrypted: acct.webhook_secret_encrypted.clone(),
+                        },
+                    )
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    // Discord: flatten accounts from DiscordConfig into HashMap
+    let discord = channels
+        .discord
+        .as_ref()
+        .map(|dc| {
+            dc.accounts
+                .iter()
+                .map(|(k, acct)| {
+                    (
+                        k.clone(),
+                        ChannelConfig {
+                            enabled: acct.enabled,
+                            allowlist: acct.allowlist.clone(),
+                            token: acct.token.clone(),
+                            token_encrypted: acct.token_encrypted.clone(),
+                            webhook_secret: None,
+                            webhook_secret_encrypted: None,
+                        },
+                    )
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    ChannelsConfig {
+        telegram,
+        slack: channels
+            .slack
+            .iter()
+            .map(|(k, v)| (k.clone(), map_openkrab_channel_config(v)))
+            .collect(),
+        discord,
+        whatsapp: channels
+            .whatsapp
+            .iter()
+            .map(|(k, v)| (k.clone(), map_openkrab_channel_config(v)))
+            .collect(),
+        accounts: channels
+            .accounts
+            .iter()
+            .map(|(k, v)| (k.clone(), map_openkrab_channel_config(v)))
+            .collect(),
+    }
+}
+
+fn map_openkrab_agents(agents: Option<&crate::openkrab_config::AgentsConfig>) -> AgentsConfig {
+    let Some(agents) = agents else {
+        return AgentsConfig::default();
+    };
+
+    let defaults = agents
+        .defaults
+        .as_ref()
+        .map_or_else(AgentDefaults::default, |d| AgentDefaults {
+            model: d.model.as_ref().map(|m| m.primary.clone()),
+            sandbox: d
+                .sandbox
+                .as_ref()
+                .map_or_else(SandboxConfig::default, |s| SandboxConfig {
+                    mode: Some(s.mode.clone()),
+                    ..SandboxConfig::default()
+                }),
+            memory_search: None,
+            tools: std::collections::HashMap::new(),
+        });
+
+    AgentsConfig {
+        defaults,
+        list: Vec::new(),
+    }
+}
+
+fn map_openkrab_auth(auth: Option<&crate::openkrab_config::AuthConfig>) -> AuthConfig {
+    let Some(auth) = auth else {
+        return AuthConfig::default();
+    };
+
+    let profiles = auth
+        .profiles
+        .iter()
+        .map(|(key, profile)| {
+            let value = serde_json::to_value(profile).unwrap_or(serde_json::Value::Null);
+            (key.clone(), value)
+        })
+        .collect();
+
+    AuthConfig { profiles }
+}
+
+/// Re-export OpenKrabConfig as the main config type
+pub use crate::openkrab_config::OpenKrabConfig;
 
 /// Re-export config I/O functions
 pub use crate::config_io::{
     apply_env_substitution, clear_config_cache, get_default_config, load_config, load_config_file,
     load_config_from_path, migrate_legacy_config, read_config_snapshot, resolve_config_path,
-    save_config, save_config_to_path, validate_config as validate_openclaw_config,
+    save_config, save_config_to_path, validate_config as validate_openkrab_config,
 };
 
 /// Re-export validation functions
@@ -16,100 +147,114 @@ pub use crate::config_validation::{
     validate_config_object_with_plugins, validate_config_schema, ValidationError, ValidationResult,
 };
 
-/// Convert OpenClawConfig to AppConfig (for backward compatibility)
-pub fn openclaw_to_app_config(openclaw: &OpenClawConfig) -> AppConfig {
+/// Convert OpenKrabConfig to AppConfig (for backward compatibility)
+pub fn openkrab_to_app_config(openkrab: &OpenKrabConfig) -> AppConfig {
     AppConfig {
-        profile: "default".to_string(), // TODO: derive from openclaw config
-        log_level: openclaw
+        profile: "default".to_string(),
+        log_level: openkrab
             .logging
             .as_ref()
             .map(|l| l.level.clone())
             .unwrap_or_else(|| "info".to_string()),
-        enable_telegram: openclaw
+        enable_telegram: openkrab
             .channels
             .as_ref()
-            .and_then(|c| c.telegram.get("default"))
-            .map(|c| c.enabled)
+            .and_then(|c| c.telegram.as_ref())
+            .and_then(|tc| tc.accounts.get("default"))
+            .map(|a| a.enabled)
             .unwrap_or(false),
-        enable_slack: openclaw
+        enable_slack: openkrab
             .channels
             .as_ref()
             .and_then(|c| c.slack.get("default"))
             .map(|c| c.enabled)
             .unwrap_or(false),
-        enable_discord: openclaw
+        enable_discord: openkrab
             .channels
             .as_ref()
-            .and_then(|c| c.discord.get("default"))
-            .map(|c| c.enabled)
+            .and_then(|c| c.discord.as_ref())
+            .and_then(|dc| dc.accounts.get("default"))
+            .map(|a| a.enabled)
             .unwrap_or(false),
-        enable_line: false, // TODO: add to OpenClawConfig
-        enable_whatsapp: openclaw
+        enable_line: false,
+        enable_whatsapp: openkrab
             .channels
             .as_ref()
             .and_then(|c| c.whatsapp.get("default"))
             .map(|c| c.enabled)
             .unwrap_or(false),
-        enable_dashboard: openclaw.web.as_ref().map(|w| w.enabled).unwrap_or(false),
+        enable_dashboard: openkrab.web.as_ref().map(|w| w.enabled).unwrap_or(false),
         dashboard_bind: format!(
             "0.0.0.0:{}",
-            openclaw.web.as_ref().and_then(|w| w.port).unwrap_or(3000)
+            openkrab.web.as_ref().and_then(|w| w.port).unwrap_or(3000)
         ),
-        memory: crate::memory::config::MemoryConfig::default(), // TODO: convert from openclaw
-        agent: crate::agents::AgentIdentity::default(),         // TODO: convert from openclaw
+        memory: crate::memory::config::MemoryConfig::default(),
+        agent: crate::agents::AgentIdentity::default(),
         feature_matrix: FeatureMatrix::default(),
+        agents: map_openkrab_agents(openkrab.agents.as_ref()),
+        auth: map_openkrab_auth(openkrab.auth.as_ref()),
+        channels: map_openkrab_channels(openkrab.channels.as_ref()),
+        gateway: GatewayConfig::default(),
+        logging: LoggingConfig::default(),
     }
 }
 
-/// Convert AppConfig to OpenClawConfig (for forward compatibility)
-pub fn app_to_openclaw_config(app: &AppConfig) -> OpenClawConfig {
-    let mut channels = crate::openclaw_config::ChannelsConfig::default();
+/// Convert AppConfig to OpenKrabConfig (for forward compatibility)
+pub fn app_to_openkrab_config(app: &AppConfig) -> OpenKrabConfig {
+    let mut channels = crate::openkrab_config::ChannelsConfig::default();
+
+    let to_openkrab_channel = |cfg: Option<&ChannelConfig>| crate::openkrab_config::ChannelConfig {
+        enabled: cfg.map(|c| c.enabled).unwrap_or(true),
+        allowlist: cfg.map(|c| c.allowlist.clone()).unwrap_or_default(),
+        token: cfg.and_then(|c| c.token.clone()),
+        token_encrypted: cfg.and_then(|c| c.token_encrypted.clone()),
+        webhook_secret: cfg.and_then(|c| c.webhook_secret.clone()),
+        webhook_secret_encrypted: cfg.and_then(|c| c.webhook_secret_encrypted.clone()),
+    };
 
     if app.enable_telegram {
-        channels.telegram.insert(
+        let acct_cfg = app.channels.telegram.get("default");
+        let mut tc = crate::openkrab_config::TelegramConfig::default();
+        tc.accounts.insert(
             "default".to_string(),
-            crate::openclaw_config::ChannelConfig {
-                enabled: true,
-                allowlist: vec![],
-                token: None,
-                webhook_secret: None,
+            crate::openkrab_config::TelegramAccountConfig {
+                enabled: acct_cfg.map(|c| c.enabled).unwrap_or(true),
+                allowlist: acct_cfg.map(|c| c.allowlist.clone()).unwrap_or_default(),
+                token: acct_cfg.and_then(|c| c.token.clone()),
+                token_encrypted: acct_cfg.and_then(|c| c.token_encrypted.clone()),
+                webhook_secret: acct_cfg.and_then(|c| c.webhook_secret.clone()),
+                webhook_secret_encrypted: acct_cfg.and_then(|c| c.webhook_secret_encrypted.clone()),
             },
         );
+        channels.telegram = Some(tc);
     }
 
     if app.enable_slack {
         channels.slack.insert(
             "default".to_string(),
-            crate::openclaw_config::ChannelConfig {
-                enabled: true,
-                allowlist: vec![],
-                token: None,
-                webhook_secret: None,
-            },
+            to_openkrab_channel(app.channels.slack.get("default")),
         );
     }
 
     if app.enable_discord {
-        channels.discord.insert(
+        let acct_cfg = app.channels.discord.get("default");
+        let mut dc = crate::openkrab_config::DiscordConfig::default();
+        dc.accounts.insert(
             "default".to_string(),
-            crate::openclaw_config::ChannelConfig {
-                enabled: true,
-                allowlist: vec![],
-                token: None,
-                webhook_secret: None,
+            crate::openkrab_config::DiscordAccountConfig {
+                enabled: acct_cfg.map(|c| c.enabled).unwrap_or(true),
+                allowlist: acct_cfg.map(|c| c.allowlist.clone()).unwrap_or_default(),
+                token: acct_cfg.and_then(|c| c.token.clone()),
+                token_encrypted: acct_cfg.and_then(|c| c.token_encrypted.clone()),
             },
         );
+        channels.discord = Some(dc);
     }
 
     if app.enable_whatsapp {
         channels.whatsapp.insert(
             "default".to_string(),
-            crate::openclaw_config::ChannelConfig {
-                enabled: true,
-                allowlist: vec![],
-                token: None,
-                webhook_secret: None,
-            },
+            to_openkrab_channel(app.channels.whatsapp.get("default")),
         );
     }
 
@@ -119,16 +264,17 @@ pub fn app_to_openclaw_config(app: &AppConfig) -> OpenClawConfig {
         .nth(1)
         .and_then(|p| p.parse().ok());
 
-    OpenClawConfig {
-        meta: Some(crate::openclaw_config::ConfigMeta {
+    OpenKrabConfig {
+        meta: Some(crate::openkrab_config::ConfigMeta {
             last_touched_version: Some(env!("CARGO_PKG_VERSION").to_string()),
             last_touched_at: Some(chrono::Utc::now().to_rfc3339()),
         }),
-        logging: Some(crate::openclaw_config::LoggingConfig {
+        logging: Some(crate::openkrab_config::LoggingConfig {
             level: app.log_level.clone(),
             file: None,
+            ..Default::default()
         }),
-        web: Some(crate::openclaw_config::WebConfig {
+        web: Some(crate::openkrab_config::WebConfig {
             enabled: app.enable_dashboard,
             port,
         }),
@@ -289,6 +435,8 @@ pub struct DockerConfig {
     pub seccomp_profile: Option<String>,
     #[serde(default)]
     pub apparmor_profile: Option<String>,
+    #[serde(default)]
+    pub binds: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
@@ -340,7 +488,11 @@ pub struct ChannelConfig {
     #[serde(default)]
     pub token: Option<String>,
     #[serde(default)]
+    pub token_encrypted: Option<crate::secure::EncryptedValue>,
+    #[serde(default)]
     pub webhook_secret: Option<String>,
+    #[serde(default)]
+    pub webhook_secret_encrypted: Option<crate::secure::EncryptedValue>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
@@ -382,6 +534,11 @@ impl Default for AppConfig {
             memory: crate::memory::config::MemoryConfig::default(),
             agent: crate::agents::AgentIdentity::default(),
             feature_matrix: FeatureMatrix::default(),
+            agents: AgentsConfig::default(),
+            auth: AuthConfig::default(),
+            channels: ChannelsConfig::default(),
+            gateway: GatewayConfig::default(),
+            logging: LoggingConfig::default(),
         }
     }
 }

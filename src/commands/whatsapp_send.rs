@@ -1,7 +1,6 @@
 //! WhatsApp send command — port of `openclaw/extensions/whatsapp/src/send.ts`
 
 use anyhow::{bail, Result};
-use reqwest::Client;
 
 use crate::connectors::whatsapp_client;
 
@@ -12,7 +11,7 @@ pub async fn send_whatsapp_message(
     access_token: &str,
     phone_number_id: &str,
 ) -> Result<serde_json::Value> {
-    let client = Client::new();
+    let client = crate::infra::retry_http::build_retrying_client();
     whatsapp_client::send_message(&client, access_token, phone_number_id, to, text).await
 }
 
@@ -40,7 +39,7 @@ pub async fn send_whatsapp_template(
     access_token: &str,
     phone_number_id: &str,
 ) -> Result<serde_json::Value> {
-    let client = Client::new();
+    let client = crate::infra::retry_http::build_retrying_client();
     let payload =
         whatsapp_client::build_whatsapp_template_payload(to, template_name, language_code);
     whatsapp_client::send_template(&client, access_token, phone_number_id, payload).await

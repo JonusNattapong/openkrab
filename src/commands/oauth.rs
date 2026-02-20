@@ -285,7 +285,7 @@ pub fn login_minimax_oauth(region: Option<&str>) -> Result<QwenCredentials> {
                 let _ = models_auth_add_command(&profile_id, "minimax", Some(&token.access));
                 return Ok(QwenCredentials {
                     access: token.access,
-                    refresh: token.refresh,
+                    refresh: Some(token.refresh),
                     expires: token.expires,
                 });
             }

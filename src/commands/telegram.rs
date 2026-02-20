@@ -34,7 +34,7 @@ pub async fn telegram_send_command(
     let chat_id = normalize_target(to)?;
     let token = std::env::var("TELEGRAM_BOT_TOKEN")
         .map_err(|_| anyhow!("Missing TELEGRAM_BOT_TOKEN environment variable"))?;
-    let client = reqwest::Client::new();
+    let client = crate::infra::retry_http::build_retrying_client();
     let response = crate::connectors::telegram_client::send_message(
         &client,
         &token,

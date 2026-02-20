@@ -31,7 +31,7 @@ pub struct OllamaProvider {
     base_url: String,
     chat_model: String,
     embedding_model: String,
-    client: reqwest::Client,
+    client: reqwest_middleware::ClientWithMiddleware,
 }
 
 impl OllamaProvider {
@@ -40,7 +40,7 @@ impl OllamaProvider {
             base_url: base_url.into(),
             chat_model: "llama3".to_string(),
             embedding_model: "nomic-embed-text".to_string(),
-            client: reqwest::Client::new(),
+            client: crate::infra::retry_http::build_retrying_client(),
         }
     }
 
@@ -53,7 +53,7 @@ impl OllamaProvider {
             base_url: base_url.into(),
             chat_model: chat_model.into(),
             embedding_model: embedding_model.into(),
-            client: reqwest::Client::new(),
+            client: crate::infra::retry_http::build_retrying_client(),
         }
     }
 

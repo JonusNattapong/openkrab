@@ -480,11 +480,7 @@ impl BashPtySession {
                 break;
             }
 
-            // Set a read timeout
-            self.pty_pair
-                .master
-                .set_blocking(false)
-                .context("failed to set non-blocking mode")?;
+            // portable_pty readers already handle non-blocking via WouldBlock
 
             match reader.read(&mut buf) {
                 Ok(0) => break, // EOF

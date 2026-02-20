@@ -57,9 +57,10 @@ pub fn resolve_sandbox_browser_image(cfg: &AppConfig) -> String {
     cfg.agents
         .defaults
         .sandbox
+        .docker
         .browser
-        .image
-        .clone()
+        .as_ref()
+        .and_then(|b| b.image.clone())
         .unwrap_or_else(|| DEFAULT_SANDBOX_BROWSER_IMAGE.to_string())
 }
 
@@ -68,9 +69,10 @@ pub fn resolve_sandbox_common_image(cfg: &AppConfig) -> String {
     cfg.agents
         .defaults
         .sandbox
+        .docker
         .common
-        .image
-        .clone()
+        .as_ref()
+        .and_then(|c| c.image.clone())
         .unwrap_or_else(|| DEFAULT_SANDBOX_COMMON_IMAGE.to_string())
 }
 

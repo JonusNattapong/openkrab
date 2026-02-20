@@ -70,7 +70,7 @@ fn parse_content_disposition_filename(header: Option<&str>) -> Option<String> {
         };
         let decoded = urlencoding::decode(to_decode).unwrap_or_default();
         return Some(
-            Path::new(&decoded)
+            Path::new(decoded.as_ref())
                 .file_name()?
                 .to_string_lossy()
                 .to_string(),
@@ -88,8 +88,9 @@ fn parse_content_disposition_filename(header: Option<&str>) -> Option<String> {
     )
 }
 
-async fn read_error_body_snippet(res: &mut Response, max_chars: usize) -> Option<String> {
-    let text = res.text().await.ok()?;
+async fn read_error_body_snippet(res: Response, max_chars: usize) -> Option<String> {
+    let bytes = res.bytes().await.ok()?;
+    let text = String::from_utf8_lossy(&bytes);
     if text.is_empty() {
         return None;
     }
@@ -124,9 +125,8 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
 
     if !res.status().is_success() {
         let status = res.status();
-        let mut res = res;
         let mut detail = format!("HTTP {}", status);
-        if let Some(snippet) = read_error_body_snippet(&mut res, 200).await {
+        if let Some(snippet) = read_error_body_snippet(res, 200).await {
             detail = format!("{}; body: {}", detail, snippet);
         }
         return Err(MediaFetchError {
@@ -137,16 +137,19 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
     }
 
     let content_length = res.content_length();
-    if let (Some(max_bytes), Some(len)) = (options.max_bytes, content_length) {
-        if len as usize > max_bytes {
-            return Err(MediaFetchError {
-                code: MediaFetchErrorCode::MaxBytes,
-                message: format!("Content length {} exceeds maxBytes {}", len, max_bytes),
-            }
-            .into());
-        }
-    }
-
+    let final_url = res.url().clone();
+    let content_disposition = res
+        .headers()
+        .get("content-disposition")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string());
+    let header_mime = res
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string());
+    
+    // Now consume the response for the body
     let buffer = if let Some(max_bytes) = options.max_bytes {
         let limited = res.bytes().await.map_err(|e| MediaFetchError {
             code: MediaFetchErrorCode::FetchFailed,
@@ -164,17 +167,11 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
         res.bytes().await?.to_vec()
     };
 
-    let final_url = res.url().clone();
-    let content_disposition = res
-        .headers()
-        .get("content-disposition")
-        .and_then(|v| v.to_str().ok());
-
     let file_name_from_url = final_url
         .path_segments()
         .and_then(|s| s.last().map(|p| p.to_string()));
 
-    let header_file_name = parse_content_disposition_filename(content_disposition);
+    let header_file_name = parse_content_disposition_filename(content_disposition.as_deref());
     let file_path_hint_name = options
         .file_path_hint
         .as_ref()
@@ -185,13 +182,8 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
         .or(file_name_from_url)
         .or(file_path_hint_name);
 
-    let header_mime = res
-        .headers()
-        .get("content-type")
-        .and_then(|v| v.to_str().ok());
-
     let content_type =
-        super::mime::detect_mime(Some(&buffer), header_mime, file_name.as_deref()).await;
+        super::mime::detect_mime(Some(&buffer), header_mime.as_deref(), file_name.as_deref()).await;
 
     Ok(FetchMediaResult {
         buffer,

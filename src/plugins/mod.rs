@@ -34,6 +34,22 @@ pub struct PluginManifest {
     pub requires: Vec<String>,
     /// Entry-point (path or URL).
     pub entry: Option<String>,
+    /// Security: Code signature (base64 encoded ed25519 signature)
+    #[serde(default)]
+    pub signature: Option<String>,
+    /// Security: Public key fingerprint for verification
+    #[serde(default)]
+    pub public_key_fingerprint: Option<String>,
+    /// Security: Sandbox level required (default: strict for external plugins)
+    #[serde(default)]
+    pub sandbox_level: Option<crate::plugins::sandbox::SandboxLevel>,
+    /// Security: Allow native plugins (default: false, WASM only)
+    #[serde(default = "default_false")]
+    pub allow_native: bool,
+}
+
+fn default_false() -> bool {
+    false
 }
 
 fn default_true() -> bool {
@@ -51,6 +67,10 @@ impl PluginManifest {
             kind: PluginKind::Extension,
             requires: Vec::new(),
             entry: None,
+            signature: None,
+            public_key_fingerprint: None,
+            sandbox_level: None,
+            allow_native: false,
         }
     }
 

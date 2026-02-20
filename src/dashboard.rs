@@ -614,18 +614,20 @@ pub async fn api_status_handler(State(state): State<Arc<GatewayState>>) -> impl 
     });
 
     // Try a trivial search just to confirm memory is reachable
-    let memory_count: Option<usize> = state
-        .memory
-        .search_hybrid(
-            "status",
-            HybridSearchOptions {
-                max_results: 1,
-                ..Default::default()
-            },
-        )
-        .await
-        .ok()
-        .map(|_| 0); // Total count not exposed yet; shown as placeholder
+    let memory_count: Option<usize> = match state.memory.as_ref() {
+        Some(memory) => memory
+            .search_hybrid(
+                "status",
+                HybridSearchOptions {
+                    max_results: 1,
+                    ..Default::default()
+                },
+            )
+            .await
+            .ok()
+            .map(|_| 0),
+        None => None,
+    };
 
     let body = json!({
         "healthy": true,
@@ -648,15 +650,27 @@ pub async fn api_chat_handler(
         return (
             StatusCode::BAD_REQUEST,
             Json(json!({ "ok": false, "reply": "Message cannot be empty." })),
-        );
+        )
+            .into_response();
     }
 
-    match state.agent.answer(&req.message).await {
-        Ok(reply) => (StatusCode::OK, Json(json!({ "ok": true, "reply": reply }))),
+    let agent = match state.agent.as_ref() {
+        Some(a) => a,
+        None => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "ok": false, "reply": "Agent not available" })),
+            )
+                .into_response();
+        }
+    };
+
+    match agent.answer(&req.message).await {
+        Ok(reply) => (StatusCode::OK, Json(json!({ "ok": true, "reply": reply }))).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({ "ok": false, "reply": format!("Agent error: {}", e) })),
-        ),
+        ).into_response(),
     }
 }
 
@@ -676,8 +690,18 @@ pub async fn api_memory_handler(
         }
     };
 
-    match state
-        .memory
+    let memory = match state.memory.as_ref() {
+        Some(m) => m,
+        None => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({ "ok": false, "error": "Memory not available" })),
+            )
+                .into_response();
+        }
+    };
+
+    match memory
         .search_hybrid(&query, HybridSearchOptions::default())
         .await
     {

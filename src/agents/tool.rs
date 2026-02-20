@@ -3,6 +3,49 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+const ALLOWED_COMMANDS: &[&str] = &[
+    "cargo", "npm", "pnpm", "node", "python", "python3", "pip", "git", "docker", "make", "cmake",
+    "rustc", "go", "javac", "java", "dotnet", "ruby", "perl", "php", "bun", "deno", "uv",
+];
+
+// Prevent command injection by validating command strings
+const BLOCKED_COMMAND_PATTERNS: &[&str] = &[
+    ";", "&", "|", "&&", "||", "`", "$(", "${", "<>", ">", "<",
+    "/etc/passwd", "/etc/shadow", "/etc/hosts", "/etc/sudoers",
+    "/proc/", "/dev/", "/sys/", "/boot/", "/root/",
+    "../", "..\\", "\\..", "./", ".\\",
+];
+
+// Additional security: only allow specific formats
+fn is_command_allowed(command: &str) -> bool {
+    // Reject empty commands
+    if command.trim().is_empty() {
+        return false;
+    }
+
+    // Check for dangerous patterns
+    for pattern in BLOCKED_COMMAND_PATTERNS {
+        if command.contains(pattern) {
+            return false;
+        }
+    }
+
+    // Only allow known command executables
+    let cmd_part = command.split_whitespace().next().unwrap_or("");
+    let cmd_name = if cfg!(target_os = "windows") {
+        cmd_part.trim_end_matches(".exe").trim_end_matches(".EXE")
+    } else {
+        cmd_part
+    };
+
+    // Additional path validation - reject paths
+    if cmd_name.contains('/') || cmd_name.contains('\\') || cmd_name.contains("..") {
+        return false;
+    }
+
+    ALLOWED_COMMANDS.contains(&cmd_name)
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ToolDefinition {
     pub name: String,
@@ -29,6 +72,7 @@ pub trait Tool: Send + Sync {
     async fn call(&self, arguments: &str) -> Result<String>;
 }
 
+#[derive(Debug)]
 pub struct SearchMemoryTool {
     manager: std::sync::Arc<crate::memory::MemoryManager>,
 }
@@ -84,6 +128,7 @@ impl Tool for SearchMemoryTool {
     }
 }
 
+#[derive(Debug)]
 pub struct ReadFileTool {
     workspace_root: std::path::PathBuf,
 }
@@ -123,8 +168,10 @@ impl Tool for ReadFileTool {
 
         let full_path = self.workspace_root.join(rel_path);
 
-        // Security check: ensure path is within workspace
-        if !full_path.starts_with(&self.workspace_root) {
+        let canonical_root = std::fs::canonicalize(&self.workspace_root)?;
+        let canonical_path = std::fs::canonicalize(&full_path)?;
+
+        if !canonical_path.starts_with(&canonical_root) {
             return Err(anyhow::anyhow!(
                 "Access denied: Path is outside of workspace."
             ));
@@ -139,6 +186,7 @@ impl Tool for ReadFileTool {
     }
 }
 
+#[derive(Debug)]
 pub struct ListFilesTool {
     workspace_root: std::path::PathBuf,
 }
@@ -178,7 +226,10 @@ impl Tool for ListFilesTool {
 
         let full_path = self.workspace_root.join(rel_path);
 
-        if !full_path.starts_with(&self.workspace_root) {
+        let canonical_root = std::fs::canonicalize(&self.workspace_root)?;
+        let canonical_path = std::fs::canonicalize(&full_path)?;
+
+        if !canonical_path.starts_with(&canonical_root) {
             return Err(anyhow::anyhow!(
                 "Access denied: Path is outside of workspace."
             ));
@@ -200,6 +251,7 @@ impl Tool for ListFilesTool {
     }
 }
 
+#[derive(Debug)]
 pub struct WriteFileTool {
     workspace_root: std::path::PathBuf,
 }
@@ -247,13 +299,15 @@ impl Tool for WriteFileTool {
 
         let full_path = self.workspace_root.join(rel_path);
 
-        if !full_path.starts_with(&self.workspace_root) {
+        let canonical_root = std::fs::canonicalize(&self.workspace_root)?;
+        let canonical_path = std::fs::canonicalize(&full_path)?;
+
+        if !canonical_path.starts_with(&canonical_root) {
             return Err(anyhow::anyhow!(
                 "Access denied: Path is outside of workspace."
             ));
         }
 
-        // Ensure parent directory exists
         if let Some(parent) = full_path.parent() {
             tokio::fs::create_dir_all(parent).await?;
         }
@@ -263,6 +317,7 @@ impl Tool for WriteFileTool {
     }
 }
 
+#[derive(Debug)]
 pub struct RememberTool {
     manager: std::sync::Arc<crate::memory::MemoryManager>,
     workspace_root: std::path::PathBuf,
@@ -346,6 +401,7 @@ impl Tool for RememberTool {
     }
 }
 
+#[derive(Debug)]
 pub struct ExecCommandTool {
     workspace_root: std::path::PathBuf,
     require_approval: bool,
@@ -398,11 +454,15 @@ impl Tool for ExecCommandTool {
             if input != "y" && input != "yes" {
                 return Ok("Execution REJECTED by user.".to_string());
             }
+        } else if !is_command_allowed(command) {
+            return Err(anyhow::anyhow!(
+                "Command not allowed. Only predefined commands are permitted without user approval: {:?}",
+                ALLOWED_COMMANDS
+            ));
         }
 
         println!("Executing: {}", command);
 
-        // Simple shell execution
         let output = if cfg!(target_os = "windows") {
             std::process::Command::new("powershell")
                 .args(["-Command", command])
@@ -443,6 +503,7 @@ impl Tool for ExecCommandTool {
     }
 }
 
+#[derive(Debug)]
 pub struct TaskTool {
     workspace_root: std::path::PathBuf,
 }
@@ -560,6 +621,7 @@ impl Tool for TaskTool {
     }
 }
 
+#[derive(Debug)]
 pub struct SpeakTool;
 
 impl SpeakTool {
@@ -642,6 +704,7 @@ struct ScheduledTask {
     enabled: bool,
 }
 
+#[derive(Debug)]
 pub struct ScheduleTool {
     workspace_root: std::path::PathBuf,
 }
@@ -772,6 +835,7 @@ impl Tool for ScheduleTool {
     }
 }
 
+#[derive(Debug)]
 pub struct BrowserTool;
 
 impl BrowserTool {
@@ -829,6 +893,7 @@ impl Tool for BrowserTool {
     }
 }
 
+#[derive(Debug)]
 pub struct CodeInterpreterTool {
     workspace_root: std::path::PathBuf,
 }

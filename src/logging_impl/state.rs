@@ -1,11 +1,11 @@
 use super::console::ConsoleSettings;
 use super::levels::LogLevel;
-use super::logger::LoggerSettings;
+use super::logger::{LoggerResolvedSettings, LoggerSettings};
 use std::sync::{Mutex, RwLock};
 
 pub struct LoggingState {
     pub cached_logger: RwLock<Option<()>>,
-    pub cached_settings: RwLock<Option<LoggerSettings>>,
+    pub cached_settings: RwLock<Option<LoggerResolvedSettings>>,
     pub cached_console_settings: RwLock<Option<ConsoleSettings>>,
     pub override_settings: RwLock<Option<LoggerSettings>>,
     pub console_patched: Mutex<bool>,

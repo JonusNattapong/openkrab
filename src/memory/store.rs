@@ -7,7 +7,36 @@ pub struct MemoryStore {
     conn: std::sync::Mutex<Connection>,
 }
 
+impl std::fmt::Debug for MemoryStore {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MemoryStore").field("conn", &"...").finish()
+    }
+}
+
 impl MemoryStore {
+    fn load_sqlite_vec_extension(conn: &Connection) -> Result<()> {
+        unsafe {
+            conn.load_extension_enable()?;
+
+            // The sqlite-vec crate declares sqlite3_vec_init() with 0 arguments,
+            // but the C function expects 3. We cast it to the correct signature.
+            type Sqlite3VecInit = unsafe extern "C" fn(
+                *mut rusqlite::ffi::sqlite3,
+                *mut *mut std::os::raw::c_char,
+                *const rusqlite::ffi::sqlite3_api_routines,
+            ) -> std::os::raw::c_int;
+
+            let init_fn: Sqlite3VecInit =
+                std::mem::transmute(sqlite_vec::sqlite3_vec_init as *const ());
+
+            // Load the extension - ignore return value as sqlite-vec doesn't return errors on init
+            let _ = init_fn(conn.handle(), std::ptr::null_mut(), std::ptr::null());
+
+            conn.load_extension_disable()?;
+        }
+        Ok(())
+    }
+
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         let conn = Connection::open(path)?;
         Self::setup_conn(&conn)?;
@@ -25,24 +54,13 @@ impl MemoryStore {
     }
 
     fn setup_conn(conn: &Connection) -> Result<()> {
-        // Load sqlite-vec extension
-        unsafe {
-            conn.load_extension_enable()?;
-
-            // The sqlite-vec crate declares sqlite3_vec_init() with 0 arguments,
-            // but the C function expects 3. We cast it to the correct signature.
-            type Sqlite3VecInit = unsafe extern "C" fn(
-                *mut rusqlite::ffi::sqlite3,
-                *mut *mut std::os::raw::c_char,
-                *const rusqlite::ffi::sqlite3_api_routines,
-            ) -> std::os::raw::c_int;
-
-            let init_fn: Sqlite3VecInit =
-                std::mem::transmute(sqlite_vec::sqlite3_vec_init as *const ());
-            init_fn(conn.handle(), std::ptr::null_mut(), std::ptr::null());
-
-            conn.load_extension_disable()?;
-        }
+        // SAFETY: This unsafe block is required to load the sqlite-vec extension.
+        // The sqlite-vec crate provides a C-compatible function (sqlite3_vec_init)
+        // that must be called with the correct FFI signature. The transmute is safe
+        // because we cast from a known function pointer type to the correct FFI signature.
+        // The extension is loaded from a trusted source (sqlite-vec crate) and
+        // we immediately disable further extension loading after initialization.
+        Self::load_sqlite_vec_extension(conn)?;
 
         schema::ensure_schema(conn)?;
 
@@ -292,6 +310,7 @@ pub struct SearchResult {
     pub score: f64,
 }
 
+#[derive(Debug)]
 pub struct ChunkData {
     pub id: String,
     pub path: String,

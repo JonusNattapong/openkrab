@@ -64,14 +64,15 @@ pub async fn health_command(cfg: &AppConfig, timeout_ms: u64) -> HealthResult {
     checks.push(gateway_check);
 
     // Check 3: Memory system
+    let memory_enabled = cfg.memory.enabled.unwrap_or(true);
     let memory_check = HealthCheck {
         name: "memory".to_string(),
-        status: if cfg.memory.enabled {
+        status: if memory_enabled {
             CheckStatus::Pass
         } else {
             CheckStatus::Warn
         },
-        message: if cfg.memory.enabled {
+        message: if memory_enabled {
             "Memory system enabled".to_string()
         } else {
             "Memory system disabled".to_string()
@@ -81,7 +82,7 @@ pub async fn health_command(cfg: &AppConfig, timeout_ms: u64) -> HealthResult {
     checks.push(memory_check);
 
     // Check 4: Auth profiles
-    let auth_count = cfg.auth.as_ref().map(|a| a.profiles.len()).unwrap_or(0);
+    let auth_count = cfg.auth.profiles.len();
     let auth_check = HealthCheck {
         name: "auth".to_string(),
         status: if auth_count > 0 {

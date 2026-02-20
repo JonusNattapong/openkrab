@@ -1,9 +1,10 @@
 //! signal::daemon — Signal-cli daemon auto-start/management.
 //! Ported from `openclaw/src/signal/daemon.ts` (Phase 13).
 
-use std::process::{Command, Stdio};
-use std::sync::{Arc, Mutex};
-use tokio::process::Child;
+use std::process::Stdio;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use tokio::process::{Child, Command};
 use tokio::sync::mpsc;
 
 /// Daemon configuration options.
@@ -30,20 +31,20 @@ impl DaemonHandle {
     pub async fn stop(&self) {
         let _ = self.shutdown_tx.send(()).await;
 
-        if let Ok(mut child_guard) = self.child.lock() {
-            if let Some(ref mut child) = *child_guard {
-                let _ = child.kill().await;
-                let _ = child.wait().await;
-            }
-            *child_guard = None;
+        let mut child_guard = self.child.lock().await;
+        if let Some(ref mut child) = *child_guard {
+            let _ = child.kill().await;
+            let _ = child.wait().await;
         }
+        *child_guard = None;
     }
 }
 
 impl Drop for DaemonHandle {
     fn drop(&mut self) {
         // Try to stop the daemon when dropped
-        if let Ok(mut child_guard) = self.child.lock() {
+        // Use try_lock since Drop is synchronous
+        if let Ok(mut child_guard) = self.child.try_lock() {
             if let Some(ref mut child) = *child_guard {
                 // Note: This is synchronous and may not work properly in async context
                 // In production, prefer calling stop() explicitly
@@ -99,7 +100,6 @@ pub async fn spawn_daemon(
         .stderr(Stdio::piped())
         .spawn()?;
 
-    let child = Child::from(child);
     let child_arc = Arc::new(Mutex::new(Some(child)));
     let (shutdown_tx, mut shutdown_rx) = mpsc::channel(1);
 
@@ -109,19 +109,17 @@ pub async fn spawn_daemon(
         tokio::select! {
             _ = shutdown_rx.recv() => {
                 // Shutdown requested
-                if let Ok(mut child_guard) = child_clone.lock() {
-                    if let Some(ref mut child) = *child_guard {
-                        let _ = child.kill().await;
-                    }
+                let mut child_guard = child_clone.lock().await;
+                if let Some(ref mut child) = *child_guard {
+                    let _ = child.kill().await;
                 }
             }
             status = async {
-                if let Ok(mut child_guard) = child_clone.lock() {
-                    if let Some(ref mut child) = *child_guard {
-                        return child.wait().await;
-                    }
+                let mut child_guard = child_clone.lock().await;
+                if let Some(ref mut child) = *child_guard {
+                    return child.wait().await;
                 }
-                Ok(std::process::ExitStatus::default())
+                Ok::<_, std::io::Error>(std::process::ExitStatus::default())
             } => {
                 match status {
                     Ok(exit_status) => {

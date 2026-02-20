@@ -287,9 +287,10 @@ fn execute_add_participant(
 ) -> Result<ActionResult, String> {
     let chat_guid = ctx.chat_guid.as_ref().ok_or("chat_guid required")?;
 
-    let address = ctx
+    let address: &str = ctx
         .address
         .as_ref()
+        .map(|s| s.as_str())
         .or_else(|| ctx.params.get("address").and_then(|v| v.as_str()))
         .ok_or("address required")?;
 
@@ -309,9 +310,10 @@ fn execute_remove_participant(
 ) -> Result<ActionResult, String> {
     let chat_guid = ctx.chat_guid.as_ref().ok_or("chat_guid required")?;
 
-    let address = ctx
+    let address: &str = ctx
         .address
         .as_ref()
+        .map(|s| s.as_str())
         .or_else(|| ctx.params.get("address").and_then(|v| v.as_str()))
         .ok_or("address required")?;
 

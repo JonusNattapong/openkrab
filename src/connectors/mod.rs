@@ -32,6 +32,9 @@ pub mod nostr;
 // ── Phase 13 connectors ────────────────────────────────────────────────────────
 pub mod tlon;
 
+// ── Phase 21 connectors ────────────────────────────────────────────────────────
+pub mod zalouser;
+
 // ── Phase 5-6 connectors (additional) ───────────────────────────────────────────
 pub mod matrix;
 pub mod signal;
@@ -77,3 +80,8 @@ pub use tlon::{extract_text as tlon_extract_text, parse_graph_entry as tlon_pars
 pub use twitch::{build_privmsg as twitch_build_privmsg, parse_privmsg as twitch_parse_privmsg};
 pub use whatsapp_client::build_whatsapp_text_payload;
 pub use zalo::{build_text_payload as zalo_build_text, parse_event as zalo_parse_event};
+pub use zalouser::{
+    normalize_inbound as zalouser_normalize_inbound,
+    normalize_target as zalouser_normalize_target,
+    is_sender_allowed as zalouser_is_sender_allowed,
+};

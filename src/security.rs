@@ -1,5 +1,5 @@
 //! security — Security hardening: sandbox validation, env sanitization, prompt sanitization.
-//! Ported from `openclaw/src/agents/sandbox/` and `openclaw/src/agents/sanitize-for-prompt.ts` (Phase 18).
+//! Ported from `openkrab/src/agents/sandbox/` and `openkrab/src/agents/sanitize-for-prompt.ts` (Phase 18).
 
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
@@ -250,7 +250,7 @@ pub struct SandboxConfig {
 }
 
 pub fn validate_sandbox_security(cfg: &SandboxConfig) -> Result<(), String> {
-    let binds_slice = cfg.binds.as_deref().map(|v| v.as_slice()).unwrap_or(&[]);
+    let binds_slice: &[String] = cfg.binds.as_deref().unwrap_or(&[]);
     validate_bind_mounts(Some(binds_slice))?;
     validate_network_mode(cfg.network.as_deref())?;
     validate_seccomp_profile(cfg.seccomp_profile.as_deref())?;
@@ -276,7 +276,7 @@ static BLOCKED_ENV_PATTERNS: LazyLock<Vec<regex::Regex>> = LazyLock::new(|| {
         r"^SLACK_(BOT|APP)_TOKEN$",
         r"^LINE_CHANNEL_SECRET$",
         r"^LINE_CHANNEL_ACCESS_TOKEN$",
-        r"^OPENCLAW_GATEWAY_(TOKEN|PASSWORD)$",
+        r"^OPENKRAB_GATEWAY_(TOKEN|PASSWORD)$",
         r"^AWS_(SECRET_ACCESS_KEY|SECRET_KEY|SESSION_TOKEN)$",
         r"^(GH|GITHUB)_TOKEN$",
         r"^(AZURE|AZURE_OPENAI|COHERE|AI_GATEWAY|OPENROUTER)_API_KEY$",

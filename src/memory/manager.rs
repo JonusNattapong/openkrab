@@ -9,6 +9,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc;
 use walkdir::WalkDir;
 
+#[derive(Debug, Clone)]
 pub struct MemoryChunk {
     pub start_line: i32,
     pub end_line: i32,
@@ -71,9 +72,19 @@ pub struct MemoryManager {
     pub provider: Box<dyn EmbeddingProvider>,
 }
 
+impl std::fmt::Debug for MemoryManager {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MemoryManager")
+            .field("store", &"...")
+            .field("provider", &"...")
+            .finish()
+    }
+}
+
 use crate::memory::store::SearchResult;
 use std::collections::HashMap;
 
+#[derive(Debug, Clone, Copy)]
 pub struct HybridSearchOptions {
     pub max_results: usize,
     pub vector_weight: f64,

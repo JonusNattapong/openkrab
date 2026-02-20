@@ -1,5 +1,5 @@
 use anyhow::Result;
-use reqwest::Client;
+use reqwest_middleware::ClientWithMiddleware as Client;
 use serde_json::json;
 
 /// Build the JSON payload for posting a message to Slack

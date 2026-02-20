@@ -3,6 +3,7 @@ use crate::gateway::{GatewayServer, GatewayState};
 use std::sync::Arc;
 
 const LINE_MAX_TEXT_CHARS: usize = 5000;
+const MAX_PAYLOAD_SIZE: usize = 1024 * 1024; // 1MB limit
 
 pub mod signature {
     use base64::Engine;
@@ -253,8 +254,24 @@ pub fn parse_events(payload: &serde_json::Value) -> Vec<LineEvent> {
     out
 }
 
+fn validate_payload_size(payload: &serde_json::Value) -> Result<(), String> {
+    let size = serde_json::to_vec(payload)
+        .map_err(|e| format!("JSON serialization error: {}", e))?
+        .len();
+    
+    if size > MAX_PAYLOAD_SIZE {
+        return Err(format!("Payload too large: {} bytes (max: {})", size, MAX_PAYLOAD_SIZE));
+    }
+    Ok(())
+}
+
 /// Handle incoming Line webhook events: parse → agent → reply.
 pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value) {
+    if let Err(e) = validate_payload_size(&payload) {
+        tracing::warn!("[line] Payload validation failed: {}", e);
+        return;
+    }
+
     let events = parse_events(&payload);
 
     for event in events {
@@ -267,11 +284,18 @@ pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value)
         tracing::info!("[line] Received: {:?}", normalized);
 
         tokio::spawn(async move {
-            match state_clone.agent.answer(&text).await {
+            let agent = match state_clone.agent.as_ref() {
+                Some(a) => a,
+                None => {
+                    tracing::error!("[line] Agent not available");
+                    return;
+                }
+            };
+            match agent.answer(&text).await {
                 Ok(answer) => {
                     if let Ok(token) = std::env::var("LINE_CHANNEL_ACCESS_TOKEN") {
                         if let Some(reply_token) = reply_token.as_ref() {
-                            let client = reqwest::Client::new();
+                            let client = crate::infra::retry_http::build_base_client();
                             for chunk in split_outbound_chunks(&answer, LINE_MAX_TEXT_CHARS) {
                                 if let Err(e) = crate::connectors::line_client::reply_message(
                                     &client,
@@ -298,7 +322,7 @@ pub async fn handle_events(state: Arc<GatewayState>, payload: serde_json::Value)
                         std::env::var("LINE_CHANNEL_ACCESS_TOKEN"),
                         reply_token.as_ref(),
                     ) {
-                        let client = reqwest::Client::new();
+                        let client = crate::infra::retry_http::build_base_client();
                         for chunk in split_outbound_chunks(
                             &format!("⚠️ Agent unavailable: {e}"),
                             LINE_MAX_TEXT_CHARS,

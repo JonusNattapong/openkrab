@@ -71,12 +71,12 @@ pub struct PathParamOptions {
 }
 
 /// Action gate for controlling tool behavior
-pub type ActionGate<T> = dyn Fn(&str, Option<bool>) -> bool + Send + Sync;
+pub type ActionGate = dyn Fn(&str, Option<bool>) -> bool + Send + Sync;
 
 /// Create an action gate from a configuration map
-pub fn create_action_gate<T: std::any::Any>(
+pub fn create_action_gate(
     actions: Option<HashMap<String, bool>>,
-) -> Box<ActionGate<T>> {
+) -> Box<ActionGate> {
     let actions = actions.unwrap_or_default();
     Box::new(move |key: &str, default_value: Option<bool>| -> bool {
         actions
@@ -177,7 +177,7 @@ pub fn read_boolean_param(
                 key
             ))),
         },
-        serde_json::Value::Number(n) => Ok(*n.as_i64().unwrap_or(0) != 0),
+        serde_json::Value::Number(n) => Ok(n.as_i64().unwrap_or(0) != 0),
         _ => Err(ToolInputError::new(format!(
             "Parameter '{}' must be a boolean",
             key

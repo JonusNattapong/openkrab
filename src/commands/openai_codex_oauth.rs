@@ -17,10 +17,18 @@ pub struct OpenAICredentials {
     pub token_type: String,
 }
 
-#[derive(Debug, Clone)]
 pub struct OAuthHandlers {
     pub on_auth: Box<dyn Fn(String) -> Result<()> + Send + Sync>,
     pub on_prompt: Box<dyn Fn(&str, Option<&str>) -> Result<String> + Send + Sync>,
+}
+
+impl std::fmt::Debug for OAuthHandlers {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OAuthHandlers")
+            .field("on_auth", &"...")
+            .field("on_prompt", &"...")
+            .finish()
+    }
 }
 
 impl Default for OAuthHandlers {
@@ -65,9 +73,10 @@ pub fn create_vps_aware_oauth_handlers(
             }),
         }
     } else {
+        let local_msg = local_browser_message.to_string();
         OAuthHandlers {
             on_auth: Box::new(move |url| {
-                println!("{}", local_browser_message);
+                println!("{}", local_msg);
                 println!("Opening: {}", url);
                 // In real implementation, would open browser
                 Ok(())

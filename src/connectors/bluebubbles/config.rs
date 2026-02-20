@@ -98,9 +98,9 @@ pub fn resolve_account(
                 name: account_config.name.clone(),
                 enabled: account_config.enabled.unwrap_or(true),
                 configured,
-                base_url,
+                base_url: base_url.clone(),
                 config: BlueBubblesAccountConfig {
-                    server_url: Some(base_url.clone()),
+                    server_url: Some(base_url),
                     password,
                     ..account_config.clone()
                 },

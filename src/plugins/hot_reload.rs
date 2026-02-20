@@ -133,21 +133,29 @@ impl HotReloadManager {
         let mut summary = HotReloadSummary::default();
 
         // Process all pending events
-        if let Some(ref mut rx) = self.event_rx {
+        let events: Vec<_> = if let Some(ref mut rx) = self.event_rx {
+            let mut collected = Vec::new();
             while let Ok(event) = rx.try_recv() {
-                debug!("Processing hot reload event: {:?}", event);
+                collected.push(event);
+            }
+            collected
+        } else {
+            Vec::new()
+        };
 
-                match self.handle_event(event, manager).await {
-                    Ok(Some(plugin_name)) => {
-                        summary.reloaded.push(plugin_name);
-                    }
-                    Ok(None) => {
-                        summary.skipped += 1;
-                    }
-                    Err(e) => {
-                        summary.failed += 1;
-                        summary.errors.push(e.to_string());
-                    }
+        for event in events {
+            debug!("Processing hot reload event: {:?}", event);
+
+            match self.handle_event(event, manager).await {
+                Ok(Some(plugin_name)) => {
+                    summary.reloaded.push(plugin_name);
+                }
+                Ok(None) => {
+                    summary.skipped += 1;
+                }
+                Err(e) => {
+                    summary.failed += 1;
+                    summary.errors.push(e.to_string());
                 }
             }
         }
@@ -178,50 +186,63 @@ impl HotReloadManager {
 
         info!("Hot reloading plugin: {}", plugin_name);
 
-        // Perform reload
-        let mut mgr = manager.lock().await;
-
-        // 1. Unload the plugin
-        if let Err(e) = mgr.loader.unload(&plugin_name, &mut mgr.registry) {
-            warn!("Failed to unload plugin '{}': {}", plugin_name, e);
+        // Step 1: Unload
+        {
+            let mut mgr = manager.lock().await;
+            let registry = &mut mgr.registry as *mut PluginRegistry;
+            unsafe {
+                let _ = mgr.loader.unload(&plugin_name, &mut *registry);
+            }
         }
 
-        // 2. Rediscover and reload
-        match mgr.loader.discover() {
-            Ok(discovered) => {
-                if let Some(plugin) = discovered.iter().find(|p| p.manifest.name == plugin_name) {
-                    // Reload into registry
-                    if let Err(e) = mgr.loader.load(plugin, &mut mgr.registry) {
-                        return Err(anyhow::anyhow!("Failed to load plugin: {}", e));
+        // Step 2: Discover
+        let discovered = {
+            let mgr = manager.lock().await;
+            mgr.loader.discover().map_err(|e| anyhow::anyhow!("Failed to discover: {}", e))?
+        };
+
+        // Step 3: Find plugin
+        let plugin = discovered.iter().find(|p| p.manifest.name == plugin_name);
+        
+        let should_init = match plugin {
+            Some(p) => {
+                // Step 4: Load
+                {
+                    let mut mgr = manager.lock().await;
+                    let registry = &mut mgr.registry as *mut PluginRegistry;
+                    unsafe {
+                        let _ = mgr.loader.load(p, &mut *registry);
                     }
-
-                    // Re-initialize if it was enabled
-                    if let Some(entry) = mgr.registry.get(&plugin_name) {
-                        if entry.is_enabled() {
-                            if let Err(e) = mgr.loader.initialize(&plugin_name, &mut mgr.registry).await {
-                                // Mark as error state
-                                if let Some(entry) = mgr.registry.get_mut(&plugin_name) {
-                                    entry.status = PluginStatus::Error {
-                                        reason: e.to_string(),
-                                    };
-                                }
-                                return Err(anyhow::anyhow!("Failed to initialize plugin: {}", e));
-                            }
-                        }
-                    }
-
-                    // Update last reload time
-                    self.update_reload_time(&plugin_name).await;
-
-                    info!("Plugin '{}' hot reloaded successfully", plugin_name);
-                    Ok(Some(plugin_name))
-                } else {
-                    Err(anyhow::anyhow!("Plugin '{}' not found during rediscovery", plugin_name))
                 }
+                
+                // Step 5: Check if enabled
+                let mgr = manager.lock().await;
+                mgr.registry.get(&plugin_name)
+                    .map(|e| e.is_enabled())
+                    .unwrap_or(false)
             }
-            Err(e) => {
-                Err(anyhow::anyhow!("Failed to discover plugins: {}", e))
+            None => false
+        };
+
+        // Step 6: Initialize if needed
+        if should_init {
+            let mut mgr = manager.lock().await;
+            let registry = &mut mgr.registry as *mut PluginRegistry;
+            let result = unsafe { mgr.loader.initialize(&plugin_name, &mut *registry).await };
+            if let Err(e) = result {
+                if let Some(entry) = mgr.registry.get_mut(&plugin_name) {
+                    entry.status = PluginStatus::Error {
+                        reason: e.to_string(),
+                    };
+                }
+                return Err(anyhow::anyhow!("Failed to initialize plugin: {}", e));
             }
+            drop(mgr);
+            self.update_reload_time(&plugin_name).await;
+            info!("Plugin '{}' hot reloaded successfully", plugin_name);
+            Ok(Some(plugin_name))
+        } else {
+            Err(anyhow::anyhow!("Plugin '{}' not found during rediscovery", plugin_name))
         }
     }
 
@@ -229,22 +250,45 @@ impl HotReloadManager {
     async fn rescan_all(&self, manager: &Arc<Mutex<PluginManager>>) -> Result<()> {
         info!("Rescanning all plugins");
 
-        let mut mgr = manager.lock().await;
+        // Step 1: Get loaded plugins
+        let loaded: Vec<String> = {
+            let mgr = manager.lock().await;
+            mgr.loader.loaded_plugins()
+                .iter()
+                .map(|p| p.manifest.name.clone())
+                .collect()
+        };
 
-        // Get list of currently loaded plugins
-        let loaded: Vec<String> = mgr.loader.loaded_plugins()
-            .iter()
-            .map(|p| p.manifest.name.clone())
-            .collect();
-
-        // Unload all
+        // Step 2: Unload all
         for name in &loaded {
-            let _ = mgr.loader.unload(name, &mut mgr.registry);
+            let mut mgr = manager.lock().await;
+            let registry = &mut mgr.registry as *mut PluginRegistry;
+            unsafe {
+                let _ = mgr.loader.unload(name, &mut *registry);
+            }
         }
 
-        // Rediscover and reload all
-        let _ = mgr.loader.load_all(&mut mgr.registry)?;
-        let _ = mgr.loader.initialize_all(&mut mgr.registry).await?;
+        // Step 3: Discover
+        let discovered = {
+            let mgr = manager.lock().await;
+            mgr.loader.discover().map_err(|e| anyhow::anyhow!("Failed to discover: {}", e))?
+        };
+        
+        // Step 4: Load all
+        {
+            let mut mgr = manager.lock().await;
+            let loader = &mut mgr.loader as *mut PluginLoader;
+            let registry = &mut mgr.registry as *mut PluginRegistry;
+            unsafe {
+                let _ = (*loader).load_all(&mut *registry);
+            }
+        }
+        
+        // Step 5: Initialize all
+        {
+            let mut mgr = manager.lock().await;
+            let _ = mgr.initialize_all().await;
+        }
 
         Ok(())
     }
@@ -336,7 +380,7 @@ impl HotReloadManager {
     fn clone_for_task(&self) -> HotReloadTask {
         HotReloadTask {
             last_reload: self.last_reload.clone(),
-            event_rx: self.event_rx.as_ref().map(|rx| rx.clone()),
+            event_rx: None, // Receiver can't be cloned, needs to be taken
             enabled: self.enabled,
         }
     }

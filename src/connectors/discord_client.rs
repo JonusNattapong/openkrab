@@ -8,7 +8,7 @@
 //! - Typing indicator, voice messages
 
 use anyhow::{bail, Result};
-use reqwest::Client;
+use reqwest_middleware::ClientWithMiddleware as Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 

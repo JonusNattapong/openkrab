@@ -182,13 +182,13 @@ fn send_media_bytes(
     let mime = content_type.unwrap_or("application/octet-stream");
     let name = filename.unwrap_or("attachment");
 
-    let part = reqwest::multipart::Part::bytes(data.to_vec())
+    let part = reqwest::blocking::multipart::Part::bytes(data.to_vec())
         .file_name(name.to_string())
         .mime_str(mime)
         .map_err(|e| format!("mime error: {}", e))?;
 
-    let mut form = reqwest::multipart::Form::new()
-        .text("chatGuid", &chat_guid)
+    let mut form = reqwest::blocking::multipart::Form::new()
+        .text("chatGuid", chat_guid.clone())
         .part("file", part);
 
     if let Some(cap) = caption {
@@ -204,10 +204,11 @@ fn send_media_bytes(
         .map_err(|e| format!("upload failed: {}", e))?;
 
     if !response.status().is_success() {
+        let status = response.status();
         let error_text = response.text().unwrap_or_default();
         return Err(format!(
             "media send failed ({}): {}",
-            response.status(),
+            status,
             error_text
         ));
     }

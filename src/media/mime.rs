@@ -124,9 +124,9 @@ pub async fn detect_mime(
     let header_mime = normalize_mime(header_mime);
     let sniffed = sniff_mime(buffer).await;
 
-    if let Some(s) = sniffed {
-        if !is_generic_mime(Some(&s)) || ext_mime.is_none() {
-            return Some(s);
+    if let Some(ref s) = sniffed {
+        if !is_generic_mime(Some(s)) || ext_mime.is_none() {
+            return Some(s.clone());
         }
     }
 

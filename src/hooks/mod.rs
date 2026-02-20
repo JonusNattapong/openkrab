@@ -62,6 +62,14 @@ pub struct HookRegistry {
     hooks: HashMap<String, Vec<HookFn>>,
 }
 
+impl std::fmt::Debug for HookRegistry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HookRegistry")
+            .field("events", &self.hooks.len())
+            .finish()
+    }
+}
+
 impl HookRegistry {
     pub fn new() -> Self {
         Self {

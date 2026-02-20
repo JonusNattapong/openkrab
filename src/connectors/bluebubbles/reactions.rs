@@ -43,12 +43,9 @@ pub fn send_reaction(
         .map_err(|e| format!("request failed: {}", e))?;
 
     if !response.status().is_success() {
+        let status = response.status();
         let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "reaction failed ({}): {}",
-            response.status(),
-            error_text
-        ));
+        return Err(format!("reaction failed ({}): {}", status, error_text));
     }
 
     let json: serde_json::Value = response.json().map_err(|e| format!("parse error: {}", e))?;
@@ -91,12 +88,9 @@ pub fn remove_reaction(
         .map_err(|e| format!("request failed: {}", e))?;
 
     if !response.status().is_success() {
+        let status = response.status();
         let error_text = response.text().unwrap_or_default();
-        return Err(format!(
-            "unreact failed ({}): {}",
-            response.status(),
-            error_text
-        ));
+        return Err(format!("unreact failed ({}): {}", status, error_text));
     }
 
     Ok(BlueBubblesSendResult {
@@ -121,24 +115,26 @@ pub fn map_emoji_to_reaction(emoji: &str) -> Option<String> {
     emoji_map.get(emoji).map(|s| s.to_string())
 }
 
-pub fn parse_reaction_action(action: &str) -> (&str, Option<&str>) {
-    let action = action.to_lowercase();
+/// Parse a reaction action string into (action_type, optional_emoji).
+/// Returns owned Strings to avoid lifetime issues with the local `action` variable.
+pub fn parse_reaction_action(action: &str) -> (String, Option<String>) {
+    let action_lower = action.to_lowercase();
 
-    if action.contains("remove") || action.contains("un") || action.contains("delete") {
-        return ("remove", None);
+    if action_lower.contains("remove") || action_lower.contains("un") || action_lower.contains("delete") {
+        return ("remove".to_string(), None);
     }
 
-    if let Some(emoji) = action.strip_prefix("react:") {
-        return ("add", Some(emoji));
+    if let Some(emoji) = action_lower.strip_prefix("react:") {
+        return ("add".to_string(), Some(emoji.to_string()));
     }
 
-    if action.starts_with('[') {
-        if let Some(end) = action.find(']') {
-            return ("add", Some(&action[1..end]));
+    if action_lower.starts_with('[') {
+        if let Some(end) = action_lower.find(']') {
+            return ("add".to_string(), Some(action_lower[1..end].to_string()));
         }
     }
 
-    ("add", Some(&action))
+    ("add".to_string(), Some(action_lower))
 }
 
 #[cfg(test)]
@@ -162,7 +158,7 @@ mod tests {
     fn test_parse_reaction_action() {
         let (action, emoji) = parse_reaction_action("react:👍");
         assert_eq!(action, "add");
-        assert_eq!(emoji, Some("👍"));
+        assert_eq!(emoji.as_deref(), Some("👍"));
 
         let (action2, _) = parse_reaction_action("remove");
         assert_eq!(action2, "remove");

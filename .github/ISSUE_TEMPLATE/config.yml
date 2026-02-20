@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Documentation
-    url: https://github.com/openkrab/krabkrab#documentation
-    about: Check the documentation before opening an issue
-  - name: Security Vulnerability
-    url: https://github.com/openkrab/krabkrab/security/policy
-    about: Please report security issues privately
+  - name: Onboarding
+    url: https://discord.gg/clawd
+    about: New to OpenClaw? Join Discord for setup guidance from Krill in \#help.
+  - name: Support
+    url: https://discord.gg/clawd
+    about: Get help from Krill and the community on Discord in \#help.

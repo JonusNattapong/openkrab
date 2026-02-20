@@ -1,5 +1,64 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
+use subtle::ConstantTimeEq;
+use tokio::sync::RwLock;
+
+struct RateLimitEntry {
+    attempts: u32,
+    first_attempt: Instant,
+}
+
+pub struct RateLimiter {
+    entries: RwLock<HashMap<String, RateLimitEntry>>,
+    max_attempts: u32,
+    window: Duration,
+}
+
+impl RateLimiter {
+    pub fn new(max_attempts: u32, window_secs: u64) -> Self {
+        Self {
+            entries: RwLock::new(HashMap::new()),
+            max_attempts,
+            window: Duration::from_secs(window_secs),
+        }
+    }
+
+    pub async fn check(&self, key: &str) -> (bool, Option<u64>) {
+        let mut entries = self.entries.write().await;
+        let now = Instant::now();
+
+        if let Some(entry) = entries.get_mut(key) {
+            if now.duration_since(entry.first_attempt) > self.window {
+                entry.attempts = 1;
+                entry.first_attempt = now;
+                return (true, None);
+            }
+
+            entry.attempts += 1;
+            if entry.attempts > self.max_attempts {
+                let remaining = self.window.saturating_sub(now.duration_since(entry.first_attempt));
+                return (false, Some(remaining.as_millis() as u64));
+            }
+            return (true, None);
+        }
+
+        entries.insert(
+            key.to_string(),
+            RateLimitEntry {
+                attempts: 1,
+                first_attempt: now,
+            },
+        );
+        (true, None)
+    }
+
+    pub async fn reset(&self, key: &str) {
+        let mut entries = self.entries.write().await;
+        entries.remove(key);
+    }
+}
 
 /// Authentication modes supported by the gateway
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -16,9 +75,11 @@ pub enum AuthMode {
 pub struct ResolvedAuth {
     pub mode: AuthMode,
     pub token: Option<String>,
+    pub username: Option<String>,
     pub password: Option<String>,
     pub allow_tailscale: bool,
     pub trusted_proxy: Option<TrustedProxyConfig>,
+    pub rate_limit_per_user: Option<u32>,
 }
 
 /// Trusted proxy configuration
@@ -108,9 +169,9 @@ impl Authenticator for TokenAuth {
         let auth_header = ctx.headers.get("authorization");
         let token_param = ctx.query_params.get("token");
 
-        let provided_token = auth_header
+        let provided_token: Option<&str> = auth_header
             .and_then(|h| h.strip_prefix("Bearer "))
-            .or_else(|| token_param.as_deref());
+            .or_else(|| token_param.map(|s| s.as_str()));
 
         match provided_token {
             Some(token) if token == self.token => AuthResult {
@@ -143,6 +204,10 @@ impl PasswordAuth {
     pub fn new(username: String, password: String) -> Self {
         Self { username, password }
     }
+
+    fn constant_time_compare(a: &str, b: &str) -> bool {
+        a.as_bytes().ct_eq(b.as_bytes()).into()
+    }
 }
 
 impl Authenticator for PasswordAuth {
@@ -158,7 +223,10 @@ impl Authenticator for PasswordAuth {
                             let username = parts[0];
                             let password = parts[1];
 
-                            if username == self.username && password == self.password {
+                            let username_ok = Self::constant_time_compare(username, &self.username);
+                            let password_ok = Self::constant_time_compare(password, &self.password);
+
+                            if username_ok & password_ok {
                                 return AuthResult {
                                     ok: true,
                                     method: Some("password".to_string()),
@@ -188,10 +256,15 @@ impl Authenticator for PasswordAuth {
 /// Authentication manager that handles different auth methods
 pub struct AuthManager {
     authenticator: Box<dyn Authenticator>,
+    rate_limiter: Option<Arc<RateLimiter>>,
 }
 
 impl AuthManager {
     pub fn new(auth_config: ResolvedAuth) -> Self {
+        let rate_limiter = auth_config.rate_limit_per_user.map(|max_attempts| {
+            Arc::new(RateLimiter::new(max_attempts, 60))
+        });
+
         let authenticator: Box<dyn Authenticator> = match auth_config.mode {
             AuthMode::None => Box::new(NoAuth),
             AuthMode::Token => {
@@ -199,17 +272,32 @@ impl AuthManager {
                 Box::new(TokenAuth::new(token))
             }
             AuthMode::Password => {
-                let username = "admin".to_string(); // Default username
+                let username = auth_config.username.unwrap_or_else(|| "admin".to_string());
                 let password = auth_config.password.unwrap_or_default();
                 Box::new(PasswordAuth::new(username, password))
             }
             AuthMode::TrustedProxy => Box::new(NoAuth), // Simplified for now
         };
 
-        Self { authenticator }
+        Self { authenticator, rate_limiter }
     }
 
-    pub fn authenticate(&self, ctx: &AuthContext) -> AuthResult {
+    pub async fn authenticate(&self, ctx: &AuthContext) -> AuthResult {
+        if let Some(limiter) = &self.rate_limiter {
+            let client_ip = ctx.client_ip.as_deref().unwrap_or("unknown");
+            let (allowed, retry_after) = limiter.check(client_ip).await;
+            if !allowed {
+                return AuthResult {
+                    ok: false,
+                    method: None,
+                    user: None,
+                    reason: Some("Rate limit exceeded".to_string()),
+                    rate_limited: Some(true),
+                    retry_after_ms: retry_after,
+                };
+            }
+        }
+
         self.authenticator.authenticate(ctx)
     }
 }
@@ -219,9 +307,11 @@ impl Default for AuthManager {
         Self::new(ResolvedAuth {
             mode: AuthMode::None,
             token: None,
+            username: None,
             password: None,
             allow_tailscale: false,
             trusted_proxy: None,
+            rate_limit_per_user: None,
         })
     }
 }

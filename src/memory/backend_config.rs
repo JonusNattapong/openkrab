@@ -99,15 +99,18 @@ const DEFAULT_QMD_LIMITS: QmdLimitsConfig = QmdLimitsConfig {
     max_injected_chars: 4_000,
     timeout_ms: DEFAULT_QMD_TIMEOUT_MS,
 };
-const DEFAULT_QMD_SCOPE: SessionSendPolicyConfig = SessionSendPolicyConfig {
-    default: "deny".to_string(),
-    rules: vec![PolicyRule {
-        action: "allow".to_string(),
-        chat_type: Some("direct".to_string()),
-        channel: None,
-        session_key: None,
-    }],
-};
+
+fn default_qmd_scope() -> SessionSendPolicyConfig {
+    SessionSendPolicyConfig {
+        default: "deny".to_string(),
+        rules: vec![PolicyRule {
+            action: "allow".to_string(),
+            chat_type: Some("direct".to_string()),
+            channel: None,
+            session_key: None,
+        }],
+    }
+}
 
 fn sanitize_name(input: &str) -> String {
     let lower = input
@@ -350,7 +353,7 @@ pub fn resolve_memory_backend_config(
         },
         limits: DEFAULT_QMD_LIMITS.clone(),
         include_default_memory: true,
-        scope: Some(DEFAULT_QMD_SCOPE.clone()),
+        scope: Some(default_qmd_scope()),
     });
 
     let include_default_memory = qmd_cfg.include_default_memory;

@@ -46,7 +46,7 @@ impl MonitorManager {
                     format!("whatsapp:{}", account_id.unwrap_or_default()),
                     Box::new(WhatsAppMonitorHandle {
                         stop_tx: monitor_result.stop_tx,
-                        handle: monitor_result.handle,
+                        handle: Mutex::new(Some(monitor_result.handle)),
                     }),
                 );
             }
@@ -99,14 +99,17 @@ pub trait MonitorHandle: Send + Sync {
 /// WhatsApp monitor handle
 pub struct WhatsAppMonitorHandle {
     stop_tx: mpsc::Sender<()>,
-    handle: tokio::task::JoinHandle<Result<()>>,
+    handle: Mutex<Option<tokio::task::JoinHandle<Result<()>>>>,
 }
 
 #[async_trait::async_trait]
 impl MonitorHandle for WhatsAppMonitorHandle {
     async fn stop(&self) -> Result<()> {
         let _ = self.stop_tx.send(()).await;
-        let _ = self.handle.await;
+        let handle = self.handle.lock().unwrap().take();
+        if let Some(handle) = handle {
+            let _ = handle.await;
+        }
         Ok(())
     }
 }

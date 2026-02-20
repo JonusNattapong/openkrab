@@ -55,7 +55,7 @@ pub struct OpenAiProvider {
     api_key: String,
     chat_model: String,
     embedding_model: String,
-    client: reqwest::Client,
+    client: reqwest_middleware::ClientWithMiddleware,
 }
 
 impl OpenAiProvider {
@@ -64,7 +64,7 @@ impl OpenAiProvider {
             api_key: api_key.into(),
             chat_model: "gpt-4o-mini".to_string(),
             embedding_model: "text-embedding-3-small".to_string(),
-            client: reqwest::Client::new(),
+            client: crate::infra::retry_http::build_retrying_client(),
         }
     }
 
@@ -77,7 +77,7 @@ impl OpenAiProvider {
             api_key: api_key.into(),
             chat_model: chat_model.into(),
             embedding_model: embedding_model.into(),
-            client: reqwest::Client::new(),
+            client: crate::infra::retry_http::build_retrying_client(),
         }
     }
 

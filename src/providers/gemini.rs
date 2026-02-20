@@ -45,7 +45,7 @@ pub struct GeminiProvider {
     api_key: String,
     chat_model: String,
     embedding_model: String,
-    client: reqwest::Client,
+    client: reqwest_middleware::ClientWithMiddleware,
 }
 
 impl GeminiProvider {
@@ -54,7 +54,7 @@ impl GeminiProvider {
             api_key: api_key.into(),
             chat_model: "gemini-1.5-flash".to_string(),
             embedding_model: "text-embedding-004".to_string(),
-            client: reqwest::Client::new(),
+            client: crate::infra::retry_http::build_retrying_client(),
         }
     }
 
@@ -67,7 +67,7 @@ impl GeminiProvider {
             api_key: api_key.into(),
             chat_model: chat_model.into(),
             embedding_model: embedding_model.into(),
-            client: reqwest::Client::new(),
+            client: crate::infra::retry_http::build_retrying_client(),
         }
     }
 

@@ -124,7 +124,7 @@ fn query_chat_guid_by_identifier(
 ) -> Result<String, String> {
     let chats = query_chats(base_url, password, 0, 500, timeout_ms)?;
 
-    for chat in chats {
+    for chat in &chats {
         if let Some(guid) = extract_chat_guid(&chat) {
             if let Some(extracted) = extract_handle_from_chat_guid(&guid) {
                 if extracted == normalize_handle(identifier) || extracted == identifier {
@@ -145,7 +145,7 @@ fn query_chat_guid_by_identifier(
         }
     }
 
-    for chat in chats {
+    for chat in &chats {
         let participants = chat
             .get("participants")
             .and_then(|p| p.as_array())
@@ -268,7 +268,7 @@ fn query_chats(
         .into_iter()
         .filter_map(|v| {
             if let serde_json::Value::Object(m) = v {
-                Some(m)
+                Some(m.into_iter().collect::<HashMap<_, _>>())
             } else {
                 None
             }
@@ -343,10 +343,11 @@ fn send_to_chat(
         .map_err(|e| format!("request failed: {}", e))?;
 
     if !response.status().is_success() {
+        let status = response.status();
         let error_text = response.text().unwrap_or_default();
         return Err(format!(
             "send failed ({}): {}",
-            response.status(),
+            status,
             error_text
         ));
     }
@@ -386,13 +387,14 @@ pub fn create_new_chat(
         .map_err(|e| format!("request failed: {}", e))?;
 
     if !response.status().is_success() {
+        let status = response.status();
         let error_text = response.text().unwrap_or_default();
         if error_text.to_lowercase().contains("private api") {
             return Err("Cannot create new chat: Private API must be enabled".to_string());
         }
         return Err(format!(
             "create chat failed ({}): {}",
-            response.status(),
+            status,
             error_text
         ));
     }

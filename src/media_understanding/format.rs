@@ -1,3 +1,4 @@
+use encoding_rs;
 use regex::Regex;
 use std::collections::HashMap;
 
@@ -89,11 +90,13 @@ pub fn decode_text_sample(buffer: Option<&[u8]>) -> String {
                     swapped.push(sample[i]);
                 }
             }
-            String::from_utf16le(&swapped)
-                .unwrap_or_else(|_| String::from_utf8_lossy(sample).to_string())
+            let (cow, _, _) = encoding_rs::UTF_16LE.decode(&swapped);
+            cow.to_string()
         }
-        Some("utf-16le") => String::from_utf16le(sample)
-            .unwrap_or_else(|_| String::from_utf8_lossy(sample).to_string()),
+        Some("utf-16le") => {
+            let (cow, _, _) = encoding_rs::UTF_16LE.decode(sample);
+            cow.to_string()
+        }
         _ => String::from_utf8_lossy(sample).to_string(),
     }
 }

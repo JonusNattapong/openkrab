@@ -1,5 +1,5 @@
 use anyhow::Result;
-use reqwest::Client;
+use reqwest_middleware::ClientWithMiddleware as Client;
 use serde_json::json;
 
 /// Build a JSON payload for Telegram `sendMessage` API

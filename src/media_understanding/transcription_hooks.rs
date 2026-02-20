@@ -196,6 +196,14 @@ pub struct TranscriptionHookRegistry {
     hooks: Vec<Arc<dyn TranscriptionHook>>,
 }
 
+impl std::fmt::Debug for TranscriptionHookRegistry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TranscriptionHookRegistry")
+            .field("hooks_count", &self.hooks.len())
+            .finish()
+    }
+}
+
 impl Default for TranscriptionHookRegistry {
     fn default() -> Self {
         Self::new()

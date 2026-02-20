@@ -16,6 +16,24 @@ pub struct Config {
 pub struct AgentConfig {
     pub model: Option<String>,
     pub workspace: Option<String>,
+    pub agent_dir: Option<String>,
+    pub list: Vec<AgentDefinition>,
+    pub subagents: SubagentsConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AgentDefinition {
+    pub name: String,
+    pub model: Option<String>,
+    pub system_prompt: Option<String>,
+    pub tools: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SubagentsConfig {
+    pub enabled: bool,
+    pub max_concurrent: Option<u32>,
+    pub agents: Vec<AgentDefinition>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

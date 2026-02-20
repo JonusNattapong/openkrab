@@ -1,0 +1,161 @@
+"channel: bluebubbles":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/bluebubbles/**"
+
+"channel: discord":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/discord/**"
+          - "src/connectors/discord_client/**"
+
+"channel: irc":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/irc/**"
+
+"channel: feishu":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/feishu/**"
+
+"channel: googlechat":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/googlechat/**"
+
+"channel: line":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/line/**"
+          - "src/connectors/line_client/**"
+
+"channel: matrix":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/matrix/**"
+
+"channel: mattermost":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/mattermost/**"
+
+"channel: msteams":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/msteams/**"
+
+"channel: nextcloud-talk":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/nextcloud_talk/**"
+
+"channel: nostr":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/nostr/**"
+
+"channel: signal":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/signal/**"
+          - "src/signal/**"
+
+"channel: slack":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/slack/**"
+          - "src/connectors/slack_client/**"
+          - "src/slack/**"
+
+"channel: telegram":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/telegram/**"
+          - "src/connectors/telegram_client/**"
+
+"channel: whatsapp":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/connectors/bluebubbles/**"
+          - "src/whatsapp/**"
+
+"app: macos":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "apps/macos/**"
+
+"app: cli":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "bin/krabkrab-cli/**"
+
+"gateway":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/gateway/**"
+          - "src/daemon.rs"
+
+"docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "docs/**"
+
+"cli":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/commands/**"
+
+"agents":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/agents/**"
+
+"security":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/security/**"
+          - "src/security_audit/**"
+          - "src/secure/**"
+          - "src/signature/**"
+
+"plugins":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/plugins/**"
+          - "src/plugin_sdk/**"
+
+"memory":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/memory/**"
+
+"voice":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/voice/**"
+          - "src/tts/**"
+
+"tui":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/tui/**"
+
+"docker":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Dockerfile"
+          - "Dockerfile.*"
+          - "docker-compose.yml"
+          - ".dockerignore"
+
+"tests":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+
+"wizard":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/wizard/**"

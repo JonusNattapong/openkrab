@@ -7,6 +7,7 @@
 use std::path::{Path, PathBuf};
 
 pub mod outbound;
+pub mod retry_http;
 
 // ─── Known directories ────────────────────────────────────────────────────────
 

@@ -34,7 +34,7 @@ pub fn is_telegram_voice_compatible_audio(
     }
 
     if let Some(name) = file_name.map(|s| s.trim()).filter(|s| !s.is_empty()) {
-        if let Some(ext) = crate::media::mime::get_file_extension(name) {
+        if let Some(ext) = crate::media::mime::get_file_extension(Some(name)) {
             return TELEGRAM_VOICE_AUDIO_EXTENSIONS.contains(ext);
         }
     }

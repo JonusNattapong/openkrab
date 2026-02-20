@@ -12,6 +12,17 @@ pub struct Agent {
     pub tools: Vec<Box<dyn Tool>>,
 }
 
+impl std::fmt::Debug for Agent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Agent")
+            .field("identity", &self.identity.name)
+            .field("provider", &"...")
+            .field("memory", &self.memory.is_some())
+            .field("tools_count", &self.tools.len())
+            .finish()
+    }
+}
+
 impl Agent {
     pub fn new(
         identity: AgentIdentity,

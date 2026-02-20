@@ -273,7 +273,8 @@ fn run_voice_action(action: &str, payload: &Value) -> Result<Value> {
                 .unwrap_or(1024) as usize;
             let mic = crate::voice::microphone::MicrophoneCapture::new(sample_rate, buffer_size);
             let audio_data = mic.get_audio_buffer();
-            let base64_audio = base64::engine::general_purpose::STANDARD.encode(&audio_data);
+            let audio_bytes: Vec<u8> = audio_data.iter().flat_map(|&s| s.to_le_bytes()).collect();
+            let base64_audio = base64::engine::general_purpose::STANDARD.encode(&audio_bytes);
             Ok(json!({
                 "ok": true,
                 "action": "mic_read",
