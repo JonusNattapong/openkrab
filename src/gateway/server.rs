@@ -305,6 +305,7 @@ pub async fn start_gateway_server(
     let app = Router::new()
         .route("/ws", get(handle_websocket))
         .route("/health", get(|| async { "OK" }))
+        .nest("/webrtc", crate::webrtc::webrtc_router())
         .with_state(server.clone());
 
     let app = if opts.enable_cors {

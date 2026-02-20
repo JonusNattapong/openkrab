@@ -57,6 +57,7 @@ pub mod utils;
 pub mod version;
 pub mod voice;
 pub mod web_connector;
+pub mod webrtc;
 pub mod whatsapp;
 pub mod wizard;
 

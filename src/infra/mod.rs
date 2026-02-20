@@ -6,6 +6,7 @@
 
 use std::path::{Path, PathBuf};
 
+pub mod notifications;
 pub mod outbound;
 pub mod retry_http;
 

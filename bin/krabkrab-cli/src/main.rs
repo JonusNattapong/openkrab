@@ -4,15 +4,15 @@ use krabkrab::commands::{
     channels_remove_command, channels_status_command, config_edit_command, config_get_command,
     config_set_command, config_show_command, configure_command_interactive, cron_add_command,
     cron_list_command, daemon_command, devices_command, directory_command, discord_send_command,
-    discord_send_dry_run_command, dns_command, docs_command, doctor_command,
-    exec_approvals_command, hooks_command, login_chutes_oauth, login_github_copilot,
+    discord_send_dry_run_command, dns_command, docs_command, doctor_simple,
+    exec_approvals_command, hooks_command, is_remote_environment, login_github_copilot,
     login_minimax_oauth, login_openai_codex_oauth_interactive, login_qwen_oauth, logs_tail_command,
     memory_search_command, memory_sync_command, models_auth_add_command, models_auth_get_command,
     models_auth_list_command, models_auth_remove_command, models_list_command, nodes_command,
     onboard_quick, onboard_wizard, pairing_approve_command, pairing_generate_command,
     pairing_list_command, run_interactive_shell, sandbox_command, send_whatsapp_media,
-    send_whatsapp_message, send_whatsapp_template, skills_command, slack_send_command,
-    slack_send_dry_run_command, status_command, system_command, telegram_send_command,
+    send_whatsapp_message, skills_command, slack_send_command,
+    slack_send_dry_run_command, status_simple, system_command, telegram_send_command,
     telegram_send_dry_run_command, update_command, webhooks_command,
 };
 
@@ -286,6 +286,14 @@ enum LoginSub {
         #[arg(long)]
         profile_id: Option<String>,
     },
+    OpenAiCodex {
+        #[arg(long)]
+        profile_id: Option<String>,
+        #[arg(long)]
+        client_id: Option<String>,
+        #[arg(long)]
+        client_secret: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -375,8 +383,8 @@ async fn main() -> anyhow::Result<()> {
     let opts = Opts::parse();
     match opts.command.unwrap_or(CliCommand::Hello) {
         CliCommand::Hello => println!("{}", krabkrab::hello().message),
-        CliCommand::Status => println!("{}", status_command()),
-        CliCommand::Doctor => println!("{}", doctor_command()),
+        CliCommand::Status => println!("{}", status_simple()),
+        CliCommand::Doctor => println!("{}", doctor_simple()),
         CliCommand::Onboard { sub, profile } => {
             match sub {
                 Some(OnboardSub::Wizard) | None => {
@@ -528,15 +536,31 @@ async fn main() -> anyhow::Result<()> {
         CliCommand::Login { sub } => match sub {
             LoginSub::Minimax { region } => {
                 let out = login_minimax_oauth(Some(&region))?;
-                println!("{out}");
+                println!("access={} expires={}", out.access, out.expires);
+                drop(out);
             }
             LoginSub::Qwen => {
                 let out = login_qwen_oauth()?;
                 println!("access={} expires={}", out.access, out.expires);
+                drop(out); // ensure value is used
             }
             LoginSub::GithubCopilot { profile_id } => {
                 let out = login_github_copilot(profile_id.as_deref())?;
                 println!("{out}");
+            }
+            LoginSub::OpenAiCodex {
+                profile_id,
+                client_id,
+                client_secret,
+            } => {
+                let is_remote = is_remote_environment();
+                let out = login_openai_codex_oauth_interactive(
+                    is_remote,
+                    client_id.as_deref(),
+                    client_secret.as_deref(),
+                )?;
+                println!("access_token={}", out.access_token);
+                let _ = profile_id;
             }
         },
         CliCommand::Bridge {
@@ -623,11 +647,13 @@ async fn main() -> anyhow::Result<()> {
                     }
                 }
                 BrowserSub::Tabs { profile } => {
-                    let tabs = browser::list_tabs(&profile).await?;
+                    let mgr = browser::BrowserManager::new(&profile).await?;
+                    let tabs = mgr.list_tabs().await?;
                     println!("{}", serde_json::to_string_pretty(&tabs)?);
                 }
                 BrowserSub::Open { profile, url } => {
-                    let tab = browser::open_tab(&profile, &url).await?;
+                    let mgr = browser::BrowserManager::new(&profile).await?;
+                    let tab = mgr.open_tab(&url).await?;
                     println!("{}", serde_json::to_string_pretty(&tab)?);
                 }
                 BrowserSub::Navigate { profile, url } => {

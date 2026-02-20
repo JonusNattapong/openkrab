@@ -92,7 +92,7 @@ pub use models_auth::{
     models_auth_add_command, models_auth_get_command, models_auth_list_command,
     models_auth_remove_command,
 };
-pub use oauth::{login_github_copilot, login_minimax_oauth, login_qwen_oauth};
+pub use oauth::{is_remote_environment, login_github_copilot, login_minimax_oauth, login_qwen_oauth};
 pub use onboard::{onboard_command, onboard_quick, onboard_wizard};
 pub use onboard_types::{ChannelConfig, OnboardMode, OnboardResult, WizardState, WizardStep};
 pub use openai_codex_oauth::{login_openai_codex_oauth, login_openai_codex_oauth_interactive};

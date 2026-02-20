@@ -45,7 +45,7 @@ This document outlines the planned features and roadmap for OpenKrab.
 
 - [ ] Native WhatsApp SDK parity extras
 - [ ] Native LINE SDK parity extras
-- [ ] Native macOS notifications (via `cocoa` crate)
+- [x] Native desktop notifications (macOS/Windows/Linux via `notify-rust`)
 
 #### Deployment & Distribution
 
@@ -58,13 +58,13 @@ This document outlines the planned features and roadmap for OpenKrab.
 
 #### Voice & Communication
 
-- [ ] WebRTC support for voice calls
+- [x] WebRTC support for voice calls
 - [ ] SIP integration
 - [ ] Video call support
 
 #### AI & ML Enhancements
 
-- [ ] Local LLM inference (llama.cpp integration)
+- [x] Local LLM inference (llama.cpp integration)
 - [ ] Multi-modal support (vision, audio)
 - [ ] Agent chaining and workflows
 - [ ] Custom model fine-tuning pipeline
@@ -91,12 +91,12 @@ This document outlines the planned features and roadmap for OpenKrab.
 
 - ✅ Docker container images (Dockerfile + docker-compose)
 - ✅ Cross-compilation for ARM32, FreeBSD, OpenBSD
-- Native macOS notifications
+- ~~Native desktop notifications~~ ✅
 
 ### v2026.4.x (Q2 2026)
 
-- WebRTC voice calls
-- Local LLM inference
+- ~~WebRTC voice calls~~ ✅
+- ~~Local LLM inference~~ ✅
 - Plugin marketplace beta
 
 ### v2026.5.x (Q3 2026)
@@ -139,7 +139,7 @@ Want to help implement these features? See [CONTRIBUTING.md](CONTRIBUTING.md) fo
 Priority areas for contributors:
 
 1. ~~Docker containerization~~ ✅
-2. WebRTC implementation
+2. ~~WebRTC implementation~~ ✅
 3. Additional channel connectors
 4. Plugin SDK improvements
 5. Documentation and tutorials

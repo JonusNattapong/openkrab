@@ -9,6 +9,7 @@ pub mod copilot_proxy;
 pub mod copilot_token;
 pub mod gemini;
 pub mod gemini_cli_auth;
+pub mod llama_cpp;
 pub mod minimax_oauth;
 pub mod ollama;
 pub mod openai;
@@ -99,6 +100,9 @@ pub fn default_registry_from_env() -> ProviderRegistry {
     registry.register(Box::new(
         crate::providers::ollama::OllamaProvider::from_env(),
     ));
+    registry.register(Box::new(
+        crate::providers::llama_cpp::LlamaCppProvider::from_env(),
+    ));
 
     registry
 }
@@ -117,6 +121,7 @@ pub fn known_model_ids(provider: &str) -> Vec<String> {
             .map(|m| (*m).to_string())
             .collect(),
         ProviderKind::Ollama => vec!["llama3".to_string(), "nomic-embed-text".to_string()],
+        ProviderKind::LlamaCpp => vec!["local-model".to_string()],
         ProviderKind::Copilot => crate::providers::copilot_models::get_default_model_ids()
             .into_iter()
             .map(|m| m.to_string())
@@ -148,6 +153,7 @@ pub enum ProviderKind {
     OpenAi,
     Gemini,
     Ollama,
+    LlamaCpp,
     Copilot,
     CopilotProxy,
     QwenPortal,
@@ -160,6 +166,7 @@ impl ProviderKind {
             "openai" | "gpt" => ProviderKind::OpenAi,
             "gemini" | "google" => ProviderKind::Gemini,
             "ollama" => ProviderKind::Ollama,
+            "llama-cpp" | "llamacpp" => ProviderKind::LlamaCpp,
             "copilot" | "github-copilot" => ProviderKind::Copilot,
             "copilot-proxy" => ProviderKind::CopilotProxy,
             "qwen" | "qwen-portal" => ProviderKind::QwenPortal,
@@ -172,6 +179,7 @@ impl ProviderKind {
             ProviderKind::OpenAi => "openai",
             ProviderKind::Gemini => "gemini",
             ProviderKind::Ollama => "ollama",
+            ProviderKind::LlamaCpp => "llama-cpp",
             ProviderKind::Copilot => "copilot",
             ProviderKind::CopilotProxy => "copilot-proxy",
             ProviderKind::QwenPortal => "qwen-portal",

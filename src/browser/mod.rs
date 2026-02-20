@@ -568,6 +568,68 @@ impl BrowserManager {
         Ok(())
     }
 
+    /// Upload files to a file input element
+    pub async fn upload_files(
+        &self,
+        tab_id: &str,
+        selector: &str,
+        files: &[String],
+    ) -> Result<()> {
+        let session = self.get_session(tab_id).await?;
+
+        // Normalize paths to absolute paths
+        let mut absolute_files = Vec::new();
+        for f in files {
+            let path = std::path::PathBuf::from(f);
+            let abs = if path.is_absolute() {
+                path
+            } else {
+                std::env::current_dir()?.join(path)
+            };
+            if !abs.exists() {
+                bail!("File does not exist: {}", abs.display());
+            }
+            absolute_files.push(abs.to_string_lossy().to_string());
+        }
+
+        let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
+
+        let root_node_id = result
+            .get("result")
+            .and_then(|r| r.get("root"))
+            .and_then(|r| r.get("nodeId"))
+            .and_then(Value::as_i64)
+            .ok_or_else(|| anyhow!("Failed to get document root"))?;
+
+        let query_result = session
+            .call(
+                "DOM.querySelector",
+                json!({
+                    "nodeId": root_node_id,
+                    "selector": selector
+                }),
+            )
+            .await?;
+
+        let node_id = query_result
+            .get("result")
+            .and_then(|r| r.get("nodeId"))
+            .and_then(Value::as_i64)
+            .ok_or_else(|| anyhow!("Element not found: {}", selector))?;
+
+        session
+            .call(
+                "DOM.setFileInputFiles",
+                json!({
+                    "nodeId": node_id,
+                    "files": absolute_files
+                }),
+            )
+            .await?;
+
+        Ok(())
+    }
+
     /// Take screenshot
     pub async fn screenshot(&self, tab_id: &str, full_page: bool) -> Result<String> {
         let session = self.get_session(tab_id).await?;
@@ -1022,6 +1084,21 @@ pub async fn type_text(profile: &str, selector: &str, text: &str) -> Result<()> 
         .next()
         .ok_or_else(|| anyhow!("no tabs available"))?;
     manager.type_text(&first_tab.id, selector, text).await
+}
+
+/// Backward-compatible upload_files function
+pub async fn upload_files(
+    profile: &str,
+    selector: &str,
+    files: &[String],
+) -> Result<()> {
+    let manager = BrowserManager::new(profile).await?;
+    let tabs = manager.list_tabs().await?;
+    let first_tab = tabs
+        .into_iter()
+        .next()
+        .ok_or_else(|| anyhow!("no tabs available"))?;
+    manager.upload_files(&first_tab.id, selector, files).await
 }
 
 // ============================================================================
