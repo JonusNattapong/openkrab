@@ -303,6 +303,34 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         return Ok(config);
     }
 
+    // Check existing config validity
+    let config_path = dirs::config_dir()
+        .unwrap_or_else(|| std::path::PathBuf::from("."))
+        .join("krabkrab")
+        .join("default.toml");
+
+    if config_path.exists() {
+        println!("\n{}", "━".repeat(60));
+        println!("📋 Checking existing configuration...");
+        println!("{}", "━".repeat(60));
+
+        match config_io::load_config() {
+            Ok(cfg) => {
+                if let Err(e) = config_io::validate_config(&cfg) {
+                    println!("\n⚠️  Configuration is invalid!");
+                    println!("Error: {}", e);
+                    println!("\nRun 'krabkrab doctor' to fix, then re-run onboarding.");
+                    return Err(anyhow::anyhow!("Invalid configuration"));
+                }
+                println!("  ✅ Configuration is valid");
+            }
+            Err(e) => {
+                println!("\n⚠️  Could not load configuration: {}", e);
+                println!("  Will create a new configuration.");
+            }
+        }
+    }
+
     // Probe existing config
     let existing_cfg = config_io::load_config().ok();
     if let Some(cfg) = &existing_cfg {
@@ -413,9 +441,31 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // STEP X: GATEWAY CONFIGURATION (for Manual mode)
+    // STEP X: GATEWAY MODE (local or remote)
     // ─────────────────────────────────────────────────────────────────────
-    if mode == OnboardMode::Manual {
+    println!("\n{}", "━".repeat(60));
+    println!("🌐 STEP X: Gateway Mode");
+    println!("{}", "━".repeat(60));
+
+    let mode_options = vec!["Local gateway (this machine)", "Remote gateway (info-only)"];
+    let mode_selection = Select::with_theme(&theme)
+        .with_prompt("What do you want to set up?")
+        .default(0)
+        .items(&mode_options)
+        .interact()?;
+
+    let is_remote = mode_selection == 1;
+
+    if is_remote {
+        println!("\n📡 Remote gateway mode selected.");
+        println!("   You'll need to configure the remote gateway URL separately.");
+        println!("   Run 'krabkrab configure' after onboarding to add remote gateway.");
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // STEP X: GATEWAY CONFIGURATION (for Manual mode + local)
+    // ─────────────────────────────────────────────────────────────────────
+    if mode == OnboardMode::Manual && !is_remote {
         println!("\n{}", "━".repeat(60));
         println!("🌐 STEP X: Gateway Configuration");
         println!("{}", "━".repeat(60));
@@ -971,6 +1021,89 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     println!("\n  Skills can extend your agent's capabilities.");
     println!("  Add skills by placing skill files in the skills directory.");
     println!("  Learn more: https://docs.openclaw.ai/tools/skills\n");
+
+    // ─────────────────────────────────────────────────────────────────────
+    // STEP 11: HOOKS SETUP
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("🪝 STEP 11: Internal Hooks Setup");
+    println!("{}", "━".repeat(60));
+    println!("Hooks allow your agent to respond to specific events.\n");
+
+    let hooks_dir = base_dir.join("hooks");
+    if let Err(e) = std::fs::create_dir_all(&hooks_dir) {
+        println!("  ⚠️  Could not create hooks dir: {}", e);
+    } else {
+        println!("  ✅ Hooks directory created: {}", hooks_dir.display());
+    }
+
+    // Create default hooks
+    let new_session_hook = hooks_dir.join("on_new_session.rs");
+    if !new_session_hook.exists() {
+        let default_hook = r#"// On new session hook
+// This runs when a new session is created
+
+fn on_new_session(session: &Session) {
+    // Send a welcome message to new sessions
+    session.send("Hello! I'm ready to help you.");
+}
+"#;
+        if let Err(e) = std::fs::write(&new_session_hook, default_hook) {
+            println!("  ⚠️  Could not create default hook: {}", e);
+        } else {
+            println!("  ✅ Default session hook created");
+        }
+    }
+
+    println!("\n  Built-in hooks:");
+    println!("  - on_new_session: Triggered when a new session starts");
+    println!("  - on_message: Triggered on every message");
+    println!("  - on_tool_call: Triggered when a tool is called\n");
+
+    // ─────────────────────────────────────────────────────────────────────
+    // STEP 12: GATEWAY SERVICE INSTALL
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("⚙️  STEP 12: Gateway Service Setup");
+    println!("{}", "━".repeat(60));
+
+    #[cfg(target_os = "windows")]
+    {
+        println!("Windows detected.");
+        println!("Gateway service on Windows requires manual setup.");
+        println!("Run 'krabkrab gateway start' to start the gateway.\n");
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let install_service = Confirm::with_theme(&theme)
+            .with_prompt("Install Gateway as a launchd service? (recommended)")
+            .default(true)
+            .interact()?;
+
+        if install_service {
+            println!("\n  macOS service setup:");
+            println!("  To install manually, run:");
+            println!("    brew services start krabkrab");
+            println!("  Or use: krabkrab gateway start");
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        let install_service = Confirm::with_theme(&theme)
+            .with_prompt("Install Gateway as a systemd service? (recommended)")
+            .default(true)
+            .interact()?;
+
+        if install_service {
+            println!("\n  Linux service setup:");
+            println!("  To install manually, run:");
+            println!("    sudo systemctl enable krabkrab");
+            println!("    sudo systemctl start krabkrab");
+            println!("  Or use: krabkrab gateway start");
+        }
+    }
 
     // ─────────────────────────────────────────────────────────────────────
     // COMPLETION
