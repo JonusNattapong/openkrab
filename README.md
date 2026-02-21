@@ -27,6 +27,20 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 
 ---
 
+## 📊 Benchmark Snapshot (OpenKrab vs OpenClaw vs ZeroClaw)
+
+| Metric | OpenClaw | OpenKrab 🦀 | ZeroClaw |
+|--------|----------|-------------|----------|
+| **Language** | TypeScript | **Rust** | Rust |
+| **RAM** | >1GB | **~50MB** | <5MB |
+| **Binary Size** | ~28MB | **~16MB** | ~8.8MB |
+| **Startup** | >500s | **~46ms** | <10ms |
+| **Cost** | Mac Mini $599 | **$10 hardware** | $10 |
+
+> Notes: OpenKrab measured on Windows x86_64, Feb 2026. Binary size is release build. Startup time is CLI --version. RAM is typical runtime memory.
+
+---
+
 ## ✨ Features
 
 ### 🤖 AI Capabilities
