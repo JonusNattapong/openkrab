@@ -78,6 +78,23 @@ pub fn ensure_schema(conn: &Connection) -> Result<()> {
         [],
     )?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS sessions (
+            id TEXT PRIMARY KEY,
+            label TEXT,
+            model_override TEXT,
+            verbosity TEXT NOT NULL,
+            send_policy TEXT NOT NULL,
+            elevated INTEGER NOT NULL DEFAULT 0,
+            transcript TEXT NOT NULL,
+            max_transcript INTEGER NOT NULL,
+            created_at INTEGER NOT NULL,
+            last_active INTEGER NOT NULL,
+            metadata TEXT NOT NULL
+        )",
+        [],
+    )?;
+
     Ok(())
 }
 

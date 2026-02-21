@@ -4,6 +4,36 @@
 use serde::{Deserialize, Serialize};
 use std::env;
 
+fn read_api_key_from_config(provider: &str) -> Option<String> {
+    let cfg = crate::config_io::load_config().ok()?;
+    let auth = cfg.auth?;
+
+    for profile in auth.profiles.values() {
+        if !profile.provider.eq_ignore_ascii_case(provider) {
+            continue;
+        }
+
+        match &profile.credential {
+            crate::openkrab_config::Credential::Token { token } => {
+                if !token.trim().is_empty() {
+                    return Some(token.clone());
+                }
+            }
+            crate::openkrab_config::Credential::OAuth { access, .. } => {
+                if !access.trim().is_empty() {
+                    return Some(access.clone());
+                }
+            }
+            crate::openkrab_config::Credential::EncryptedToken { .. } => {
+                // Encrypted credentials require secure store integration.
+                continue;
+            }
+        }
+    }
+
+    None
+}
+
 /// Provider authentication configuration.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProviderAuthConfig {
@@ -45,10 +75,8 @@ pub fn resolve_api_key_for_provider(provider: &str) -> Option<String> {
         }
     }
 
-    // 2. Auth profiles (placeholder - would load from storage)
-    // In production, this would load from ~/.krabkrab/auth_profiles.json
-
-    None
+    // 2. Auth profiles in config
+    read_api_key_from_config(provider)
 }
 
 /// Resolve base URL for a provider.

@@ -1,7 +1,7 @@
 //! Onboarding wizard — the main flow that guides users through first-time setup.
 //! Ported from `openkrab/src/wizard/onboarding.ts`
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 use super::prompts::{
     WizardCancelledError, WizardConfirmParams, WizardPrompter,
@@ -189,7 +189,7 @@ pub async fn run_onboarding_wizard(
             .await?;
 
         if action == "reset" {
-            let _reset_scope = prompter
+            let reset_scope = prompter
                 .select(WizardSelectParams {
                     message: "Reset scope".to_string(),
                     options: vec![
@@ -212,7 +212,18 @@ pub async fn run_onboarding_wizard(
                     initial_value: None,
                 })
                 .await?;
-            // TODO: Actually perform the reset
+
+            let workspace_hint = base_config
+                .get("agents")
+                .and_then(|a| a.get("defaults"))
+                .and_then(|d| d.get("workspace"))
+                .and_then(|v| v.as_str())
+                .unwrap_or(DEFAULT_WORKSPACE);
+
+            let reset_summary = perform_reset_scope(&config_path, &reset_scope, workspace_hint)?;
+            prompter
+                .note(&reset_summary, Some("Reset complete"))
+                .await?;
         }
     }
 
@@ -330,6 +341,59 @@ fn load_existing_config(path: &str) -> Option<serde_json::Value> {
     let content = std::fs::read_to_string(path).ok()?;
     // Try JSON first, then try YAML-like parsing as JSON
     serde_json::from_str(&content).ok()
+}
+
+fn perform_reset_scope(config_path: &str, scope: &str, workspace_hint: &str) -> Result<String> {
+    let home = dirs::home_dir().unwrap_or_else(|| std::path::PathBuf::from("."));
+    let base_dir = home.join(".openkrab");
+    let config = std::path::PathBuf::from(config_path);
+    let credentials = base_dir.join("credentials");
+    let sessions = base_dir.join("sessions");
+    let workspace = expand_tilde(workspace_hint, &home);
+
+    let mut lines = vec![format!("Scope: {}", scope)];
+
+    delete_path_if_exists(&config, &mut lines)?;
+
+    if matches!(scope, "config+creds+sessions" | "full") {
+        delete_path_if_exists(&credentials, &mut lines)?;
+        delete_path_if_exists(&sessions, &mut lines)?;
+    }
+
+    if scope == "full" {
+        delete_path_if_exists(&workspace, &mut lines)?;
+    }
+
+    Ok(lines.join("\n"))
+}
+
+fn expand_tilde(input: &str, home: &std::path::Path) -> std::path::PathBuf {
+    let trimmed = input.trim();
+    if trimmed == "~" {
+        return home.to_path_buf();
+    }
+    if let Some(rest) = trimmed.strip_prefix("~/") {
+        return home.join(rest);
+    }
+    std::path::PathBuf::from(trimmed)
+}
+
+fn delete_path_if_exists(path: &std::path::Path, lines: &mut Vec<String>) -> Result<()> {
+    if !path.exists() {
+        lines.push(format!("skip (not found): {}", path.display()));
+        return Ok(());
+    }
+
+    if path.is_dir() {
+        std::fs::remove_dir_all(path)
+            .with_context(|| format!("failed removing directory {}", path.display()))?;
+        lines.push(format!("removed dir: {}", path.display()));
+    } else {
+        std::fs::remove_file(path)
+            .with_context(|| format!("failed removing file {}", path.display()))?;
+        lines.push(format!("removed file: {}", path.display()));
+    }
+    Ok(())
 }
 
 #[cfg(test)]

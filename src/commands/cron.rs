@@ -43,43 +43,100 @@ Example:
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct CronConfig {
+    #[serde(default)]
+    pub jobs: Vec<CronJob>,
+}
+
 pub fn cron_add_command(schedule: &str, command: &str) -> String {
     let cron_path = get_cron_path();
-
     if let Some(parent) = cron_path.parent() {
         let _ = fs::create_dir_all(parent);
     }
 
-    let job = format!(
-        "[[jobs]]\nid = \"{}\"\nschedule = \"{}\"\ncommand = \"{}\"\nenabled = true\n",
-        uuid::Uuid::new_v4(),
-        schedule,
-        command
-    );
-
-    let content = if cron_path.exists() {
-        let mut existing = fs::read_to_string(&cron_path).unwrap_or_default();
-        existing.push_str("\n");
-        existing.push_str(&job);
-        existing
+    let mut config: CronConfig = if cron_path.exists() {
+        fs::read_to_string(&cron_path)
+            .ok()
+            .and_then(|s| toml::from_str(&s).ok())
+            .unwrap_or_default()
     } else {
-        job
+        CronConfig::default()
     };
 
-    match fs::write(&cron_path, &content) {
-        Ok(_) => format!("Added cron job: {} -> {}", schedule, command),
-        Err(e) => format!("Failed to add cron job: {}", e),
+    let id = uuid::Uuid::new_v4().to_string();
+    config.jobs.push(CronJob {
+        id: id.clone(),
+        schedule: schedule.to_string(),
+        command: command.to_string(),
+        enabled: true,
+        last_run: None,
+        next_run: None,
+    });
+
+    if let Ok(content) = toml::to_string(&config) {
+        if fs::write(&cron_path, &content).is_ok() {
+            return format!("Added cron job [{}]: {} -> {}", id, schedule, command);
+        }
     }
+    "Failed to add cron job".to_string()
 }
 
 pub fn cron_remove_command(id: &str) -> String {
-    format!("Removing cron job: {} (not yet implemented)", id)
+    let cron_path = get_cron_path();
+    let mut config: CronConfig = fs::read_to_string(&cron_path)
+        .ok()
+        .and_then(|s| toml::from_str(&s).ok())
+        .unwrap_or_default();
+
+    let initial_len = config.jobs.len();
+    config.jobs.retain(|j| j.id != id);
+
+    if config.jobs.len() < initial_len {
+        if let Ok(content) = toml::to_string(&config) {
+            let _ = fs::write(&cron_path, &content);
+            return format!("Removed cron job: {}", id);
+        }
+    }
+    format!("Cron job not found: {}", id)
 }
 
 pub fn cron_enable_command(id: &str) -> String {
-    format!("Enabling cron job: {} (not yet implemented)", id)
+    let cron_path = get_cron_path();
+    let mut config: CronConfig = fs::read_to_string(&cron_path)
+        .ok()
+        .and_then(|s| toml::from_str(&s).ok())
+        .unwrap_or_default();
+
+    for job in &mut config.jobs {
+        if job.id == id {
+            job.enabled = true;
+            if let Ok(content) = toml::to_string(&config) {
+                let _ = fs::write(&cron_path, &content);
+                return format!("Enabled cron job: {}", id);
+            }
+            return "Failed to save cron configuration".to_string();
+        }
+    }
+    format!("Cron job not found: {}", id)
 }
 
 pub fn cron_disable_command(id: &str) -> String {
-    format!("Disabling cron job: {} (not yet implemented)", id)
+    let cron_path = get_cron_path();
+    let mut config: CronConfig = fs::read_to_string(&cron_path)
+        .ok()
+        .and_then(|s| toml::from_str(&s).ok())
+        .unwrap_or_default();
+
+    for job in &mut config.jobs {
+        if job.id == id {
+            job.enabled = false;
+            if let Ok(content) = toml::to_string(&config) {
+                let _ = fs::write(&cron_path, &content);
+                return format!("Disabled cron job: {}", id);
+            }
+            return "Failed to save cron configuration".to_string();
+        }
+    }
+    format!("Cron job not found: {}", id)
 }

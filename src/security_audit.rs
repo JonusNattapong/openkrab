@@ -185,7 +185,9 @@ impl SecurityAuditLogger {
                     "[SECURITY-CRITICAL] {:?}: {} - {}",
                     event.event_type, event.source, event.message
                 );
-                // TODO: Send alert to admin
+                if let Err(e) = send_critical_alert(&event) {
+                    warn!("Failed to emit critical security alert: {}", e);
+                }
             }
         }
 
@@ -222,6 +224,61 @@ impl SecurityAuditLogger {
         tokio::fs::write(path, json).await?;
         Ok(())
     }
+}
+
+fn send_critical_alert(event: &SecurityEvent) -> anyhow::Result<()> {
+    let alert = format!(
+        "[SECURITY-CRITICAL] {} {} {} - {}",
+        event.timestamp.to_rfc3339(),
+        event.source,
+        event.event_type,
+        event.message
+    );
+
+    eprintln!("{}", alert);
+
+    if let Ok(path) = std::env::var("OPENKRAB_SECURITY_ALERT_LOG") {
+        if !path.trim().is_empty() {
+            use std::io::Write;
+            let mut f = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(path)?;
+            writeln!(f, "{}", alert)?;
+        }
+    }
+
+    if let Ok(webhook) = std::env::var("OPENKRAB_SECURITY_ALERT_WEBHOOK") {
+        if !webhook.trim().is_empty() {
+            let payload = serde_json::json!({
+                "severity": "critical",
+                "timestamp": event.timestamp.to_rfc3339(),
+                "event_type": format!("{:?}", event.event_type),
+                "source": event.source,
+                "message": event.message,
+                "subject": event.subject,
+                "context": event.context,
+                "stack_trace": event.stack_trace,
+            });
+
+            let rt = tokio::runtime::Handle::try_current();
+            match rt {
+                Ok(handle) => {
+                    let url = webhook.clone();
+                    handle.spawn(async move {
+                        let client = reqwest::Client::new();
+                        let _ = client.post(url).json(&payload).send().await;
+                    });
+                }
+                Err(_) => {
+                    let client = reqwest::blocking::Client::new();
+                    let _ = client.post(webhook).json(&payload).send();
+                }
+            }
+        }
+    }
+
+    Ok(())
 }
 
 /// Global security audit logger

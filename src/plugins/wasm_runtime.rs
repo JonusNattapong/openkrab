@@ -8,6 +8,7 @@ use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, error, info, warn};
+use wasmtime::component::ResourceTable;
 use wasmtime::{Config, Engine, Instance, Linker, Module, Store};
 use wasmtime_wasi::{WasiCtx, WasiCtxBuilder, WasiView};
 
@@ -19,6 +20,8 @@ use crate::plugins::sandbox::{Sandbox, SandboxConfig, SandboxLevel};
 pub struct WasmPluginState {
     /// WASI context for filesystem/network access
     wasi: WasiCtx,
+    /// WASI resource table
+    table: ResourceTable,
     /// Plugin metadata
     pub name: String,
     pub version: String,
@@ -31,8 +34,8 @@ pub struct WasmPluginState {
 }
 
 impl WasiView for WasmPluginState {
-    fn table(&mut self) -> &mut wasmtime::component::ResourceTable {
-        todo!()
+    fn table(&mut self) -> &mut ResourceTable {
+        &mut self.table
     }
 
     fn ctx(&mut self) -> &mut WasiCtx {
@@ -49,6 +52,7 @@ impl WasmPluginState {
 
         Self {
             wasi,
+            table: ResourceTable::new(),
             name,
             version,
             tools: Vec::new(),

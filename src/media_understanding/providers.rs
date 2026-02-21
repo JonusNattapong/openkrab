@@ -177,9 +177,11 @@ impl MediaUnderstandingProvider for OpenAiVisionProvider {
     }
 }
 
+#[cfg(test)]
 pub struct MockMediaProvider;
 
 #[async_trait]
+#[cfg(test)]
 impl MediaUnderstandingProvider for MockMediaProvider {
     fn id(&self) -> &str {
         "mock"
@@ -534,8 +536,6 @@ impl MediaUnderstandingProvider for DeepgramProvider {
 
 pub fn build_provider_registry() -> HashMap<String, Box<dyn MediaUnderstandingProvider>> {
     let mut registry: HashMap<String, Box<dyn MediaUnderstandingProvider>> = HashMap::new();
-
-    registry.insert("mock".to_string(), Box::new(MockMediaProvider));
 
     if let Ok(api_key) = std::env::var("OPENAI_API_KEY") {
         registry.insert(

@@ -11,24 +11,49 @@ pub struct PairingInfo {
 }
 
 pub fn pairing_list_command() -> String {
-    let devices = vec![PairingInfo {
-        device_id: "demo-device-1".to_string(),
-        device_name: "iPhone".to_string(),
-        status: "paired".to_string(),
-        paired_at: Some("2024-01-15T10:30:00Z".to_string()),
-    }];
+    let mut output = String::from("Paired Devices (Allowlist):\n");
+    output.push_str("=============================\n\n");
 
-    let mut output = String::from("Paired Devices:\n");
-    output.push_str("=================\n\n");
+    let config = match crate::config_io::load_config() {
+        Ok(cfg) => cfg,
+        Err(e) => return format!("Failed to read configuration: {}", e),
+    };
 
-    for device in devices {
-        output.push_str(&format!(
-            "{} ({})\n   Status: {}\n   Paired: {}\n\n",
-            device.device_name,
-            device.device_id,
-            device.status,
-            device.paired_at.unwrap_or_else(|| "N/A".to_string())
-        ));
+    let mut found_any = false;
+
+    if let Some(channels) = config.channels {
+        if let Some(telegram) = channels.telegram {
+            for (acc_name, acc) in telegram.accounts {
+                for id in acc.allowlist {
+                    found_any = true;
+                    output.push_str(&format!("({}) Telegram [{}]\n", id, acc_name));
+                }
+            }
+        }
+        if let Some(discord) = channels.discord {
+            for (acc_name, acc) in discord.accounts {
+                for id in acc.allowlist {
+                    found_any = true;
+                    output.push_str(&format!("({}) Discord [{}]\n", id, acc_name));
+                }
+            }
+        }
+        for (acc_name, acc) in channels.slack {
+            for id in acc.allowlist {
+                found_any = true;
+                output.push_str(&format!("({}) Slack [{}]\n", id, acc_name));
+            }
+        }
+        for (acc_name, acc) in channels.whatsapp {
+            for id in acc.allowlist {
+                found_any = true;
+                output.push_str(&format!("({}) WhatsApp [{}]\n", id, acc_name));
+            }
+        }
+    }
+
+    if !found_any {
+        output.push_str("No devices are currently paired (allowlist is empty).\n");
     }
 
     output
@@ -42,7 +67,52 @@ pub fn pairing_approve_command(channel: &str, code: &str) -> String {
 }
 
 pub fn pairing_revoke_command(device_id: &str) -> String {
-    format!("Revoking pairing for device: {}", device_id)
+    let mut config = match crate::config_io::load_config() {
+        Ok(cfg) => cfg,
+        Err(e) => return format!("Failed to read configuration: {}", e),
+    };
+
+    let mut removed = false;
+
+    if let Some(ref mut channels) = config.channels {
+        if let Some(ref mut telegram) = channels.telegram {
+            for (_, acc) in telegram.accounts.iter_mut() {
+                if let Some(pos) = acc.allowlist.iter().position(|x| x == device_id) {
+                    acc.allowlist.remove(pos);
+                    removed = true;
+                }
+            }
+        }
+        if let Some(ref mut discord) = channels.discord {
+            for (_, acc) in discord.accounts.iter_mut() {
+                if let Some(pos) = acc.allowlist.iter().position(|x| x == device_id) {
+                    acc.allowlist.remove(pos);
+                    removed = true;
+                }
+            }
+        }
+        for (_, acc) in channels.slack.iter_mut() {
+            if let Some(pos) = acc.allowlist.iter().position(|x| x == device_id) {
+                acc.allowlist.remove(pos);
+                removed = true;
+            }
+        }
+        for (_, acc) in channels.whatsapp.iter_mut() {
+            if let Some(pos) = acc.allowlist.iter().position(|x| x == device_id) {
+                acc.allowlist.remove(pos);
+                removed = true;
+            }
+        }
+    }
+
+    if removed {
+        match crate::config_io::save_config(&config) {
+            Ok(_) => format!("Revoked pairing for device: {}", device_id),
+            Err(e) => format!("Failed to save config: {}", e),
+        }
+    } else {
+        format!("Device {} was not paired in any channel.", device_id)
+    }
 }
 
 pub fn pairing_generate_command() -> String {

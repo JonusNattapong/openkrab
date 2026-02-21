@@ -36,6 +36,7 @@ impl Default for OAuthHandlers {
         Self {
             on_auth: Box::new(|url| {
                 println!("Open URL in browser: {}", url);
+                open_url_in_browser(&url)?;
                 Ok(())
             }),
             on_prompt: Box::new(|message, placeholder| {
@@ -78,7 +79,7 @@ pub fn create_vps_aware_oauth_handlers(
             on_auth: Box::new(move |url| {
                 println!("{}", local_msg);
                 println!("Opening: {}", url);
-                // In real implementation, would open browser
+                open_url_in_browser(&url)?;
                 Ok(())
             }),
             on_prompt: Box::new(|message, placeholder| {
@@ -92,6 +93,33 @@ pub fn create_vps_aware_oauth_handlers(
             }),
         }
     }
+}
+
+fn open_url_in_browser(url: &str) -> Result<()> {
+    if cfg!(target_os = "windows") {
+        let status = std::process::Command::new("cmd")
+            .args(["/C", "start", "", url])
+            .status()?;
+        if !status.success() {
+            bail!("failed to open browser with cmd/start");
+        }
+        return Ok(());
+    }
+
+    if cfg!(target_os = "macos") {
+        let status = std::process::Command::new("open").arg(url).status()?;
+        if !status.success() {
+            bail!("failed to open browser with macOS open");
+        }
+        return Ok(());
+    }
+
+    // Linux/Unix fallback
+    let status = std::process::Command::new("xdg-open").arg(url).status()?;
+    if !status.success() {
+        bail!("failed to open browser with xdg-open");
+    }
+    Ok(())
 }
 
 #[derive(Debug, Deserialize)]

@@ -47,6 +47,7 @@ impl MonitorManager {
                     Box::new(WhatsAppMonitorHandle {
                         stop_tx: monitor_result.stop_tx,
                         handle: Mutex::new(Some(monitor_result.handle)),
+                        status: monitor_result.status,
                     }),
                 );
             }
@@ -75,15 +76,8 @@ impl MonitorManager {
     pub fn get_status(&self) -> HashMap<String, serde_json::Value> {
         let mut status = HashMap::new();
 
-        for (key, _monitor) in &self.monitors {
-            // In real implementation, would get actual status from monitor
-            status.insert(
-                key.clone(),
-                serde_json::json!({
-                    "running": true,
-                    "connected": true
-                }),
-            );
+        for (key, monitor) in &self.monitors {
+            status.insert(key.clone(), monitor.status());
         }
 
         status
@@ -94,12 +88,14 @@ impl MonitorManager {
 #[async_trait::async_trait]
 pub trait MonitorHandle: Send + Sync {
     async fn stop(&self) -> Result<()>;
+    fn status(&self) -> serde_json::Value;
 }
 
 /// WhatsApp monitor handle
 pub struct WhatsAppMonitorHandle {
     stop_tx: mpsc::Sender<()>,
     handle: Mutex<Option<tokio::task::JoinHandle<Result<()>>>>,
+    status: Arc<Mutex<connectors::whatsapp_monitor::WhatsAppMonitorStatus>>,
 }
 
 #[async_trait::async_trait]
@@ -111,6 +107,29 @@ impl MonitorHandle for WhatsAppMonitorHandle {
             let _ = handle.await;
         }
         Ok(())
+    }
+
+    fn status(&self) -> serde_json::Value {
+        let snapshot = self.status.lock().unwrap().clone();
+        serde_json::json!({
+            "running": snapshot.running,
+            "connected": snapshot.connected,
+            "reconnect_attempts": snapshot.reconnect_attempts,
+            "last_connected_at": snapshot
+                .last_connected_at
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|d| d.as_secs()),
+            "last_disconnect": snapshot.last_disconnect,
+            "last_message_at": snapshot
+                .last_message_at
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|d| d.as_secs()),
+            "last_event_at": snapshot
+                .last_event_at
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|d| d.as_secs()),
+            "last_error": snapshot.last_error,
+        })
     }
 }
 

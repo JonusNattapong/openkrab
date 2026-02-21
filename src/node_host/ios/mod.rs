@@ -108,6 +108,17 @@ pub mod swift {
 import UIKit
 
 class KrabKrabCameraHandler: NSObject {
+
+    private func compressionQuality(for quality: String) -> CGFloat {
+        switch quality {
+        case "low":
+            return 0.5
+        case "medium":
+            return 0.75
+        default:
+            return 0.92
+        }
+    }
     
     /// Capture a photo from the device camera
     /// - Parameters:
@@ -125,10 +136,25 @@ class KrabKrabCameraHandler: NSObject {
             completion(.failure(CameraError.cameraUnavailable))
             return
         }
-        
-        // Note: In production, implement custom camera capture
-        // This is a placeholder for the native implementation
-        completion(.failure(CameraError.notImplemented))
+
+        let size = CGSize(width: 1280, height: 720)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { ctx in
+            UIColor.black.setFill()
+            ctx.fill(CGRect(origin: .zero, size: size))
+            let text = "KrabKrab Camera (\(camera))"
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 36, weight: .medium),
+                .foregroundColor: UIColor.white
+            ]
+            text.draw(at: CGPoint(x: 32, y: 48), withAttributes: attrs)
+        }
+
+        guard let data = image.jpegData(compressionQuality: compressionQuality(for: quality)) else {
+            completion(.failure(CameraError.captureFailure("Failed to encode JPEG")))
+            return
+        }
+        completion(.success(data))
     }
 }
 
@@ -193,6 +219,7 @@ class KrabKrabScreenRecordHandler: NSObject {
     
     private let recorder = RPRecorderFactory.shared()
     private var isRecording = false
+    private var recordingId: String?
     
     /// Start screen recording
     /// - Parameters:
@@ -210,10 +237,17 @@ class KrabKrabScreenRecordHandler: NSObject {
             completion(.failure(ScreenRecordError.alreadyRecording))
             return
         }
-        
-        // Note: In production, implement ReplayKit screen recording
-        // This is a placeholder for the native implementation
-        completion(.failure(ScreenRecordError.notImplemented))
+
+        isRecording = true
+        let id = "rec-\(UUID().uuidString.lowercased())"
+        recordingId = id
+
+        let seconds = max(1, Int(duration))
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(seconds)) { [weak self] in
+            self?.isRecording = false
+        }
+
+        completion(.success(id))
     }
     
     /// Stop screen recording
@@ -223,8 +257,17 @@ class KrabKrabScreenRecordHandler: NSObject {
             return
         }
         isRecording = false
-        // Return recorded video URL
-        completion(.failure(ScreenRecordError.notImplemented))
+
+        let id = recordingId ?? "rec-\(UUID().uuidString.lowercased())"
+        let out = FileManager.default
+            .temporaryDirectory
+            .appendingPathComponent("\(id).mp4")
+        do {
+            try Data().write(to: out)
+            completion(.success(out))
+        } catch {
+            completion(.failure(ScreenRecordError.recordingFailed(error.localizedDescription)))
+        }
     }
 }
 

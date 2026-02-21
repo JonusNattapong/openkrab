@@ -1,159 +1,104 @@
-# OpenKrab Development Plan
+# De-mocking Plan for OpenKrab CLI
 
-This document outlines the planned features and roadmap for OpenKrab.
+The OpenKrab CLI was rapidly ported from the TypeScript `openclaw` codebase. While core functionalities (gateway daemon, prompt handling, config parsing) were ported robustly, many secondary CLI sub-commands were left as "mocks" or "stubs" that simply return `format!("...")` strings.
 
-## Current Status
+To achieve 100% feature parody with the original `openclaw` application, we need to replace these mock functions with actual active logic.
 
-**Version:** 2026.2.20  
-**Status:** Production Ready  
-**Lines of Code:** ~56,276 Rust  
-**Test Coverage:** 410+ tests
-
-### Completed Features (100%)
-
-- ✅ Multi-channel gateway (18 platforms)
-- ✅ AI agent runtime with tools
-- ✅ Memory system (vector + text search)
-- ✅ Voice system (wake word, VAD, TTS)
-- ✅ Plugin system (WASM runtime)
-- ✅ Browser automation (CDP with pooling)
-- ✅ Canvas/A2UI (Agent-to-UI protocol)
-- ✅ Hooks system (Event-driven architecture)
-- ✅ Security (pairing, sandboxing, audit)
-- ✅ Web dashboard
-- ✅ CLI commands (40+)
-
-### Recently Completed (2026-02-20)
-
-- ✅ Transcript compaction (`agents/compaction.rs`) — context window management
-- ✅ Block/tool streaming (`agents/streaming.rs`) — paragraph-aware response streaming
-- ✅ Binding system (`routing/bindings.rs`) — channel-to-agent mapping
-- ✅ Complex session keys (`routing/session_key.rs`) — composite agent:id:rest format with DM scoping
-- ✅ Role-based routing (`routing/role_routing.rs`) — allowlist/blocklist/priority role rules
-- ✅ Session management tools (`agents/session_tools.rs`) — spawn/send/list/history
-- ✅ Heartbeat runner (`gateway/heartbeat.rs`) — periodic health checks
-- ✅ Gateway config hot reload (`gateway/config_reload.rs`) — file-watch with diff-based reload plans
-- ✅ Transcript update events (`sessions/transcript_events.rs`) — pub/sub event bus
+This document outlines all identified mock targets, what they currently do, and what they *should* do based on the reference TypeScript codebase.
 
 ---
 
-## Future Releases
+## 1. Administration Commands (`src/commands/admin.rs`)
 
-### Planned Features
+### `skills` command
 
-#### Platform Support
+- **Current (OpenKrab):** Returns `format!("skills: action={}", action)`
+- **Target (OpenClaw):** Read/Write to the gateway HTTP/RPC to install/uninstall, list, and toggle skills. Requires communicating with the active daemon or modifying the `skills.toml` config and signaling a reload.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\skills-cli.ts`
 
-- [ ] Native WhatsApp SDK parity extras
-- [ ] Native LINE SDK parity extras
-- [x] Native desktop notifications (macOS/Windows/Linux via `notify-rust`)
+### `sandbox` command
 
-#### Deployment & Distribution
+- **Current (OpenKrab):** Returns `format!("sandbox: action={} (docker sandbox control)", action)`
+- **Target (OpenClaw):** Controls the Docker container executing the agent's code. Needs to ping Docker socket, start/stop containers, and flush containers.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\sandbox-cli.ts`
 
-- [x] Docker container images (multi-arch: amd64 + arm64)
-- [x] Cross-compiled binaries for more platforms
-  - [x] ARM32 (Raspberry Pi — armv7)
-  - [x] FreeBSD (x86_64)
-  - [x] OpenBSD (x86_64 compat via static musl)
-  - [x] Linux musl (fully static binary)
+### `nodes` command
 
-#### Voice & Communication
+- **Current (OpenKrab):** Returns `format!("nodes: action={} (device node management)", action)`
+- **Target (OpenClaw):** Interact with local hardware nodes (camera, mic) or remote nodes.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\nodes-cli\nodes-cli.ts`
 
-- [x] WebRTC support for voice calls
-- [ ] SIP integration
-- [ ] Video call support
+### `browser` command
 
-#### AI & ML Enhancements
+- **Current (OpenKrab):** Returns `format!("browser: action={} (chrome/chromium control)", action)`
+- **Target (OpenClaw):** Connect to a local Chrome Debugging Protocol (CDP) session, manage automated browser contexts, and list active tabs.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\browser-cli.ts`
 
-- [x] Local LLM inference (llama.cpp integration)
-- [ ] Multi-modal support (vision, audio)
-- [ ] Agent chaining and workflows
-- [ ] Custom model fine-tuning pipeline
+### `hooks` & `webhooks` commands
 
-#### Enterprise Features
+- **Current (OpenKrab):** Returns `format!("hooks: ...")` and `format!("webhooks: ...")`
+- **Target (OpenClaw):** Manage event subscriptions (e.g., `MESSAGE_INBOUND`). Update config to add webhook endpoint URLs and manage authentication tokens for them.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\hooks-cli.ts` & `webhooks-cli.ts`
 
-- [ ] LDAP/Active Directory integration
-- [ ] SAML SSO support
-- [ ] Audit log export (SIEM integration)
-- [ ] Compliance reporting (GDPR, SOC2)
+### `exec-approvals` command
 
-#### Developer Experience
+- **Current (OpenKrab):** Returns `format!("exec-approvals: action={}", action)`
+- **Target (OpenClaw):** Command to manage user approval policies for command execution (`allow`, `deny`, `always-ask`).
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\exec-approvals-cli.ts`
 
-- [ ] Plugin SDK documentation
-- [ ] Plugin marketplace
-- [ ] GraphQL API
-- [ ] Webhook management UI
+### `dns`, `directory`, `system`, `devices` commands
+
+- **Current (OpenKrab):** All return simple formatted strings.
+- **Target (OpenClaw):** Network discovery, device registry parsing, and local system information fetching.
+- **Reference:** `dns-cli.ts`, `directory-cli.ts`, `system-cli.ts`, `devices-cli.ts`
 
 ---
 
-## Version Roadmap
+## 2. State & Task Management
 
-### v2026.3.x (Q1 2026)
+### Cron (`src/commands/cron.rs`)
 
-- ✅ Docker container images (Dockerfile + docker-compose)
-- ✅ Cross-compilation for ARM32, FreeBSD, OpenBSD
-- ~~Native desktop notifications~~ ✅
+- **Current (OpenKrab):** `add` and `list` work (modifies TOML). `remove`, `enable`, `disable` return strings containing `"(not yet implemented)"`.
+- **Target (OpenClaw):** Parse the `cron.toml` file, drop or toggle the specified job ID, and re-save the file.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\cron-cli\*`
 
-### v2026.4.x (Q2 2026)
+### Channels (`src/commands/channels.rs`)
 
-- ~~WebRTC voice calls~~ ✅
-- ~~Local LLM inference~~ ✅
-- Plugin marketplace beta
+- **Current (OpenKrab):** `channel_add_command` and `channel_remove_command` return strings instead of altering the configuration file.
+- **Target (OpenClaw):** Push/pull configurations directly to `openkrab.toml` / `channels.toml` and emit an RPC restart signal to the Gateway to immediately hot-swap the channel adapters.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\channels-cli.ts`
 
-### v2026.5.x (Q3 2026)
+### Logs (`src/commands/logs.rs`)
 
-- Multi-modal AI support
-- Enterprise SSO (SAML/LDAP)
-- GraphQL API
+- **Current (OpenKrab):** `logs_command` returns `"(not yet implemented)"` when the `--follow` flag is passed.
+- **Target (OpenClaw):** Attach a WebSocket or Unix Domain Socket to the Gateway's log stream to tail logs in real-time.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\logs-cli.ts`
 
-### v2026.6.x (Q4 2026)
+### Pairing (`src/commands/pairing.rs`)
 
-- Video calls
-- Agent workflows
-- Compliance reporting
+- **Current (OpenKrab):** `pairing_revoke_command` returns `format!("Revoking pairing for device: {}", device_id)`.
+- **Target (OpenClaw):** Actually delete the device's token pair from the local persistent keyring.
+- **Reference:** `D:\Projects\Github\openclaw\src\cli\pairing-cli.ts`
 
----
+### Sessions (`src/commands/sessions.rs`)
 
-## Long-term Vision
-
-### Goals
-
-- [ ] Mobile apps (iOS/Android) using React Native or native
-- [ ] Desktop apps (Electron or Tauri)
-- [ ] Cloud-hosted option (managed service)
-- [ ] Enterprise certification (SOC2, ISO 27001)
-- [ ] AI agent marketplace
-
-### Research Areas
-
-- [ ] Federated learning for privacy-preserving AI
-- [ ] Homomorphic encryption for secure computation
-- [ ] Edge AI deployment on low-power devices
-- [ ] Quantum-resistant cryptography
+- **Current (OpenKrab):** `session_lock`, `session_unlock`, `session_archive`, `session_delete` return formatted strings.
+- **Target (OpenClaw):** Access the SQLite memory backend (or LanceDB), find the session thread, and modify its `status` or permanently delete its rows.
 
 ---
 
-## Contributing
+## 3. Communication Channel CLI Injections
 
-Want to help implement these features? See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+### Direct Messaging (`src/commands/telegram.rs`, `slack.rs`, `discord.rs`, `whatsapp_send.rs`)
 
-Priority areas for contributors:
-
-1. ~~Docker containerization~~ ✅
-2. ~~WebRTC implementation~~ ✅
-3. Additional channel connectors
-4. Plugin SDK improvements
-5. Documentation and tutorials
+- **Current (OpenKrab):** When triggering the CLI command `krabkrab telegram send <id> <msg>`, it generally just parses arguments and returns `Ok(format!("telegram to={} payload={}", ...))`.
+- **Target (OpenClaw):** Should form an HTTP POST request targeting either the Gateway's local API to queue the outbound message, or send it directly using the connector's internal API logic.
 
 ---
 
-## Feature Requests
+## Summary of Action Plan
 
-To request a feature:
-
-1. Check if it's already on this list
-2. Open an issue on GitHub with the `enhancement` label
-3. Discuss in GitHub Discussions
-
----
-
-Last updated: 2026-02-20
+1. **Phase 1: Admin Configuration Modifiers:** Focus on `hooks`, `webhooks`, `cron`, and `channels` since these require simple modifications to the local `.toml`/`.json` config files. ✓ (cron, channels done)
+2. **Phase 2: Database/State Commands:** Focus on `sessions` and `pairing` by connecting the CLI directly into the SQLite instances used by the Gateway. ✓ (pairing done via config)
+3. **Phase 3: Sandbox & Browser Automation:** Rewrite `sandbox` and `browser` CLI handlers to manage Docker and Chrome processes respectively. ✓ (browser native CLI handled, sandbox Docker integration done)
+4. **Phase 4: Daemon Synchronization:** Implement WebSocket/HTTP RPC calls so that the CLI can notify the Gateway to reload configurations or tail logs (`logs --follow`).

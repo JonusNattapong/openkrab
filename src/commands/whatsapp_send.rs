@@ -19,15 +19,55 @@ pub async fn send_whatsapp_message(
 pub async fn send_whatsapp_media(
     to: &str,
     text: Option<&str>,
-    _media_url: &str,
+    media_url: &str,
     access_token: &str,
     phone_number_id: &str,
 ) -> Result<serde_json::Value> {
-    // For now, just send text. In full implementation, would handle media upload
-    if let Some(text) = text {
-        send_whatsapp_message(to, text, access_token, phone_number_id).await
+    if media_url.trim().is_empty() {
+        bail!("Media URL is required");
+    }
+
+    let client = crate::infra::retry_http::build_retrying_client();
+    let url = format!(
+        "https://graph.facebook.com/v19.0/{}/messages",
+        phone_number_id
+    );
+    let mut payload = serde_json::json!({
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": to,
+        "type": "image",
+        "image": {
+            "link": media_url
+        }
+    });
+
+    if let Some(caption) = text {
+        payload["image"]["caption"] = serde_json::json!(caption);
+    }
+
+    let resp = client
+        .post(&url)
+        .bearer_auth(access_token)
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await?;
+
+    let status = resp.status();
+    let raw_body = resp.text().await?;
+    if !status.is_success() {
+        return Err(anyhow::anyhow!(
+            "whatsapp send_whatsapp_media failed ({}): {}",
+            status,
+            raw_body
+        ));
+    }
+
+    if raw_body.trim().is_empty() {
+        Ok(serde_json::json!({}))
     } else {
-        bail!("Media messages require text content");
+        Ok(serde_json::from_str(&raw_body)?)
     }
 }
 

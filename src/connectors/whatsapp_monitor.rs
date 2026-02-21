@@ -2,6 +2,7 @@
 
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use tokio::sync::mpsc;
 use tokio::time::{sleep, Duration};
@@ -19,20 +20,36 @@ pub struct WhatsAppMessage {
     pub message_type: String,
 }
 
-/// WhatsApp client for monitoring (placeholder for Web WhatsApp integration)
+/// WhatsApp client for monitoring.
+///
+/// This implementation supports file-backed ingestion for local bridge setups
+/// via `WHATSAPP_MONITOR_INBOX` and incremental cursor-based polling.
 pub struct WhatsAppClient {
-    // In real implementation, this would connect to WhatsApp Web
     connected: bool,
+    source_file: Option<PathBuf>,
+    cursor: usize,
 }
 
 impl WhatsAppClient {
     pub fn new() -> Result<Self> {
-        Ok(Self { connected: false })
+        Ok(Self {
+            connected: false,
+            source_file: std::env::var("WHATSAPP_MONITOR_INBOX")
+                .ok()
+                .map(PathBuf::from),
+            cursor: 0,
+        })
     }
 
     pub async fn connect(&mut self) -> Result<()> {
-        // Simulate connection to WhatsApp Web
-        sleep(Duration::from_secs(1)).await;
+        if let Some(path) = &self.source_file {
+            if !path.exists() {
+                return Err(anyhow!(
+                    "WHATSAPP_MONITOR_INBOX does not exist: {}",
+                    path.display()
+                ));
+            }
+        }
         self.connected = true;
         Ok(())
     }
@@ -62,7 +79,7 @@ pub struct WhatsAppMonitorStatus {
 
 /// WhatsApp monitor result
 pub struct WhatsAppMonitorResult {
-    pub status: WhatsAppMonitorStatus,
+    pub status: Arc<Mutex<WhatsAppMonitorStatus>>,
     pub stop_tx: mpsc::Sender<()>,
     pub handle: tokio::task::JoinHandle<Result<()>>,
 }
@@ -94,7 +111,7 @@ pub async fn monitor_whatsapp_provider(
     let message_handler_clone = message_handler.clone();
 
     let handle = tokio::spawn(async move {
-        let client = WhatsAppClient::new()
+        let mut client = WhatsAppClient::new()
             .map_err(|e| anyhow!("Failed to create WhatsApp client: {}", e))?;
 
         // Main monitoring loop
@@ -104,7 +121,7 @@ pub async fn monitor_whatsapp_provider(
                     println!("WhatsApp monitor stopping...");
                     break;
                 }
-                result = monitor_loop(&client, &status_clone, &message_handler_clone, &options) => {
+                result = monitor_loop(&mut client, &status_clone, &message_handler_clone, &options) => {
                     if let Err(e) = result {
                         let backoff_ms = {
                             let mut status = status_clone.lock().unwrap();
@@ -132,17 +149,15 @@ pub async fn monitor_whatsapp_provider(
         Ok(())
     });
 
-    let current_status = status.lock().unwrap().clone();
-
     Ok(WhatsAppMonitorResult {
-        status: current_status,
+        status,
         stop_tx,
         handle,
     })
 }
 
 async fn monitor_loop(
-    client: &WhatsAppClient,
+    client: &mut WhatsAppClient,
     status: &Arc<Mutex<WhatsAppMonitorStatus>>,
     message_handler: &Arc<dyn MessageHandler>,
     options: &MonitorOptions,
@@ -154,9 +169,8 @@ async fn monitor_loop(
         status_guard.last_error = None;
     }
 
-    // Simulate connection (in real implementation, this would connect to WhatsApp Web)
-    println!("Connecting to WhatsApp...");
-    sleep(Duration::from_secs(1)).await; // Simulate connection delay
+    tracing::info!("Connecting WhatsApp monitor...");
+    client.connect().await?;
 
     {
         let mut status_guard = status.lock().unwrap();
@@ -165,20 +179,14 @@ async fn monitor_loop(
         status_guard.reconnect_attempts = 0;
     }
 
-    println!("WhatsApp connected successfully");
+    tracing::info!("WhatsApp monitor connected");
 
     // Main message polling loop
     loop {
-        // Check for stop signal
-        if let Ok(_) = tokio::time::timeout(Duration::from_millis(100), async {
-            // This would be non-blocking in real implementation
-        })
-        .await
-        {
+        if !client.is_connected() {
             break;
         }
 
-        // Poll for messages (in real implementation, this would listen to WebSocket/events)
         match poll_messages(client, options).await {
             Ok(messages) => {
                 for message in messages {
@@ -192,7 +200,7 @@ async fn monitor_loop(
                     let message_value =
                         serde_json::to_value(&message).unwrap_or_else(|_| serde_json::Value::Null);
                     if let Err(e) = message_handler.handle_message(message_value).await {
-                        println!("Error handling WhatsApp message: {}", e);
+                        tracing::warn!("Error handling WhatsApp message: {}", e);
                     }
                 }
             }
@@ -205,25 +213,64 @@ async fn monitor_loop(
             }
         }
 
-        // Small delay between polls
-        sleep(Duration::from_millis(100)).await;
+        sleep(Duration::from_millis(300)).await;
     }
 
     Ok(())
 }
 
 async fn poll_messages(
-    _client: &WhatsAppClient,
+    client: &mut WhatsAppClient,
     _options: &MonitorOptions,
 ) -> Result<Vec<WhatsAppMessage>> {
-    // In real implementation, this would:
-    // 1. Listen to WebSocket events from WhatsApp Web
-    // 2. Parse incoming messages
-    // 3. Convert to WhatsAppMessage structs
-    // 4. Return them
+    if !client.is_connected() {
+        return Err(anyhow!("WhatsApp monitor is not connected"));
+    }
 
-    // For now, return empty vector (no messages)
-    Ok(vec![])
+    let Some(path) = &client.source_file else {
+        return Ok(vec![]);
+    };
+
+    let raw = tokio::fs::read_to_string(path).await?;
+    let lines: Vec<&str> = raw.lines().collect();
+    if client.cursor >= lines.len() {
+        return Ok(vec![]);
+    }
+
+    let mut out = Vec::new();
+    for line in lines.iter().skip(client.cursor) {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+
+        if let Ok(msg) = serde_json::from_str::<WhatsAppMessage>(line) {
+            out.push(msg);
+            continue;
+        }
+
+        let payload: serde_json::Value = match serde_json::from_str(line) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+
+        for m in crate::connectors::whatsapp::parse_messages(&payload) {
+            out.push(WhatsAppMessage {
+                id: m.message_id.clone(),
+                from: m.from.clone(),
+                to: m.phone_number_id.clone(),
+                body: m.text.clone(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_secs())
+                    .unwrap_or(0),
+                message_type: "text".to_string(),
+            });
+        }
+    }
+
+    client.cursor = lines.len();
+    Ok(out)
 }
 
 fn calculate_backoff(attempt: u32) -> u64 {
@@ -243,7 +290,7 @@ mod tests {
 
     #[async_trait::async_trait]
     impl MessageHandler for MockMessageHandler {
-        async fn handle_message(&self, _message: WhatsAppMessage) -> Result<()> {
+        async fn handle_message(&self, _message: serde_json::Value) -> Result<()> {
             Ok(())
         }
     }

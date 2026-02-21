@@ -4,6 +4,7 @@
 
 use anyhow::{Context, Result};
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
+use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use sha2::{Digest, Sha256};
 
 /// Verify a plugin signature using ed25519
@@ -28,9 +29,6 @@ pub fn verify_signature(data: &[u8], signature_b64: &str, public_key_b64: &str) 
         .decode(public_key_b64)
         .context("Failed to decode public key")?;
 
-    // Verify ed25519 signature
-    // Note: In production, use ring or ed25519-dalek crate
-    // This is a placeholder implementation
     verify_ed25519(data, &signature, &public_key)
 }
 
@@ -58,19 +56,28 @@ pub fn verify_key_fingerprint(public_key_b64: &str, expected_fingerprint: &str) 
     Ok(actual.eq_ignore_ascii_case(expected_fingerprint))
 }
 
-/// Placeholder ed25519 verification
-///
-/// TODO: Replace with actual ed25519 implementation using ring or ed25519-dalek
-fn verify_ed25519(_data: &[u8], _signature: &[u8], _public_key: &[u8]) -> Result<bool> {
-    // Placeholder: In production, use:
-    // use ed25519_dalek::{PublicKey, Signature, Verifier};
-    // let public_key = PublicKey::from_bytes(public_key)?;
-    // let signature = Signature::from_bytes(signature)?;
-    // public_key.verify(data, &signature).is_ok()
+fn verify_ed25519(data: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool> {
+    let pk_bytes: [u8; 32] = public_key
+        .try_into()
+        .map_err(|_| anyhow::anyhow!("Invalid ed25519 public key length: expected 32 bytes"))?;
+    let sig_bytes: [u8; 64] = signature
+        .try_into()
+        .map_err(|_| anyhow::anyhow!("Invalid ed25519 signature length: expected 64 bytes"))?;
 
-    // For now, return true to allow development
-    // In production, this MUST be implemented properly
-    Ok(true)
+    let verifying_key =
+        VerifyingKey::from_bytes(&pk_bytes).context("Failed to parse ed25519 public key")?;
+    let signature = Signature::from_bytes(&sig_bytes);
+
+    Ok(verifying_key.verify(data, &signature).is_ok())
+}
+
+fn decode_public_key_bytes(public_key_b64: &str) -> Option<Vec<u8>> {
+    let decoded = BASE64.decode(public_key_b64).ok()?;
+    if decoded.len() == 32 {
+        Some(decoded)
+    } else {
+        None
+    }
 }
 
 /// Plugin signature validator
@@ -115,15 +122,43 @@ impl SignatureValidator {
             if !self.trusted_keys.iter().any(|k| k.eq_ignore_ascii_case(fp)) {
                 return Ok(ValidationResult::UntrustedKey);
             }
+
+            // Resolve matching public key from trusted entries.
+            let mut matched_key: Option<&str> = None;
+            for entry in &self.trusted_keys {
+                if let Some(pk) = decode_public_key_bytes(entry) {
+                    let mut hasher = Sha256::new();
+                    hasher.update(&pk);
+                    let derived = format!("{:x}", hasher.finalize())[..16].to_string();
+                    if derived.eq_ignore_ascii_case(fp) {
+                        matched_key = Some(entry.as_str());
+                        break;
+                    }
+                }
+            }
+
+            let Some(public_key_b64) = matched_key else {
+                return Ok(ValidationResult::Invalid);
+            };
+
+            return match verify_signature(manifest_json, sig, public_key_b64) {
+                Ok(true) => Ok(ValidationResult::Valid),
+                Ok(false) => Ok(ValidationResult::Invalid),
+                Err(e) => Err(e),
+            };
         }
 
-        // TODO: Get actual public key from fingerprint
-        // For now, accept any signature in dev mode
-        match verify_signature(manifest_json, sig, "placeholder_key") {
-            Ok(true) => Ok(ValidationResult::Valid),
-            Ok(false) => Ok(ValidationResult::Invalid),
-            Err(e) => Err(e),
+        // No fingerprint provided: verify against any trusted public key.
+        for entry in &self.trusted_keys {
+            if decode_public_key_bytes(entry).is_none() {
+                continue;
+            }
+            if verify_signature(manifest_json, sig, entry)? {
+                return Ok(ValidationResult::Valid);
+            }
         }
+
+        Ok(ValidationResult::Invalid)
     }
 
     /// Add a trusted key
@@ -135,9 +170,12 @@ impl SignatureValidator {
 
     /// Check if key is trusted
     pub fn is_key_trusted(&self, fingerprint: &str) -> bool {
-        self.trusted_keys
-            .iter()
-            .any(|k| k.eq_ignore_ascii_case(fingerprint))
+        self.trusted_keys.iter().any(|k| {
+            k.eq_ignore_ascii_case(fingerprint)
+                || calculate_key_fingerprint(k)
+                    .map(|fp| fp.eq_ignore_ascii_case(fingerprint))
+                    .unwrap_or(false)
+        })
     }
 }
 

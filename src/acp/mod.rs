@@ -1,4 +1,4 @@
-//! acp — Agent Communication Protocol types, client and server stubs.
+//! acp — Agent Communication Protocol types and in-process runtime.
 //! Ported from `openkrab/src/acp/` (Phase 9).
 //!
 //! ACP provides a structured JSON-over-HTTP/WS protocol so external processes
@@ -7,6 +7,9 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::sync::Arc;
+use std::time::Instant;
+use tokio::sync::RwLock;
 
 // ─── Core message types ───────────────────────────────────────────────────────
 
@@ -185,6 +188,146 @@ impl AcpResponse {
     }
 }
 
+// ─── Runtime ──────────────────────────────────────────────────────────────────
+
+/// In-process ACP runtime handling request/response workflow.
+pub struct AcpRuntime {
+    sessions: RwLock<HashMap<String, AcpSession>>,
+    started_at: Instant,
+    auth_token: Option<String>,
+    agent: Option<Arc<crate::agents::Agent>>,
+}
+
+impl Default for AcpRuntime {
+    fn default() -> Self {
+        Self::new(None, None)
+    }
+}
+
+impl AcpRuntime {
+    pub fn new(auth_token: Option<String>, agent: Option<Arc<crate::agents::Agent>>) -> Self {
+        Self {
+            sessions: RwLock::new(HashMap::new()),
+            started_at: Instant::now(),
+            auth_token,
+            agent,
+        }
+    }
+
+    pub fn with_agent(agent: Arc<crate::agents::Agent>) -> Self {
+        Self::new(None, Some(agent))
+    }
+
+    pub async fn handle_request(&self, req: AcpRequest) -> AcpResponse {
+        if let Some(expected) = &self.auth_token {
+            if req.auth_token.as_deref() != Some(expected.as_str()) {
+                let err = AcpResponse::err("unauthorized");
+                return if let Some(id) = req.request_id {
+                    err.with_request_id(id)
+                } else {
+                    err
+                };
+            }
+        }
+
+        let rid = req.request_id.clone();
+        let resp = match req.command {
+            AcpCommand::NewSession { session_id } => {
+                let sid = session_id.unwrap_or_else(|| format!("acp-{}", uuid::Uuid::new_v4()));
+                let mut sessions = self.sessions.write().await;
+                sessions
+                    .entry(sid.clone())
+                    .or_insert_with(|| AcpSession::new(sid.clone()));
+                AcpResponse::ok(AcpEvent::SessionCreated { session_id: sid })
+            }
+            AcpCommand::EndSession { session_id } => {
+                let mut sessions = self.sessions.write().await;
+                if sessions.remove(&session_id).is_some() {
+                    AcpResponse::ok(AcpEvent::SessionEnded { session_id })
+                } else {
+                    AcpResponse::err(format!("session not found: {session_id}"))
+                }
+            }
+            AcpCommand::ClearSession { session_id } => {
+                let mut sessions = self.sessions.write().await;
+                match sessions.get_mut(&session_id) {
+                    Some(s) => {
+                        s.messages.clear();
+                        s.updated_at = unix_now();
+                        AcpResponse::ok(AcpEvent::Status {
+                            version: ACP_VERSION.to_string(),
+                            sessions: sessions.len(),
+                            uptime_secs: self.started_at.elapsed().as_secs(),
+                        })
+                    }
+                    None => AcpResponse::err(format!("session not found: {session_id}")),
+                }
+            }
+            AcpCommand::ListSessions => {
+                let sessions = self.sessions.read().await;
+                let list = sessions.keys().cloned().collect::<Vec<_>>().join(",");
+                AcpResponse::ok(AcpEvent::ChatReply {
+                    session_id: "_system".to_string(),
+                    content: list,
+                    done: true,
+                })
+            }
+            AcpCommand::GetStatus => {
+                let sessions = self.sessions.read().await;
+                AcpResponse::ok(AcpEvent::Status {
+                    version: ACP_VERSION.to_string(),
+                    sessions: sessions.len(),
+                    uptime_secs: self.started_at.elapsed().as_secs(),
+                })
+            }
+            AcpCommand::Chat {
+                session_id,
+                message,
+            } => self.handle_chat(session_id, message).await,
+        };
+
+        if let Some(id) = rid {
+            resp.with_request_id(id)
+        } else {
+            resp
+        }
+    }
+
+    async fn handle_chat(&self, session_id: String, message: String) -> AcpResponse {
+        {
+            let mut sessions = self.sessions.write().await;
+            let session = sessions
+                .entry(session_id.clone())
+                .or_insert_with(|| AcpSession::new(session_id.clone()));
+            session.push(AcpMessage::user(message.clone()));
+        }
+
+        let reply = if let Some(agent) = &self.agent {
+            match agent.answer(&message).await {
+                Ok(r) => r,
+                Err(e) => {
+                    return AcpResponse::err(format!("agent error: {}", e));
+                }
+            }
+        } else {
+            format!("[acp] {}", message)
+        };
+
+        {
+            let mut sessions = self.sessions.write().await;
+            if let Some(session) = sessions.get_mut(&session_id) {
+                session.push(AcpMessage::assistant(reply.clone()));
+            }
+        }
+
+        AcpResponse::ok(AcpEvent::ChatReply {
+            session_id,
+            content: reply,
+            done: true,
+        })
+    }
+}
+
 // ─── Session mapper ───────────────────────────────────────────────────────────
 
 /// Maps connector channel IDs to ACP session IDs.
@@ -317,5 +460,64 @@ mod tests {
         assert_eq!(u.role, AcpRole::User);
         let a = AcpMessage::assistant("hello");
         assert_eq!(a.role, AcpRole::Assistant);
+    }
+
+    #[tokio::test]
+    async fn runtime_new_chat_end_session() {
+        let runtime = AcpRuntime::default();
+
+        let created = runtime
+            .handle_request(AcpRequest {
+                command: AcpCommand::NewSession {
+                    session_id: Some("s1".into()),
+                },
+                auth_token: None,
+                request_id: Some("r1".into()),
+            })
+            .await;
+        assert!(created.ok);
+        assert_eq!(created.request_id.as_deref(), Some("r1"));
+
+        let reply = runtime
+            .handle_request(AcpRequest {
+                command: AcpCommand::Chat {
+                    session_id: "s1".into(),
+                    message: "hello".into(),
+                },
+                auth_token: None,
+                request_id: None,
+            })
+            .await;
+        assert!(reply.ok);
+        match reply.event {
+            Some(AcpEvent::ChatReply { session_id, .. }) => assert_eq!(session_id, "s1"),
+            _ => panic!("expected chat reply"),
+        }
+
+        let ended = runtime
+            .handle_request(AcpRequest {
+                command: AcpCommand::EndSession {
+                    session_id: "s1".into(),
+                },
+                auth_token: None,
+                request_id: None,
+            })
+            .await;
+        assert!(ended.ok);
+    }
+
+    #[tokio::test]
+    async fn runtime_auth_rejects_invalid_token() {
+        let runtime = AcpRuntime::new(Some("secret".into()), None);
+        let resp = runtime
+            .handle_request(AcpRequest {
+                command: AcpCommand::GetStatus,
+                auth_token: Some("bad".into()),
+                request_id: Some("req-1".into()),
+            })
+            .await;
+        assert!(!resp.ok);
+        assert_eq!(resp.error.as_deref(), Some("unauthorized"));
+        assert_eq!(resp.request_id.as_deref(), Some("req-1"));
     }
 }

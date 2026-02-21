@@ -45,6 +45,7 @@ pub mod secure;
 pub mod security_audit;
 pub mod shared;
 pub mod signature;
+pub mod skills;
 pub mod sessions;
 pub mod shell;
 pub mod signal;

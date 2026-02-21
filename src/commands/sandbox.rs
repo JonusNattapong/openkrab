@@ -98,32 +98,54 @@ pub fn sandbox_build_command(browser: bool, common: bool) -> String {
 
     // Build default image
     lines.push("Building default sandbox image...".to_string());
-    lines.push(
-        "  (This would run: docker build -t krabkrab/sandbox:latest -f Dockerfile.sandbox .)"
-            .to_string(),
-    );
+    let status = Command::new("docker")
+        .args([
+            "build",
+            "-t",
+            "krabkrab/sandbox:latest",
+            "-f",
+            "Dockerfile.sandbox",
+            ".",
+        ])
+        .status();
+    lines.push(format!("  Result: {:?}", status));
 
     if browser {
         lines.push("Building browser sandbox image...".to_string());
-        lines.push("  (This would run: docker build -t krabkrab/sandbox-browser:latest -f Dockerfile.sandbox.browser .)".to_string());
+        let status = Command::new("docker")
+            .args([
+                "build",
+                "-t",
+                "krabkrab/sandbox-browser:latest",
+                "-f",
+                "Dockerfile.sandbox.browser",
+                ".",
+            ])
+            .status();
+        lines.push(format!("  Result: {:?}", status));
     }
 
     if common {
         lines.push("Building common sandbox image...".to_string());
-        lines.push("  (This would run: docker build -t krabkrab/sandbox-common:latest -f Dockerfile.sandbox.common .)".to_string());
+        let status = Command::new("docker")
+            .args([
+                "build",
+                "-t",
+                "krabkrab/sandbox-common:latest",
+                "-f",
+                "Dockerfile.sandbox.common",
+                ".",
+            ])
+            .status();
+        lines.push(format!("  Result: {:?}", status));
     }
 
-    lines.push(String::new());
-    lines.push(
-        "Note: In a full implementation, this would execute the actual docker build commands."
-            .to_string(),
-    );
-
+    lines.push("Build complete.".to_string());
     lines.join("\n")
 }
 
 /// Recreate sandbox containers.
-pub fn sandbox_recreate_command(_cfg: &AppConfig, force: bool) -> String {
+pub fn sandbox_recreate_command(cfg: &AppConfig, force: bool) -> String {
     if !is_docker_available() {
         return "Docker is not available. Install Docker to use sandbox features.".to_string();
     }
@@ -131,17 +153,123 @@ pub fn sandbox_recreate_command(_cfg: &AppConfig, force: bool) -> String {
     let mut lines = vec!["Recreating sandbox containers...".to_string()];
 
     if force {
-        lines.push("Force mode: Will stop and remove existing containers".to_string());
+        let output = Command::new("docker")
+            .args(["ps", "-qa", "--filter", "label=krabkrab.sandbox=true"])
+            .output()
+            .expect("Failed to execute docker ps");
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        for id in stdout.lines() {
+            let id = id.trim();
+            if !id.is_empty() {
+                lines.push(format!("Removing container {}", id));
+                let rm_status = Command::new("docker").args(["rm", "-f", id]).status();
+                lines.push(format!("  Result: {:?}", rm_status));
+            }
+        }
     }
 
-    lines.push(String::new());
-    lines.push("This would:".to_string());
-    lines.push("  1. Stop running sandbox containers".to_string());
-    lines.push("  2. Remove old containers".to_string());
-    lines.push("  3. Pull latest images (if configured)".to_string());
-    lines.push("  4. Start new containers with fresh state".to_string());
+    let network = cfg
+        .agents
+        .defaults
+        .sandbox
+        .docker
+        .network
+        .clone()
+        .or_else(|| cfg.agents.defaults.sandbox.network.clone());
+    let binds = cfg
+        .agents
+        .defaults
+        .sandbox
+        .docker
+        .binds
+        .clone()
+        .or_else(|| cfg.agents.defaults.sandbox.binds.clone())
+        .unwrap_or_default();
+
+    let targets = vec![
+        ("krabkrab-sandbox-default", resolve_sandbox_image(cfg)),
+        (
+            "krabkrab-sandbox-browser",
+            resolve_sandbox_browser_image(cfg),
+        ),
+        ("krabkrab-sandbox-common", resolve_sandbox_common_image(cfg)),
+    ];
+
+    for (name, image) in targets {
+        if !docker_image_exists(&image) {
+            lines.push(format!("Skipping {} (image missing: {})", name, image));
+            continue;
+        }
+
+        match ensure_sandbox_container(name, &image, network.as_deref(), &binds) {
+            Ok(action) => lines.push(format!("{}: {}", name, action)),
+            Err(e) => lines.push(format!("{}: failed ({})", name, e)),
+        }
+    }
 
     lines.join("\n")
+}
+
+fn ensure_sandbox_container(
+    name: &str,
+    image: &str,
+    network: Option<&str>,
+    binds: &[String],
+) -> Result<String, String> {
+    let inspect = Command::new("docker")
+        .args(["inspect", "-f", "{{.State.Running}}", name])
+        .output()
+        .map_err(|e| format!("docker inspect failed: {e}"))?;
+
+    if inspect.status.success() {
+        let running = String::from_utf8_lossy(&inspect.stdout).trim().to_string();
+        if running.eq_ignore_ascii_case("true") {
+            return Ok(format!("already running ({})", image));
+        }
+
+        let start = Command::new("docker")
+            .args(["start", name])
+            .status()
+            .map_err(|e| format!("docker start failed: {e}"))?;
+        if start.success() {
+            return Ok(format!("started ({})", image));
+        }
+        return Err("docker start returned non-zero status".to_string());
+    }
+
+    let mut args: Vec<String> = vec![
+        "run".to_string(),
+        "-d".to_string(),
+        "--name".to_string(),
+        name.to_string(),
+        "--label".to_string(),
+        "krabkrab.sandbox=true".to_string(),
+    ];
+
+    if let Some(net) = network.filter(|s| !s.trim().is_empty()) {
+        args.push("--network".to_string());
+        args.push(net.to_string());
+    }
+
+    for bind in binds {
+        if !bind.trim().is_empty() {
+            args.push("-v".to_string());
+            args.push(bind.clone());
+        }
+    }
+
+    args.push(image.to_string());
+
+    let run = Command::new("docker")
+        .args(args)
+        .status()
+        .map_err(|e| format!("docker run failed: {e}"))?;
+    if run.success() {
+        Ok(format!("created ({})", image))
+    } else {
+        Err("docker run returned non-zero status".to_string())
+    }
 }
 
 /// Explain sandbox configuration.

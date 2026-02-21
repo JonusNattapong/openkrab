@@ -1,7 +1,9 @@
 use axum::{
+    extract::connect_info::ConnectInfo,
     extract::{ws::Message, ws::WebSocketUpgrade, State},
+    Json,
     response::Response,
-    routing::get,
+    routing::{get, post},
     Router,
 };
 use futures_util::{SinkExt, StreamExt};
@@ -31,6 +33,8 @@ pub struct GatewayServer {
     pub heartbeat_runner: Arc<RwLock<Option<crate::gateway::heartbeat::HeartbeatRunner>>>,
     /// Handle for config hot-reloading
     pub config_reloader: Arc<RwLock<Option<crate::gateway::config_reload::ConfigReloaderHandle>>>,
+    /// ACP runtime (HTTP endpoint)
+    pub acp_runtime: Arc<crate::acp::AcpRuntime>,
 }
 
 impl std::fmt::Debug for GatewayServer {
@@ -51,6 +55,7 @@ pub struct ClientConnection {
     pub client_id: Option<String>,
     pub addr: SocketAddr,
     pub connected_at: chrono::DateTime<chrono::Utc>,
+    pub tx: tokio::sync::mpsc::UnboundedSender<Message>,
 }
 
 #[derive(Debug)]
@@ -82,6 +87,7 @@ impl GatewayServer {
             sessions: Arc::new(RwLock::new(crate::sessions::SessionRegistry::new())),
             heartbeat_runner: Arc::new(RwLock::new(None)),
             config_reloader: Arc::new(RwLock::new(None)),
+            acp_runtime: Arc::new(crate::acp::AcpRuntime::default()),
         }
     }
 
@@ -92,13 +98,14 @@ impl GatewayServer {
         let json = serde_json::to_string(&message)?;
         let clients = self.clients.read().await;
 
-        // In a real implementation, we'd have WebSocket senders stored here
-        // For now, just log the broadcast
-        tracing::debug!(
-            "Broadcasting message to {} clients: {}",
-            clients.len(),
-            json
-        );
+        let mut delivered = 0usize;
+        for client in clients.values() {
+            if client.tx.send(Message::Text(json.clone().into())).is_ok() {
+                delivered += 1;
+            }
+        }
+
+        tracing::debug!("Broadcast delivered to {}/{} clients", delivered, clients.len());
 
         Ok(())
     }
@@ -112,11 +119,20 @@ impl GatewayServer {
         let clients = self.clients.read().await;
 
         // Find client by client_id
+        let mut found = false;
         for client in clients.values() {
             if client.client_id.as_deref() == Some(client_id) {
-                tracing::debug!("Sending message to client {}: {}", client_id, json);
+                found = true;
+                client
+                    .tx
+                    .send(Message::Text(json.clone().into()))
+                    .map_err(|_| "failed to send message to client")?;
                 break;
             }
+        }
+
+        if !found {
+            return Err(format!("Client not found: {}", client_id).into());
         }
 
         Ok(())
@@ -134,11 +150,16 @@ impl GatewayServer {
 async fn handle_websocket(
     ws: WebSocketUpgrade,
     State(server): State<Arc<GatewayServer>>,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
 ) -> Response {
-    ws.on_upgrade(move |socket| handle_socket(socket, server))
+    ws.on_upgrade(move |socket| handle_socket(socket, server, addr))
 }
 
-async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<GatewayServer>) {
+async fn handle_socket(
+    socket: axum::extract::ws::WebSocket,
+    server: Arc<GatewayServer>,
+    addr: SocketAddr,
+) {
     let connection_id = {
         let mut next_id = server.next_connection_id.write().await;
         let id = *next_id;
@@ -146,12 +167,13 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
         id
     };
 
-    let addr = "127.0.0.1:0".parse().unwrap(); // Placeholder
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<Message>();
     let client = ClientConnection {
         id: connection_id,
-        client_id: None,
+        client_id: Some(format!("client-{}", connection_id)),
         addr,
         connected_at: chrono::Utc::now(),
+        tx,
     };
 
     // Add to clients map
@@ -163,6 +185,13 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
     tracing::info!("WebSocket connection established: {}", connection_id);
 
     let (mut sender, mut receiver) = socket.split();
+    let writer_handle = tokio::spawn(async move {
+        while let Some(outgoing) = rx.recv().await {
+            if sender.send(outgoing).await.is_err() {
+                break;
+            }
+        }
+    });
 
     // Send hello message
     let hello = GatewayMessage::Hello {
@@ -172,7 +201,14 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
     };
 
     if let Ok(json) = serde_json::to_string(&hello) {
-        if sender.send(Message::Text(json.into())).await.is_err() {
+        let hello_send = {
+            let clients = server.clients.read().await;
+            clients
+                .get(&connection_id)
+                .map(|c| c.tx.send(Message::Text(json.into())).is_ok())
+                .unwrap_or(false)
+        };
+        if !hello_send {
             tracing::warn!("Failed to send hello message to client {}", connection_id);
         }
     }
@@ -227,7 +263,13 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
                                         attachments: None,
                                     };
                                     if let Ok(json) = serde_json::to_string(&response) {
-                                        let _ = sender.send(Message::Text(json.into())).await;
+                                        let tx_opt = {
+                                            let clients = server.clients.read().await;
+                                            clients.get(&connection_id).map(|c| c.tx.clone())
+                                        };
+                                        if let Some(tx) = tx_opt {
+                                            let _ = tx.send(Message::Text(json.into()));
+                                        }
                                     }
                                 }
                                 Err(e) => {
@@ -237,7 +279,13 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
                                         message: e.to_string(),
                                     };
                                     if let Ok(json) = serde_json::to_string(&error_msg) {
-                                        let _ = sender.send(Message::Text(json.into())).await;
+                                        let tx_opt = {
+                                            let clients = server.clients.read().await;
+                                            clients.get(&connection_id).map(|c| c.tx.clone())
+                                        };
+                                        if let Some(tx) = tx_opt {
+                                            let _ = tx.send(Message::Text(json.into()));
+                                        }
                                     }
                                 }
                             }
@@ -265,7 +313,13 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
 
                         let response = GatewayMessage::Status { sessions, agents };
                         if let Ok(json) = serde_json::to_string(&response) {
-                            let _ = sender.send(Message::Text(json.into())).await;
+                            let tx_opt = {
+                                let clients = server.clients.read().await;
+                                clients.get(&connection_id).map(|c| c.tx.clone())
+                            };
+                            if let Some(tx) = tx_opt {
+                                let _ = tx.send(Message::Text(json.into()));
+                            }
                         }
                     }
                     _ => {
@@ -290,8 +344,16 @@ async fn handle_socket(socket: axum::extract::ws::WebSocket, server: Arc<Gateway
         let mut clients = server.clients.write().await;
         clients.remove(&connection_id);
     }
+    writer_handle.abort();
 
     tracing::info!("WebSocket connection cleaned up: {}", connection_id);
+}
+
+async fn handle_acp(
+    State(server): State<Arc<GatewayServer>>,
+    Json(request): Json<crate::acp::AcpRequest>,
+) -> Json<crate::acp::AcpResponse> {
+    Json(server.acp_runtime.handle_request(request).await)
 }
 
 pub async fn start_gateway_server(
@@ -304,6 +366,7 @@ pub async fn start_gateway_server(
 
     let app = Router::new()
         .route("/ws", get(handle_websocket))
+        .route(crate::acp::ACP_DEFAULT_PATH, post(handle_acp))
         .route("/health", get(|| async { "OK" }))
         .nest("/webrtc", crate::webrtc::webrtc_router())
         .with_state(server.clone());
@@ -318,7 +381,9 @@ pub async fn start_gateway_server(
     tracing::info!("Starting gateway server on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
-    let _server_handle = tokio::spawn(async move { axum::serve(listener, app).await });
+    let _server_handle = tokio::spawn(async move {
+        axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await
+    });
 
     // In a real implementation, we'd return a handle to stop the server
     // For now, just return the GatewayServer instance

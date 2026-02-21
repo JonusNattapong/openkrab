@@ -203,7 +203,8 @@ impl BroadcastRegistry {
         self.groups.is_empty()
     }
 
-    /// Simulate a broadcast (for testing — does not actually send).
+    #[cfg(test)]
+    /// Test-only broadcast simulation helper.
     pub fn simulate(&self, msg: &BroadcastMessage) -> BroadcastResult {
         let mut result = BroadcastResult::new();
         for group in self.resolve_targets(msg) {

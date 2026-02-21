@@ -57,7 +57,7 @@ pub async fn apply_media_understanding(
     let mut applied_image = false;
     let mut applied_audio = false;
     let mut applied_video = false;
-    let applied_file = false;
+    let mut applied_file = false;
 
     let tasks: Vec<_> = capabilities
         .into_iter()
@@ -90,8 +90,27 @@ pub async fn apply_media_understanding(
         all_outputs.extend(outputs);
     }
 
-    // TODO: Add file extraction logic here
-    // applied_file = extract_file_blocks(...)
+    // Basic file extraction for non image/audio/video attachments.
+    for att in attachments {
+        let kind = crate::media_understanding::attachments::resolve_attachment_kind(att);
+        if kind == "unknown" {
+            let locator = att
+                .path
+                .as_ref()
+                .cloned()
+                .or_else(|| att.url.as_ref().cloned())
+                .unwrap_or_else(|| "(unknown source)".to_string());
+            all_outputs.push(MediaUnderstandingOutput {
+                kind: "file.extract".to_string(),
+                text: format!("File attachment detected: {}", locator),
+                attachment_index: att.index,
+                provider: None,
+                model: None,
+                confidence: None,
+            });
+            applied_file = true;
+        }
+    }
 
     Ok(ApplyMediaUnderstandingResult {
         outputs: all_outputs,
@@ -234,8 +253,8 @@ async fn run_capability(
 
         attachment_decisions.push(crate::media_understanding::types::AttachmentDecision {
             attachment_index: attachment.index,
+            chosen: attempts.iter().find(|a| a.outcome == "success").cloned(),
             attempts,
-            chosen: None, // TODO: select best
         });
     }
 

@@ -237,3 +237,40 @@ cargo build                 # check compilation
 | 22 | `shared` utilities (all 17 files) | ✅ |
 | 23 | `.github` workflows and templates adaptation | ✅ |
 | 24 | `wizard` onboarding (prompts, session, gateway config, completion, finalize) | ✅ |
+| 25 | De-mocking CLI commands & Wizard parity | ⏳ Planned |
+
+---
+
+## De-mocking Plan (CLI & Wizard Parity)
+
+During the rapid port to Rust, several CLI commands were provided with stubbed implementations (`format!("... (not yet implemented)")`) or simplified logic compared to the original Node.js OpenClaw codebase.
+
+### 1. Onboarding Wizard (`src/commands/onboard.rs`)
+
+* **OS Detection**: Implement checks for Windows/WSL2 and print the WSL2 recommendation banner.
+* **Security Warnings**: Add the detailed security baseline warning (sandbox, least-privilege tools, tailscale) and prompt for acknowledgment.
+* **Config Discovery**: Discover existing `gateway.port`, `gateway.bind`, and `models` from existing `openclaw.json` instead of starting from scratch every time.
+* **Channel Probing**: Fetch and display the status of all available channels (e.g., "Telegram: configured", "Feishu: install plugin to enable").
+* **Health Checks**: Attempt to connect to the Gateway WS endpoint (`ws://127.0.0.1...`) and report health status accurately during the "Restarting Gateway" phase.
+* **Browser Launch**: Automatically open the Web UI URL with the generated authentication token after onboarding.
+
+### 2. Administrative Commands (`src/commands/admin.rs`)
+
+* **Actual Implementations Needed**:
+  * `skills` (listing, fetching updates, enabling/disabling)
+  * `sandbox` (Docker container control)
+  * `nodes` (Device node management)
+  * `browser` (Chrome CDP profile management)
+  * `hooks` & `webhooks` (Listing and modifying hook configurations)
+  * `exec-approvals`
+  * `dns` & `directory`
+  * `system` & `devices`
+
+### 3. Task & State Management
+
+* **Cron** (`src/commands/cron.rs`): Implement `remove`, `enable`, and `disable`.
+* **Pairing** (`src/commands/pairing.rs`): Implement `revoke`.
+* **Channels** (`src/commands/channels.rs`): Implement actual `add` and `remove` logic against the active gateway.
+* **Sessions** (`src/commands/sessions.rs`): Implement `lock`, `unlock`, `archive`, and `delete`.
+* **Logs** (`src/commands/logs.rs`): Implement `--follow` tailing.
+* **Memory** (`src/commands/memory.rs`): Parity with SQLite-vec / LanceDB integrations.

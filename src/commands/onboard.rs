@@ -6,6 +6,7 @@
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use crate::config_io;
 
 /// Onboarding configuration result
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -157,16 +158,67 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     // ─────────────────────────────────────────────────────────────────────
     print_welcome_banner();
 
-    println!("This wizard will guide you through setting up your krabkrab assistant.\n");
+    if cfg!(target_os = "windows") {
+        println!("Windows detected — krabkrab runs great on WSL2!");
+        println!("Native Windows might be trickier.");
+        println!("Quick setup: wsl --install (one command, one reboot)");
+        println!("Guide: https://docs.openclaw.ai/windows\n");
+    }
+
+    println!("Security warning — please read.");
+    println!();
+    println!("krabkrab is a hobby project and still in beta. Expect sharp edges.");
+    println!("This bot can read files and run actions if tools are enabled.");
+    println!("A bad prompt can trick it into doing unsafe things.");
+    println!();
+    println!("If you’re not comfortable with basic security and access control, don’t run krabkrab.");
+    println!("Ask someone experienced to help before enabling tools or exposing it to the internet.");
+    println!();
+    println!("Recommended baseline:");
+    println!("- Pairing/allowlists + mention gating.");
+    println!("- Sandbox + least-privilege tools.");
+    println!("- Keep secrets out of the agent’s reachable filesystem.");
+    println!("- Use the strongest available model for any bot with tools or untrusted inboxes.");
+    println!();
+    println!("Run regularly:");
+    println!("krabkrab security audit --deep");
+    println!("krabkrab security audit --fix");
+    println!();
+    println!("Must read: https://docs.openclaw.ai/gateway/security\n");
 
     let ready = Confirm::with_theme(&theme)
-        .with_prompt("Ready to begin?")
-        .default(true)
+        .with_prompt("I understand this is powerful and inherently risky. Continue?")
+        .default(false)
         .interact()?;
 
     if !ready {
-        println!("Onboarding cancelled. Run 'krabkrab onboard' when you're ready.");
+        println!("Onboarding cancelled. Run 'krabkrab onboard' when you're ready to accept the risks.");
         return Ok(config);
+    }
+
+    // Probe existing config
+    let existing_cfg = config_io::load_config().ok();
+    if let Some(cfg) = &existing_cfg {
+        println!("\n{}", "━".repeat(60));
+        println!("Existing config detected");
+        println!("{}", "━".repeat(60));
+        
+        let ws = "none".to_string(); // Workspace might not be in config directly, or handled differently
+        let port = cfg.gateway.as_ref().and_then(|g| g.port).unwrap_or(18789);
+        println!("workspace: {}", ws);
+        println!("gateway.port: {}", port);
+        
+        let use_existing = Confirm::with_theme(&theme)
+            .with_prompt("Use existing values where applicable?")
+            .default(true)
+            .interact()?;
+            
+        if use_existing {
+            if cfg.gateway.is_some() {
+                config.dashboard.enabled = true;
+                config.dashboard.bind = format!("127.0.0.1:{}", port);
+            }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -593,7 +645,16 @@ fn print_completion_banner(config: &OnboardingConfig) {
     println!();
     println!("  3. Open the dashboard:");
     if config.dashboard.enabled {
-        println!("     http://{}", config.dashboard.bind);
+        let url = format!("http://{}", config.dashboard.bind);
+        println!("     {}", url);
+        println!("     (Opening in browser...)");
+        
+        #[cfg(target_os = "windows")]
+        std::process::Command::new("cmd").args(["/c", "start", &url]).spawn().ok();
+        #[cfg(target_os = "macos")]
+        std::process::Command::new("open").arg(&url).spawn().ok();
+        #[cfg(target_os = "linux")]
+        std::process::Command::new("xdg-open").arg(&url).spawn().ok();
     }
     println!();
     println!("  4. Test your agent:");

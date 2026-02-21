@@ -53,11 +53,15 @@ pub fn configure_command_interactive() -> String {
 
     config.memory.provider = providers[selection].to_string();
 
-    // 3. Save Configuration (Mock for now, would save to file)
-    let toml = toml::to_string_pretty(&config).unwrap_or_default();
-
-    format!(
-        "✅ Configuration Completed!\n\nHere is your generated config:\n\n{}",
-        toml
-    )
+    // 3. Persist configuration
+    let openkrab_cfg = crate::config::app_to_openkrab_config(&config);
+    match crate::config::save_config(&openkrab_cfg) {
+        Ok(()) => {
+            let path = crate::config::resolve_config_path()
+                .map(|p| p.display().to_string())
+                .unwrap_or_else(|_| "(unknown path)".to_string());
+            format!("✅ Configuration saved to {}", path)
+        }
+        Err(e) => format!("❌ Failed to save configuration: {}", e),
+    }
 }

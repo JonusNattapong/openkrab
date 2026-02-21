@@ -303,15 +303,70 @@ pub fn read_path_param(
 
 /// Sanitize tool result images by removing or blurring sensitive content
 pub async fn sanitize_tool_result_images(
-    _result: &mut serde_json::Value,
-    _limits: Option<&ImageSanitizationLimits>,
+    result: &mut serde_json::Value,
+    limits: Option<&ImageSanitizationLimits>,
 ) -> Result<(), ToolInputError> {
-    // TODO: Implement image sanitization
-    // This would involve:
-    // 1. Extracting image data from the result
-    // 2. Applying sanitization (blur, redact, etc.)
-    // 3. Updating the result with sanitized images
+    sanitize_value_images(result, limits);
     Ok(())
+}
+
+fn sanitize_value_images(value: &mut serde_json::Value, limits: Option<&ImageSanitizationLimits>) {
+    match value {
+        serde_json::Value::Array(items) => {
+            for item in items {
+                sanitize_value_images(item, limits);
+            }
+        }
+        serde_json::Value::Object(map) => {
+            for (k, v) in map.iter_mut() {
+                match v {
+                    serde_json::Value::String(s) if is_image_like_key(k) => {
+                        *s = sanitize_image_string(s, limits);
+                    }
+                    _ => sanitize_value_images(v, limits),
+                }
+            }
+        }
+        serde_json::Value::String(s) => {
+            if s.starts_with("data:image/") {
+                *s = sanitize_image_string(s, limits);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn is_image_like_key(key: &str) -> bool {
+    let lower = key.to_ascii_lowercase();
+    lower.contains("image") || lower.contains("screenshot") || lower.contains("photo")
+}
+
+fn sanitize_image_string(input: &str, limits: Option<&ImageSanitizationLimits>) -> String {
+    let max_len = max_data_url_len(limits);
+    if input.starts_with("data:image/") && input.len() > max_len {
+        return format!("[redacted image data: {} chars]", input.len());
+    }
+
+    if input.starts_with("http://") || input.starts_with("https://") {
+        if let Some((base, _query)) = input.split_once('?') {
+            return base.to_string();
+        }
+    }
+
+    input.to_string()
+}
+
+fn max_data_url_len(limits: Option<&ImageSanitizationLimits>) -> usize {
+    let default_limit = 2_000_000usize;
+    let Some(limits) = limits else {
+        return default_limit;
+    };
+
+    let width = limits.max_width.unwrap_or(1024).clamp(64, 8192) as usize;
+    let height = limits.max_height.unwrap_or(1024).clamp(64, 8192) as usize;
+    let rgba_bytes = width.saturating_mul(height).saturating_mul(4);
+    let base64_len = rgba_bytes.saturating_mul(4) / 3;
+    base64_len.clamp(64_000, 8_000_000)
 }
 
 /// Image sanitization limits
@@ -400,5 +455,40 @@ mod tests {
         assert_eq!(gate("read", None), true);
         assert_eq!(gate("write", None), false);
         assert_eq!(gate("unknown", Some(true)), true);
+    }
+
+    #[tokio::test]
+    async fn test_sanitize_tool_result_images_redacts_large_data_url() {
+        let mut payload = serde_json::json!({
+            "image": format!("data:image/png;base64,{}", "A".repeat(3_000_000))
+        });
+
+        sanitize_tool_result_images(
+            &mut payload,
+            Some(&ImageSanitizationLimits {
+                max_width: Some(200),
+                max_height: Some(200),
+                quality: None,
+                format: None,
+            }),
+        )
+        .await
+        .unwrap();
+
+        let image = payload["image"].as_str().unwrap();
+        assert!(image.starts_with("[redacted image data:"));
+    }
+
+    #[tokio::test]
+    async fn test_sanitize_tool_result_images_strips_query_from_url() {
+        let mut payload = serde_json::json!({
+            "screenshot_url": "https://example.com/file.png?token=secret&x=1"
+        });
+
+        sanitize_tool_result_images(&mut payload, None).await.unwrap();
+        assert_eq!(
+            payload["screenshot_url"].as_str().unwrap(),
+            "https://example.com/file.png"
+        );
     }
 }

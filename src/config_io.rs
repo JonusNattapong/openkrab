@@ -3,10 +3,14 @@
 use crate::openkrab_config::OpenKrabConfig;
 use anyhow::{anyhow, bail, Result};
 use once_cell::sync::Lazy;
+use path_clean::PathClean;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::sync::RwLock;
 use std::time::SystemTime;
 
@@ -38,6 +42,10 @@ pub fn load_config() -> Result<OpenKrabConfig> {
 
 /// Load configuration from specific path with caching
 pub fn load_config_from_path(path: &Path) -> Result<OpenKrabConfig> {
+    if !path.exists() {
+        return Ok(OpenKrabConfig::default());
+    }
+
     let metadata = fs::metadata(path)?;
     let mtime = metadata.modified()?;
     let current_hash = compute_file_hash(path)?;
@@ -51,18 +59,17 @@ pub fn load_config_from_path(path: &Path) -> Result<OpenKrabConfig> {
 
     // Load fresh config
     let config = load_config_file(path)?;
-    let processed_config = process_config_includes(&config)?;
 
     // Update cache
     let cached = CachedConfig {
-        config: processed_config.clone(),
+        config: config.clone(),
         path: path.to_path_buf(),
         hash: current_hash,
         mtime,
     };
     *CONFIG_CACHE.write().unwrap() = Some(cached);
 
-    Ok(processed_config)
+    Ok(config)
 }
 
 /// Load configuration file without caching
@@ -71,8 +78,8 @@ pub fn load_config_file(path: &Path) -> Result<OpenKrabConfig> {
         return Ok(OpenKrabConfig::default());
     }
 
-    let content = fs::read_to_string(path)?;
-    let config = parse_config_json5(&content)?;
+    let content = fs::read_to_string(&path)?;
+    let config = parse_config_json5(&content, Some(path))?;
     Ok(config)
 }
 
@@ -134,9 +141,14 @@ pub fn resolve_config_path() -> Result<PathBuf> {
 }
 
 /// Parse JSON5 configuration content
-fn parse_config_json5(content: &str) -> Result<OpenKrabConfig> {
-    // For now, use JSON parsing. JSON5 support would require additional dependency
-    let config: OpenKrabConfig = serde_json::from_str(content)?;
+fn parse_config_json5(content: &str, base_path: Option<&Path>) -> Result<OpenKrabConfig> {
+    let parsed: Value = json5::from_str(content)?;
+    let resolved = if let Some(path) = base_path {
+        resolve_config_includes(parsed, path)?
+    } else {
+        parsed
+    };
+    let config: OpenKrabConfig = serde_json::from_value(resolved)?;
     Ok(config)
 }
 
@@ -146,15 +158,154 @@ pub fn load_config_value() -> Result<serde_json::Value> {
     if !path.exists() {
         return Ok(serde_json::json!({}));
     }
-    let content = fs::read_to_string(path)?;
-    let val: serde_json::Value = serde_json::from_str(&content)?;
-    Ok(val)
+    let content = fs::read_to_string(&path)?;
+    let parsed: Value = json5::from_str(&content)?;
+    resolve_config_includes(parsed, &path)
 }
 
-/// Process config includes (#include directives)
-fn process_config_includes(config: &OpenKrabConfig) -> Result<OpenKrabConfig> {
-    // TODO: Implement #include processing
-    Ok(config.clone())
+const INCLUDE_KEY: &str = "$include";
+const MAX_INCLUDE_DEPTH: usize = 10;
+
+fn resolve_config_includes(root: Value, config_path: &Path) -> Result<Value> {
+    let root_dir = config_path
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .to_path_buf();
+    resolve_includes_recursive(root, config_path, &root_dir, &mut vec![], 0)
+}
+
+fn resolve_includes_recursive(
+    node: Value,
+    current_path: &Path,
+    root_dir: &Path,
+    visited: &mut Vec<PathBuf>,
+    depth: usize,
+) -> Result<Value> {
+    if depth > MAX_INCLUDE_DEPTH {
+        bail!("Maximum include depth exceeded ({})", MAX_INCLUDE_DEPTH);
+    }
+
+    match node {
+        Value::Array(items) => {
+            let mut out = Vec::with_capacity(items.len());
+            for item in items {
+                out.push(resolve_includes_recursive(
+                    item,
+                    current_path,
+                    root_dir,
+                    visited,
+                    depth,
+                )?);
+            }
+            Ok(Value::Array(out))
+        }
+        Value::Object(mut obj) => {
+            let include_value = obj.remove(INCLUDE_KEY);
+            let mut processed_obj = serde_json::Map::new();
+            for (k, v) in obj {
+                processed_obj.insert(
+                    k,
+                    resolve_includes_recursive(v, current_path, root_dir, visited, depth)?,
+                );
+            }
+
+            if let Some(include_value) = include_value {
+                let included = resolve_include_value(
+                    include_value,
+                    current_path,
+                    root_dir,
+                    visited,
+                    depth + 1,
+                )?;
+                Ok(deep_merge(included, Value::Object(processed_obj)))
+            } else {
+                Ok(Value::Object(processed_obj))
+            }
+        }
+        other => Ok(other),
+    }
+}
+
+fn resolve_include_value(
+    include_value: Value,
+    current_path: &Path,
+    root_dir: &Path,
+    visited: &mut Vec<PathBuf>,
+    depth: usize,
+) -> Result<Value> {
+    match include_value {
+        Value::String(path) => load_included_file(&path, current_path, root_dir, visited, depth),
+        Value::Array(items) => {
+            let mut merged = Value::Object(serde_json::Map::new());
+            for item in items {
+                let Value::String(path) = item else {
+                    bail!("$include array entries must be strings");
+                };
+                let included = load_included_file(&path, current_path, root_dir, visited, depth)?;
+                merged = deep_merge(merged, included);
+            }
+            Ok(merged)
+        }
+        _ => bail!("$include must be a string or an array of strings"),
+    }
+}
+
+fn load_included_file(
+    include_path: &str,
+    current_path: &Path,
+    root_dir: &Path,
+    visited: &mut Vec<PathBuf>,
+    depth: usize,
+) -> Result<Value> {
+    let base_dir = current_path.parent().unwrap_or_else(|| Path::new("."));
+    let resolved = if Path::new(include_path).is_absolute() {
+        PathBuf::from(include_path)
+    } else {
+        base_dir.join(include_path)
+    };
+    let normalized = resolved.clean();
+
+    if !normalized.starts_with(root_dir) {
+        bail!(
+            "Include path escapes config directory: {} (root: {})",
+            normalized.display(),
+            root_dir.display()
+        );
+    }
+
+    if visited.iter().any(|p| p == &normalized) {
+        bail!("Circular include detected at {}", normalized.display());
+    }
+
+    let raw = fs::read_to_string(&normalized)
+        .map_err(|e| anyhow!("Failed to read include {}: {}", normalized.display(), e))?;
+    let parsed: Value = json5::from_str(&raw)
+        .map_err(|e| anyhow!("Failed to parse include {}: {}", normalized.display(), e))?;
+
+    visited.push(normalized.clone());
+    let resolved = resolve_includes_recursive(parsed, &normalized, root_dir, visited, depth)?;
+    visited.pop();
+    Ok(resolved)
+}
+
+fn deep_merge(target: Value, source: Value) -> Value {
+    match (target, source) {
+        (Value::Array(mut a), Value::Array(b)) => {
+            a.extend(b);
+            Value::Array(a)
+        }
+        (Value::Object(mut a), Value::Object(b)) => {
+            for (k, v) in b {
+                let merged = match a.remove(&k) {
+                    Some(existing) => deep_merge(existing, v),
+                    None => v,
+                };
+                a.insert(k, merged);
+            }
+            Value::Object(a)
+        }
+        (_, b) => b,
+    }
 }
 
 /// Compute file hash for cache validation
@@ -188,10 +339,80 @@ pub fn apply_env_substitution(config: &mut OpenKrabConfig) -> Result<()> {
 }
 
 /// Apply shell environment variables
-fn apply_shell_env(_config: &mut OpenKrabConfig, _timeout_ms: u64) -> Result<()> {
-    // This would require shell execution, simplified for now
-    // TODO: Implement actual shell env import
+fn apply_shell_env(config: &mut OpenKrabConfig, timeout_ms: u64) -> Result<()> {
+    let Some(env_cfg) = &config.env else {
+        return Ok(());
+    };
+
+    let mut expected_keys: Vec<String> = env_cfg.vars.keys().cloned().collect();
+    for (k, v) in &env_cfg.extra_vars {
+        if v.is_string() {
+            expected_keys.push(k.clone());
+        }
+    }
+    expected_keys.sort();
+    expected_keys.dedup();
+
+    if expected_keys.is_empty() {
+        return Ok(());
+    }
+
+    let shell_env = load_shell_env(timeout_ms)?;
+    for key in expected_keys {
+        if std::env::var(&key).is_ok() {
+            continue;
+        }
+        if let Some(value) = shell_env.get(&key) {
+            std::env::set_var(&key, value);
+        }
+    }
+
     Ok(())
+}
+
+fn load_shell_env(timeout_ms: u64) -> Result<HashMap<String, String>> {
+    let mut cmd = if cfg!(windows) {
+        let mut c = Command::new("cmd");
+        c.args(["/C", "set"]);
+        c
+    } else {
+        let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
+        let mut c = Command::new(shell);
+        c.args(["-lc", "env"]);
+        c
+    };
+
+    cmd.stdout(Stdio::piped());
+    cmd.stderr(Stdio::piped());
+
+    let mut child = cmd.spawn()?;
+    let started = std::time::Instant::now();
+    loop {
+        if child.try_wait()?.is_some() {
+            break;
+        }
+        if started.elapsed().as_millis() as u64 > timeout_ms {
+            let _ = child.kill();
+            let _ = child.wait();
+            bail!("Shell env import timed out after {}ms", timeout_ms);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+
+    let mut stdout = String::new();
+    if let Some(mut s) = child.stdout.take() {
+        let _ = s.read_to_string(&mut stdout);
+    }
+
+    let mut out = HashMap::new();
+    for line in stdout.lines() {
+        if let Some((k, v)) = line.split_once('=') {
+            if !k.trim().is_empty() {
+                out.insert(k.trim().to_string(), v.to_string());
+            }
+        }
+    }
+    Ok(out)
 }
 
 /// Apply inline environment variables
@@ -247,9 +468,49 @@ pub fn get_default_config() -> OpenKrabConfig {
 
 /// Migrate legacy configuration format
 pub fn migrate_legacy_config(legacy_content: &str) -> Result<OpenKrabConfig> {
-    // TODO: Implement legacy migration
-    // For now, try to parse as JSON
-    parse_config_json5(legacy_content)
+    let raw: Value = json5::from_str(legacy_content)?;
+
+    if let Ok(cfg) = serde_json::from_value::<OpenKrabConfig>(raw.clone()) {
+        return Ok(cfg);
+    }
+
+    if let Ok(app_cfg) = serde_json::from_value::<crate::config::AppConfig>(raw.clone()) {
+        return Ok(crate::config::app_to_openkrab_config(&app_cfg));
+    }
+
+    let mut app_cfg = crate::config::AppConfig::default();
+    if let Value::Object(obj) = raw {
+        if let Some(v) = obj.get("profile").and_then(|v| v.as_str()) {
+            app_cfg.profile = v.to_string();
+        }
+        if let Some(v) = obj.get("log_level").and_then(|v| v.as_str()) {
+            app_cfg.log_level = v.to_string();
+        }
+        if let Some(v) = obj.get("enable_telegram").and_then(|v| v.as_bool()) {
+            app_cfg.enable_telegram = v;
+        }
+        if let Some(v) = obj.get("enable_slack").and_then(|v| v.as_bool()) {
+            app_cfg.enable_slack = v;
+        }
+        if let Some(v) = obj.get("enable_discord").and_then(|v| v.as_bool()) {
+            app_cfg.enable_discord = v;
+        }
+        if let Some(v) = obj.get("enable_line").and_then(|v| v.as_bool()) {
+            app_cfg.enable_line = v;
+        }
+        if let Some(v) = obj.get("enable_whatsapp").and_then(|v| v.as_bool()) {
+            app_cfg.enable_whatsapp = v;
+        }
+        if let Some(v) = obj.get("enable_dashboard").and_then(|v| v.as_bool()) {
+            app_cfg.enable_dashboard = v;
+        }
+        if let Some(v) = obj.get("dashboard_bind").and_then(|v| v.as_str()) {
+            app_cfg.dashboard_bind = v.to_string();
+        }
+        return Ok(crate::config::app_to_openkrab_config(&app_cfg));
+    }
+
+    bail!("Unrecognized legacy config format")
 }
 
 #[cfg(test)]

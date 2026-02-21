@@ -1,4 +1,5 @@
 use crate::memory::schema;
+use crate::sessions::{Session, VerbosityLevel};
 use rusqlite::{Connection, Result};
 use serde::Serialize;
 use std::path::Path;
@@ -295,6 +296,122 @@ impl MemoryStore {
             results.push(row?);
         }
         Ok(results)
+    }
+
+    pub fn save_session(&self, session: &Session) -> Result<()> {
+        let transcript_json =
+            serde_json::to_string(&session.transcript).unwrap_or_else(|_| "[]".to_string());
+        let metadata_json =
+            serde_json::to_string(&session.metadata).unwrap_or_else(|_| "{}".to_string());
+        let created_at = session.created_at.timestamp();
+        let last_active = session.last_active.timestamp();
+        let elevated = if session.elevated { 1 } else { 0 };
+
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "INSERT OR REPLACE INTO sessions (
+                id, label, model_override, verbosity, send_policy, elevated, 
+                transcript, max_transcript, created_at, last_active, metadata
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+            rusqlite::params![
+                session.id,
+                session.label,
+                session.model_override,
+                session.verbosity.as_str(),
+                serde_json::to_string(&session.send_policy).unwrap_or_default(),
+                elevated,
+                transcript_json,
+                session.max_transcript as i64,
+                created_at,
+                last_active,
+                metadata_json
+            ],
+        )?;
+        Ok(())
+    }
+
+    pub fn load_session(&self, id: &str) -> Result<Option<Session>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare(
+            "SELECT id, label, model_override, verbosity, send_policy, elevated, 
+                    transcript, max_transcript, created_at, last_active, metadata 
+             FROM sessions WHERE id = ?1",
+        )?;
+
+        let mut rows = stmt.query([id])?;
+        if let Some(row) = rows.next()? {
+            let verbosity_str: String = row.get(3)?;
+            let send_policy_json: String = row.get(4)?;
+            let transcript_json: String = row.get(6)?;
+            let metadata_json: String = row.get(10)?;
+
+            let created_at_ts: i64 = row.get(8)?;
+            let last_active_ts: i64 = row.get(9)?;
+
+            let session = Session {
+                id: row.get(0)?,
+                label: row.get(1)?,
+                model_override: row.get(2)?,
+                verbosity: VerbosityLevel::from_str(&verbosity_str),
+                send_policy: serde_json::from_str(&send_policy_json).unwrap_or_default(),
+                elevated: row.get::<_, i32>(5)? != 0,
+                transcript: serde_json::from_str(&transcript_json).unwrap_or_default(),
+                max_transcript: row.get::<_, i64>(7)? as usize,
+                created_at: chrono::DateTime::from_timestamp(created_at_ts, 0).unwrap_or_default(),
+                last_active: chrono::DateTime::from_timestamp(last_active_ts, 0)
+                    .unwrap_or_default(),
+                metadata: serde_json::from_str(&metadata_json).unwrap_or_default(),
+            };
+            Ok(Some(session))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub fn list_sessions(&self) -> Result<Vec<Session>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare(
+            "SELECT id, label, model_override, verbosity, send_policy, elevated, 
+                    transcript, max_transcript, created_at, last_active, metadata 
+             FROM sessions ORDER BY last_active DESC",
+        )?;
+
+        let session_rows = stmt.query_map([], |row| {
+            let verbosity_str: String = row.get(3)?;
+            let send_policy_json: String = row.get(4)?;
+            let transcript_json: String = row.get(6)?;
+            let metadata_json: String = row.get(10)?;
+
+            let created_at_ts: i64 = row.get(8)?;
+            let last_active_ts: i64 = row.get(9)?;
+
+            Ok(Session {
+                id: row.get(0)?,
+                label: row.get(1)?,
+                model_override: row.get(2)?,
+                verbosity: VerbosityLevel::from_str(&verbosity_str),
+                send_policy: serde_json::from_str(&send_policy_json).unwrap_or_default(),
+                elevated: row.get::<_, i32>(5)? != 0,
+                transcript: serde_json::from_str(&transcript_json).unwrap_or_default(),
+                max_transcript: row.get::<_, i64>(7)? as usize,
+                created_at: chrono::DateTime::from_timestamp(created_at_ts, 0).unwrap_or_default(),
+                last_active: chrono::DateTime::from_timestamp(last_active_ts, 0)
+                    .unwrap_or_default(),
+                metadata: serde_json::from_str(&metadata_json).unwrap_or_default(),
+            })
+        })?;
+
+        let mut sessions = Vec::new();
+        for s in session_rows {
+            sessions.push(s?);
+        }
+        Ok(sessions)
+    }
+
+    pub fn delete_session(&self, id: &str) -> Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute("DELETE FROM sessions WHERE id = ?1", [id])?;
+        Ok(())
     }
 }
 

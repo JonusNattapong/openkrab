@@ -193,9 +193,39 @@ fn validate_models_config(
 
 /// Validate config object with plugins (full validation)
 pub fn validate_config_object_with_plugins(config: &OpenKrabConfig) -> ValidationResult<()> {
-    // For now, just do basic schema validation
-    // TODO: Add plugin-based validation
-    validate_config_schema(config)
+    validate_config_schema(config)?;
+
+    let mut errors = Vec::new();
+    if let Some(plugins) = &config.plugins {
+        if plugins.enabled {
+            if let Some(dirs) = &plugins.plugin_dirs {
+                let mut seen = std::collections::HashSet::new();
+                for (idx, dir) in dirs.iter().enumerate() {
+                    let trimmed = dir.trim();
+                    if trimmed.is_empty() {
+                        errors.push(ValidationError {
+                            field: format!("plugins.plugin_dirs[{}]", idx),
+                            message: "plugin directory must not be empty".to_string(),
+                        });
+                        continue;
+                    }
+
+                    if !seen.insert(trimmed.to_string()) {
+                        errors.push(ValidationError {
+                            field: format!("plugins.plugin_dirs[{}]", idx),
+                            message: "duplicate plugin directory entry".to_string(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors)
+    }
 }
 
 /// Validate config object (raw validation without plugins)

@@ -151,8 +151,16 @@ fn resolve_path(raw: &str, workspace_dir: &str) -> Result<String, String> {
     }
 
     if trimmed.starts_with('~') {
-        // TODO: Expand home directory
-        return Ok(trimmed.to_string());
+        let home = dirs::home_dir().ok_or_else(|| "home directory not found".to_string())?;
+        let suffix = trimmed
+            .trim_start_matches('~')
+            .trim_start_matches(['/', '\\']);
+        let expanded = if suffix.is_empty() {
+            home
+        } else {
+            home.join(suffix)
+        };
+        return Ok(expanded.to_string_lossy().to_string());
     }
 
     if std::path::Path::new(trimmed).is_absolute() {
@@ -168,8 +176,7 @@ fn resolve_interval_ms(raw: Option<String>) -> u64 {
     if value.is_empty() {
         return DEFAULT_QMD_INTERVAL_MS;
     }
-    // TODO: Parse duration like "5m"
-    DEFAULT_QMD_INTERVAL_MS
+    parse_duration_ms(value).unwrap_or(DEFAULT_QMD_INTERVAL_MS)
 }
 
 fn resolve_embed_interval_ms(raw: Option<String>) -> u64 {
@@ -177,8 +184,31 @@ fn resolve_embed_interval_ms(raw: Option<String>) -> u64 {
     if value.is_empty() {
         return DEFAULT_QMD_EMBED_INTERVAL_MS;
     }
-    // TODO: Parse duration like "60m"
-    DEFAULT_QMD_EMBED_INTERVAL_MS
+    parse_duration_ms(value).unwrap_or(DEFAULT_QMD_EMBED_INTERVAL_MS)
+}
+
+fn parse_duration_ms(input: &str) -> Option<u64> {
+    let s = input.trim().to_lowercase();
+    if s.is_empty() {
+        return None;
+    }
+
+    if let Ok(ms) = s.parse::<u64>() {
+        return Some(ms);
+    }
+
+    let split_idx = s.find(|c: char| !c.is_ascii_digit())?;
+    let (num_part, unit_part) = s.split_at(split_idx);
+    let n = num_part.parse::<u64>().ok()?;
+    let factor = match unit_part.trim() {
+        "ms" => 1,
+        "s" | "sec" | "secs" => 1_000,
+        "m" | "min" | "mins" => 60_000,
+        "h" | "hr" | "hrs" => 3_600_000,
+        "d" | "day" | "days" => 86_400_000,
+        _ => return None,
+    };
+    n.checked_mul(factor)
 }
 
 fn resolve_debounce_ms(raw: Option<u64>) -> u64 {
@@ -381,11 +411,13 @@ pub fn resolve_memory_backend_config(
         collections,
         sessions: resolve_session_config(Some(qmd_cfg.sessions), workspace_dir),
         update: QmdUpdateConfig {
-            interval_ms: resolve_interval_ms(Some("5m".to_string())), // TODO: proper parsing
+            interval_ms: resolve_interval_ms(Some(qmd_cfg.update.interval_ms.to_string())),
             debounce_ms: resolve_debounce_ms(Some(qmd_cfg.update.debounce_ms)),
             on_boot: qmd_cfg.update.on_boot,
             wait_for_boot_sync: qmd_cfg.update.wait_for_boot_sync,
-            embed_interval_ms: resolve_embed_interval_ms(Some("60m".to_string())), // TODO: proper parsing
+            embed_interval_ms: resolve_embed_interval_ms(Some(
+                qmd_cfg.update.embed_interval_ms.to_string(),
+            )),
             command_timeout_ms: resolve_timeout_ms(
                 Some(qmd_cfg.update.command_timeout_ms),
                 DEFAULT_QMD_COMMAND_TIMEOUT_MS,
@@ -439,5 +471,14 @@ mod tests {
         assert_eq!(resolve_search_mode(Some("query".to_string())), "query");
         assert_eq!(resolve_search_mode(Some("invalid".to_string())), "search");
         assert_eq!(resolve_search_mode(None), "search");
+    }
+
+    #[test]
+    fn test_parse_duration_ms() {
+        assert_eq!(parse_duration_ms("5000"), Some(5000));
+        assert_eq!(parse_duration_ms("5m"), Some(300000));
+        assert_eq!(parse_duration_ms("60s"), Some(60000));
+        assert_eq!(parse_duration_ms("2h"), Some(7200000));
+        assert_eq!(parse_duration_ms("invalid"), None);
     }
 }

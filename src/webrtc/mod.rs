@@ -40,7 +40,10 @@ pub struct WebRtcAnswer {
 }
 
 /// Start the WebRTC signaling service as an Axum router.
-pub fn webrtc_router() -> Router {
+pub fn webrtc_router<S>() -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
     Router::new().route("/offer", post(handle_webrtc_offer))
 }
 
@@ -127,11 +130,10 @@ async fn process_offer(offer: WebRtcOffer) -> Result<WebRtcAnswer> {
     ));
 
     // 6. Set Remote Description (the Offer)
-    let session_desc = RTCSessionDescription {
-        sdp_type: webrtc::peer_connection::sdp::sdp_type::RTCSdpType::Offer,
-        sdp: offer.sdp,
-        ..Default::default()
-    };
+    let mut session_desc = RTCSessionDescription::default();
+    session_desc.sdp_type = webrtc::peer_connection::sdp::sdp_type::RTCSdpType::Offer;
+    session_desc.sdp = offer.sdp;
+    
     peer_connection.set_remote_description(session_desc).await?;
 
 

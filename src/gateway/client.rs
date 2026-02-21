@@ -84,7 +84,7 @@ impl GatewayConnection {
         session_key: String,
         message: String,
         attachments: Option<Vec<crate::gateway::types::Attachment>>,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<GatewayMessage, Box<dyn std::error::Error + Send + Sync>> {
         let chat_msg = GatewayMessage::Chat {
             session_key,
             message,
@@ -93,9 +93,26 @@ impl GatewayConnection {
 
         self.send(chat_msg).await?;
 
-        // In a real implementation, we'd wait for a response
-        // For now, just return success
-        Ok(())
+        loop {
+            match self.receive().await? {
+                Some(GatewayMessage::Chat {
+                    session_key,
+                    message,
+                    attachments,
+                }) => {
+                    return Ok(GatewayMessage::Chat {
+                        session_key,
+                        message,
+                        attachments,
+                    });
+                }
+                Some(GatewayMessage::Error { code, message }) => {
+                    return Err(format!("Gateway error ({}): {}", code, message).into());
+                }
+                Some(_) => continue,
+                None => return Err("Connection closed while waiting for chat reply".into()),
+            }
+        }
     }
 
     /// Get server status

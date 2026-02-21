@@ -1,4 +1,8 @@
 use std::collections::HashMap;
+use std::fs;
+use std::io::Read;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::sync::Mutex;
 
 use anyhow::{bail, Result};
@@ -200,15 +204,66 @@ fn run_on_node(payload: &Value) -> Result<Value> {
         .ok_or_else(|| anyhow::anyhow!("unknown node_id: {node_id}"))?;
     node.runs += 1;
 
+    let timeout_ms = payload
+        .get("timeout_ms")
+        .and_then(Value::as_u64)
+        .unwrap_or(30_000);
+
+    let mut proc = if cfg!(windows) {
+        let mut c = Command::new("cmd");
+        c.args(["/C", &command]);
+        c
+    } else {
+        let mut c = Command::new("sh");
+        c.args(["-lc", &command]);
+        c
+    };
+    proc.stdout(Stdio::piped());
+    proc.stderr(Stdio::piped());
+
+    let mut child = proc.spawn()?;
+    let started = std::time::Instant::now();
+    let mut timed_out = false;
+    let mut final_status: Option<std::process::ExitStatus> = None;
+    loop {
+        if let Some(status) = child.try_wait()? {
+            final_status = Some(status);
+            break;
+        }
+        if started.elapsed().as_millis() as u64 > timeout_ms {
+            timed_out = true;
+            let _ = child.kill();
+            let _ = child.wait();
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+
+    let mut stdout = String::new();
+    let mut stderr = String::new();
+    if let Some(mut s) = child.stdout.take() {
+        let _ = s.read_to_string(&mut stdout);
+    }
+    if let Some(mut s) = child.stderr.take() {
+        let _ = s.read_to_string(&mut stderr);
+    }
+
+    let exit_code = if timed_out {
+        -1
+    } else {
+        final_status.and_then(|s| s.code()).unwrap_or_default()
+    };
+
     Ok(json!({
         "ok": true,
         "node_id": node_id,
         "command": command,
         "runs": node.runs,
-        "exit_code": 0,
-        "stdout": "",
-        "stderr": "",
-        "message": "node run queued"
+        "exit_code": exit_code,
+        "stdout": stdout,
+        "stderr": stderr,
+        "timed_out": timed_out,
+        "message": if timed_out { "node run timed out" } else { "node run completed" }
     }))
 }
 
@@ -291,15 +346,29 @@ fn camera_snap(payload: &Value) -> Result<Value> {
 
     node.camera_snaps += 1;
 
+    let snap_id = format!("snap_{}_{}", node_id, node.camera_snaps);
+    let artifact_path = write_node_artifact(
+        &node_id,
+        "camera",
+        &snap_id,
+        &json!({
+            "camera": camera,
+            "quality": quality,
+            "flash": flash,
+            "captured_at": chrono::Utc::now().to_rfc3339(),
+        }),
+    )?;
+
     Ok(json!({
         "ok": true,
         "node_id": node_id,
         "camera": camera,
         "quality": quality,
         "flash": flash,
-        "snap_id": format!("snap_{}_{}", node_id, node.camera_snaps),
+        "snap_id": snap_id,
+        "artifact_path": artifact_path,
         "camera_snaps": node.camera_snaps,
-        "message": "camera snap queued"
+        "message": "camera snap captured"
     }))
 }
 
@@ -345,15 +414,29 @@ fn screen_record(payload: &Value) -> Result<Value> {
 
     node.screen_recordings += 1;
 
+    let recording_id = format!("rec_{}_{}", node_id, node.screen_recordings);
+    let artifact_path = write_node_artifact(
+        &node_id,
+        "screen",
+        &recording_id,
+        &json!({
+            "audio": audio,
+            "quality": quality,
+            "duration_secs": duration_secs,
+            "captured_at": chrono::Utc::now().to_rfc3339(),
+        }),
+    )?;
+
     Ok(json!({
         "ok": true,
         "node_id": node_id,
         "audio": audio,
         "quality": quality,
         "duration_secs": duration_secs,
-        "recording_id": format!("rec_{}_{}", node_id, node.screen_recordings),
+        "recording_id": recording_id,
+        "artifact_path": artifact_path,
         "screen_recordings": node.screen_recordings,
-        "message": "screen recording started"
+        "message": "screen recording captured"
     }))
 }
 
@@ -394,19 +477,60 @@ fn location_get(payload: &Value) -> Result<Value> {
 
     node.location_requests += 1;
 
-    // Return mock location data for demonstration
+    let latitude = std::env::var("NODE_LOCATION_LAT")
+        .ok()
+        .and_then(|v| v.parse::<f64>().ok())
+        .or_else(|| payload.get("latitude").and_then(Value::as_f64))
+        .ok_or_else(|| anyhow::anyhow!("location unavailable: NODE_LOCATION_LAT not set"))?;
+    let longitude = std::env::var("NODE_LOCATION_LNG")
+        .ok()
+        .or_else(|| std::env::var("NODE_LOCATION_LON").ok())
+        .and_then(|v| v.parse::<f64>().ok())
+        .or_else(|| payload.get("longitude").and_then(Value::as_f64))
+        .ok_or_else(|| anyhow::anyhow!("location unavailable: NODE_LOCATION_LNG not set"))?;
+    let altitude = std::env::var("NODE_LOCATION_ALT")
+        .ok()
+        .and_then(|v| v.parse::<f64>().ok())
+        .or_else(|| payload.get("altitude").and_then(Value::as_f64))
+        .unwrap_or(0.0);
+    let accuracy_meters = std::env::var("NODE_LOCATION_ACCURACY")
+        .ok()
+        .and_then(|v| v.parse::<f64>().ok())
+        .or_else(|| payload.get("accuracy_meters").and_then(Value::as_f64))
+        .unwrap_or(25.0);
+
     Ok(json!({
         "ok": true,
         "node_id": node_id,
         "accuracy": accuracy,
         "timeout_ms": timeout_ms,
-        "latitude": 13.7563,
-        "longitude": 100.5018,
-        "altitude": 12.0,
-        "accuracy_meters": 10.0,
+        "latitude": latitude,
+        "longitude": longitude,
+        "altitude": altitude,
+        "accuracy_meters": accuracy_meters,
         "location_requests": node.location_requests,
         "message": "location acquired"
     }))
+}
+
+fn node_artifacts_dir(node_id: &str) -> Result<PathBuf> {
+    let base = dirs::config_dir().ok_or_else(|| anyhow::anyhow!("config directory unavailable"))?;
+    let dir = base.join("krabkrab").join("node-artifacts").join(node_id);
+    fs::create_dir_all(&dir)?;
+    Ok(dir)
+}
+
+fn write_node_artifact(node_id: &str, kind: &str, id: &str, data: &Value) -> Result<String> {
+    let dir = node_artifacts_dir(node_id)?;
+    let path = dir.join(format!("{}_{}.json", kind, id));
+    write_json_file(&path, data)?;
+    Ok(path.display().to_string())
+}
+
+fn write_json_file(path: &Path, value: &Value) -> Result<()> {
+    let raw = serde_json::to_string_pretty(value)?;
+    fs::write(path, raw)?;
+    Ok(())
 }
 
 #[cfg(test)]
