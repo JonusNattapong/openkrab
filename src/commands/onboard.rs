@@ -188,6 +188,40 @@ pub enum ResetScope {
     Full,
 }
 
+/// Gateway auth mode
+#[derive(Debug, Clone)]
+pub struct GatewaySettings {
+    pub port: u16,
+    pub bind: String,
+    pub auth_mode: String,
+    pub token: Option<String>,
+    pub password: Option<String>,
+    pub tailscale_mode: String,
+    pub custom_bind_host: Option<String>,
+}
+
+impl Default for GatewaySettings {
+    fn default() -> Self {
+        Self {
+            port: 18789,
+            bind: "loopback".to_string(),
+            auth_mode: "token".to_string(),
+            token: None,
+            password: None,
+            tailscale_mode: "off".to_string(),
+            custom_bind_host: None,
+        }
+    }
+}
+
+/// Onboarding mode (local or remote gateway)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum OnboardGatewayMode {
+    #[default]
+    Local,
+    Remote,
+}
+
 /// Run the interactive wizard onboarding flow
 pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     let theme = ColorfulTheme::default();
@@ -366,6 +400,91 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         println!("   - Provider: {}", config.llm.provider);
         println!("   - Model: {}", config.llm.model);
         println!("   - Dashboard: http://{}\n", config.dashboard.bind);
+
+        // QuickStart gateway settings
+        println!("{}", "━".repeat(60));
+        println!("🚀 QuickStart Gateway Settings");
+        println!("{}", "━".repeat(60));
+        println!("Gateway port: 18789");
+        println!("Gateway bind: Loopback (127.0.0.1)");
+        println!("Gateway auth: Token");
+        println!("Tailscale: Off");
+        println!();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // STEP X: GATEWAY CONFIGURATION (for Manual mode)
+    // ─────────────────────────────────────────────────────────────────────
+    if mode == OnboardMode::Manual {
+        println!("\n{}", "━".repeat(60));
+        println!("🌐 STEP X: Gateway Configuration");
+        println!("{}", "━".repeat(60));
+
+        // Port
+        let port_str = Input::with_theme(&theme)
+            .with_prompt("Gateway port")
+            .default("18789".to_string())
+            .interact_text()?;
+        let port: u16 = port_str.parse().unwrap_or(18789);
+
+        // Bind
+        let bind_options = vec!["loopback", "lan", "custom"];
+        let bind_selection = Select::with_theme(&theme)
+            .with_prompt("Gateway bind")
+            .default(0)
+            .items(&bind_options)
+            .interact()?;
+        let bind = bind_options[bind_selection].to_string();
+
+        // Auth mode
+        let auth_options = vec!["Token", "Password"];
+        let auth_selection = Select::with_theme(&theme)
+            .with_prompt("Gateway auth mode")
+            .default(0)
+            .items(&auth_options)
+            .interact()?;
+        let auth_mode = if auth_selection == 0 {
+            "token"
+        } else {
+            "password"
+        }
+        .to_string();
+
+        // Tailscale
+        let ts_options = vec!["Off", "Serve", "Funnel"];
+        let ts_selection = Select::with_theme(&theme)
+            .with_prompt("Tailscale exposure")
+            .default(0)
+            .items(&ts_options)
+            .interact()?;
+        let tailscale_mode = match ts_selection {
+            0 => "off",
+            1 => "serve",
+            _ => "funnel",
+        };
+
+        println!("\n✅ Gateway configured:");
+        println!("   - Port: {}", port);
+        println!("   - Bind: {}", bind);
+        println!("   - Auth: {}", auth_mode);
+        println!("   - Tailscale: {}", tailscale_mode);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // PROBE GATEWAY REACHABILITY
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("🔍 Checking gateway reachability...");
+    println!("{}", "━".repeat(60));
+
+    let gateway_url = "ws://127.0.0.1:18789";
+    let gateway_reachable = probe_gateway(gateway_url);
+
+    if gateway_reachable {
+        println!("✅ Gateway reachable at {}", gateway_url);
+    } else {
+        println!("⚠️  Gateway not detected at {}", gateway_url);
+        println!("   It will be started when you run 'krabkrab gateway start'");
     }
 
     println!("Security warning — please read.");
@@ -781,10 +900,13 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     // ─────────────────────────────────────────────────────────────────────
     // COMPLETION
     // ─────────────────────────────────────────────────────────────────────
-    print_completion_banner(&config);
+    let _hatch_choice = print_completion_banner_and_choice(&config)?;
 
     // Try to check gateway health if it's running
     check_gateway_health(&config);
+
+    // Setup shell completion
+    setup_shell_completion()?;
 
     Ok(config)
 }
@@ -884,6 +1006,60 @@ fn check_gateway_health(_config: &OnboardingConfig) {
     }
 }
 
+/// Probe if gateway is reachable at the given URL
+fn probe_gateway(url: &str) -> bool {
+    use std::net::TcpStream;
+    use std::time::Duration;
+
+    let addr = url
+        .strip_prefix("ws://")
+        .or_else(|| url.strip_prefix("http://"))
+        .unwrap_or(url);
+
+    if let Ok(_stream) = TcpStream::connect_timeout(
+        &addr
+            .parse()
+            .unwrap_or_else(|_| "127.0.0.1:18789".parse().unwrap()),
+        Duration::from_secs(2),
+    ) {
+        return true;
+    }
+    false
+}
+
+/// Setup shell completion for krabkrab
+fn setup_shell_completion() -> anyhow::Result<()> {
+    println!("\n{}", "🐚 Setting up shell completion...");
+
+    let shell = std::env::var("SHELL")
+        .ok()
+        .map(|s| {
+            if s.contains("zsh") {
+                "zsh"
+            } else if s.contains("bash") {
+                "bash"
+            } else if s.contains("fish") {
+                "fish"
+            } else {
+                "unknown"
+            }
+        })
+        .unwrap_or("unknown");
+
+    if shell == "unknown" {
+        println!("  ⚠️  Could not detect shell. Skipping completion setup.");
+        println!("  To set up manually, run:");
+        println!("    krabkrab completion --shell <bash|zsh|fish>");
+        return Ok(());
+    }
+
+    println!("  ✅ Shell completion available for {}", shell);
+    println!("  To enable, add to your shell config:");
+    println!("    source $(krabkrab completion --shell {})", shell);
+
+    Ok(())
+}
+
 /// Print the welcome banner
 fn print_welcome_banner() {
     println!();
@@ -896,11 +1072,13 @@ fn print_welcome_banner() {
     println!();
 }
 
-/// Print the completion banner
-fn print_completion_banner(config: &OnboardingConfig) {
+/// Print the completion banner and offer hatch choice
+pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::Result<String> {
+    let theme = ColorfulTheme::default();
+
     println!();
     println!("{}", "════════════════════════════════════════════════════");
-    println!("{}", "Onboarding complete.");
+    println!("{}", "Onboarding complete!");
     println!("{}", "════════════════════════════════════════════════════");
     println!();
     println!("Next steps:");
@@ -915,7 +1093,35 @@ fn print_completion_banner(config: &OnboardingConfig) {
     if config.dashboard.enabled {
         let url = format!("http://{}", config.dashboard.bind);
         println!("     {}", url);
-        println!("     (Opening in browser...)");
+    }
+    println!();
+    println!("  4. Test your agent:");
+    println!("     krabkrab ask \"Hello, {}!\"", config.agent.name);
+    println!();
+
+    // Hatch choice
+    println!("{}", "━".repeat(60));
+    println!("🐣 How do you want to start your agent?");
+    println!("{}", "━".repeat(60));
+
+    let hatch_options = vec!["Launch TUI (recommended)", "Open Web UI", "Do this later"];
+
+    let hatch_selection = Select::with_theme(&theme)
+        .with_prompt("Choose startup option")
+        .default(0)
+        .items(&hatch_options)
+        .interact()?;
+
+    let choice = match hatch_selection {
+        0 => "tui",
+        1 => "web",
+        _ => "later",
+    };
+
+    // Open browser for web option
+    if choice == "web" && config.dashboard.enabled {
+        let url = format!("http://{}", config.dashboard.bind);
+        println!("\n🌐 Opening Web UI...");
 
         #[cfg(target_os = "windows")]
         std::process::Command::new("cmd")
@@ -930,12 +1136,12 @@ fn print_completion_banner(config: &OnboardingConfig) {
             .spawn()
             .ok();
     }
-    println!();
-    println!("  4. Test your agent:");
-    println!("     krabkrab ask \"Hello, {}!\"", config.agent.name);
+
     println!();
     println!("For more help, run: krabkrab --help");
     println!();
+
+    Ok(choice.to_string())
 }
 
 /// Generate TOML configuration from OnboardingConfig
