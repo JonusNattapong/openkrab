@@ -1,0 +1,11 @@
+name = "weather"
+description = "Get weather information and forecasts"
+version = "1.0.0"
+enabled = false
+
+[install]
+required = []
+
+[tools]
+- weather_lookup
+- forecast

@@ -898,6 +898,81 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     }
 
     // ─────────────────────────────────────────────────────────────────────
+    // STEP 8: WORKSPACE SETUP
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("📁 STEP 8: Workspace Setup");
+    println!("{}", "━".repeat(60));
+
+    let home = dirs::home_dir().unwrap_or_else(|| std::path::PathBuf::from("."));
+    let base_dir = home.join(".openkrab");
+    let workspace_dir = base_dir.join("krabkrab-workspace");
+    let sessions_dir = base_dir.join("sessions");
+
+    // Create workspace directory
+    if let Err(e) = std::fs::create_dir_all(&workspace_dir) {
+        println!("  ⚠️  Could not create workspace: {}", e);
+    } else {
+        println!("  ✅ Workspace created: {}", workspace_dir.display());
+    }
+
+    // Create sessions directory
+    if let Err(e) = std::fs::create_dir_all(&sessions_dir) {
+        println!("  ⚠️  Could not create sessions dir: {}", e);
+    } else {
+        println!(
+            "  ✅ Sessions directory created: {}",
+            sessions_dir.display()
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // STEP 9: BOOTSTRAP SETUP
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("🐣 STEP 9: Bootstrap Message");
+    println!("{}", "━".repeat(60));
+    println!("Set a message to wake up your agent on first launch.\n");
+
+    let use_bootstrap = Confirm::with_theme(&theme)
+        .with_prompt("Enable bootstrap message?")
+        .default(true)
+        .interact()?;
+
+    if use_bootstrap {
+        let bootstrap_message = Input::with_theme(&theme)
+            .with_prompt("Wake-up message")
+            .default("Wake up, my friend!".to_string())
+            .interact_text()?;
+
+        // Save bootstrap to workspace
+        let bootstrap_file = workspace_dir.join("bootstrap.txt");
+        if let Err(e) = std::fs::write(&bootstrap_file, &bootstrap_message) {
+            println!("  ⚠️  Could not save bootstrap: {}", e);
+        } else {
+            println!("  ✅ Bootstrap message saved");
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // STEP 10: SKILLS SETUP
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("🧩 STEP 10: Skills Setup");
+    println!("{}", "━".repeat(60));
+
+    let skills_dir = base_dir.join("skills");
+    if let Err(e) = std::fs::create_dir_all(&skills_dir) {
+        println!("  ⚠️  Could not create skills dir: {}", e);
+    } else {
+        println!("  ✅ Skills directory created: {}", skills_dir.display());
+    }
+
+    println!("\n  Skills can extend your agent's capabilities.");
+    println!("  Add skills by placing skill files in the skills directory.");
+    println!("  Learn more: https://docs.openclaw.ai/tools/skills\n");
+
+    // ─────────────────────────────────────────────────────────────────────
     // COMPLETION
     // ─────────────────────────────────────────────────────────────────────
     let _hatch_choice = print_completion_banner_and_choice(&config)?;
