@@ -1487,6 +1487,18 @@ fn save_gateway_token(token: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// Load gateway token from credentials directory
+fn load_gateway_token() -> anyhow::Result<String> {
+    let home = dirs::home_dir().unwrap_or_else(|| std::path::PathBuf::from("."));
+    let token_file = home
+        .join(".openkrab")
+        .join("credentials")
+        .join("gateway_token");
+
+    let content = std::fs::read_to_string(token_file)?;
+    Ok(content.trim().to_string())
+}
+
 /// Setup shell completion for krabkrab
 fn setup_shell_completion() -> anyhow::Result<()> {
     println!("\n{}", "🐚 Setting up shell completion...");
@@ -1536,6 +1548,10 @@ fn print_welcome_banner() {
 pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::Result<String> {
     let theme = ColorfulTheme::default();
 
+    // Load gateway token for display
+    let gateway_token = load_gateway_token().ok();
+    let token_display = gateway_token.as_ref().map(|t| t.as_str());
+
     println!();
     println!("{}", "════════════════════════════════════════════════════");
     println!("{}", "Onboarding complete!");
@@ -1551,12 +1567,45 @@ pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::
     println!();
     println!("  3. Open the dashboard:");
     if config.dashboard.enabled {
-        let url = format!("http://{}", config.dashboard.bind);
-        println!("     {}", url);
+        let base_url = format!("http://{}", config.dashboard.bind);
+        println!("     {}", base_url);
+
+        // Show tokenized URL if token exists
+        if let Some(token) = token_display {
+            let tokenized_url = format!("{}#token={}", base_url, token);
+            println!("     (with token: {})", tokenized_url);
+        }
     }
     println!();
-    println!("  4. Test your agent:");
+    println!("  4. Gateway token:");
+    if let Some(token) = token_display {
+        println!("     Token: {}", token);
+        println!("     View: krabkrab config get gateway.auth.token");
+    } else {
+        println!("     Generate: krabkrab doctor --generate-gateway-token");
+    }
+    println!();
+    println!("  5. Test your agent:");
     println!("     krabkrab ask \"Hello, {}!\"", config.agent.name);
+    println!();
+
+    // Optional apps
+    println!("{}", "━".repeat(60));
+    println!("📱 Optional Apps");
+    println!("{}", "━".repeat(60));
+    println!("Add nodes for extra features:");
+    println!("  - macOS app (system + notifications)");
+    println!("  - iOS app (camera/canvas)");
+    println!("  - Android app (camera/canvas)");
+    println!("Learn more: https://docs.openclaw.ai/nodes");
+    println!();
+
+    // Control UI info
+    println!("{}", "━".repeat(60));
+    println!("🌐 Control UI");
+    println!("{}", "━".repeat(60));
+    println!("Docs: https://docs.openclaw.ai/web/control-ui");
+    println!("Open anytime: krabkrab dashboard --no-open");
     println!();
 
     // Hatch choice
