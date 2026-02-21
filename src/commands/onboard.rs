@@ -3,10 +3,10 @@
 //! Provides an interactive step-by-step wizard for first-time users to configure
 //! their krabkrab assistant, including agent identity, channels, memory, and providers.
 
+use crate::config_io;
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use crate::config_io;
 
 /// Onboarding configuration result
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -171,8 +171,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     println!("This bot can read files and run actions if tools are enabled.");
     println!("A bad prompt can trick it into doing unsafe things.");
     println!();
-    println!("If you’re not comfortable with basic security and access control, don’t run krabkrab.");
-    println!("Ask someone experienced to help before enabling tools or exposing it to the internet.");
+    println!(
+        "If you’re not comfortable with basic security and access control, don’t run krabkrab."
+    );
+    println!(
+        "Ask someone experienced to help before enabling tools or exposing it to the internet."
+    );
     println!();
     println!("Recommended baseline:");
     println!("- Pairing/allowlists + mention gating.");
@@ -192,7 +196,9 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         .interact()?;
 
     if !ready {
-        println!("Onboarding cancelled. Run 'krabkrab onboard' when you're ready to accept the risks.");
+        println!(
+            "Onboarding cancelled. Run 'krabkrab onboard' when you're ready to accept the risks."
+        );
         return Ok(config);
     }
 
@@ -202,17 +208,17 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         println!("\n{}", "━".repeat(60));
         println!("Existing config detected");
         println!("{}", "━".repeat(60));
-        
+
         let ws = "none".to_string(); // Workspace might not be in config directly, or handled differently
         let port = cfg.gateway.as_ref().and_then(|g| g.port).unwrap_or(18789);
         println!("workspace: {}", ws);
         println!("gateway.port: {}", port);
-        
+
         let use_existing = Confirm::with_theme(&theme)
             .with_prompt("Use existing values where applicable?")
             .default(true)
             .interact()?;
-            
+
         if use_existing {
             if cfg.gateway.is_some() {
                 config.dashboard.enabled = true;
@@ -580,60 +586,21 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
 /// Print the welcome banner
 fn print_welcome_banner() {
     println!();
-    println!(
-        "{}",
-        "╔═══════════════════════════════════════════════════════════╗"
-    );
-    println!(
-        "{}",
-        "║                                                           ║"
-    );
-    println!(
-        "{}",
-        "║     🦀 Welcome to krabkrab Onboarding Wizard! 🦀          ║"
-    );
-    println!(
-        "{}",
-        "║                                                           ║"
-    );
-    println!(
-        "{}",
-        "║     Your Personal AI Assistant - Rust Edition             ║"
-    );
-    println!(
-        "{}",
-        "║                                                           ║"
-    );
-    println!(
-        "{}",
-        "╚═══════════════════════════════════════════════════════════╝"
-    );
+    println!("{}", "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄");
+    println!("{}", "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██");
+    println!("{}", "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██");
+    println!("{}", "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██");
+    println!("{}", "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀");
+    println!("{}", "                  🦀 OPENKRAB 🦀                    ");
     println!();
 }
 
 /// Print the completion banner
 fn print_completion_banner(config: &OnboardingConfig) {
     println!();
-    println!(
-        "{}",
-        "╔═══════════════════════════════════════════════════════════╗"
-    );
-    println!(
-        "{}",
-        "║                                                           ║"
-    );
-    println!(
-        "{}",
-        "║              🎉 Onboarding Complete! 🎉                   ║"
-    );
-    println!(
-        "{}",
-        "║                                                           ║"
-    );
-    println!(
-        "{}",
-        "╚═══════════════════════════════════════════════════════════╝"
-    );
+    println!("{}", "════════════════════════════════════════════════════");
+    println!("{}", "Onboarding complete.");
+    println!("{}", "════════════════════════════════════════════════════");
     println!();
     println!("Next steps:");
     println!();
@@ -648,13 +615,19 @@ fn print_completion_banner(config: &OnboardingConfig) {
         let url = format!("http://{}", config.dashboard.bind);
         println!("     {}", url);
         println!("     (Opening in browser...)");
-        
+
         #[cfg(target_os = "windows")]
-        std::process::Command::new("cmd").args(["/c", "start", &url]).spawn().ok();
+        std::process::Command::new("cmd")
+            .args(["/c", "start", &url])
+            .spawn()
+            .ok();
         #[cfg(target_os = "macos")]
         std::process::Command::new("open").arg(&url).spawn().ok();
         #[cfg(target_os = "linux")]
-        std::process::Command::new("xdg-open").arg(&url).spawn().ok();
+        std::process::Command::new("xdg-open")
+            .arg(&url)
+            .spawn()
+            .ok();
     }
     println!();
     println!("  4. Test your agent:");
