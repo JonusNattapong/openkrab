@@ -79,6 +79,40 @@ pub struct DashboardConfig {
     pub bind: String,
 }
 
+/// Auth profile for LLM providers
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthProfile {
+    pub name: String,
+    pub provider: String,
+    pub auth_type: AuthType,
+    pub api_key: Option<String>,
+    pub base_url: Option<String>,
+}
+
+/// Auth type enum
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum AuthType {
+    ApiKey,
+    OAuth,
+    Keychain,
+    Environment,
+}
+
+impl Default for AuthType {
+    fn default() -> Self {
+        Self::ApiKey
+    }
+}
+
+/// Channel plugin definition
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChannelPlugin {
+    pub id: String,
+    pub name: String,
+    pub enabled: bool,
+    pub config: Option<serde_json::Value>,
+}
+
 impl Default for AgentDefinition {
     fn default() -> Self {
         Self {
@@ -754,6 +788,70 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     }
 
     // ─────────────────────────────────────────────────────────────────────
+    // STEP 3.5: AUTH PROFILES
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("🔐 STEP 3.5: Auth Profile Setup");
+    println!("{}", "━".repeat(60));
+    println!("Auth profiles allow you to manage multiple provider credentials.\n");
+
+    let auth_type_options = vec![
+        "API Key (direct input)",
+        "Environment variable",
+        "Keychain (macOS/Windows)",
+    ];
+    let auth_selection = Select::with_theme(&theme)
+        .with_prompt("Authentication method")
+        .default(0)
+        .items(&auth_type_options)
+        .interact()?;
+
+    let auth_type = match auth_selection {
+        0 => "api_key",
+        1 => "environment",
+        2 => "keychain",
+        _ => "api_key",
+    };
+
+    match auth_type {
+        "environment" => {
+            println!("  Using environment variable for authentication.");
+            println!(
+                "  Set {} before starting the gateway.",
+                match config.llm.provider.as_str() {
+                    "openai" => "OPENAI_API_KEY",
+                    "anthropic" => "ANTHROPIC_API_KEY",
+                    "gemini" => "GOOGLE_API_KEY",
+                    _ => "API_KEY",
+                }
+            );
+        }
+        "keychain" => {
+            #[cfg(target_os = "macos")]
+            {
+                println!("  macOS Keychain selected.");
+                println!(
+                    "  Run 'krabkrab auth store --provider {}' after onboarding.",
+                    config.llm.provider
+                );
+            }
+            #[cfg(target_os = "windows")]
+            {
+                println!("  Windows Credential Manager selected.");
+                println!(
+                    "  Run 'krabkrab auth store --provider {}' after onboarding.",
+                    config.llm.provider
+                );
+            }
+            #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+            {
+                println!("  Keychain not available on this platform. Using API key instead.");
+            }
+        }
+        _ => {}
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
     // STEP 4: MEMORY CONFIGURATION
     // ─────────────────────────────────────────────────────────────────────
     println!("\n{}", "━".repeat(60));
@@ -870,6 +968,17 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
             _ => {}
         }
     }
+
+    // Channel plugins info
+    println!("\n📦 Available channel plugins:");
+    println!("  - telegram: Telegram messaging");
+    println!("  - discord: Discord server");
+    println!("  - slack: Slack workspace");
+    println!("  - whatsapp: WhatsApp Business");
+    println!("  - line: LINE messaging");
+    println!("  - matrix: Matrix protocol");
+    println!("  - signal: Signal messaging");
+    println!("\n  Install more: krabkrab channels install <plugin>");
 
     // ─────────────────────────────────────────────────────────────────────
     // STEP 6: DASHBOARD CONFIGURATION
@@ -1106,6 +1215,46 @@ fn on_new_session(session: &Session) {
     }
 
     // ─────────────────────────────────────────────────────────────────────
+    // STEP 13: GATEWAY TOKEN GENERATION
+    // ─────────────────────────────────────────────────────────────────────
+    println!("\n{}", "━".repeat(60));
+    println!("🔑 STEP 13: Gateway Token Setup");
+    println!("{}", "━".repeat(60));
+
+    let generate_token = Confirm::with_theme(&theme)
+        .with_prompt("Generate a secure gateway token? (recommended)")
+        .default(true)
+        .interact()?;
+
+    let gateway_token = if generate_token {
+        let token = generate_gateway_token();
+        println!("  ✅ Generated gateway token: {}...", &token[..8]);
+        println!("  Token will be saved to configuration.");
+        Some(token)
+    } else {
+        let enter_token = Confirm::with_theme(&theme)
+            .with_prompt("Enter a custom token?")
+            .default(false)
+            .interact()?;
+
+        if enter_token {
+            Some(
+                Input::with_theme(&theme)
+                    .with_prompt("Enter custom token")
+                    .interact_text()?,
+            )
+        } else {
+            None
+        }
+    };
+
+    // Save token to credentials directory
+    if let Some(token) = &gateway_token {
+        save_gateway_token(token)?;
+        println!("  ✅ Token saved to ~/.openkrab/credentials/gateway_token");
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
     // COMPLETION
     // ─────────────────────────────────────────────────────────────────────
     let _hatch_choice = print_completion_banner_and_choice(&config)?;
@@ -1235,6 +1384,48 @@ fn probe_gateway(url: &str) -> bool {
     false
 }
 
+/// Generate a secure random gateway token
+fn generate_gateway_token() -> String {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+
+    let random: u64 = rand_simple();
+
+    format!("krab_{:x}{:x}", timestamp, random)
+}
+
+/// Simple pseudo-random number generator
+fn rand_simple() -> u64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos() as u64;
+
+    // Linear congruential generator
+    const A: u64 = 6364136223846793005;
+    const C: u64 = 1;
+    (A.wrapping_mul(nanos) ^ (nanos >> 17)).wrapping_add(C)
+}
+
+/// Save gateway token to credentials directory
+fn save_gateway_token(token: &str) -> anyhow::Result<()> {
+    let home = dirs::home_dir().unwrap_or_else(|| std::path::PathBuf::from("."));
+    let creds_dir = home.join(".openkrab").join("credentials");
+
+    std::fs::create_dir_all(&creds_dir)?;
+
+    let token_file = creds_dir.join("gateway_token");
+    std::fs::write(token_file, token)?;
+
+    Ok(())
+}
+
 /// Setup shell completion for krabkrab
 fn setup_shell_completion() -> anyhow::Result<()> {
     println!("\n{}", "🐚 Setting up shell completion...");
@@ -1326,23 +1517,57 @@ pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::
         _ => "later",
     };
 
-    // Open browser for web option
-    if choice == "web" && config.dashboard.enabled {
-        let url = format!("http://{}", config.dashboard.bind);
-        println!("\n🌐 Opening Web UI...");
+    // Handle user choice
+    match choice {
+        "tui" => {
+            println!("\n🐣 Launching TUI...");
+            println!("   Starting your agent with: 'Wake up, my friend!'\n");
 
-        #[cfg(target_os = "windows")]
-        std::process::Command::new("cmd")
-            .args(["/c", "start", &url])
-            .spawn()
-            .ok();
-        #[cfg(target_os = "macos")]
-        std::process::Command::new("open").arg(&url).spawn().ok();
-        #[cfg(target_os = "linux")]
-        std::process::Command::new("xdg-open")
-            .arg(&url)
-            .spawn()
-            .ok();
+            // Try to launch TUI
+            #[cfg(target_os = "windows")]
+            {
+                std::process::Command::new("cmd")
+                    .args(["/c", "start", "krabkrab", "tui"])
+                    .spawn()
+                    .ok();
+            }
+            #[cfg(target_os = "macos")]
+            {
+                std::process::Command::new("open")
+                    .args(["-a", "Terminal", "--args", "-c", "krabkrab tui"])
+                    .spawn()
+                    .ok();
+            }
+            #[cfg(target_os = "linux")]
+            {
+                std::process::Command::new("x-terminal-emulator")
+                    .args(["-e", "krabkrab tui"])
+                    .spawn()
+                    .ok();
+            }
+
+            // Fallback: show instructions
+            println!("   If TUI didn't start, run manually:");
+            println!("   krabkrab tui");
+        }
+        "web" => {
+            let url = format!("http://{}", config.dashboard.bind);
+            println!("\n🌐 Opening Web UI...");
+
+            #[cfg(target_os = "windows")]
+            std::process::Command::new("cmd")
+                .args(["/c", "start", &url])
+                .spawn()
+                .ok();
+            #[cfg(target_os = "macos")]
+            std::process::Command::new("open").arg(&url).spawn().ok();
+            #[cfg(target_os = "linux")]
+            std::process::Command::new("xdg-open")
+                .arg(&url)
+                .spawn()
+                .ok();
+        }
+        _ => {}
     }
 
     println!();
