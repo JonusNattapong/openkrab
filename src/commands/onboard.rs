@@ -349,15 +349,18 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         println!("{}", "━".repeat(60));
 
         match config_io::load_config() {
-            Ok(cfg) => {
-                if let Err(e) = config_io::validate_config(&cfg) {
-                    println!("\n⚠️  Configuration is invalid!");
-                    println!("Error: {}", e);
-                    println!("\nRun 'krabkrab doctor' to fix, then re-run onboarding.");
-                    return Err(anyhow::anyhow!("Invalid configuration"));
+            Ok(cfg) => match config_io::validate_config(&cfg) {
+                Ok(_) => {
+                    println!("  ✅ Configuration is valid");
                 }
-                println!("  ✅ Configuration is valid");
-            }
+                Err(e) => {
+                    println!("\n⚠️  Configuration is invalid!");
+                    println!("\nValidation errors:");
+                    println!("  - {}", e.to_string().replace("\n", "\n  - "));
+                    println!("\nRun 'krabkrab doctor' to fix, then re-run onboarding.");
+                    return Err(anyhow::anyhow!("Invalid configuration: {}", e));
+                }
+            },
             Err(e) => {
                 println!("\n⚠️  Could not load configuration: {}", e);
                 println!("  Will create a new configuration.");
@@ -729,10 +732,29 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     }
     .to_string();
 
-    config.llm.model = Input::with_theme(&theme)
-        .with_prompt("Model name")
-        .default(default_model)
-        .interact_text()?;
+    // Model picker - show available models for provider
+    println!("\nAvailable models for {}:", config.llm.provider);
+
+    let models = get_available_models(&config.llm.provider);
+    for (i, model) in models.iter().enumerate() {
+        println!("  {}. {}", i + 1, model);
+    }
+    println!();
+
+    let model_selection = Select::with_theme(&theme)
+        .with_prompt("Select model (or enter custom)")
+        .default(0)
+        .items(&models)
+        .interact()?;
+
+    if model_selection < models.len() {
+        config.llm.model = models[model_selection].clone();
+    } else {
+        config.llm.model = Input::with_theme(&theme)
+            .with_prompt("Model name")
+            .default(default_model)
+            .interact_text()?;
+    }
 
     // API Key for cloud providers
     if !["ollama"].contains(&config.llm.provider.as_str()) {
@@ -971,14 +993,19 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
 
     // Channel plugins info
     println!("\n📦 Available channel plugins:");
-    println!("  - telegram: Telegram messaging");
-    println!("  - discord: Discord server");
-    println!("  - slack: Slack workspace");
-    println!("  - whatsapp: WhatsApp Business");
-    println!("  - line: LINE messaging");
-    println!("  - matrix: Matrix protocol");
-    println!("  - signal: Signal messaging");
-    println!("\n  Install more: krabkrab channels install <plugin>");
+    println!("  Built-in:");
+    println!("    ✓ telegram   - Telegram messaging");
+    println!("    ✓ discord    - Discord server");
+    println!("    ✓ slack      - Slack workspace");
+    println!("    ✓ whatsapp   - WhatsApp Business");
+    println!("    ✓ line       - LINE messaging");
+    println!("  Additional:");
+    println!("    ○ matrix     - Matrix protocol");
+    println!("    ○ signal     - Signal messaging");
+    println!("    ○ imessage   - Apple Messages");
+    println!();
+    println!("  Plugin registry: https://clawdhub.com");
+    println!("  Install more: krabkrab channels install <plugin>");
 
     // ─────────────────────────────────────────────────────────────────────
     // STEP 6: DASHBOARD CONFIGURATION
@@ -1382,6 +1409,40 @@ fn probe_gateway(url: &str) -> bool {
         return true;
     }
     false
+}
+
+/// Get available models for a provider
+fn get_available_models(provider: &str) -> Vec<String> {
+    match provider {
+        "openai" => vec![
+            "gpt-4o".to_string(),
+            "gpt-4o-mini".to_string(),
+            "gpt-4-turbo".to_string(),
+            "gpt-4".to_string(),
+            "gpt-3.5-turbo".to_string(),
+        ],
+        "anthropic" => vec![
+            "claude-sonnet-4-20250514".to_string(),
+            "claude-sonnet-3-5".to_string(),
+            "claude-3-opus-20240229".to_string(),
+            "claude-3-sonnet-20240229".to_string(),
+            "claude-3-haiku-20240307".to_string(),
+        ],
+        "gemini" => vec![
+            "gemini-2.0-flash".to_string(),
+            "gemini-1.5-pro".to_string(),
+            "gemini-1.5-flash".to_string(),
+            "gemini-pro".to_string(),
+        ],
+        "ollama" => vec![
+            "llama3".to_string(),
+            "llama2".to_string(),
+            "mistral".to_string(),
+            "codellama".to_string(),
+            "mixtral".to_string(),
+        ],
+        _ => vec!["gpt-4".to_string()],
+    }
 }
 
 /// Generate a secure random gateway token
