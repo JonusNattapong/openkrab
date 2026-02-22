@@ -389,7 +389,8 @@
       window.scrollTo(0, 0);
       contentEl.innerHTML = `<div style="text-align:center; padding-top: 100px;">Loading...</div>`;
 
-      const fullPath = path.endsWith('.md') ? path : `${path}.md`;
+      // Adjust path to look into the docs folder which is outside 'website'
+      const fullPath = path.endsWith('.md') ? `../docs/${path}` : `../docs/${path}.md`;
 
       try {
         const response = await fetch(fullPath);
