@@ -1,239 +1,443 @@
----
-summary: "OpenKrab is a personal AI assistant in Rust with multi-channel gateway capabilities."
-read_when:
-  - Introducing OpenKrab to newcomers
-title: "OpenKrab"
----
+<!DOCTYPE html>
+<html lang="en">
 
-# OpenKrab 🦀 <!-- deployment-trigger-2026-02-22 -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenKrab Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fragment+Mono:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-toml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <style>
+    :root {
+      --primary: #FF5A36;
+      --primary-light: #FF8A6B;
+      --bg-dark: #0f172a;
+      --bg-sidebar: #1e293b;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --border: #334155;
+      --accent-glow: rgba(255, 90, 54, 0.15);
+    }
 
-<p align="center">
-    <img
-        src="/assets/openkrab-logo-text-dark.png"
-        alt="OpenKrab"
-        width="500"
-        class="dark:hidden"
-    />
-    <img
-        src="/assets/openkrab-logo-text.png"
-        alt="OpenKrab"
-        width="500"
-        class="hidden dark:block"
-    />
-</p>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-> _"EXFOLIATE! EXFOLIATE!"_ — Molty, a space lobster
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-<p align="center">
-  <strong>High-performance AI assistant in Rust with multi-channel gateway.</strong><br />
-  Connect Telegram, Slack, Discord, WhatsApp, Signal, iMessage, and more to your personal AI.
-</p>
+    /* --- Sidebar --- */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+      z-index: 1000;
+    }
 
-<Columns>
-  <Card title="Get Started" href="/start/getting-started" icon="rocket">
-    Install OpenKrab and bring up the Gateway in minutes.
-  </Card>
-  <Card title="Configure" href="/start/configuration" icon="settings">
-    Set up your AI providers and messaging channels.
-  </Card>
-  <Card title="Web Dashboard" href="/web/dashboard" icon="layout-dashboard">
-    Launch the browser dashboard for chat, config, and sessions.
-  </Card>
-</Columns>
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
+      text-decoration: none;
+    }
 
-## What is OpenKrab?
+    .logo-container img {
+      height: 32px;
+    }
 
-OpenKrab is a **personal AI assistant** written in **Rust** that connects your favorite chat apps — Telegram, Slack, Discord, WhatsApp, Signal, iMessage, and more — to AI agents. It provides native performance, memory safety, and efficient resource usage for self-hosted deployment.
+    .nav-group {
+      margin-bottom: 1.5rem;
+    }
 
-**Who is it for?** Developers and power users who want a fast, secure, personal AI assistant they can message from anywhere — without giving up control of their data or relying on hosted services.
+    .nav-group-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
 
-**What makes it different?**
+    .nav-link {
+      display: block;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-- **Rust-powered**: Native performance, memory safety, single binary deployment
-- **Multi-channel**: One Gateway serves Telegram, Slack, Discord, WhatsApp, Signal, and more simultaneously
-- **AI-native**: Built for AI agents with tool use, sessions, memory (vector + text search), and multi-agent routing
-- **Voice-enabled**: Wake word detection, talk mode, VAD, and audio processing
-- **Plugin system**: WASM runtime with hot reload and sandboxing
-- **Open source**: MIT licensed, community-driven
+    .nav-link:hover {
+      color: var(--text-main);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
 
-**What do you need?** Rust 1.75+ (or pre-built binary), an API key (OpenAI/Anthropic/Gemini), and 5 minutes.
+    .nav-link.active {
+      color: var(--primary);
+      background-color: var(--accent-glow);
+      font-weight: 600;
+    }
 
-## How it works
+    /* --- Main Content --- */
+    main {
+      margin-left: 280px;
+      padding: 4rem 10%;
+      min-height: 100vh;
+      max-width: 1400px;
+    }
 
-```mermaid
-flowchart TB
-    subgraph Clients["Messaging Channels"]
-        Telegram["Telegram"]
-        Slack["Slack"]
-        Discord["Discord"]
-        WhatsApp["WhatsApp"]
-        Signal["Signal"]
-        iMessage["iMessage"]
-        WebChat["WebChat"]
-    end
+    #content {
+      animation: fadeIn 0.4s ease-out;
+    }
 
-    subgraph GatewayPlane["Gateway (Rust/Tokio)"]
-        GatewayCore["WebSocket and HTTP Server"]
-        Sessions["Sessions Manager"]
-        Channels["Channels Registry"]
-        Auth["Authentication & Rate Control"]
-    end
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
 
-    subgraph Runtime["Core Runtime"]
-        Agents["AI Agents"]
-        Memory["Memory (Vector + Text Search)"]
-        Providers["Model Providers"]
-        Tools["Tools (shell, web, media)"]
-    end
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-    subgraph Plugins["Plugin System"]
-        WASM["WASM Runtime"]
-        HotReload["Hot Reload"]
-    end
+    /* --- Typography --- */
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 1.5rem;
+      color: var(--text-main);
+    }
 
-    Telegram --> GatewayCore
-    Slack --> GatewayCore
-    Discord --> GatewayCore
-    WhatsApp --> GatewayCore
-    Signal --> GatewayCore
-    iMessage --> GatewayCore
-    WebChat --> GatewayCore
+    h1 {
+      font-size: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      margin-top: 0;
+    }
 
-    GatewayCore --> Agents
-    GatewayCore --> Memory
-    GatewayCore --> Providers
-    GatewayCore --> Tools
+    h2 {
+      font-size: 1.8rem;
+      margin-top: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
 
-    Agents --> Plugins
-```
+    h3 {
+      font-size: 1.4rem;
+      margin-top: 2rem;
+    }
 
-The Gateway is the single source of truth for sessions, routing, and channel connections.
+    p {
+      margin-bottom: 1.25rem;
+      color: var(--text-dim);
+    }
 
-## Key capabilities
+    code {
+      font-family: 'Fragment Mono', monospace;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: var(--primary-light);
+    }
 
-<Columns>
-  <Card title="Multi-channel gateway" icon="network">
-    Telegram, Slack, Discord, WhatsApp, Signal, iMessage with a single Gateway process.
-  </Card>
-  <Card title="Rust performance" icon="zap">
-    Native compiled binary, <100MB memory, instant startup.
-  </Card>
-  <Card title="Multi-agent routing" icon="route">
-    Isolated sessions per agent, workspace, or sender.
-  </Card>
-  <Card title="Memory system" icon="brain">
-    Hybrid vector + full-text search with temporal decay.
-  </Card>
-  <Card title="Voice system" icon="mic">
-    Wake word detection, VAD, talk mode, audio processing.
-  </Card>
-  <Card title="Plugin system" icon="plug">
-    WASM runtime with hot reload and sandboxing.
-  </Card>
-</Columns>
+    pre {
+      background-color: #1a1a1a !important;
+      padding: 1.5rem !important;
+      border-radius: 12px !important;
+      border: 1px solid var(--border) !important;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
 
-## Quick start
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      color: inherit;
+    }
 
-<Steps>
-  <Step title="Install OpenKrab">
-    ```bash
-    # From source
-    git clone https://github.com/openkrab/openkrab.git
-    cd openkrab
-    cargo build --release
-    ```
-  </Step>
-  <Step title="Configure and start the Gateway">
-    ```bash
-    # Set your AI provider
-    krabkrab config set providers.openai.api_key "sk-..."
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: border-bottom 0.2s;
+      border-bottom: 1px solid transparent;
+    }
 
-    # Start the gateway
-    krabkrab gateway --port 18789
-    ```
-  </Step>
-  <Step title="Send messages">
-    ```bash
-    krabkrab telegram --to @username --text "Hello from OpenKrab!"
-    krabkrab ask "What's on my calendar today?"
-    ```
-  </Step>
-</Steps>
+    a:hover {
+      border-bottom: 1px solid var(--primary);
+    }
 
-Need the full install and dev setup? See [Quick start](/start/quickstart).
+    ul,
+    ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-dim);
+    }
 
-## Dashboard
+    li {
+      margin-bottom: 0.5rem;
+    }
 
-Open the browser dashboard after the Gateway starts.
+    blockquote {
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.5rem;
+      background-color: var(--accent-glow);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
 
-- Local default: [http://127.0.0.1:18789/](http://127.0.0.1:18789/)
-- Remote access: [Web surfaces](/web) and [Tailscale](/gateway/tailscale)
+    img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin: 2rem 0;
+      border: 1px solid var(--border);
+    }
 
-## Configuration
+    /* --- Components --- */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 2.5rem 0;
+    }
 
-Config lives at `~/.config/krabkrab/config.toml`.
+    .card {
+      background-color: var(--bg-sidebar);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none !important;
+    }
 
-- If you **do nothing**, OpenKrab uses default settings with OpenAI provider.
-- If you want to lock it down, start with `channels.telegram.allow_from` and rate limiting.
+    .card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+    }
 
-Example:
+    .card h4 {
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
-```toml
-[channels.telegram]
-allow_from = ["@username"]
-rate_limit = 100
+    .card p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
 
-[providers.openai]
-api_key = "sk-..."
-model = "gpt-4o"
+    /* --- Scrollbar --- */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
 
-[memory]
-enabled = true
-embedding_provider = "openai"
-```
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
 
-## Start here
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
 
-<Columns>
-  <Card title="Docs hubs" href="/start/hubs" icon="book-open">
-    All docs and guides, organized by use case.
-  </Card>
-  <Card title="Configuration" href="/gateway/configuration" icon="settings">
-    Core Gateway settings, tokens, and provider config.
-  </Card>
-  <Card title="Remote access" href="/gateway/remote" icon="globe">
-    SSH and tailnet access patterns.
-  </Card>
-  <Card title="Channels" href="/channels/telegram" icon="message-square">
-    Channel-specific setup for Telegram, Slack, Discord, and more.
-  </Card>
-  <Card title="Voice System" href="/tools/voice" icon="mic">
-    Wake word, talk mode, VAD, and audio processing.
-  </Card>
-  <Card title="Help" href="/help" icon="life-buoy">
-    Common fixes and troubleshooting entry point.
-  </Card>
-</Columns>
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-dim);
+    }
 
-## Learn more
+    @media (max-width: 900px) {
+      #sidebar {
+        width: 0;
+        padding: 0;
+        display: none;
+      }
 
-<Columns>
-  <Card title="Full feature list" href="/concepts/features" icon="list">
-    Complete channel, routing, memory, and voice capabilities.
-  </Card>
-  <Card title="Memory System" href="/concepts/memory" icon="brain">
-    Hybrid search, embeddings, and knowledge base.
-  </Card>
-  <Card title="Multi-agent routing" href="/concepts/multi-agent" icon="route">
-    Workspace isolation and per-agent sessions.
-  </Card>
-  <Card title="Security" href="/gateway/security" icon="shield">
-    Tokens, allowlists, sandboxing, and safety controls.
-  </Card>
-  <Card title="Plugin System" href="/tools/plugin" icon="puzzle">
-    WASM runtime, hot reload, and sandboxing.
-  </Card>
-  <Card title="About and credits" href="/reference/credits" icon="info">
-    Project origins, contributors, and license.
-  </Card>
-</Columns>
+      main {
+        margin-left: 0;
+        padding: 2rem 5%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <aside id="sidebar">
+    <a href="#/index" class="logo-container">
+      <img src="assets/openkrab-logo-text.png" alt="OpenKrab Logo">
+    </a>
+    <div id="nav-list">
+      <!-- Navigation will be populated here -->
+    </div>
+  </aside>
+
+  <main>
+    <div id="content">
+      <center>
+        <div style="margin-top: 10vh;">
+          <h2 style="border:none">Loading OpenKrab Documentation...</h2>
+          <div style="color: var(--primary); font-size: 2rem;">🦀</div>
+        </div>
+      </center>
+    </div>
+  </main>
+
+  <script>
+    const contentEl = document.getElementById('content');
+    const navListEl = document.getElementById('nav-list');
+    const repoBase = window.location.pathname.startsWith('/openkrab') ? '/openkrab/' : '/';
+
+    // Custom renderer for Mintlify components
+    const renderer = new marked.Renderer();
+
+    // Handle Images - fix paths for subpaths
+    renderer.image = function (href, title, text) {
+      let cleanHref = href;
+      if (href.startsWith('/')) {
+        cleanHref = repoBase + href.substring(1);
+      }
+      return `<img src="${cleanHref}" alt="${text || ''}" title="${title || ''}">`;
+    };
+
+    marked.setOptions({
+      renderer: renderer,
+      highlight: function (code, lang) {
+        if (Prism.languages[lang]) {
+          return Prism.highlight(code, Prism.languages[lang], lang);
+        }
+        return code;
+      }
+    });
+
+    async function loadDocs() {
+      try {
+        const response = await fetch('docs.json');
+        const data = await response.json();
+        buildSidebar(data);
+        handleRouting();
+      } catch (err) {
+        console.error('Failed to load docs.json', err);
+        contentEl.innerHTML = `<h1>Error</h1><p>Failed to load documentation structure. Make sure docs.json exists.</p>`;
+      }
+    }
+
+    function buildSidebar(data) {
+      const enTab = data.navigation.languages[0].tabs[0]; // Just take first tab for now
+      let html = '';
+
+      enTab.groups.forEach(group => {
+        html += `<div class="nav-group">`;
+        html += `<div class="nav-group-title">${group.group}</div>`;
+
+        group.pages.forEach(page => {
+          const pagePath = typeof page === 'string' ? page : page.group;
+          const label = typeof page === 'string' ? page.split('/').pop().replace(/-/g, ' ') : page.group;
+          html += `<a href="#/${pagePath}" class="nav-link" data-path="${pagePath}">${label}</a>`;
+        });
+
+        html += `</div>`;
+      });
+
+      navListEl.innerHTML = html;
+
+      // Add click listeners
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+        });
+      });
+    }
+
+    async function navigate(path) {
+      window.scrollTo(0, 0);
+      contentEl.innerHTML = `<div style="text-align:center; padding-top: 100px;">Loading...</div>`;
+
+      const fullPath = path.endsWith('.md') ? path : `${path}.md`;
+
+      try {
+        const response = await fetch(fullPath);
+        if (!response.ok) throw new Error('Page not found');
+        let text = await response.text();
+
+        // Remove Frontmatter
+        text = text.replace(/^---[\s\S]*?---/, '');
+
+        // Transform custom Mintlify components to something we can style
+        text = text.replace(/<Columns>/g, '<div class="card-grid">');
+        text = text.replace(/<\/Columns>/g, '</div>');
+        text = text.replace(/<Card\s+title="([^"]+)"\s+href="([^"]+)"\s+icon="([^"]+)">([\s\S]*?)<\/Card>/g,
+          (match, title, href, icon, body) => `
+                <a href="#${href}" class="card">
+                    <h4>${title}</h4>
+                    <p>${body.trim()}</p>
+                </a>
+            `);
+
+        contentEl.innerHTML = marked.parse(text);
+
+        // Sync active state in sidebar
+        document.querySelectorAll('.nav-link').forEach(l => {
+          const linkPath = l.getAttribute('data-path');
+          if (path === linkPath || path === `/${linkPath}`) {
+            l.classList.add('active');
+          } else {
+            l.classList.remove('active');
+          }
+        });
+
+        Prism.highlightAllUnder(contentEl);
+      } catch (err) {
+        contentEl.innerHTML = `<h1>404</h1><p>The page <strong>${path}</strong> could not be found.</p>`;
+      }
+    }
+
+    function handleRouting() {
+      const hash = window.location.hash || '#/index';
+      const path = hash.substring(2);
+      navigate(path);
+    }
+
+    window.addEventListener('hashchange', handleRouting);
+    loadDocs();
+  </script>
+
+</body>
+
+</html>
