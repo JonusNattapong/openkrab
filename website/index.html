@@ -633,6 +633,18 @@
         // Fix absolute asset paths for GitHub Pages
         html = html.replace(/src="\/assets\//g, 'src="assets/');
 
+        // De-duplicate the main logo (it often appears twice for light/dark mode in original MD)
+        // We look for the main logo pattern and if it appears twice in a row, we remove the duplicates
+        const logoPattern = /<img[^>]*openkrab-logo-text[^>]*>/g;
+        const logos = html.match(logoPattern);
+        if (logos && logos.length > 1) {
+          // Keep only the first logo if they are identical or very similar brand images
+          const firstLogo = logos[0];
+          html = html.replace(logoPattern, (match, offset) => {
+            return offset === html.indexOf(firstLogo) ? match : '';
+          });
+        }
+
         // Strip leftover Mintlify tags
         html = html.replace(/<\/?(Note|Warning|Info|Tip)[^>]*>/g, '');
 
