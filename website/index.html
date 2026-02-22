@@ -178,7 +178,8 @@
     }
 
     .logo-img {
-      height: 48px !important;
+      height: auto !important;
+      max-height: 40px !important;
       width: auto;
       margin: 0 !important;
       border: none !important;
@@ -482,8 +483,7 @@
 
   <aside id="sidebar">
     <a href="#/index" class="logo-box">
-      <img src="assets/logo/logo-face-Photoroom.png" alt="OpenKrab Logo" class="logo-img">
-      <span>OpenKrab</span>
+      <img src="assets/logo/logo-long-Photoroom.png" alt="OpenKrab Logo" class="logo-img">
     </a>
     <div id="nav-container"></div>
   </aside>
@@ -629,6 +629,9 @@
 
         // 3. Final Render and Re-insertion
         let html = marked.parse(raw);
+
+        // Fix absolute asset paths for GitHub Pages
+        html = html.replace(/src="\/assets\//g, 'src="assets/');
 
         // Strip leftover Mintlify tags
         html = html.replace(/<\/?(Note|Warning|Info|Tip)[^>]*>/g, '');
