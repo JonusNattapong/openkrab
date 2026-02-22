@@ -568,24 +568,28 @@
         // 1. Remove Frontmatter
         raw = raw.replace(/^---[\s\S]*?---/, '');
 
-        // Detect the pattern with images and replace it with one official logo
-        const heroRegex = /<p align="center">[\s\S]*?<img[^>]+openkrab-logo-text[\s\S]*?<\/p>/;
-        if (heroRegex.test(raw)) {
-          raw = raw.replace(heroRegex, `
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <img src="assets/logo/logo-long-Photoroom.png" alt="OpenKrab Logo" style="width: 100%; max-width: 600px; border: none !important; box-shadow: none !important;">
-            </div>`);
-        }
-
-        // 3. Fix General Image Paths
-        // If an image path starts with /assets/ or assets/, prefix it with docs/ (except for our new logo folder)
-        raw = raw.replace(/src="(\/)?assets\/(?!logo\/)([^"]+)"/g, (m, s, p) => `src="docs/assets/${p}"`);
-        // Handle markdown style images too
-        raw = raw.replace(/!\[(.*?)\]\((\/)?assets\/(?!logo\/)([^"]+)\)/g, (m, alt, s, p) => `![${alt}](docs/assets/${p})`);
-
-        // 2. Extract and Placeholder Custom Components
+        // 2. Prep Placeholders
         const placeholders = [];
 
+        // 3. Fix Hero Section (Extract to placeholder to prevent code block rendering)
+        const heroRegex = /<p align="center">[\s\S]*?<img[^>]+openkrab-logo-text[\s\S]*?<\/p>/;
+        if (heroRegex.test(raw)) {
+          const id = `%%HERO_${placeholders.length}%%`;
+          placeholders.push({
+            id: id,
+            html: `
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <img src="assets/logo/logo-long-Photoroom.png" alt="OpenKrab Logo" style="width: 100%; max-width: 600px; border: none !important; box-shadow: none !important;">
+            </div>`
+          });
+          raw = raw.replace(heroRegex, id);
+        }
+
+        // 4. Fix General Image Paths (Exclude our official logo folder)
+        raw = raw.replace(/src="(\/)?assets\/(?!logo\/)([^"]+)"/g, (m, s, p) => `src="docs/assets/${p}"`);
+        raw = raw.replace(/!\[(.*?)\]\((\/)?assets\/(?!logo\/)([^"]+)\)/g, (m, alt, s, p) => `![${alt}](docs/assets/${p})`);
+
+        // 5. Extract Custom Components
         // Handle Columns & Cards together to maintain structure
         raw = raw.replace(/<Columns>([\s\S]*?)<\/Columns>/g, (match, content) => {
           const id = `%%COLUMNS_${placeholders.length}%%`;
@@ -609,7 +613,7 @@
           return id;
         });
 
-        // Handle standalone cards if any
+        // Handle standalone cards
         raw = raw.replace(/<Card\s+([^>]+)>([\s\S]*?)<\/Card>/g, (m, attrs, body) => {
           const id = `%%CARD_${placeholders.length}%%`;
           const title = (attrs.match(/title="([^"]+)"/) || [])[1] || 'Docs';
