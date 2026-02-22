@@ -5,7 +5,7 @@ read_when:
 title: "OpenKrab"
 ---
 
-# OpenKrab 🦀
+# OpenKrab 🦀 <!-- deployment-trigger-2026-02-22 -->
 
 <p align="center">
     <img
@@ -147,7 +147,7 @@ The Gateway is the single source of truth for sessions, routing, and channel con
     ```bash
     # Set your AI provider
     krabkrab config set providers.openai.api_key "sk-..."
-    
+
     # Start the gateway
     krabkrab gateway --port 18789
     ```
