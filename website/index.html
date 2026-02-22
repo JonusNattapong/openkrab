@@ -4,12 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenKrab Docs</title>
+  <title>OpenKrab | High-Performance AI Gateway</title>
+  <!-- Premium Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fragment+Mono:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
+
+  <!-- Scripts & Styles -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
@@ -17,16 +20,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-toml.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
   <style>
     :root {
       --primary: #FF5A36;
-      --primary-light: #FF8A6B;
-      --bg-dark: #0f172a;
-      --bg-sidebar: #1e293b;
+      --primary-rgb: 255, 90, 54;
+      --secondary: #FF8A6B;
+      --bg-deep: #020617;
+      --bg-card: #0f172a;
+      --bg-sidebar: #020617;
       --text-main: #f8fafc;
-      --text-dim: #94a3b8;
-      --border: #334155;
-      --accent-glow: rgba(255, 90, 54, 0.15);
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --selection: rgba(255, 90, 54, 0.3);
+      --glass: rgba(15, 23, 42, 0.8);
+      --sidebar-width: 300px;
     }
 
     * {
@@ -35,12 +43,89 @@
       padding: 0;
     }
 
+    ::selection {
+      background: var(--selection);
+      color: #fff;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg-dark);
+      background-color: var(--bg-deep);
       color: var(--text-main);
-      line-height: 1.6;
+      line-height: 1.7;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Custom Scrollbar --- */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-deep);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* --- Header --- */
+    header {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: var(--sidebar-width);
+      height: 64px;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+    }
+
+    .search-bar {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      width: 300px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .search-bar:hover {
+      border-color: var(--primary);
+    }
+
+    .header-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .header-links a {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .header-links a:hover {
+      color: var(--primary);
     }
 
     /* --- Sidebar --- */
@@ -48,249 +133,272 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 280px;
+      width: var(--sidebar-width);
       height: 100vh;
       background-color: var(--bg-sidebar);
       border-right: 1px solid var(--border);
-      padding: 2rem 1.5rem;
+      padding: 2.5rem 2rem;
       overflow-y: auto;
       z-index: 1000;
     }
 
-    .logo-container {
+    .logo-box {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
       text-decoration: none;
     }
 
-    .logo-container img {
-      height: 32px;
+    .logo-box span {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .nav-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
 
-    .nav-group-title {
+    .nav-title {
+      font-family: 'Outfit', sans-serif;
       font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-dim);
-      margin-bottom: 0.75rem;
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      opacity: 0.6;
     }
 
-    .nav-link {
+    .nav-item {
       display: block;
-      padding: 0.4rem 0.75rem;
-      font-size: 0.9rem;
-      color: var(--text-dim);
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
       text-decoration: none;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      border-radius: 8px;
+      margin-left: -12px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
     }
 
-    .nav-link:hover {
+    .nav-item:hover {
       color: var(--text-main);
-      background-color: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.03);
     }
 
-    .nav-link.active {
+    .nav-item.active {
       color: var(--primary);
-      background-color: var(--accent-glow);
+      background: rgba(var(--primary-rgb), 0.1);
+      border-color: rgba(var(--primary-rgb), 0.2);
       font-weight: 600;
     }
 
-    /* --- Main Content --- */
+    /* --- Content Area --- */
     main {
-      margin-left: 280px;
-      padding: 4rem 10%;
+      margin-left: var(--sidebar-width);
+      padding: 100px 10% 80px 10%;
       min-height: 100vh;
       max-width: 1400px;
     }
 
-    #content {
-      animation: fadeIn 0.4s ease-out;
+    #doc-content {
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    #doc-content.visible {
+      opacity: 1;
     }
 
-    /* --- Typography --- */
+    /* --- Markdown Styling --- */
     h1,
     h2,
     h3,
     h4 {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Outfit', sans-serif;
       margin-bottom: 1.5rem;
-      color: var(--text-main);
+      color: #fff;
+      font-weight: 600;
     }
 
     h1 {
-      font-size: 2.5rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
-      margin-top: 0;
+      font-size: 3rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 2.5rem;
     }
 
     h2 {
-      font-size: 1.8rem;
-      margin-top: 2.5rem;
+      font-size: 2rem;
+      margin-top: 4rem;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 0.5rem;
+      letter-spacing: -0.02em;
     }
 
     h3 {
-      font-size: 1.4rem;
-      margin-top: 2rem;
+      font-size: 1.5rem;
+      margin-top: 3rem;
     }
 
     p {
-      margin-bottom: 1.25rem;
-      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+      color: var(--text-muted);
+      font-size: 1.1rem;
     }
 
     code {
-      font-family: 'Fragment Mono', monospace;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 0.2rem 0.4rem;
-      border-radius: 4px;
-      font-size: 0.9em;
-      color: var(--primary-light);
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(30, 41, 59, 0.5);
+      color: var(--secondary);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
     }
 
     pre {
-      background-color: #1a1a1a !important;
-      padding: 1.5rem !important;
-      border-radius: 12px !important;
+      background: #0b0f19 !important;
+      padding: 2rem !important;
+      border-radius: 16px !important;
       border: 1px solid var(--border) !important;
-      margin-bottom: 2rem;
+      margin: 2rem 0;
       overflow-x: auto;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
     }
 
     pre code {
-      background-color: transparent;
+      background: none;
+      border: none;
       padding: 0;
-      color: inherit;
-    }
-
-    a {
-      color: var(--primary);
-      text-decoration: none;
-      transition: border-bottom 0.2s;
-      border-bottom: 1px solid transparent;
-    }
-
-    a:hover {
-      border-bottom: 1px solid var(--primary);
+      color: #e2e8f0;
     }
 
     ul,
     ol {
-      margin-left: 1.5rem;
-      margin-bottom: 1.5rem;
-      color: var(--text-dim);
+      margin: 0 0 1.5rem 1.5rem;
+      color: var(--text-muted);
     }
 
     li {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
     }
 
     blockquote {
+      background: linear-gradient(to right, rgba(var(--primary-rgb), 0.05), transparent);
       border-left: 4px solid var(--primary);
-      padding: 1rem 1.5rem;
-      background-color: var(--accent-glow);
-      border-radius: 0 8px 8px 0;
-      margin-bottom: 1.5rem;
+      padding: 1.5rem 2rem;
+      border-radius: 0 12px 12px 0;
+      margin: 2.5rem 0;
       font-style: italic;
+      color: var(--text-main);
+    }
+
+    a.text-link {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: 0.2s;
+    }
+
+    a.text-link:hover {
+      border-bottom-color: var(--primary);
     }
 
     img {
       max-width: 100%;
-      border-radius: 12px;
-      margin: 2rem 0;
+      border-radius: 20px;
+      margin: 3rem 0;
       border: 1px solid var(--border);
+      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
     }
 
-    /* --- Components --- */
+    /* --- Mintlify Components Fixes --- */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.5rem;
-      margin: 2.5rem 0;
+      margin: 3rem 0;
     }
 
-    .card {
-      background-color: var(--bg-sidebar);
+    .doc-card {
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
+      border-radius: 20px;
+      padding: 2rem;
       text-decoration: none !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: block;
+      height: 100%;
     }
 
-    .card:hover {
+    .doc-card:hover {
+      transform: translateY(-8px);
       border-color: var(--primary);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(var(--primary-rgb), 0.1);
     }
 
-    .card h4 {
-      margin-bottom: 0.5rem;
+    .doc-card h4 {
+      margin-bottom: 0.75rem;
       color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
     }
 
-    .card p {
-      font-size: 0.9rem;
+    .doc-card p {
+      font-size: 0.95rem;
       margin-bottom: 0;
+      color: var(--text-muted);
+      line-height: 1.6;
     }
 
-    /* --- Scrollbar --- */
-    ::-webkit-scrollbar {
-      width: 8px;
+    /* --- Transitions --- */
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      z-index: 10000;
+      animation: pulse 2s infinite;
+      display: none;
     }
 
-    ::-webkit-scrollbar-track {
-      background: var(--bg-dark);
+    @keyframes pulse {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
     }
 
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-dim);
-    }
-
-    @media (max-width: 900px) {
+    @media (max-width: 1000px) {
       #sidebar {
         width: 0;
-        padding: 0;
         display: none;
+      }
+
+      header {
+        left: 0;
+        padding: 0 1.5rem;
       }
 
       main {
         margin-left: 0;
-        padding: 2rem 5%;
+        padding: 100px 5% 40px 5%;
+      }
+
+      .search-bar {
+        width: 200px;
       }
     }
   </style>
@@ -298,45 +406,48 @@
 
 <body>
 
+  <div id="loader"></div>
+
   <aside id="sidebar">
-    <a href="#/index" class="logo-container">
-      <img src="assets/openkrab-logo-text.png" alt="OpenKrab Logo">
+    <a href="#/index" class="logo-box">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FF5A36" />
+        <path d="M2 17L12 22L22 17" stroke="#FF5A36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M2 12L12 17L22 12" stroke="#FF5A36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span>OpenKrab</span>
     </a>
-    <div id="nav-list">
-      <!-- Navigation will be populated here -->
-    </div>
+    <div id="nav-container"></div>
   </aside>
 
-  <main>
-    <div id="content">
-      <center>
-        <div style="margin-top: 10vh;">
-          <h2 style="border:none">Loading OpenKrab Documentation...</h2>
-          <div style="color: var(--primary); font-size: 2rem;">🦀</div>
-        </div>
-      </center>
+  <header>
+    <div class="search-bar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      Search documentation...
     </div>
+    <div class="header-links">
+      <a href="https://github.com/openkrab/openkrab" target="_blank">Repository</a>
+      <a href="https://github.com/openkrab/openkrab/releases" target="_blank">v2026.2.22</a>
+    </div>
+  </header>
+
+  <main>
+    <div id="doc-content"></div>
   </main>
 
   <script>
-    const contentEl = document.getElementById('content');
-    const navListEl = document.getElementById('nav-list');
-    const repoBase = window.location.pathname.startsWith('/openkrab') ? '/openkrab/' : '/';
+    const contentBox = document.getElementById('doc-content');
+    const navBox = document.getElementById('nav-container');
+    const loader = document.getElementById('loader');
 
-    // Custom renderer for Mintlify components
-    const renderer = new marked.Renderer();
-
-    // Handle Images - fix paths for subpaths
-    renderer.image = function (href, title, text) {
-      let cleanHref = href;
-      if (href.startsWith('/')) {
-        cleanHref = repoBase + href.substring(1);
-      }
-      return `<img src="${cleanHref}" alt="${text || ''}" title="${title || ''}">`;
-    };
-
+    // Configure Marked
     marked.setOptions({
-      renderer: renderer,
+      gfm: true,
+      breaks: true,
+      headerIds: true,
       highlight: function (code, lang) {
         if (Prism.languages[lang]) {
           return Prism.highlight(code, Prism.languages[lang], lang);
@@ -345,113 +456,106 @@
       }
     });
 
-    async function loadDocs() {
+    async function init() {
       try {
-        const response = await fetch('docs.json');
-        const data = await response.json();
-        buildSidebar(data);
-        handleRouting();
-      } catch (err) {
-        console.error('Failed to load docs.json', err);
-        contentEl.innerHTML = `<h1>Error</h1><p>Failed to load documentation structure. Make sure docs.json exists.</p>`;
+        const res = await fetch('docs.json');
+        const data = await res.json();
+        renderNav(data);
+        handleRoute();
+      } catch (e) {
+        contentBox.innerHTML = `<h1>System Error</h1><p>Documentation index (docs.json) not found.</p>`;
       }
     }
 
-    function buildSidebar(data) {
-      const enTab = data.navigation.languages[0].tabs[0]; // Just take first tab for now
+    function renderNav(data) {
+      const tab = data.navigation.languages[0].tabs[0];
       let html = '';
-
-      enTab.groups.forEach(group => {
+      tab.groups.forEach(group => {
         html += `<div class="nav-group">`;
-        html += `<div class="nav-group-title">${group.group}</div>`;
-
+        html += `<div class="nav-title">${group.group}</div>`;
         group.pages.forEach(page => {
-          const pagePath = typeof page === 'string' ? page : page.group;
-          const label = typeof page === 'string' ? page.split('/').pop().replace(/-/g, ' ') : page.group;
-          html += `<a href="#/${pagePath}" class="nav-link" data-path="${pagePath}">${label}</a>`;
+          const path = typeof page === 'string' ? page : page.group;
+          const name = typeof page === 'string' ? page.split('/').pop().replace(/-/g, ' ') : page.group;
+          html += `<a href="#/${path}" class="nav-item" data-path="${path}">${name}</a>`;
         });
-
         html += `</div>`;
       });
-
-      navListEl.innerHTML = html;
-
-      // Add click listeners
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-          document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-          link.classList.add('active');
-        });
-      });
+      navBox.innerHTML = html;
     }
 
-    async function navigate(path) {
-      window.scrollTo(0, 0);
-      contentEl.innerHTML = `<div style="text-align:center; padding-top: 100px;">Loading...</div>`;
+    async function loadPage(path) {
+      loader.style.display = 'block';
+      contentBox.classList.remove('visible');
 
-      // Adjust path to look into the docs folder which is outside 'website'
-      const fullPath = path.endsWith('.md') ? `../docs/${path}` : `../docs/${path}.md`;
+      const cleanPath = path.replace(/^\//, '');
+      const target = cleanPath.endsWith('.md') ? `../docs/${cleanPath}` : `../docs/${cleanPath}.md`;
 
       try {
-        const response = await fetch(fullPath);
-        if (!response.ok) throw new Error('Page not found');
-        let text = await response.text();
+        const res = await fetch(target);
+        if (!res.ok) throw new Error();
+        let raw = await res.text();
 
-        // Remove Frontmatter
-        text = text.replace(/^---[\s\S]*?---/, '');
+        // 1. Remove Frontmatter
+        raw = raw.replace(/^---[\s\S]*?---/, '');
 
-        // Transform custom Mintlify components to something we can style
-        text = text.replace(/<Columns>/g, '<div class="card-grid">');
-        text = text.replace(/<\/Columns>/g, '</div>');
+        // 2. Fix Indentation Issues (Pre-processing for Mintlify components)
+        // We strip leading whitespace inside Columns/Card tags to prevent marked from seeing code blocks
+        raw = raw.replace(/<Columns>([\s\S]*?)<\/Columns>/g, (m, content) => {
+          return `<Columns>${content.split('\n').map(line => line.trim()).join('\n')}</Columns>`;
+        });
 
-        // More robust regex for Card component
+        // 3. Render Custom Components
+        // Columns
+        raw = raw.replace(/<Columns>/g, '<div class="card-grid">');
+        raw = raw.replace(/<\/Columns>/g, '</div>');
+
+        // Cards
         const cardRegex = /<Card\s+([^>]+)>([\s\S]*?)<\/Card>/g;
-        text = text.replace(cardRegex, (match, attrs, body) => {
-          const titleMatch = attrs.match(/title="([^"]+)"/);
-          const hrefMatch = attrs.match(/href="([^"]+)"/);
-          const title = titleMatch ? titleMatch[1] : 'Docs';
-          const href = hrefMatch ? hrefMatch[1] : '#';
+        raw = raw.replace(cardRegex, (m, attrs, body) => {
+          const title = (attrs.match(/title="([^"]+)"/) || [])[1] || 'Documentation';
+          const href = (attrs.match(/href="([^"]+)"/) || [])[1] || '#';
+          // Remove any leftover markdown escaping/indentation inside body
+          const cleanBody = body.trim().replace(/^\s+|\s+$/gm, '');
           return `
-            <a href="#${href}" class="card">
-                <h4>${title}</h4>
-                <p>${body.trim()}</p>
-            </a>`;
+                <a href="#${href}" class="doc-card">
+                    <h4>${title}</h4>
+                    <p>${cleanBody}</p>
+                </a>`;
         });
 
-        // Clean up any remaining Mintlify tags if necessary
-        text = text.replace(/<[^>]+>/g, (m) => {
-          if (m.startsWith('<div') || m.startsWith('</div') || m.startsWith('<a') || m.startsWith('</a') || m.startsWith('<h') || m.startsWith('</h') || m.startsWith('<p') || m.startsWith('</p') || m.startsWith('<img') || m.startsWith('<br') || m.startsWith('<ul') || m.startsWith('<ol') || m.startsWith('<li')) {
-            return m;
-          }
-          return ''; // Strip unknown tags to avoid raw display
+        // Strip other Mintlify tags
+        raw = raw.replace(/<\/?(Steps|Step|Note|Warning|Info|Tip)[^>]*>/g, '');
+
+        // 4. Final Render
+        contentBox.innerHTML = marked.parse(raw);
+
+        // Highlight links
+        document.querySelectorAll('#doc-content a').forEach(a => a.classList.add('text-link'));
+        contentBox.querySelectorAll('a.doc-card').forEach(a => a.classList.remove('text-link'));
+
+        // Sync Nav
+        document.querySelectorAll('.nav-item').forEach(el => {
+          el.classList.toggle('active', el.getAttribute('data-path') === cleanPath);
         });
 
-        contentEl.innerHTML = marked.parse(text);
-
-        // Sync active state in sidebar
-        document.querySelectorAll('.nav-link').forEach(l => {
-          const linkPath = l.getAttribute('data-path');
-          if (path === linkPath || path === `/${linkPath}`) {
-            l.classList.add('active');
-          } else {
-            l.classList.remove('active');
-          }
-        });
-
-        Prism.highlightAllUnder(contentEl);
-      } catch (err) {
-        contentEl.innerHTML = `<h1>404</h1><p>The page <strong>${path}</strong> could not be found.</p>`;
+        contentBox.classList.add('visible');
+        Prism.highlightAllUnder(contentBox);
+        window.scrollTo(0, 0);
+      } catch (e) {
+        contentBox.innerHTML = `<h1>404 | Page Not Found</h1><p>We couldn't find the requested page: <code>${path}</code></p>`;
+        contentBox.classList.add('visible');
+      } finally {
+        loader.style.display = 'none';
       }
     }
 
-    function handleRouting() {
+    function handleRoute() {
       const hash = window.location.hash || '#/index';
-      const path = hash.substring(2);
-      navigate(path);
+      loadPage(hash.substring(2));
     }
 
-    window.addEventListener('hashchange', handleRouting);
-    loadDocs();
+    window.addEventListener('hashchange', handleRoute);
+    init();
   </script>
 
 </body>
