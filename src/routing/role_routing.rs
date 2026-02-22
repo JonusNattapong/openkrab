@@ -117,7 +117,12 @@ impl PriorityRoleRoutingRule {
     }
 
     /// Add a role with a numeric priority (higher = evaluated first).
-    pub fn add_role(mut self, priority: i32, role_id: impl Into<String>, target: DeliveryTarget) -> Self {
+    pub fn add_role(
+        mut self,
+        priority: i32,
+        role_id: impl Into<String>,
+        target: DeliveryTarget,
+    ) -> Self {
         self.entries.push((priority, role_id.into(), target));
         self.entries.sort_by(|a, b| b.0.cmp(&a.0));
         self
@@ -218,7 +223,10 @@ mod tests {
         ));
 
         let denied_ctx = ctx_with_roles(vec!["member"]);
-        assert!(matches!(rule.evaluate(&denied_ctx), RouteDecision::Drop { .. }));
+        assert!(matches!(
+            rule.evaluate(&denied_ctx),
+            RouteDecision::Drop { .. }
+        ));
     }
 
     #[test]
@@ -226,7 +234,11 @@ mod tests {
         let rule = PriorityRoleRoutingRule::new()
             .add_role(10, "owner", DeliveryTarget::new("discord", "owner-channel"))
             .add_role(5, "admin", DeliveryTarget::new("discord", "admin-channel"))
-            .add_role(1, "member", DeliveryTarget::new("discord", "member-channel"));
+            .add_role(
+                1,
+                "member",
+                DeliveryTarget::new("discord", "member-channel"),
+            );
 
         // User has both admin and member — should match admin (higher priority)
         let ctx = ctx_with_roles(vec!["member", "admin"]);

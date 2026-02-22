@@ -72,7 +72,8 @@ pub async fn monitor(state: std::sync::Arc<crate::gateway::GatewayState>, token:
                                                 &chat_id_str,
                                                 "Agent not available",
                                                 None,
-                                            ).await;
+                                            )
+                                            .await;
                                             return;
                                         }
                                     };

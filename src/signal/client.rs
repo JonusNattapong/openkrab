@@ -26,15 +26,15 @@ pub struct HealthCheckResponse {
 /// Perform health check on Signal daemon
 pub async fn health_check(url: &str) -> anyhow::Result<HealthCheckResponse> {
     let client = reqwest::Client::new();
-    let response = client
-        .get(format!("{}/health", url))
-        .send()
-        .await?;
-    
+    let response = client.get(format!("{}/health", url)).send().await?;
+
     if response.status().is_success() {
         let health = response.json::<HealthCheckResponse>().await?;
         Ok(health)
     } else {
-        Err(anyhow::anyhow!("Health check failed: {}", response.status()))
+        Err(anyhow::anyhow!(
+            "Health check failed: {}",
+            response.status()
+        ))
     }
 }

@@ -5,8 +5,7 @@ use anyhow::Result;
 use rand::Rng;
 
 use super::prompts::{
-    WizardConfirmParams, WizardPrompter, WizardSelectOption, WizardSelectParams,
-    WizardTextParams,
+    WizardConfirmParams, WizardPrompter, WizardSelectOption, WizardSelectParams, WizardTextParams,
 };
 use super::types::{
     GatewayAuthChoice, GatewayBindMode, GatewayWizardSettings, QuickstartGatewayDefaults,
@@ -227,16 +226,17 @@ pub async fn configure_gateway(
     }
 
     // Reset on exit
-    let tailscale_reset_on_exit = if tailscale_mode != TailscaleMode::Off && flow != WizardFlow::Quickstart {
-        prompter
-            .confirm(WizardConfirmParams {
-                message: "Reset Tailscale serve/funnel on exit?".to_string(),
-                initial_value: Some(false),
-            })
-            .await?
-    } else {
-        false
-    };
+    let tailscale_reset_on_exit =
+        if tailscale_mode != TailscaleMode::Off && flow != WizardFlow::Quickstart {
+            prompter
+                .confirm(WizardConfirmParams {
+                    message: "Reset Tailscale serve/funnel on exit?".to_string(),
+                    initial_value: Some(false),
+                })
+                .await?
+        } else {
+            false
+        };
 
     // Generate or prompt for token/password
     let gateway_token = if auth_mode == GatewayAuthChoice::Token {
@@ -247,7 +247,9 @@ pub async fn configure_gateway(
                 .text(WizardTextParams {
                     message: "Gateway token (blank to generate)".to_string(),
                     initial_value: defaults.token.clone(),
-                    placeholder: Some("Needed for multi-machine or non-loopback access".to_string()),
+                    placeholder: Some(
+                        "Needed for multi-machine or non-loopback access".to_string(),
+                    ),
                 })
                 .await?;
             let trimmed = input.trim().to_string();

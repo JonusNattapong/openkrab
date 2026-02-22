@@ -113,11 +113,10 @@ pub fn parse_content_type(value: Option<&str>) -> (Option<String>, Option<String
 
 pub fn normalize_mime_list(values: Option<&[String]>, fallback: &[&str]) -> HashSet<String> {
     match values {
-        Some(v) if !v.is_empty() => {
-            v.iter()
-                .filter_map(|s| normalize_mime_type(Some(s)))
-                .collect()
-        }
+        Some(v) if !v.is_empty() => v
+            .iter()
+            .filter_map(|s| normalize_mime_type(Some(s)))
+            .collect(),
         _ => fallback
             .iter()
             .filter_map(|s| normalize_mime_type(Some(s)))

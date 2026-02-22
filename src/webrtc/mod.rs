@@ -1,11 +1,7 @@
 //! WebRTC support for OpenKrab voice calling.
 
 use anyhow::{anyhow, Result};
-use axum::{
-    extract::Json,
-    routing::post,
-    Router,
-};
+use axum::{extract::Json, routing::post, Router};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use webrtc::{
@@ -111,31 +107,26 @@ async fn process_offer(offer: WebRtcOffer) -> Result<WebRtcAnswer> {
     });
 
     // Handle PeerConnection state changes
-    peer_connection.on_peer_connection_state_change(Box::new(
-        move |s: RTCPeerConnectionState| {
-            tracing::info!("Peer Connection State has changed: {}", s);
-            if s == RTCPeerConnectionState::Failed || s == RTCPeerConnectionState::Closed {
-                tracing::info!("Peer Connection finished");
-            }
-            Box::pin(async {})
-        },
-    ));
+    peer_connection.on_peer_connection_state_change(Box::new(move |s: RTCPeerConnectionState| {
+        tracing::info!("Peer Connection State has changed: {}", s);
+        if s == RTCPeerConnectionState::Failed || s == RTCPeerConnectionState::Closed {
+            tracing::info!("Peer Connection finished");
+        }
+        Box::pin(async {})
+    }));
 
     // Handle incoming tracks
-    peer_connection.on_track(Box::new(
-        move |track, _receiver, _receiver_track| {
-            tracing::info!("Received incoming track: {}", track.id());
-            Box::pin(async {})
-        },
-    ));
+    peer_connection.on_track(Box::new(move |track, _receiver, _receiver_track| {
+        tracing::info!("Received incoming track: {}", track.id());
+        Box::pin(async {})
+    }));
 
     // 6. Set Remote Description (the Offer)
     let mut session_desc = RTCSessionDescription::default();
     session_desc.sdp_type = webrtc::peer_connection::sdp::sdp_type::RTCSdpType::Offer;
     session_desc.sdp = offer.sdp;
-    
-    peer_connection.set_remote_description(session_desc).await?;
 
+    peer_connection.set_remote_description(session_desc).await?;
 
     // 7. Create Answer
     let answer = peer_connection.create_answer(None).await?;

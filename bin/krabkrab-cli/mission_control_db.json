@@ -1,0 +1,124 @@
+{
+  "boards": [
+    {
+      "id": "1",
+      "name": "Main Board"
+    },
+    {
+      "id": "2",
+      "name": "Development"
+    },
+    {
+      "id": "3",
+      "name": "Operations"
+    }
+  ],
+  "tasks": [
+    {
+      "assigned_agent": "Backend Engineer",
+      "id": "t1",
+      "status": "done",
+      "tags": [
+        "CI",
+        "Medium"
+      ],
+      "title": "PR hygiene automation: auto checklist/comment on PR"
+    },
+    {
+      "assigned_agent": "Backend Engineer",
+      "id": "t2",
+      "status": "todo",
+      "tags": [
+        "Security",
+        "Medium"
+      ],
+      "title": "Security: protect system against prompt injection"
+    },
+    {
+      "assigned_agent": "Docs+Frontend QA",
+      "id": "t3",
+      "status": "todo",
+      "tags": [
+        "Medium"
+      ],
+      "title": "Landing page design review + improvement"
+    },
+    {
+      "assigned_agent": "Backend Engineer",
+      "id": "t4",
+      "status": "in_progress",
+      "tags": [
+        "High"
+      ],
+      "title": "Implement standardized pagination + reusable list"
+    },
+    {
+      "assigned_agent": "Docs+Frontend QA",
+      "id": "t5",
+      "status": "in_progress",
+      "tags": [
+        "CI",
+        "High"
+      ],
+      "title": "Docs overhaul (Phase 2): Implement rancher-docs"
+    },
+    {
+      "assigned_agent": "Backend Engineer",
+      "id": "t6",
+      "status": "review",
+      "tags": [
+        "High"
+      ],
+      "title": "Fix: blocked task transitions should return 409/422"
+    },
+    {
+      "assigned_agent": "Backend Engineer",
+      "id": "t7",
+      "status": "review",
+      "tags": [
+        "High"
+      ],
+      "title": "Policy: enforce 1 DB migration per PR + audit open PRs"
+    },
+    {
+      "assigned_agent": "Unassigned",
+      "id": "t8",
+      "status": "done",
+      "tags": [
+        "High"
+      ],
+      "title": "GitHub PR #129: Fix agent task patch auth and add"
+    },
+    {
+      "assigned_agent": "Unassigned",
+      "id": "t9",
+      "status": "done",
+      "tags": [
+        "Reliability",
+        "Audit",
+        "High"
+      ],
+      "title": "Auth/Permissions: assigned agents can't PATCH tasks"
+    }
+  ],
+  "agents": [
+    {
+      "id": "a1",
+      "model": "gpt-4",
+      "name": "Backend Engineer",
+      "status": "active"
+    },
+    {
+      "id": "a2",
+      "model": "gpt-4-turbo",
+      "name": "Docs+Frontend QA",
+      "status": "active"
+    },
+    {
+      "id": "a3",
+      "model": "claude-3-opus",
+      "name": "Lead Agent",
+      "status": "idle"
+    }
+  ]
+}

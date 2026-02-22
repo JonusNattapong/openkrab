@@ -1,9 +1,11 @@
 use crate::media_understanding::attachments::{MediaAttachment, MediaAttachmentCache};
 use crate::media_understanding::resolve::{
-    resolve_max_bytes, resolve_scope_decision, resolve_timeout_ms, MediaContext as ResolveMediaContext,
+    resolve_max_bytes, resolve_scope_decision, resolve_timeout_ms,
+    MediaContext as ResolveMediaContext,
 };
 use crate::media_understanding::transcription_hooks::{
-    PostTranscriptionEvent, PreTranscriptionEvent, TranscriptionErrorEvent, TranscriptionHookRegistry,
+    PostTranscriptionEvent, PreTranscriptionEvent, TranscriptionErrorEvent,
+    TranscriptionHookRegistry,
 };
 use crate::media_understanding::types::MediaUnderstandingError;
 use crate::media_understanding::{MediaCapability, MediaUnderstandingProvider};
@@ -93,7 +95,8 @@ pub async fn transcribe_first_audio_with_options(
 
     // Check scope decision
     let resolve_ctx = to_resolve_context(ctx);
-    let scope_decision = resolve_scope_decision(&cfg.scope.clone().unwrap_or_default(), &resolve_ctx);
+    let scope_decision =
+        resolve_scope_decision(&cfg.scope.clone().unwrap_or_default(), &resolve_ctx);
     if scope_decision == crate::media_understanding::resolve::ScopePolicy::Deny {
         return Ok(None);
     }
@@ -162,8 +165,7 @@ pub async fn transcribe_first_audio_with_options(
                     let error_msg = format!("{:?}", e);
                     let retryable = matches!(
                         e,
-                        MediaUnderstandingError::Timeout
-                            | MediaUnderstandingError::FetchError(_)
+                        MediaUnderstandingError::Timeout | MediaUnderstandingError::FetchError(_)
                     );
 
                     // Fire error hook
@@ -181,8 +183,7 @@ pub async fn transcribe_first_audio_with_options(
                     // Log error but continue trying other providers
                     eprintln!(
                         "[audio_preflight] Audio transcription failed with provider {}: {}",
-                        provider_id,
-                        error_msg
+                        provider_id, error_msg
                     );
                 }
             }
@@ -206,7 +207,8 @@ pub async fn transcribe_all_audio(
     }
 
     let resolve_ctx = to_resolve_context(ctx);
-    let scope_decision = resolve_scope_decision(&cfg.scope.clone().unwrap_or_default(), &resolve_ctx);
+    let scope_decision =
+        resolve_scope_decision(&cfg.scope.clone().unwrap_or_default(), &resolve_ctx);
     if scope_decision == crate::media_understanding::resolve::ScopePolicy::Deny {
         return Ok(Vec::new());
     }
@@ -235,7 +237,10 @@ pub async fn transcribe_all_audio(
         {
             Ok(result) => result,
             Err(e) => {
-                eprintln!("[audio_preflight] Failed to get buffer for attachment {}: {}", attachment.index, e);
+                eprintln!(
+                    "[audio_preflight] Failed to get buffer for attachment {}: {}",
+                    attachment.index, e
+                );
                 continue;
             }
         };
@@ -294,8 +299,7 @@ pub async fn transcribe_all_audio(
                     let error_msg = format!("{:?}", e);
                     let retryable = matches!(
                         e,
-                        MediaUnderstandingError::Timeout
-                            | MediaUnderstandingError::FetchError(_)
+                        MediaUnderstandingError::Timeout | MediaUnderstandingError::FetchError(_)
                     );
 
                     // Fire error hook

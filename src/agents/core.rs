@@ -84,22 +84,15 @@ impl Agent {
         stream_handler: Option<crate::agents::streaming::StreamHandler>,
     ) -> Result<String> {
         // 1. Convert transcript to ChatMessages
-        let history: Vec<ChatMessage> = session
-            .transcript
-            .iter()
-            .cloned()
-            .map(Into::into)
-            .collect();
+        let history: Vec<ChatMessage> =
+            session.transcript.iter().cloned().map(Into::into).collect();
 
         // 2. Apply Compaction to history
         let context_window = crate::agents::compaction::resolve_context_window_tokens(None);
-        let compaction_msgs: Vec<crate::agents::compaction::CompactionMessage> =
-            history.into_iter().map(Into::into).collect();
-
         let compacted =
-            crate::agents::compaction::compact_transcript(&compaction_msgs, context_window, None);
+            crate::agents::compaction::compact_transcript(&history, context_window, None);
 
-        let mut messages: Vec<ChatMessage> = compacted.into_iter().map(Into::into).collect();
+        let mut messages = compacted;
 
         // 3. Prepend System Prompt (if not already summarized in compaction)
         messages.insert(

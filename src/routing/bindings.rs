@@ -11,27 +11,7 @@ use crate::routing::session_key::{normalize_account_id, normalize_agent_id};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-/// An agent binding that maps a channel + account to a specific agent.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AgentBinding {
-    /// Target agent ID.
-    #[serde(default)]
-    pub agent_id: String,
-    /// Match criteria.
-    #[serde(default)]
-    pub match_: BindingMatch,
-}
-
-/// Match criteria for a binding.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct BindingMatch {
-    /// Channel ID (e.g. "telegram", "slack", "discord").
-    #[serde(default)]
-    pub channel: Option<String>,
-    /// Account ID within the channel.
-    #[serde(default)]
-    pub account_id: Option<String>,
-}
+pub use crate::openkrab_config::{AgentBinding, BindingMatch};
 
 /// Binding configuration extracted from main config.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -67,7 +47,7 @@ struct ResolvedMatch {
 }
 
 fn resolve_binding_match(binding: &AgentBinding) -> Option<ResolvedMatch> {
-    let channel_id = normalize_channel_id(binding.match_.channel.as_deref())?;
+    let channel_id = normalize_channel_id(Some(&binding.match_.channel))?;
     let raw_account = binding
         .match_
         .account_id
@@ -168,12 +148,15 @@ pub fn resolve_agent_binding(
     account_id: &str,
 ) -> Option<String> {
     for binding in bindings {
-        let channel_match = binding.match_.channel.as_deref().unwrap_or("*");
+        let channel_match = binding.match_.channel.as_str();
+        if channel_match == "" {
+            continue; // Technically invalid to have empty channel, but just in case
+        }
+
         let account_match = binding.match_.account_id.as_deref().unwrap_or("*");
 
-        let channel_ok = channel_match == "*"
-            || channel_match == channel_id
-            || channel_match == target_channel;
+        let channel_ok =
+            channel_match == "*" || channel_match == channel_id || channel_match == target_channel;
         let account_ok = account_match == "*" || account_match == account_id;
 
         if channel_ok && account_ok {
@@ -193,8 +176,12 @@ mod tests {
         AgentBinding {
             agent_id: agent.to_string(),
             match_: BindingMatch {
-                channel: Some(channel.to_string()),
+                channel: channel.to_string(),
                 account_id: Some(account.to_string()),
+                peer: None,
+                guild_id: None,
+                team_id: None,
+                roles: None,
             },
         }
     }
@@ -265,10 +252,7 @@ mod tests {
             resolve_preferred_account_id(&["a".into()], "default", &[]),
             "a"
         );
-        assert_eq!(
-            resolve_preferred_account_id(&[], "default", &[]),
-            "default"
-        );
+        assert_eq!(resolve_preferred_account_id(&[], "default", &[]), "default");
     }
 
     #[test]
@@ -276,8 +260,12 @@ mod tests {
         let binding = AgentBinding {
             agent_id: "main".to_string(),
             match_: BindingMatch {
-                channel: Some("telegram".to_string()),
+                channel: "telegram".to_string(),
                 account_id: Some("*".to_string()),
+                peer: None,
+                guild_id: None,
+                team_id: None,
+                roles: None,
             },
         };
         let cfg = make_config(vec![binding]);

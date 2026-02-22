@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenKrab Mission Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #f3f4f6;
+            --bg-surface: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --primary: #3b82f6;
+            --border: #e5e7eb;
+            --column-inbox: #9ca3af;
+            --column-progress: #8b5cf6;
+            --column-review: #3b82f6;
+            --column-done: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 0;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--text-main);
+            font-size: 0.875rem;
+            display: block;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        .nav-group {
+            padding: 1.5rem 1rem 0;
+        }
+
+        .nav-group-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            padding: 0 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+        }
+
+        .nav-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .nav-item.active i {
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            height: 64px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .board-header {
+            padding: 2rem;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .board-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .board-header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .board-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+        }
+
+        .kanban-container {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 2rem;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        /* Agents Panel */
+        .agents-panel {
+            width: 250px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            flex-shrink: 0;
+            height: fit-content;
+        }
+
+        .agents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .agent-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .agent-item:last-child {
+            border-bottom: none;
+        }
+
+        .agent-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .agent-status {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: var(--column-done);
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .agent-info h4 {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .agent-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Kanban Board */
+        .kanban-board {
+            display: flex;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .kanban-column {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0 0.25rem;
+        }
+
+        .column-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .column-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .column-count {
+            background: var(--border);
+            padding: 0.125rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+
+        .task-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-bottom: 2rem;
+        }
+
+        /* Task Card */
+        .task-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .task-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tag {
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .tag-high {
+            color: var(--danger);
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .tag-medium {
+            color: var(--warning);
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+        }
+
+        .tag-ci {
+            color: var(--primary);
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+
+        .tag-security {
+            color: var(--danger);
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .task-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .task-assignee {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .task-assignee i {
+            font-size: 0.875rem;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-cube"></i>
+            <div>
+                OPENKRAB
+                <span>Mission Control</span>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Navigation</div>
+            <a class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+            <a class="nav-item"><i class="fa-solid fa-bolt"></i> Live feed</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Boards</div>
+            <a class="nav-item"><i class="fa-regular fa-folder"></i> Board groups</a>
+            <a class="nav-item active"><i class="fa-solid fa-layer-group"></i> Boards</a>
+            <a class="nav-item"><i class="fa-solid fa-tags"></i> Tags</a>
+            <a class="nav-item"><i class="fa-regular fa-circle-check"></i> Approvals</a>
+            <a class="nav-item"><i class="fa-solid fa-sliders"></i> Custom fields</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Skills</div>
+            <a class="nav-item"><i class="fa-solid fa-store"></i> Marketplace</a>
+            <a class="nav-item"><i class="fa-solid fa-box-open"></i> Packs</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Administration</div>
+            <a class="nav-item"><i class="fa-regular fa-building"></i> Organization</a>
+            <a class="nav-item"><i class="fa-solid fa-network-wired"></i> Gateways</a>
+            <a class="nav-item"><i class="fa-solid fa-robot"></i> Agents</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="btn" style="border: none; background: #f3f4f6;">
+                <i class="fa-solid fa-lock"></i> Personal
+            </div>
+            <div class="header-profile">
+                <div style="text-align: right; line-height: 1.2;">
+                    <div style="font-size: 0.875rem; font-weight: 500;">Operator</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Admin</div>
+                </div>
+                <div
+                    style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    OP</div>
+            </div>
+        </div>
+
+        <div class="board-header">
+            <h1>Misson Control App</h1>
+            <p>Keep tasks moving through your workflow.</p>
+            <div class="board-actions">
+                <button class="btn btn-primary">Board</button>
+                <button class="btn">List</button>
+                <button class="btn" style="color: var(--primary); border-color: var(--primary);"><i
+                        class="fa-solid fa-plus"></i></button>
+                <button class="btn"><i class="fa-solid fa-filter"></i></button>
+            </div>
+        </div>
+
+        <div class="kanban-container" id="kanban-area">
+            <!-- Agents Panel -->
+            <div class="agents-panel" id="agents-panel">
+                <div class="agents-header">
+                    <span>AGENTS <span
+                            style="color: var(--text-muted); font-weight: normal; margin-left: 0.25rem;">Loading...</span></span>
+                    <button class="btn" style="padding: 0.25rem 0.5rem;">Add</button>
+                </div>
+                <!-- Agent items will be inserted here by JS -->
+            </div>
+
+            <!-- Kanban Board -->
+            <div class="kanban-board">
+                <!-- Inbox -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <div class="column-title">
+                            <div class="column-dot" style="background: var(--column-inbox);"></div> Inbox
+                        </div>
+                        <div class="column-count">Loading...</div>
+                    </div>
+                    <div class="task-list" id="col-todo">
+                        <!-- Tasks will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- In Progress -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <div class="column-title">
+                            <div class="column-dot" style="background: var(--column-progress);"></div> In Progress
+                        </div>
+                        <div class="column-count">Loading...</div>
+                    </div>
+                    <div class="task-list" id="col-in_progress">
+                        <!-- Tasks will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Review -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <div class="column-title">
+                            <div class="column-dot" style="background: var(--column-review);"></div> Review
+                        </div>
+                        <div class="column-count">Loading...</div>
+                    </div>
+                    <div class="task-list" id="col-review">
+                        <!-- Tasks will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Done -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <div class="column-title">
+                            <div class="column-dot" style="background: var(--column-done);"></div> Done
+                        </div>
+                        <div class="column-count">Loading...</div>
+                    </div>
+                    <div class="task-list" id="col-done">
+                        <!-- Tasks will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and Render logic
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Promise.all([
+                fetchAndRenderTasks(),
+                fetchAndRenderAgents()
+            ]);
+        });
+
+        async function fetchAndRenderTasks() {
+            try {
+                const res = await fetch('/api/tasks');
+                const data = await res.json();
+                const tasks = data.tasks || [];
+
+                // Group tasks by status
+                const tasksByStatus = {
+                    'todo': [],
+                    'in_progress': [],
+                    'review': [],
+                    'done': []
+                };
+
+                tasks.forEach(task => {
+                    const status = task.status || 'todo';
+                    if (tasksByStatus[status]) {
+                        tasksByStatus[status].push(task);
+                    } else {
+                        tasksByStatus['todo'].push(task);
+                    }
+                });
+
+                // Update column counts
+                for (const [status, statusTasks] of Object.entries(tasksByStatus)) {
+                    const colEl = document.getElementById(`col-${status}`);
+                    if (!colEl) continue;
+
+                    // Update count
+                    const headerEl = colEl.previousElementSibling;
+                    if (headerEl) {
+                        const countEl = headerEl.querySelector('.column-count');
+                        if (countEl) countEl.textContent = statusTasks.length;
+                    }
+
+                    // Render cards
+                    colEl.innerHTML = '';
+                    statusTasks.forEach(task => {
+                        const card = document.createElement('div');
+                        card.className = 'task-card';
+
+                        // Default border logic
+                        if (status === 'in_progress') card.style.borderLeft = '3px solid var(--column-progress)';
+                        if (status === 'review') {
+                            card.style.border = '2px solid #fde047';
+                            card.style.background = '#fefce8';
+                        }
+                        if (status === 'done') card.style.opacity = '0.7';
+
+                        const titleStyle = status === 'done' ? 'text-decoration: line-through;' : '';
+
+                        let tagsHtml = '';
+                        (task.tags || []).forEach(tag => {
+                            let tagClass = 'tag-medium'; // default
+                            if (tag.toLowerCase() === 'high') tagClass = 'tag-high';
+                            if (tag.toLowerCase() === 'ci') tagClass = 'tag-ci';
+                            if (tag.toLowerCase() === 'security') tagClass = 'tag-security';
+
+                            tagsHtml += `<span class="tag ${tagClass}">${tag}</span> `;
+                        });
+
+                        const assigneeName = task.assigned_agent || 'Unassigned';
+                        const assigneeColor = (assigneeName !== 'Unassigned' && status !== 'done') ? 'color:var(--primary);' : '';
+
+                        card.innerHTML = `
+                            <div class="task-title" style="${titleStyle}">${task.title}</div>
+                            <div class="task-tags">${tagsHtml}</div>
+                            <div class="task-footer">
+                                <div class="task-assignee">
+                                    <i class="fa-regular fa-circle-user" style="${assigneeColor}"></i>
+                                    ${assigneeName}
+                                </div>
+                            </div>
+                        `;
+
+                        // Make card draggable
+                        card.setAttribute('draggable', 'true');
+                        card.id = `task-card-${task.id}`;
+                        card.addEventListener('dragstart', (e) => {
+                            e.dataTransfer.setData('text/plain', task.id);
+                            // Avoid setting opacity immediately inside dragstart to prevent ghost vanishing on some browsers
+                            setTimeout(() => card.style.opacity = '0.4', 0);
+                        });
+                        card.addEventListener('dragend', (e) => {
+                            card.style.opacity = card.parentElement && card.parentElement.id === 'col-done' ? '0.7' : '1';
+                        });
+
+                        colEl.appendChild(card);
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to load tasks", err);
+            }
+        }
+
+        async function fetchAndRenderAgents() {
+            try {
+                const res = await fetch('/api/agents');
+                const data = await res.json();
+                const agents = data.agents || [];
+
+                const panel = document.getElementById('agents-panel');
+                if (!panel) return;
+
+                // Update count
+                const headerSpan = panel.querySelector('.agents-header span span');
+                if (headerSpan) headerSpan.textContent = `${agents.length} total`;
+
+                // Clear existing items but keep header
+                const items = panel.querySelectorAll('.agent-item');
+                items.forEach(item => item.remove());
+
+                // Render agents
+                agents.forEach(agent => {
+                    const isError = agent.status === 'error';
+                    const isIdle = agent.status === 'idle';
+                    const isStopped = agent.status === 'stopped';
+
+                    let bgStatus = 'var(--column-done)'; // active
+                    if (isError) bgStatus = 'var(--danger)';
+                    if (isIdle) bgStatus = 'var(--warning)';
+                    if (isStopped) bgStatus = 'var(--text-muted)';
+
+                    const role = agent.model ? `Model: ${agent.model}` : 'Generalist';
+
+                    const item = document.createElement('div');
+                    item.className = 'agent-item';
+                    item.innerHTML = `
+                        <div class="agent-avatar"><i class="fa-solid fa-robot"></i><div class="agent-status" style="background: ${bgStatus}"></div></div>
+                        <div class="agent-info">
+                            <h4>${agent.name}</h4>
+                            <p>${role}</p>
+                        </div>
+                    `;
+                    panel.appendChild(item);
+                });
+            } catch (err) {
+                console.error("Failed to load agents", err);
+            }
+        }
+
+        // Mouse Scroll Script for Kanban Board
+        const slider = document.getElementById('kanban-area');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.style.cursor = 'grabbing';
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.style.cursor = 'grab';
+        });
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.style.cursor = 'grab';
+        });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2; // scroll-fast
+            slider.scrollLeft = scrollLeft - walk;
+        });
+
+        // Setup Drag & Drop for Columns
+        document.querySelectorAll('.task-list').forEach(list => {
+            list.addEventListener('dragover', e => {
+                e.preventDefault();
+                list.style.background = 'rgba(0, 0, 0, 0.02)';
+                list.style.borderRadius = '8px';
+            });
+            list.addEventListener('dragleave', e => {
+                list.style.background = 'transparent';
+            });
+            list.addEventListener('drop', async e => {
+                e.preventDefault();
+                list.style.background = 'transparent';
+
+                const taskId = e.dataTransfer.getData('text/plain');
+                if (!taskId) return;
+
+                const card = document.getElementById(`task-card-${taskId}`);
+                if (card) {
+                    list.appendChild(card);
+                    const newStatus = list.id.replace('col-', '');
+
+                    // Update column counts visually mapping
+                    const allLists = document.querySelectorAll('.task-list');
+                    allLists.forEach(l => {
+                        const countEl = l.previousElementSibling?.querySelector('.column-count');
+                        if (countEl) countEl.textContent = l.children.length;
+                    });
+
+                    // Update styling based on new status
+                    card.style.border = '';
+                    card.style.borderLeft = '';
+                    card.style.background = 'var(--bg-surface)';
+                    card.style.opacity = '1';
+
+                    const title = card.querySelector('.task-title');
+                    if (title) title.style.textDecoration = 'none';
+
+                    if (newStatus === 'done') {
+                        card.style.opacity = '0.7';
+                        if (title) title.style.textDecoration = 'line-through';
+                    } else if (newStatus === 'review') {
+                        card.style.border = '2px solid #fde047';
+                        card.style.background = '#fefce8';
+                    } else if (newStatus === 'in_progress') {
+                        card.style.borderLeft = '3px solid var(--column-progress)';
+                    } else {
+                        card.style.border = '1px solid var(--border)';
+                    }
+
+                    // Make a fetch PUT request to update the task status!
+                    try {
+                        await fetch(`/api/tasks/${taskId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: newStatus })
+                        });
+                        console.log(`Updated task ${taskId} to status -> ${newStatus}`);
+                    } catch (e) {
+                        console.error('Failed to update task:', e);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

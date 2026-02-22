@@ -7,12 +7,12 @@
 
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::{Mutex, oneshot};
+use tokio::sync::{oneshot, Mutex};
 use uuid::Uuid;
 
 use super::prompts::{
-    WizardCancelledError, WizardConfirmParams, WizardMultiSelectParams,
-    WizardProgress, WizardPrompter, WizardSelectParams, WizardTextParams, NoopProgress,
+    NoopProgress, WizardCancelledError, WizardConfirmParams, WizardMultiSelectParams,
+    WizardProgress, WizardPrompter, WizardSelectParams, WizardTextParams,
 };
 
 /// Represents a single wizard step sent to the client.
@@ -180,7 +180,9 @@ impl WizardSession {
     /// Submit an answer for a pending step.
     pub async fn answer(&self, step_id: &str, value: serde_json::Value) -> anyhow::Result<()> {
         let mut state = self.inner.lock().await;
-        let tx = state.answer_channels.remove(step_id)
+        let tx = state
+            .answer_channels
+            .remove(step_id)
             .ok_or_else(|| anyhow::anyhow!("wizard: no pending step with id {}", step_id))?;
         state.current_step = None;
         let _ = tx.send(value);
@@ -290,11 +292,15 @@ impl WizardPrompter for SessionPrompter {
             title: None,
             message: Some(params.message),
             options: Some(
-                params.options.into_iter().map(|opt| WizardStepOption {
-                    value: serde_json::Value::String(opt.value),
-                    label: opt.label,
-                    hint: opt.hint,
-                }).collect()
+                params
+                    .options
+                    .into_iter()
+                    .map(|opt| WizardStepOption {
+                        value: serde_json::Value::String(opt.value),
+                        label: opt.label,
+                        hint: opt.hint,
+                    })
+                    .collect(),
             ),
             initial_value: params.initial_value.map(serde_json::Value::String),
             placeholder: None,
@@ -305,18 +311,25 @@ impl WizardPrompter for SessionPrompter {
         Ok(result.as_str().unwrap_or("").to_string())
     }
 
-    async fn multiselect(&self, params: WizardMultiSelectParams<String>) -> anyhow::Result<Vec<String>> {
+    async fn multiselect(
+        &self,
+        params: WizardMultiSelectParams<String>,
+    ) -> anyhow::Result<Vec<String>> {
         let step = WizardStep {
             id: Uuid::new_v4().to_string(),
             step_type: WizardStepType::Multiselect,
             title: None,
             message: Some(params.message),
             options: Some(
-                params.options.into_iter().map(|opt| WizardStepOption {
-                    value: serde_json::Value::String(opt.value),
-                    label: opt.label,
-                    hint: opt.hint,
-                }).collect()
+                params
+                    .options
+                    .into_iter()
+                    .map(|opt| WizardStepOption {
+                        value: serde_json::Value::String(opt.value),
+                        label: opt.label,
+                        hint: opt.hint,
+                    })
+                    .collect(),
             ),
             initial_value: params.initial_values.map(|vs| serde_json::json!(vs)),
             placeholder: None,
@@ -324,8 +337,13 @@ impl WizardPrompter for SessionPrompter {
             executor: Some("client".to_string()),
         };
         let result = self.push_step_and_await(step).await?;
-        let arr = result.as_array()
-            .map(|a| a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect())
+        let arr = result
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                    .collect()
+            })
             .unwrap_or_default();
         Ok(arr)
     }

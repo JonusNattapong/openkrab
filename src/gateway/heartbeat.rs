@@ -125,10 +125,7 @@ impl HeartbeatRunner {
                     target: name.clone(),
                     status,
                     latency_ms: s.last_latency_ms,
-                    checked_at: s
-                        .last_success
-                        .or(s.last_failure)
-                        .unwrap_or_else(Utc::now),
+                    checked_at: s.last_success.or(s.last_failure).unwrap_or_else(Utc::now),
                     consecutive_failures: s.consecutive_failures,
                 }
             })
@@ -292,7 +289,10 @@ impl HeartbeatTarget for TcpHeartbeatTarget {
         match tokio::time::timeout(self.timeout, tokio::net::TcpStream::connect(&addr)).await {
             Ok(Ok(_)) => Ok(start.elapsed().as_millis() as u64),
             Ok(Err(e)) => Err(anyhow::anyhow!("connection failed: {}", e)),
-            Err(_) => Err(anyhow::anyhow!("connection timeout after {:?}", self.timeout)),
+            Err(_) => Err(anyhow::anyhow!(
+                "connection timeout after {:?}",
+                self.timeout
+            )),
         }
     }
 }
@@ -323,9 +323,7 @@ impl HeartbeatTarget for HttpHeartbeatTarget {
 
     async fn check(&self) -> Result<u64> {
         let start = std::time::Instant::now();
-        let client = reqwest::Client::builder()
-            .timeout(self.timeout)
-            .build()?;
+        let client = reqwest::Client::builder().timeout(self.timeout).build()?;
 
         let response = client.get(&self.url).send().await?;
         if response.status().is_success() {

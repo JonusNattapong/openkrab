@@ -50,11 +50,21 @@ pub struct ResourceLimits {
     pub max_file_size: usize,
 }
 
-fn default_max_memory() -> usize { 128 * 1024 * 1024 } // 128MB
-fn default_max_cpu_ms() -> u64 { 30_000 } // 30s
-fn default_max_execution_time() -> u64 { 60 } // 60s
-fn default_max_stack() -> usize { 8 * 1024 * 1024 } // 8MB
-fn default_max_file_size() -> usize { 10 * 1024 * 1024 } // 10MB
+fn default_max_memory() -> usize {
+    128 * 1024 * 1024
+} // 128MB
+fn default_max_cpu_ms() -> u64 {
+    30_000
+} // 30s
+fn default_max_execution_time() -> u64 {
+    60
+} // 60s
+fn default_max_stack() -> usize {
+    8 * 1024 * 1024
+} // 8MB
+fn default_max_file_size() -> usize {
+    10 * 1024 * 1024
+} // 10MB
 
 impl Default for ResourceLimits {
     fn default() -> Self {
@@ -94,7 +104,9 @@ pub struct FilesystemPolicy {
     pub allow_temp_write: bool,
 }
 
-fn default_true() -> bool { true }
+fn default_true() -> bool {
+    true
+}
 
 impl Default for FilesystemPolicy {
     fn default() -> Self {
@@ -122,7 +134,10 @@ impl FilesystemPolicy {
 
         if !self.allow_read {
             // Check explicit read paths
-            return self.read_paths.iter().any(|allowed| path.starts_with(allowed));
+            return self
+                .read_paths
+                .iter()
+                .any(|allowed| path.starts_with(allowed));
         }
 
         true
@@ -139,7 +154,10 @@ impl FilesystemPolicy {
 
         if !self.allow_write {
             // Check explicit write paths
-            return self.write_paths.iter().any(|allowed| path.starts_with(allowed));
+            return self
+                .write_paths
+                .iter()
+                .any(|allowed| path.starts_with(allowed));
         }
 
         true
@@ -190,7 +208,11 @@ impl NetworkPolicy {
         }
 
         // Check blocked hosts
-        if self.blocked_hosts.iter().any(|h| host == h || host.ends_with(h)) {
+        if self
+            .blocked_hosts
+            .iter()
+            .any(|h| host == h || host.ends_with(h))
+        {
             return false;
         }
 
@@ -201,7 +223,11 @@ impl NetworkPolicy {
 
         // Check allowed hosts
         if !self.allowed_hosts.is_empty() {
-            if !self.allowed_hosts.iter().any(|h| host == h || host.ends_with(h)) {
+            if !self
+                .allowed_hosts
+                .iter()
+                .any(|h| host == h || host.ends_with(h))
+            {
                 return false;
             }
         }
@@ -268,7 +294,10 @@ impl EnvironmentPolicy {
                 return true;
             }
             // Check prefixes
-            return self.allowed_prefixes.iter().any(|prefix| var.starts_with(prefix));
+            return self
+                .allowed_prefixes
+                .iter()
+                .any(|prefix| var.starts_with(prefix));
         }
 
         true
@@ -314,10 +343,10 @@ impl SandboxConfig {
         Self {
             level: SandboxLevel::None,
             resources: ResourceLimits {
-                max_memory: 512 * 1024 * 1024, // 512MB
-                max_cpu_ms: 120_000, // 2 min
-                max_execution_time_secs: 300, // 5 min
-                max_stack: 16 * 1024 * 1024, // 16MB
+                max_memory: 512 * 1024 * 1024,    // 512MB
+                max_cpu_ms: 120_000,              // 2 min
+                max_execution_time_secs: 300,     // 5 min
+                max_stack: 16 * 1024 * 1024,      // 16MB
                 max_file_size: 100 * 1024 * 1024, // 100MB
             },
             filesystem: FilesystemPolicy {
@@ -376,10 +405,10 @@ impl SandboxConfig {
         Self {
             level: SandboxLevel::Strict,
             resources: ResourceLimits {
-                max_memory: 64 * 1024 * 1024, // 64MB
-                max_cpu_ms: 10_000, // 10s
-                max_execution_time_secs: 30, // 30s
-                max_stack: 4 * 1024 * 1024, // 4MB
+                max_memory: 64 * 1024 * 1024,   // 64MB
+                max_cpu_ms: 10_000,             // 10s
+                max_execution_time_secs: 30,    // 30s
+                max_stack: 4 * 1024 * 1024,     // 4MB
                 max_file_size: 1 * 1024 * 1024, // 1MB
             },
             filesystem: FilesystemPolicy {
@@ -557,7 +586,11 @@ impl SandboxManager {
     }
 
     /// Get sandbox config for a plugin
-    pub async fn get_config(&self, plugin_name: &str, level: Option<SandboxLevel>) -> SandboxConfig {
+    pub async fn get_config(
+        &self,
+        plugin_name: &str,
+        level: Option<SandboxLevel>,
+    ) -> SandboxConfig {
         let configs = self.plugin_configs.read().await;
 
         if let Some(config) = configs.get(plugin_name) {
@@ -620,7 +653,8 @@ impl ApplySandbox for wasmtime_wasi::WasiCtxBuilder {
         }
 
         // Apply environment restrictions
-        let filtered_env: Vec<(&str, &str)> = sandbox.filtered_env()
+        let filtered_env: Vec<(&str, &str)> = sandbox
+            .filtered_env()
             .iter()
             .map(|(k, v)| (k.as_str(), v.as_str()))
             .collect();

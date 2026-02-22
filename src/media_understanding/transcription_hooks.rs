@@ -104,9 +104,7 @@ impl TranscriptionHookBuilder {
         F: Fn(PreTranscriptionEvent) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = ()> + Send + 'static,
     {
-        self.pre_hook = Some(Arc::new(move |event| {
-            Box::pin(callback(event))
-        }));
+        self.pre_hook = Some(Arc::new(move |event| Box::pin(callback(event))));
         self
     }
 
@@ -116,9 +114,7 @@ impl TranscriptionHookBuilder {
         F: Fn(PostTranscriptionEvent) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = ()> + Send + 'static,
     {
-        self.post_hook = Some(Arc::new(move |event| {
-            Box::pin(callback(event))
-        }));
+        self.post_hook = Some(Arc::new(move |event| Box::pin(callback(event))));
         self
     }
 
@@ -128,9 +124,7 @@ impl TranscriptionHookBuilder {
         F: Fn(TranscriptionErrorEvent) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = ()> + Send + 'static,
     {
-        self.error_hook = Some(Arc::new(move |event| {
-            Box::pin(callback(event))
-        }));
+        self.error_hook = Some(Arc::new(move |event| Box::pin(callback(event))));
         self
     }
 
@@ -140,9 +134,7 @@ impl TranscriptionHookBuilder {
         F: Fn(CleanupEvent) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = ()> + Send + 'static,
     {
-        self.cleanup_hook = Some(Arc::new(move |event| {
-            Box::pin(callback(event))
-        }));
+        self.cleanup_hook = Some(Arc::new(move |event| Box::pin(callback(event))));
         self
     }
 
@@ -291,10 +283,7 @@ impl TranscriptionHook for LoggingTranscriptionHook {
     async fn on_transcription_error(&self, event: TranscriptionErrorEvent) {
         eprintln!(
             "[transcription] Failed for attachment {} (provider: {:?}, retryable: {}): {}",
-            event.attachment_index,
-            event.provider_id,
-            event.retryable,
-            event.error
+            event.attachment_index, event.provider_id, event.retryable, event.error
         );
     }
 
@@ -333,10 +322,16 @@ impl MetricsTranscriptionHook {
 
     pub fn get_stats(&self) -> TranscriptionStats {
         TranscriptionStats {
-            total_attempts: self.total_attempts.load(std::sync::atomic::Ordering::Relaxed),
-            total_success: self.total_success.load(std::sync::atomic::Ordering::Relaxed),
+            total_attempts: self
+                .total_attempts
+                .load(std::sync::atomic::Ordering::Relaxed),
+            total_success: self
+                .total_success
+                .load(std::sync::atomic::Ordering::Relaxed),
             total_errors: self.total_errors.load(std::sync::atomic::Ordering::Relaxed),
-            total_duration_ms: self.total_duration_ms.load(std::sync::atomic::Ordering::Relaxed),
+            total_duration_ms: self
+                .total_duration_ms
+                .load(std::sync::atomic::Ordering::Relaxed),
         }
     }
 }
@@ -370,16 +365,20 @@ impl TranscriptionStats {
 #[async_trait::async_trait]
 impl TranscriptionHook for MetricsTranscriptionHook {
     async fn on_pre_transcription(&self, _event: PreTranscriptionEvent) {
-        self.total_attempts.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        self.total_attempts
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     }
 
     async fn on_post_transcription(&self, event: PostTranscriptionEvent) {
-        self.total_success.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-        self.total_duration_ms.fetch_add(event.duration_ms, std::sync::atomic::Ordering::Relaxed);
+        self.total_success
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        self.total_duration_ms
+            .fetch_add(event.duration_ms, std::sync::atomic::Ordering::Relaxed);
     }
 
     async fn on_transcription_error(&self, _event: TranscriptionErrorEvent) {
-        self.total_errors.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        self.total_errors
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     }
 }
 
@@ -408,7 +407,8 @@ mod tests {
             file_name: Some("test.mp3".to_string()),
             size_bytes: 1024,
             provider_id: Some("openai".to_string()),
-        }).await;
+        })
+        .await;
 
         assert!(called.load(Ordering::Relaxed));
     }
@@ -416,7 +416,7 @@ mod tests {
     #[tokio::test]
     async fn test_hook_registry() {
         let mut registry = TranscriptionHookRegistry::new();
-        
+
         let pre_called = Arc::new(AtomicBool::new(false));
         let post_called = Arc::new(AtomicBool::new(false));
 
@@ -427,30 +427,38 @@ mod tests {
             TranscriptionHookBuilder::new()
                 .on_pre(move |_e| {
                     let called = pre_clone.clone();
-                    async move { called.store(true, Ordering::Relaxed); }
+                    async move {
+                        called.store(true, Ordering::Relaxed);
+                    }
                 })
                 .on_post(move |_e| {
                     let called = post_clone.clone();
-                    async move { called.store(true, Ordering::Relaxed); }
-                })
+                    async move {
+                        called.store(true, Ordering::Relaxed);
+                    }
+                }),
         );
 
-        registry.fire_pre(PreTranscriptionEvent {
-            attachment_index: 0,
-            mime_type: None,
-            file_name: None,
-            size_bytes: 0,
-            provider_id: None,
-        }).await;
+        registry
+            .fire_pre(PreTranscriptionEvent {
+                attachment_index: 0,
+                mime_type: None,
+                file_name: None,
+                size_bytes: 0,
+                provider_id: None,
+            })
+            .await;
 
-        registry.fire_post(PostTranscriptionEvent {
-            attachment_index: 0,
-            transcript: "test".to_string(),
-            language: None,
-            confidence: 1.0,
-            provider_id: "test".to_string(),
-            duration_ms: 100,
-        }).await;
+        registry
+            .fire_post(PostTranscriptionEvent {
+                attachment_index: 0,
+                transcript: "test".to_string(),
+                language: None,
+                confidence: 1.0,
+                provider_id: "test".to_string(),
+                duration_ms: 100,
+            })
+            .await;
 
         assert!(pre_called.load(Ordering::Relaxed));
         assert!(post_called.load(Ordering::Relaxed));
@@ -459,14 +467,15 @@ mod tests {
     #[tokio::test]
     async fn test_metrics_hook() {
         let hook = Arc::new(MetricsTranscriptionHook::new());
-        
+
         hook.on_pre_transcription(PreTranscriptionEvent {
             attachment_index: 0,
             mime_type: None,
             file_name: None,
             size_bytes: 0,
             provider_id: None,
-        }).await;
+        })
+        .await;
 
         hook.on_post_transcription(PostTranscriptionEvent {
             attachment_index: 0,
@@ -475,7 +484,8 @@ mod tests {
             confidence: 1.0,
             provider_id: "test".to_string(),
             duration_ms: 150,
-        }).await;
+        })
+        .await;
 
         let stats = hook.get_stats();
         assert_eq!(stats.total_attempts, 1);

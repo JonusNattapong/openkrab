@@ -136,7 +136,10 @@ pub async fn clean_old_media(ttl_ms: Option<u64>) -> Result<()> {
     // Fire cleanup hooks if any are registered
     if !cleaned_paths.is_empty() {
         // Note: In a real implementation, you might want to pass this to a hook registry
-        eprintln!("[media] Cleaned up {} expired media files", cleaned_paths.len());
+        eprintln!(
+            "[media] Cleaned up {} expired media files",
+            cleaned_paths.len()
+        );
     }
 
     Ok(())
@@ -148,10 +151,10 @@ pub async fn clean_old_media_enhanced(
     ttl_ms: Option<u64>,
 ) -> Result<super::temp_lifecycle::CleanupResult> {
     let result = registry.cleanup_expired().await;
-    
+
     // Also run legacy cleanup for backward compatibility
     clean_old_media(ttl_ms).await?;
-    
+
     Ok(result)
 }
 

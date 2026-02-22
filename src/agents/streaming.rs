@@ -22,9 +22,7 @@ pub enum StreamEvent {
         accumulated: String,
     },
     /// A reasoning/thinking chunk.
-    ReasoningDelta {
-        content: String,
-    },
+    ReasoningDelta { content: String },
     /// A tool call is being initiated.
     ToolCallStart {
         tool_call_id: String,
@@ -48,19 +46,14 @@ pub enum StreamEvent {
         is_error: bool,
     },
     /// A block of text is complete (paragraph boundary for message splitting).
-    BlockReplyFlush {
-        block_index: usize,
-        content: String,
-    },
+    BlockReplyFlush { block_index: usize, content: String },
     /// The entire response is complete.
     MessageEnd {
         finish_reason: String,
         total_tokens_used: Option<usize>,
     },
     /// An error occurred during streaming.
-    Error {
-        message: String,
-    },
+    Error { message: String },
 }
 
 // ─── Stream accumulator ───────────────────────────────────────────────────────
@@ -192,11 +185,7 @@ impl StreamAccumulator {
 
     /// Feed tool call argument delta.
     pub fn push_tool_arguments(&mut self, tool_call_id: &str, delta: &str) -> Vec<StreamEvent> {
-        if let Some(tc) = self
-            .tool_calls
-            .iter_mut()
-            .find(|tc| tc.id == tool_call_id)
-        {
+        if let Some(tc) = self.tool_calls.iter_mut().find(|tc| tc.id == tool_call_id) {
             tc.arguments.push_str(delta);
         }
         vec![StreamEvent::ToolCallDelta {
@@ -414,7 +403,9 @@ mod tests {
         let mut acc = StreamAccumulator::new(2000);
         let events = acc.push_text("Hello ");
         assert_eq!(events.len(), 1);
-        assert!(matches!(&events[0], StreamEvent::TextDelta { content, .. } if content == "Hello "));
+        assert!(
+            matches!(&events[0], StreamEvent::TextDelta { content, .. } if content == "Hello ")
+        );
 
         let events = acc.push_text("World!");
         assert_eq!(acc.text(), "Hello World!");
@@ -457,9 +448,9 @@ mod tests {
         assert!(!events.is_empty());
 
         let events = acc.end_tool_call("tc_1");
-        assert!(events
-            .iter()
-            .any(|e| matches!(e, StreamEvent::ToolCallEnd { tool_name, .. } if tool_name == "read_file")));
+        assert!(events.iter().any(
+            |e| matches!(e, StreamEvent::ToolCallEnd { tool_name, .. } if tool_name == "read_file")
+        ));
     }
 
     #[test]

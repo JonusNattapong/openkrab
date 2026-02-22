@@ -107,11 +107,18 @@ impl ScopedTempFile {
             match fs::remove_file(&self.path).await {
                 Ok(_) => break,
                 Err(e) if attempt < MAX_CLEANUP_RETRIES - 1 => {
-                    eprintln!("[temp_lifecycle] Failed to delete temp file (attempt {}): {}", attempt + 1, e);
+                    eprintln!(
+                        "[temp_lifecycle] Failed to delete temp file (attempt {}): {}",
+                        attempt + 1,
+                        e
+                    );
                     tokio::time::sleep(CLEANUP_RETRY_DELAY).await;
                 }
                 Err(e) => {
-                    eprintln!("[temp_lifecycle] Failed to delete temp file after {} attempts: {}", MAX_CLEANUP_RETRIES, e);
+                    eprintln!(
+                        "[temp_lifecycle] Failed to delete temp file after {} attempts: {}",
+                        MAX_CLEANUP_RETRIES, e
+                    );
                 }
             }
         }
@@ -137,7 +144,11 @@ impl Drop for ScopedTempFile {
                 match fs::remove_file(&path).await {
                     Ok(_) => break,
                     Err(e) if attempt < MAX_CLEANUP_RETRIES - 1 => {
-                        eprintln!("[temp_lifecycle] Failed to delete temp file in drop (attempt {}): {}", attempt + 1, e);
+                        eprintln!(
+                            "[temp_lifecycle] Failed to delete temp file in drop (attempt {}): {}",
+                            attempt + 1,
+                            e
+                        );
                         tokio::time::sleep(CLEANUP_RETRY_DELAY).await;
                     }
                     Err(e) => {
@@ -220,14 +231,19 @@ impl TempFileRegistry {
         let ttl = ttl.unwrap_or(DEFAULT_TEMP_TTL);
 
         let mut inner = self.inner.write().await;
-        
+
         // Ensure directory exists
         fs::create_dir_all(&inner.base_dir).await?;
 
         // Generate unique filename
         let id = inner.next_id.fetch_add(1, Ordering::Relaxed);
         let filename = if let Some(ext) = extension {
-            format!("temp_{:08}_{}.{}", id, handle.as_str(), ext.trim_start_matches('.'))
+            format!(
+                "temp_{:08}_{}.{}",
+                id,
+                handle.as_str(),
+                ext.trim_start_matches('.')
+            )
         } else {
             format!("temp_{:08}_{}", id, handle.as_str())
         };
@@ -276,7 +292,11 @@ impl TempFileRegistry {
     }
 
     /// Extend lifetime of a temp file
-    pub async fn extend_ttl(&self, handle: &TempHandle, additional_duration: Duration) -> Result<()> {
+    pub async fn extend_ttl(
+        &self,
+        handle: &TempHandle,
+        additional_duration: Duration,
+    ) -> Result<()> {
         let mut inner = self.inner.write().await;
         if let Some(meta) = inner.files.get_mut(handle) {
             meta.expires_at += additional_duration;
@@ -289,14 +309,18 @@ impl TempFileRegistry {
     /// Delete a temp file explicitly
     pub async fn delete(&self, handle: &TempHandle) -> Result<()> {
         let mut inner = self.inner.write().await;
-        
+
         if let Some(meta) = inner.files.remove(handle) {
             // Try to delete with retries
             for attempt in 0..MAX_CLEANUP_RETRIES {
                 match fs::remove_file(&meta.path).await {
                     Ok(_) => return Ok(()),
                     Err(e) if attempt < MAX_CLEANUP_RETRIES - 1 => {
-                    eprintln!("[temp_lifecycle] Failed to delete temp file (attempt {}): {}", attempt + 1, e);
+                        eprintln!(
+                            "[temp_lifecycle] Failed to delete temp file (attempt {}): {}",
+                            attempt + 1,
+                            e
+                        );
                         tokio::time::sleep(CLEANUP_RETRY_DELAY).await;
                     }
                     Err(e) => return Err(anyhow!("Failed to delete temp file: {}", e)),
@@ -311,9 +335,9 @@ impl TempFileRegistry {
     pub async fn cleanup_expired(&self) -> CleanupResult {
         let now = Instant::now();
         let mut inner = self.inner.write().await;
-        
+
         let mut expired_handles = Vec::new();
-        
+
         for (handle, meta) in &inner.files {
             if meta.expires_at <= now {
                 expired_handles.push(handle.clone());
@@ -328,11 +352,17 @@ impl TempFileRegistry {
                 match fs::remove_file(&meta.path).await {
                     Ok(_) => {
                         deleted += 1;
-                        eprintln!("[temp_lifecycle] Cleaned up expired temp file: {:?}", meta.path);
+                        eprintln!(
+                            "[temp_lifecycle] Cleaned up expired temp file: {:?}",
+                            meta.path
+                        );
                     }
                     Err(e) => {
                         failed += 1;
-                        eprintln!("[temp_lifecycle] Failed to clean up temp file {:?}: {}", meta.path, e);
+                        eprintln!(
+                            "[temp_lifecycle] Failed to clean up temp file {:?}: {}",
+                            meta.path, e
+                        );
                         // Re-insert with extended TTL for retry later
                         let mut meta = meta;
                         meta.expires_at = now + Duration::from_secs(60);
@@ -348,7 +378,7 @@ impl TempFileRegistry {
     /// Clean up all temp files (force cleanup)
     pub async fn cleanup_all(&self) -> CleanupResult {
         let mut inner = self.inner.write().await;
-        
+
         let mut deleted = 0;
         let mut failed = 0;
 
@@ -360,7 +390,10 @@ impl TempFileRegistry {
                 }
                 Err(e) => {
                     failed += 1;
-                    eprintln!("[temp_lifecycle] Failed to clean up temp file {:?}: {}", meta.path, e);
+                    eprintln!(
+                        "[temp_lifecycle] Failed to clean up temp file {:?}: {}",
+                        meta.path, e
+                    );
                 }
             }
         }
@@ -371,9 +404,9 @@ impl TempFileRegistry {
     /// Clean up files by tag
     pub async fn cleanup_by_tag(&self, tag: &str) -> CleanupResult {
         let mut inner = self.inner.write().await;
-        
+
         let mut handles_to_remove = Vec::new();
-        
+
         for (handle, meta) in &inner.files {
             if meta.tags.contains(&tag.to_string()) {
                 handles_to_remove.push(handle.clone());
@@ -388,11 +421,17 @@ impl TempFileRegistry {
                 match fs::remove_file(&meta.path).await {
                     Ok(_) => {
                         deleted += 1;
-                        eprintln!("[temp_lifecycle] Cleaned up tagged temp file: {:?}", meta.path);
+                        eprintln!(
+                            "[temp_lifecycle] Cleaned up tagged temp file: {:?}",
+                            meta.path
+                        );
                     }
                     Err(e) => {
                         failed += 1;
-                        eprintln!("[temp_lifecycle] Failed to clean up temp file {:?}: {}", meta.path, e);
+                        eprintln!(
+                            "[temp_lifecycle] Failed to clean up temp file {:?}: {}",
+                            meta.path, e
+                        );
                     }
                 }
             }
@@ -405,11 +444,17 @@ impl TempFileRegistry {
     pub async fn stats(&self) -> TempRegistryStats {
         let inner = self.inner.read().await;
         let now = Instant::now();
-        
+
         let total_files = inner.files.len();
         let expired_files = inner.files.values().filter(|m| m.expires_at <= now).count();
-        let total_size: usize = inner.files.values()
-            .filter_map(|m| std::fs::metadata(&m.path).ok().map(|meta| meta.len() as usize))
+        let total_size: usize = inner
+            .files
+            .values()
+            .filter_map(|m| {
+                std::fs::metadata(&m.path)
+                    .ok()
+                    .map(|meta| meta.len() as usize)
+            })
             .sum();
 
         TempRegistryStats {
@@ -423,13 +468,16 @@ impl TempFileRegistry {
     pub fn start_background_cleanup(self: Arc<Self>) -> tokio::task::JoinHandle<()> {
         tokio::spawn(async move {
             let mut interval = interval(CLEANUP_INTERVAL);
-            
+
             loop {
                 interval.tick().await;
-                
+
                 let result = self.cleanup_expired().await;
                 if result.deleted > 0 || result.failed > 0 {
-                    eprintln!("[temp_lifecycle] Background cleanup: {} deleted, {} failed", result.deleted, result.failed);
+                    eprintln!(
+                        "[temp_lifecycle] Background cleanup: {} deleted, {} failed",
+                        result.deleted, result.failed
+                    );
                 }
             }
         })
@@ -482,7 +530,10 @@ mod tests {
         let registry = TempFileRegistry::with_base_dir(temp_dir.path().to_path_buf());
         registry.initialize().await.unwrap();
 
-        let scoped = registry.create_scoped(Some("txt"), None, vec!["test".to_string()]).await.unwrap();
+        let scoped = registry
+            .create_scoped(Some("txt"), None, vec!["test".to_string()])
+            .await
+            .unwrap();
         assert!(scoped.path().exists());
         assert_eq!(scoped.path().extension().unwrap(), "txt");
 
@@ -497,8 +548,11 @@ mod tests {
         registry.initialize().await.unwrap();
 
         let data = b"Hello, World!";
-        let scoped = registry.write_buffer(data, Some("txt"), None, vec![]).await.unwrap();
-        
+        let scoped = registry
+            .write_buffer(data, Some("txt"), None, vec![])
+            .await
+            .unwrap();
+
         assert!(scoped.path().exists());
         let read_data = fs::read(scoped.path()).await.unwrap();
         assert_eq!(read_data, data);
@@ -513,9 +567,12 @@ mod tests {
         registry.initialize().await.unwrap();
 
         // Create temp file with very short TTL
-        let scoped = registry.create_scoped(Some("txt"), Some(Duration::from_millis(10)), vec![]).await.unwrap();
+        let scoped = registry
+            .create_scoped(Some("txt"), Some(Duration::from_millis(10)), vec![])
+            .await
+            .unwrap();
         let path = scoped.path().to_path_buf();
-        
+
         // Don't delete - let it expire
         drop(scoped);
 
@@ -534,8 +591,14 @@ mod tests {
         let registry = TempFileRegistry::with_base_dir(temp_dir.path().to_path_buf());
         registry.initialize().await.unwrap();
 
-        let scoped1 = registry.create_scoped(Some("txt"), None, vec!["tag1".to_string()]).await.unwrap();
-        let scoped2 = registry.create_scoped(Some("txt"), None, vec!["tag2".to_string()]).await.unwrap();
+        let scoped1 = registry
+            .create_scoped(Some("txt"), None, vec!["tag1".to_string()])
+            .await
+            .unwrap();
+        let scoped2 = registry
+            .create_scoped(Some("txt"), None, vec!["tag2".to_string()])
+            .await
+            .unwrap();
 
         let path1 = scoped1.path().to_path_buf();
         let path2 = scoped2.path().to_path_buf();
@@ -560,8 +623,11 @@ mod tests {
         let registry = TempFileRegistry::with_base_dir(temp_dir.path().to_path_buf());
         registry.initialize().await.unwrap();
 
-        let scoped = registry.write_buffer(b"test data", Some("txt"), None, vec![]).await.unwrap();
-        
+        let scoped = registry
+            .write_buffer(b"test data", Some("txt"), None, vec![])
+            .await
+            .unwrap();
+
         let stats = registry.stats().await;
         assert_eq!(stats.total_files, 1);
         assert_eq!(stats.total_size_bytes, 9); // "test data"

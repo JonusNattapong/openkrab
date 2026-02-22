@@ -82,11 +82,14 @@ fn ensure_workspace_dir(workspace_dir: &str) -> Result<()> {
 fn build_summary(options: &FinalizeOnboardingOptions<'_>) -> String {
     let mut lines = Vec::new();
 
-    lines.push(format!("Mode: {}", match options.opts.mode {
-        Some(OnboardMode::Local) => "Local gateway",
-        Some(OnboardMode::Remote) => "Remote gateway",
-        None => "Local gateway",
-    }));
+    lines.push(format!(
+        "Mode: {}",
+        match options.opts.mode {
+            Some(OnboardMode::Local) => "Local gateway",
+            Some(OnboardMode::Remote) => "Remote gateway",
+            None => "Local gateway",
+        }
+    ));
     lines.push(format!("Flow: {}", options.flow));
     lines.push(format!("Workspace: {}", options.workspace_dir));
     lines.push(format!("Gateway port: {}", options.settings.port));
@@ -115,10 +118,7 @@ fn build_next_steps(options: &FinalizeOnboardingOptions<'_>) -> String {
     lines.push("".to_string());
 
     lines.push("2. Connect from a client:".to_string());
-    lines.push(format!(
-        "   ws://127.0.0.1:{}",
-        options.settings.port
-    ));
+    lines.push(format!("   ws://127.0.0.1:{}", options.settings.port));
     lines.push("".to_string());
 
     lines.push("3. Configure channels:".to_string());

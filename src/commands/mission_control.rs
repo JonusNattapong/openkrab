@@ -2,21 +2,8 @@
 //!
 //! AI Agent Orchestration - Manage tasks, boards, agents, and approvals
 
-use crate::mission_control::{activity::*, agents::*, approvals::*, boards::*, tasks::*};
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
-use std::time::{SystemTime, UNIX_EPOCH};
-
-fn now() -> i64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as i64
-}
-
-fn generate_id() -> String {
-    format!("{:x}", now())
-}
 
 pub fn mission_control_command() -> Result<()> {
     let theme = ColorfulTheme::default();

@@ -363,9 +363,36 @@ pub struct ToolsConfig {
 
 /// Agent binding
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AgentBinding {
+    pub agent_id: String,
+    #[serde(rename = "match")]
+    pub match_: BindingMatch,
+}
+
+/// Binding match criteria
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BindingMatch {
     pub channel: String,
-    pub agent: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub peer: Option<BindingPeer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guild_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub team_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub roles: Option<Vec<String>>,
+}
+
+/// Peer binding definition
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BindingPeer {
+    pub kind: String,
+    pub id: String,
 }
 
 /// Broadcast configuration
@@ -413,13 +440,44 @@ pub struct SessionConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_history: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub send_policy: Option<String>,
+    pub send_policy: Option<SessionSendPolicyConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub agent_to_agent: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maintenance: Option<SessionMaintenanceConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub identity_links: Option<Vec<IdentityLinkConfig>>,
+}
+
+/// Send policy configuration
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SessionSendPolicyConfig {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub rules: Option<Vec<SessionSendPolicyRule>>,
+}
+
+/// Send policy rule
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SessionSendPolicyRule {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_conditions: Option<SessionSendPolicyMatch>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+}
+
+/// Send policy match condition
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SessionSendPolicyMatch {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chat_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key_prefix: Option<String>,
+    #[serde(rename = "rawKeyPrefix", skip_serializing_if = "Option::is_none")]
+    pub raw_key_prefix: Option<String>,
 }
 
 /// Session maintenance configuration

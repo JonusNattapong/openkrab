@@ -16,10 +16,11 @@ pub struct Task {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum TaskStatus {
     Todo,
     InProgress,
+    Review,
     Done,
     Blocked,
 }
@@ -35,6 +36,7 @@ impl std::fmt::Display for TaskStatus {
         match self {
             TaskStatus::Todo => write!(f, "todo"),
             TaskStatus::InProgress => write!(f, "in_progress"),
+            TaskStatus::Review => write!(f, "review"),
             TaskStatus::Done => write!(f, "done"),
             TaskStatus::Blocked => write!(f, "blocked"),
         }

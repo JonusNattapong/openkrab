@@ -47,7 +47,7 @@ pub fn logs_tail_command(lines: Option<usize>, follow: bool, json: bool) -> Stri
             Err(e) => return format!("Failed to open log file: {}", e),
         };
         let mut pos = 0;
-        
+
         // Print requested tail lines first
         if let Ok(f_clone) = File::open(&log_file) {
             let reader = BufReader::new(f_clone);
@@ -88,10 +88,8 @@ pub fn logs_tail_command(lines: Option<usize>, follow: bool, json: bool) -> Stri
                 let reader = BufReader::new(file);
                 let all_lines: Vec<String> = reader.lines().filter_map(|l| l.ok()).collect();
                 let start = all_lines.len().saturating_sub(n);
-                let output: Vec<String> = all_lines[start..]
-                    .iter()
-                    .map(|l| format_line(l))
-                    .collect();
+                let output: Vec<String> =
+                    all_lines[start..].iter().map(|l| format_line(l)).collect();
 
                 output.join("\n")
             }

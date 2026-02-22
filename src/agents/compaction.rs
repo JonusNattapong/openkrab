@@ -5,7 +5,7 @@
 //! that they stay within a model's context window.
 
 use crate::agents::chat::{ChatMessage, ContentPart, UserContent};
-use serde::{Deserialize, Serialize};
+use crate::agents::session_repair::{repair_tool_use_result_pairing, strip_tool_result_details};
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -20,123 +20,39 @@ const DEFAULT_SUMMARY_FALLBACK: &str = "No prior history.";
 /// Default number of parts for splitting.
 const DEFAULT_PARTS: usize = 2;
 
-// ─── Message types ────────────────────────────────────────────────────────────
-
-/// A simplified agent message for compaction purposes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CompactionMessage {
-    pub role: String,
-    pub content: String,
-    #[serde(default)]
-    pub tool_call_id: Option<String>,
-    /// Optional details that should NOT be included in summarization.
-    #[serde(default)]
-    pub details: Option<String>,
-}
-
-impl CompactionMessage {
-    pub fn user(content: impl Into<String>) -> Self {
-        Self {
-            role: "user".into(),
-            content: content.into(),
-            tool_call_id: None,
-            details: None,
-        }
-    }
-
-    pub fn assistant(content: impl Into<String>) -> Self {
-        Self {
-            role: "assistant".into(),
-            content: content.into(),
-            tool_call_id: None,
-            details: None,
-        }
-    }
-
-    pub fn system(content: impl Into<String>) -> Self {
-        Self {
-            role: "system".into(),
-            content: content.into(),
-            tool_call_id: None,
-            details: None,
-        }
-    }
-
-    pub fn tool_result(id: impl Into<String>, content: impl Into<String>) -> Self {
-        Self {
-            role: "tool".into(),
-            content: content.into(),
-            tool_call_id: Some(id.into()),
-            details: None,
-        }
-    }
-}
-
-// ─── Converters ───────────────────────────────────────────────────────────────
-
-impl From<ChatMessage> for CompactionMessage {
-    fn from(msg: ChatMessage) -> Self {
-        match msg {
-            ChatMessage::System { content } => Self::system(content),
-            ChatMessage::User { content } => {
-                let text = match content {
-                    UserContent::Text(t) => t,
-                    UserContent::Parts(parts) => parts
-                        .into_iter()
-                        .filter_map(|p| match p {
-                            ContentPart::Text { text } => Some(text),
-                            _ => None,
-                        })
-                        .collect::<Vec<_>>()
-                        .join(" "),
-                };
-                Self::user(text)
-            }
-            ChatMessage::Assistant { content, .. } => Self::assistant(content.unwrap_or_default()),
-            ChatMessage::Tool {
-                tool_call_id,
-                content,
-            } => Self::tool_result(tool_call_id, content),
-        }
-    }
-}
-
-impl From<CompactionMessage> for ChatMessage {
-    fn from(msg: CompactionMessage) -> Self {
-        match msg.role.as_str() {
-            "system" => ChatMessage::System {
-                content: msg.content,
-            },
-            "user" => ChatMessage::User {
-                content: UserContent::Text(msg.content),
-            },
-            "assistant" => ChatMessage::Assistant {
-                content: Some(msg.content),
-                tool_calls: None,
-            },
-            "tool" => ChatMessage::Tool {
-                tool_call_id: msg.tool_call_id.unwrap_or_default(),
-                content: msg.content,
-            },
-            _ => ChatMessage::System {
-                content: msg.content,
-            },
-        }
-    }
-}
-
 // ─── Token estimation ─────────────────────────────────────────────────────────
 
-/// Rough token estimate: ~4 chars per token (GPT-family heuristic).
-pub fn estimate_tokens(msg: &CompactionMessage) -> usize {
-    // SECURITY: never include `details` — they can contain untrusted payloads
-    let chars = msg.role.len() + msg.content.len();
-    (chars + 3) / 4 // ceil division by 4
+/// Rough token estimate for a ChatMessage.
+pub fn estimate_tokens(msg: &ChatMessage) -> usize {
+    match msg {
+        ChatMessage::System { content } => (content.len() + 3) / 4,
+        ChatMessage::User { content } => {
+            let len = match content {
+                UserContent::Text(t) => t.len(),
+                UserContent::Parts(p) => p.iter().map(|part| match part {
+                    ContentPart::Text { text } => text.len(),
+                    _ => 0,
+                }).sum(),
+            };
+            (len + 7) / 4
+        }
+        ChatMessage::Assistant { content, tool_calls } => {
+            let mut len = content.as_ref().map(|c| c.len()).unwrap_or(0);
+            if let Some(calls) = tool_calls {
+                for call in calls {
+                    len += call.name.len() + call.arguments.len() + 20;
+                }
+            }
+            (len + 11) / 4
+        }
+        ChatMessage::Tool { content, .. } => (content.len() + 15) / 4,
+    }
 }
 
 /// Estimate total tokens of a message list, stripping details.
-pub fn estimate_messages_tokens(messages: &[CompactionMessage]) -> usize {
-    messages.iter().map(|m| estimate_tokens(m)).sum()
+pub fn estimate_messages_tokens(messages: &[ChatMessage]) -> usize {
+    let safe = strip_tool_result_details(messages);
+    safe.iter().map(|m| estimate_tokens(m)).sum()
 }
 
 // ─── Normalize parts ──────────────────────────────────────────────────────────
@@ -152,9 +68,9 @@ fn normalize_parts(parts: usize, message_count: usize) -> usize {
 
 /// Split messages into `parts` chunks so each chunk has roughly equal token count.
 pub fn split_messages_by_token_share(
-    messages: &[CompactionMessage],
+    messages: &[ChatMessage],
     parts: usize,
-) -> Vec<Vec<CompactionMessage>> {
+) -> Vec<Vec<ChatMessage>> {
     if messages.is_empty() {
         return Vec::new();
     }
@@ -165,8 +81,8 @@ pub fn split_messages_by_token_share(
 
     let total_tokens = estimate_messages_tokens(messages);
     let target_tokens = total_tokens / normalized_parts;
-    let mut chunks: Vec<Vec<CompactionMessage>> = Vec::new();
-    let mut current: Vec<CompactionMessage> = Vec::new();
+    let mut chunks: Vec<Vec<ChatMessage>> = Vec::new();
+    let mut current: Vec<ChatMessage> = Vec::new();
     let mut current_tokens: usize = 0;
 
     for msg in messages {
@@ -193,15 +109,15 @@ pub fn split_messages_by_token_share(
 
 /// Chunk messages so no chunk exceeds `max_tokens`.
 pub fn chunk_messages_by_max_tokens(
-    messages: &[CompactionMessage],
+    messages: &[ChatMessage],
     max_tokens: usize,
-) -> Vec<Vec<CompactionMessage>> {
+) -> Vec<Vec<ChatMessage>> {
     if messages.is_empty() {
         return Vec::new();
     }
 
-    let mut chunks: Vec<Vec<CompactionMessage>> = Vec::new();
-    let mut current_chunk: Vec<CompactionMessage> = Vec::new();
+    let mut chunks: Vec<Vec<ChatMessage>> = Vec::new();
+    let mut current_chunk: Vec<ChatMessage> = Vec::new();
     let mut current_tokens: usize = 0;
 
     for msg in messages {
@@ -231,7 +147,7 @@ pub fn chunk_messages_by_max_tokens(
 
 /// Compute adaptive chunk ratio based on average message size.
 /// When messages are large, we use smaller chunks to avoid exceeding model limits.
-pub fn compute_adaptive_chunk_ratio(messages: &[CompactionMessage], context_window: usize) -> f64 {
+pub fn compute_adaptive_chunk_ratio(messages: &[ChatMessage], context_window: usize) -> f64 {
     if messages.is_empty() || context_window == 0 {
         return BASE_CHUNK_RATIO;
     }
@@ -251,7 +167,7 @@ pub fn compute_adaptive_chunk_ratio(messages: &[CompactionMessage], context_wind
 
 /// Check if a single message is too large to summarize.
 /// If single message > 50% of context, it can't be summarized safely.
-pub fn is_oversized_for_summary(msg: &CompactionMessage, context_window: usize) -> bool {
+pub fn is_oversized_for_summary(msg: &ChatMessage, context_window: usize) -> bool {
     let tokens = estimate_tokens(msg) as f64 * SAFETY_MARGIN;
     tokens > context_window as f64 * 0.5
 }
@@ -262,9 +178,9 @@ pub fn is_oversized_for_summary(msg: &CompactionMessage, context_window: usize) 
 #[derive(Debug, Clone)]
 pub struct PruneResult {
     /// Messages that were kept (within budget).
-    pub messages: Vec<CompactionMessage>,
+    pub messages: Vec<ChatMessage>,
     /// Messages that were dropped (for potential summarization).
-    pub dropped_messages: Vec<CompactionMessage>,
+    pub dropped_messages: Vec<ChatMessage>,
     /// Number of chunk-level drops.
     pub dropped_chunks: usize,
     /// Total number of individual messages dropped.
@@ -280,7 +196,7 @@ pub struct PruneResult {
 /// Prune history to fit within `max_context_tokens * max_history_share`.
 /// Drops oldest chunks first.
 pub fn prune_history_for_context_share(
-    messages: &[CompactionMessage],
+    messages: &[ChatMessage],
     max_context_tokens: usize,
     max_history_share: Option<f64>,
     parts: Option<usize>,
@@ -290,7 +206,7 @@ pub fn prune_history_for_context_share(
     let parts = parts.unwrap_or(DEFAULT_PARTS);
 
     let mut kept_messages = messages.to_vec();
-    let mut all_dropped: Vec<CompactionMessage> = Vec::new();
+    let mut all_dropped: Vec<ChatMessage> = Vec::new();
     let mut dropped_chunks: usize = 0;
     let mut dropped_count: usize = 0;
     let mut dropped_tokens: usize = 0;
@@ -302,13 +218,18 @@ pub fn prune_history_for_context_share(
         }
         // Drop the oldest chunk (first)
         let dropped = &chunks[0];
+        let rest_flat: Vec<ChatMessage> = chunks[1..].iter().flatten().cloned().collect();
+
+        // Repair tool sequences in the remaining context
+        let repair = repair_tool_use_result_pairing(&rest_flat);
+        let repaired_kept = repair.messages;
+
         dropped_chunks += 1;
-        dropped_count += dropped.len();
+        dropped_count += dropped.len() + repair.dropped_orphan_count;
         dropped_tokens += estimate_messages_tokens(dropped);
         all_dropped.extend(dropped.clone());
 
-        // Keep the rest
-        kept_messages = chunks[1..].iter().flatten().cloned().collect();
+        kept_messages = repaired_kept;
     }
 
     PruneResult {
@@ -327,7 +248,7 @@ pub fn prune_history_for_context_share(
 /// Format messages into a plain-text summary suitable for injection as system context.
 /// This is a local summarizer that doesn't call an LLM. For LLM-based summarization,
 /// use `summarize_with_provider`.
-pub fn format_messages_as_summary(messages: &[CompactionMessage]) -> String {
+pub fn format_messages_as_summary(messages: &[ChatMessage]) -> String {
     if messages.is_empty() {
         return DEFAULT_SUMMARY_FALLBACK.to_string();
     }
@@ -336,13 +257,28 @@ pub fn format_messages_as_summary(messages: &[CompactionMessage]) -> String {
     lines.push("=== Conversation Summary ===".to_string());
 
     for msg in messages {
-        let role = msg.role.to_uppercase();
-        let content = if msg.content.len() > 500 {
-            format!("{}…", &msg.content[..500])
-        } else {
-            msg.content.clone()
+        let (role, content) = match msg {
+            ChatMessage::System { content } => ("SYSTEM", content.clone()),
+            ChatMessage::User { content } => {
+                let text = match content {
+                    UserContent::Text(t) => t.clone(),
+                    UserContent::Parts(p) => p.iter().filter_map(|part| match part {
+                        ContentPart::Text { text } => Some(text.clone()),
+                        _ => None,
+                    }).collect::<Vec<_>>().join(" "),
+                };
+                ("USER", text)
+            }
+            ChatMessage::Assistant { content, .. } => ("ASSISTANT", content.clone().unwrap_or_default()),
+            ChatMessage::Tool { content, .. } => ("TOOL", content.clone()),
         };
-        lines.push(format!("[{}] {}", role, content));
+        
+        let display_content = if content.len() > 500 {
+            format!("{}…", &content[..500])
+        } else {
+            content
+        };
+        lines.push(format!("[{}] {}", role, display_content));
     }
 
     lines.join("\n")
@@ -350,10 +286,10 @@ pub fn format_messages_as_summary(messages: &[CompactionMessage]) -> String {
 
 /// Build a compacted context: prune → summarize dropped → prepend summary to kept messages.
 pub fn compact_transcript(
-    messages: &[CompactionMessage],
+    messages: &[ChatMessage],
     max_context_tokens: usize,
     custom_instructions: Option<&str>,
-) -> Vec<CompactionMessage> {
+) -> Vec<ChatMessage> {
     let prune = prune_history_for_context_share(messages, max_context_tokens, None, None);
 
     if prune.dropped_messages.is_empty() {
@@ -376,7 +312,7 @@ pub fn compact_transcript(
         prune.dropped_count, prune.dropped_tokens
     ));
 
-    let mut result = vec![CompactionMessage::system(instructions)];
+    let mut result = vec![ChatMessage::System { content: instructions }];
     result.extend(prune.messages);
     result
 }
@@ -392,28 +328,20 @@ pub fn resolve_context_window_tokens(context_window: Option<usize>) -> usize {
 mod tests {
     use super::*;
 
-    fn make_msgs(count: usize, content_len: usize) -> Vec<CompactionMessage> {
+    fn make_msgs(count: usize, content_len: usize) -> Vec<ChatMessage> {
         (0..count)
-            .map(|i| CompactionMessage::user("x".repeat(content_len) + &format!(" msg{}", i)))
+            .map(|i| ChatMessage::User { 
+                content: UserContent::Text("x".repeat(content_len) + &format!(" msg{}", i))
+            })
             .collect()
     }
 
     #[test]
     fn estimate_tokens_basic() {
-        let msg = CompactionMessage::user("hello world");
+        let msg = ChatMessage::User { content: UserContent::Text("hello world".into()) };
         let tokens = estimate_tokens(&msg);
-        // "user" (4) + "hello world" (11) = 15 chars → ceil(15/4) = 4
         assert!(tokens > 0);
         assert!(tokens < 20);
-    }
-
-    #[test]
-    fn estimate_tokens_ignores_details() {
-        let mut msg = CompactionMessage::user("hello");
-        msg.details = Some("x".repeat(10000));
-        let tokens = estimate_tokens(&msg);
-        // Details should NOT contribute to token count
-        assert!(tokens < 10);
     }
 
     #[test]
@@ -443,13 +371,6 @@ mod tests {
     fn chunk_by_max_tokens() {
         let msgs = make_msgs(20, 100);
         let chunks = chunk_messages_by_max_tokens(&msgs, 100);
-        // Each chunk should have roughly ≤ 100 tokens
-        for chunk in &chunks {
-            if chunk.len() == 1 {
-                // Single oversized messages are fine
-                continue;
-            }
-        }
         let total: usize = chunks.iter().map(|c| c.len()).sum();
         assert_eq!(total, 20);
     }
@@ -463,8 +384,7 @@ mod tests {
 
     #[test]
     fn adaptive_ratio_large_messages() {
-        // Messages that are about 10% of context window each
-        let msgs = make_msgs(5, 50000); // ~12500 tokens each
+        let msgs = make_msgs(5, 50000); 
         let ratio = compute_adaptive_chunk_ratio(&msgs, 128000);
         assert!(ratio < BASE_CHUNK_RATIO);
         assert!(ratio >= MIN_CHUNK_RATIO);
@@ -472,10 +392,10 @@ mod tests {
 
     #[test]
     fn oversized_check() {
-        let small = CompactionMessage::user("hello");
+        let small = ChatMessage::User { content: UserContent::Text("hello".into()) };
         assert!(!is_oversized_for_summary(&small, 128000));
 
-        let huge = CompactionMessage::user("x".repeat(300000));
+        let huge = ChatMessage::User { content: UserContent::Text("x".repeat(300000)) };
         assert!(is_oversized_for_summary(&huge, 128000));
     }
 
@@ -500,7 +420,6 @@ mod tests {
     fn compact_transcript_passthrough() {
         let msgs = make_msgs(3, 10);
         let result = compact_transcript(&msgs, 100000, None);
-        // Should pass through without compaction
         assert_eq!(result.len(), 3);
     }
 
@@ -508,9 +427,12 @@ mod tests {
     fn compact_transcript_compacts() {
         let msgs = make_msgs(100, 500);
         let result = compact_transcript(&msgs, 200, None);
-        // First message should be system summary
-        assert_eq!(result[0].role, "system");
-        assert!(result[0].content.contains("Conversation Summary"));
+        match &result[0] {
+            ChatMessage::System { content } => {
+                assert!(content.contains("Conversation Summary"));
+            }
+            _ => panic!("First message should be system summary"),
+        }
         assert!(result.len() < 100);
     }
 
@@ -521,7 +443,7 @@ mod tests {
 
     #[test]
     fn format_summary_truncates_long() {
-        let msg = CompactionMessage::user("x".repeat(1000));
+        let msg = ChatMessage::User { content: UserContent::Text("x".repeat(1000)) };
         let summary = format_messages_as_summary(&[msg]);
         assert!(summary.contains("…"));
     }

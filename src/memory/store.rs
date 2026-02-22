@@ -1,8 +1,62 @@
 use crate::memory::schema;
 use crate::sessions::{Session, VerbosityLevel};
 use rusqlite::{Connection, Result};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::path::Path;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SearchResult {
+    pub id: String,
+    pub path: String,
+    pub source: String,
+    pub model: String,
+    pub start_line: i32,
+    pub end_line: i32,
+    pub text: String,
+    pub score: f64,
+}
+
+impl crate::memory::temporal_decay::TemporalDecayItem for SearchResult {
+    fn path(&self) -> &str {
+        &self.path
+    }
+    fn source(&self) -> Option<&str> {
+        Some(&self.source)
+    }
+    fn score(&self) -> f64 {
+        self.score
+    }
+    fn with_score(&self, score: f64) -> Self {
+        let mut cloned = self.clone();
+        cloned.score = score;
+        cloned
+    }
+}
+
+impl crate::memory::mmr::WithScoreAndSnippet for SearchResult {
+    fn score(&self) -> f64 {
+        self.score
+    }
+    fn snippet(&self) -> &str {
+        &self.text
+    }
+    fn path(&self) -> &str {
+        &self.path
+    }
+    fn start_line(&self) -> i32 {
+        self.start_line
+    }
+}
+
+impl From<SearchResult> for crate::memory::mmr::MMRItem {
+    fn from(res: SearchResult) -> Self {
+        Self {
+            id: format!("{}:{}:{}", res.path, res.start_line, res.id),
+            score: res.score,
+            content: res.text,
+        }
+    }
+}
 
 pub struct MemoryStore {
     conn: std::sync::Mutex<Connection>,
@@ -101,6 +155,36 @@ impl MemoryStore {
         } else {
             Ok(None)
         }
+    }
+
+    pub fn get_file_hash(&self, path: &str, source: &str) -> Option<String> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn
+            .prepare("SELECT hash FROM files WHERE path = ?1 AND source = ?2")
+            .ok()?;
+        stmt.query_row([path, source], |row| row.get(0)).ok()
+    }
+
+    pub fn update_file_info(&self, path: &str, source: &str, hash: &str) -> Result<()> {
+        let now = chrono::Utc::now().timestamp();
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "INSERT INTO files (path, source, hash, mtime, size) 
+             VALUES (?1, ?2, ?3, ?4, ?5)
+             ON CONFLICT(path) DO UPDATE SET 
+               hash=excluded.hash, 
+               mtime=excluded.mtime",
+            rusqlite::params![path, source, hash, now, 0], // size 0 for now
+        )?;
+        Ok(())
+    }
+
+    pub fn has_chunks_for_path(&self, path: &str, source: &str, model: &str) -> Result<bool> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare(
+            "SELECT 1 FROM chunks WHERE path = ?1 AND source = ?2 AND model = ?3 LIMIT 1",
+        )?;
+        Ok(stmt.exists([path, source, model])?)
     }
 
     pub fn build_fts_query(&self, raw: &str) -> Option<String> {
@@ -310,20 +394,45 @@ impl MemoryStore {
         let conn = self.conn.lock().unwrap();
         conn.execute(
             "INSERT OR REPLACE INTO sessions (
-                id, label, model_override, verbosity, send_policy, elevated, 
-                transcript, max_transcript, created_at, last_active, metadata
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+                id, label, display_name, model_override, verbosity, delivery_mode, 
+                send_policy, elevated, transcript, max_transcript, created_at, 
+                last_active, provider_override, auth_profile_override, 
+                auth_profile_override_source, auth_profile_override_compaction_count,
+                fallback_notice_selected_model, fallback_notice_active_model, 
+                fallback_notice_reason, channel, last_channel, chat_type, 
+                thinking_level, reasoning_level, response_usage,
+                input_tokens, output_tokens, total_tokens, context_tokens, metadata
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25, ?26, ?27, ?28, ?29, ?30)",
             rusqlite::params![
                 session.id,
                 session.label,
+                session.display_name,
                 session.model_override,
                 session.verbosity.as_str(),
+                serde_json::to_string(&session.delivery_mode).unwrap_or_default(),
                 serde_json::to_string(&session.send_policy).unwrap_or_default(),
                 elevated,
                 transcript_json,
                 session.max_transcript as i64,
                 created_at,
                 last_active,
+                session.provider_override,
+                session.auth_profile_override,
+                session.auth_profile_override_source,
+                session.auth_profile_override_compaction_count,
+                session.fallback_notice_selected_model,
+                session.fallback_notice_active_model,
+                session.fallback_notice_reason,
+                session.channel,
+                session.last_channel,
+                session.chat_type,
+                serde_json::to_string(&session.thinking_level).unwrap_or_default(),
+                serde_json::to_string(&session.reasoning_level).unwrap_or_default(),
+                serde_json::to_string(&session.response_usage).unwrap_or_default(),
+                session.input_tokens as i64,
+                session.output_tokens as i64,
+                session.total_tokens as i64,
+                session.context_tokens as i64,
                 metadata_json
             ],
         )?;
@@ -333,33 +442,62 @@ impl MemoryStore {
     pub fn load_session(&self, id: &str) -> Result<Option<Session>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, label, model_override, verbosity, send_policy, elevated, 
-                    transcript, max_transcript, created_at, last_active, metadata 
+            "SELECT id, label, display_name, model_override, verbosity, delivery_mode, 
+                    send_policy, elevated, transcript, max_transcript, created_at, 
+                    last_active, provider_override, auth_profile_override, 
+                    auth_profile_override_source, auth_profile_override_compaction_count,
+                    fallback_notice_selected_model, fallback_notice_active_model, 
+                    fallback_notice_reason, channel, last_channel, chat_type, 
+                    thinking_level, reasoning_level, response_usage,
+                    input_tokens, output_tokens, total_tokens, context_tokens, metadata 
              FROM sessions WHERE id = ?1",
         )?;
 
         let mut rows = stmt.query([id])?;
         if let Some(row) = rows.next()? {
-            let verbosity_str: String = row.get(3)?;
-            let send_policy_json: String = row.get(4)?;
-            let transcript_json: String = row.get(6)?;
-            let metadata_json: String = row.get(10)?;
+            let verbosity_str: String = row.get(4)?;
+            let delivery_mode_json: String = row.get(5)?;
+            let send_policy_json: String = row.get(6)?;
+            let transcript_json: String = row.get(8)?;
+            let thinking_level_json: String = row.get(22)?;
+            let reasoning_level_json: String = row.get(23)?;
+            let response_usage_json: String = row.get(24)?;
+            let metadata_json: String = row.get(29)?;
 
-            let created_at_ts: i64 = row.get(8)?;
-            let last_active_ts: i64 = row.get(9)?;
+            let created_at_ts: i64 = row.get(10)?;
+            let last_active_ts: i64 = row.get(11)?;
 
             let session = Session {
                 id: row.get(0)?,
                 label: row.get(1)?,
-                model_override: row.get(2)?,
+                display_name: row.get(2)?,
+                model_override: row.get(3)?,
                 verbosity: VerbosityLevel::from_str(&verbosity_str),
+                delivery_mode: serde_json::from_str(&delivery_mode_json).unwrap_or_default(),
                 send_policy: serde_json::from_str(&send_policy_json).unwrap_or_default(),
-                elevated: row.get::<_, i32>(5)? != 0,
+                elevated: row.get::<_, i32>(7)? != 0,
                 transcript: serde_json::from_str(&transcript_json).unwrap_or_default(),
-                max_transcript: row.get::<_, i64>(7)? as usize,
+                max_transcript: row.get::<_, i64>(9)? as usize,
                 created_at: chrono::DateTime::from_timestamp(created_at_ts, 0).unwrap_or_default(),
                 last_active: chrono::DateTime::from_timestamp(last_active_ts, 0)
                     .unwrap_or_default(),
+                provider_override: row.get(12)?,
+                auth_profile_override: row.get(13)?,
+                auth_profile_override_source: row.get(14)?,
+                auth_profile_override_compaction_count: row.get(15)?,
+                fallback_notice_selected_model: row.get(16)?,
+                fallback_notice_active_model: row.get(17)?,
+                fallback_notice_reason: row.get(18)?,
+                channel: row.get(19)?,
+                last_channel: row.get(20)?,
+                chat_type: row.get(21)?,
+                thinking_level: serde_json::from_str(&thinking_level_json).unwrap_or_default(),
+                reasoning_level: serde_json::from_str(&reasoning_level_json).unwrap_or_default(),
+                response_usage: serde_json::from_str(&response_usage_json).unwrap_or_default(),
+                input_tokens: row.get::<_, i64>(25)? as u32,
+                output_tokens: row.get::<_, i64>(26)? as u32,
+                total_tokens: row.get::<_, i64>(27)? as u32,
+                context_tokens: row.get::<_, i64>(28)? as u32,
                 metadata: serde_json::from_str(&metadata_json).unwrap_or_default(),
             };
             Ok(Some(session))
@@ -371,32 +509,61 @@ impl MemoryStore {
     pub fn list_sessions(&self) -> Result<Vec<Session>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, label, model_override, verbosity, send_policy, elevated, 
-                    transcript, max_transcript, created_at, last_active, metadata 
+            "SELECT id, label, display_name, model_override, verbosity, delivery_mode, 
+                    send_policy, elevated, transcript, max_transcript, created_at, 
+                    last_active, provider_override, auth_profile_override, 
+                    auth_profile_override_source, auth_profile_override_compaction_count,
+                    fallback_notice_selected_model, fallback_notice_active_model, 
+                    fallback_notice_reason, channel, last_channel, chat_type, 
+                    thinking_level, reasoning_level, response_usage,
+                    input_tokens, output_tokens, total_tokens, context_tokens, metadata 
              FROM sessions ORDER BY last_active DESC",
         )?;
 
         let session_rows = stmt.query_map([], |row| {
-            let verbosity_str: String = row.get(3)?;
-            let send_policy_json: String = row.get(4)?;
-            let transcript_json: String = row.get(6)?;
-            let metadata_json: String = row.get(10)?;
+            let verbosity_str: String = row.get(4)?;
+            let delivery_mode_json: String = row.get(5)?;
+            let send_policy_json: String = row.get(6)?;
+            let transcript_json: String = row.get(8)?;
+            let thinking_level_json: String = row.get(22)?;
+            let reasoning_level_json: String = row.get(23)?;
+            let response_usage_json: String = row.get(24)?;
+            let metadata_json: String = row.get(29)?;
 
-            let created_at_ts: i64 = row.get(8)?;
-            let last_active_ts: i64 = row.get(9)?;
+            let created_at_ts: i64 = row.get(10)?;
+            let last_active_ts: i64 = row.get(11)?;
 
             Ok(Session {
                 id: row.get(0)?,
                 label: row.get(1)?,
-                model_override: row.get(2)?,
+                display_name: row.get(2)?,
+                model_override: row.get(3)?,
                 verbosity: VerbosityLevel::from_str(&verbosity_str),
+                delivery_mode: serde_json::from_str(&delivery_mode_json).unwrap_or_default(),
                 send_policy: serde_json::from_str(&send_policy_json).unwrap_or_default(),
-                elevated: row.get::<_, i32>(5)? != 0,
+                elevated: row.get::<_, i32>(7)? != 0,
                 transcript: serde_json::from_str(&transcript_json).unwrap_or_default(),
-                max_transcript: row.get::<_, i64>(7)? as usize,
+                max_transcript: row.get::<_, i64>(9)? as usize,
                 created_at: chrono::DateTime::from_timestamp(created_at_ts, 0).unwrap_or_default(),
                 last_active: chrono::DateTime::from_timestamp(last_active_ts, 0)
                     .unwrap_or_default(),
+                provider_override: row.get(12)?,
+                auth_profile_override: row.get(13)?,
+                auth_profile_override_source: row.get(14)?,
+                auth_profile_override_compaction_count: row.get(15)?,
+                fallback_notice_selected_model: row.get(16)?,
+                fallback_notice_active_model: row.get(17)?,
+                fallback_notice_reason: row.get(18)?,
+                channel: row.get(19)?,
+                last_channel: row.get(20)?,
+                chat_type: row.get(21)?,
+                thinking_level: serde_json::from_str(&thinking_level_json).unwrap_or_default(),
+                reasoning_level: serde_json::from_str(&reasoning_level_json).unwrap_or_default(),
+                response_usage: serde_json::from_str(&response_usage_json).unwrap_or_default(),
+                input_tokens: row.get::<_, i64>(25)? as u32,
+                output_tokens: row.get::<_, i64>(26)? as u32,
+                total_tokens: row.get::<_, i64>(27)? as u32,
+                context_tokens: row.get::<_, i64>(28)? as u32,
                 metadata: serde_json::from_str(&metadata_json).unwrap_or_default(),
             })
         })?;
@@ -413,18 +580,6 @@ impl MemoryStore {
         conn.execute("DELETE FROM sessions WHERE id = ?1", [id])?;
         Ok(())
     }
-}
-
-#[derive(Debug, Serialize)]
-pub struct SearchResult {
-    pub id: String,
-    pub path: String,
-    pub source: String,
-    pub model: String,
-    pub start_line: i32,
-    pub end_line: i32,
-    pub text: String,
-    pub score: f64,
 }
 
 #[derive(Debug)]

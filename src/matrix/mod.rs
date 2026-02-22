@@ -577,7 +577,7 @@ pub fn create_matrix_channel() -> (
 // ─── Monitor ─────────────────────────────────────────────────────────────────
 
 pub struct Monitor {
-#[allow(dead_code)]
+    #[allow(dead_code)]
     client: reqwest::Client,
     config: Arc<MatrixConfig>,
     shutdown_tx: Option<mpsc::Sender<()>>,

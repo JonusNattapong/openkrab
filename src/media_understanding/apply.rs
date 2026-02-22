@@ -1,7 +1,7 @@
 use crate::media_understanding::attachments::{MediaAttachment, MediaAttachmentCache};
 use crate::media_understanding::resolve::{
-    resolve_max_bytes, resolve_prompt, resolve_scope_decision,
-    resolve_timeout_ms, MediaContext as ResolveMediaContext,
+    resolve_max_bytes, resolve_prompt, resolve_scope_decision, resolve_timeout_ms,
+    MediaContext as ResolveMediaContext,
 };
 use crate::media_understanding::types::MediaUnderstandingError;
 use crate::media_understanding::{
@@ -78,14 +78,14 @@ pub async fn apply_media_understanding(
 
     for result in results {
         let (decision, outputs) = result?;
-        
+
         match decision.capability.as_str() {
             "image" => applied_image = true,
             "audio" => applied_audio = true,
             "video" => applied_video = true,
             _ => {}
         }
-        
+
         all_decisions.push(decision);
         all_outputs.extend(outputs);
     }
@@ -146,7 +146,8 @@ async fn run_capability(
 
     // Check scope
     let resolve_ctx = to_resolve_context(ctx);
-    let scope_decision = resolve_scope_decision(&config.scope.clone().unwrap_or_default(), &resolve_ctx);
+    let scope_decision =
+        resolve_scope_decision(&config.scope.clone().unwrap_or_default(), &resolve_ctx);
     if scope_decision == crate::media_understanding::resolve::ScopePolicy::Deny {
         return Ok((
             MediaUnderstandingDecision {

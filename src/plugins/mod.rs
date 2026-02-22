@@ -5,8 +5,8 @@ use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub mod loader;
 pub mod hot_reload;
+pub mod loader;
 pub mod sandbox;
 #[cfg(feature = "wasm-plugins")]
 pub mod wasm_runtime;

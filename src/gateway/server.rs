@@ -1,10 +1,9 @@
 use axum::{
     extract::connect_info::ConnectInfo,
     extract::{ws::Message, ws::WebSocketUpgrade, State},
-    Json,
     response::Response,
     routing::{get, post},
-    Router,
+    Json, Router,
 };
 use futures_util::{SinkExt, StreamExt};
 use std::collections::HashMap;
@@ -105,7 +104,11 @@ impl GatewayServer {
             }
         }
 
-        tracing::debug!("Broadcast delivered to {}/{} clients", delivered, clients.len());
+        tracing::debug!(
+            "Broadcast delivered to {}/{} clients",
+            delivered,
+            clients.len()
+        );
 
         Ok(())
     }
@@ -239,14 +242,18 @@ async fn handle_socket(
                             // Get or create session
                             let mut sessions_lock = server.sessions.write().await;
                             let session = sessions_lock.get_or_create(&session_key);
-                            session.append_transcript(crate::sessions::TranscriptEntry::user(&message));
-                            
+                            session.append_transcript(crate::sessions::TranscriptEntry::user(
+                                &message,
+                            ));
+
                             // Drop lock before async call
                             drop(sessions_lock);
 
                             // Process message
                             let mut sessions_lock = server.sessions.write().await;
-                            let reply = agent.answer_session(sessions_lock.get_or_create(&session_key), None).await;
+                            let reply = agent
+                                .answer_session(sessions_lock.get_or_create(&session_key), None)
+                                .await;
                             drop(sessions_lock);
 
                             match reply {
@@ -255,7 +262,10 @@ async fn handle_socket(
                                     let mut out_payload = crate::hooks::HookPayload::new();
                                     out_payload.set("session_key", session_key.clone());
                                     out_payload.set("reply", text.clone());
-                                    crate::hooks::emit(crate::hooks::events::MESSAGE_OUTBOUND, &out_payload);
+                                    crate::hooks::emit(
+                                        crate::hooks::events::MESSAGE_OUTBOUND,
+                                        &out_payload,
+                                    );
 
                                     let response = GatewayMessage::Chat {
                                         session_key: session_key.clone(),
@@ -293,8 +303,11 @@ async fn handle_socket(
                     }
                     Ok(GatewayMessage::Status { .. }) => {
                         let sessions_registry = server.sessions.read().await;
-                        let sessions: Vec<GatewaySessionRow> = sessions_registry.iter().map(|(_, s)| GatewaySessionRow::from(s)).collect();
-                        
+                        let sessions: Vec<GatewaySessionRow> = sessions_registry
+                            .iter()
+                            .map(|(_, s)| GatewaySessionRow::from(s))
+                            .collect();
+
                         let agents = if let Some(agent) = &server.agent {
                             vec![GatewayAgentRow {
                                 id: agent.identity.name.clone().to_lowercase(),
@@ -382,7 +395,11 @@ pub async fn start_gateway_server(
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     let _server_handle = tokio::spawn(async move {
-        axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await
+        axum::serve(
+            listener,
+            app.into_make_service_with_connect_info::<SocketAddr>(),
+        )
+        .await
     });
 
     // In a real implementation, we'd return a handle to stop the server

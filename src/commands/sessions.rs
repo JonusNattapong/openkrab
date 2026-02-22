@@ -59,12 +59,12 @@ pub fn sessions_list_command(opts: SessionListOptions) -> String {
                 .filter(|s| {
                     opts.channel
                         .as_ref()
-                        .map(|c| s.get_meta("channel").map(|sc| sc == c).unwrap_or(false))
+                        .map(|c| s.channel.as_deref() == Some(c))
                         .unwrap_or(true)
                 })
                 .filter(|s| {
                     if opts.active_only {
-                        s.get_meta("archived").map(|v| v != "true").unwrap_or(true)
+                        s.get_meta("archived") != Some("true")
                     } else {
                         true
                     }
@@ -85,16 +85,24 @@ pub fn sessions_list_command(opts: SessionListOptions) -> String {
                     } else {
                         ""
                     };
-                    let channel = session.get_meta("channel").unwrap_or("?");
+                    let channel = session.channel.as_deref().unwrap_or("?");
+                    let label = session.display_name.as_deref().or(session.label.as_deref()).unwrap_or(&session.id);
+                    let tokens = if session.total_tokens > 0 {
+                        format!(" | {} tok", session.total_tokens)
+                    } else {
+                        "".to_string()
+                    };
+
                     lines.push(format!(
-                        "  {} {} | {} | {} | {} msgs | Last: {}{}",
+                        "  {} {} | {} | {} | {} msgs{}{} | Last: {}",
                         lock_icon,
                         session.id,
-                        session.label.as_deref().unwrap_or(&session.id),
+                        label,
                         channel,
                         session.transcript.len(),
-                        session.last_active.format("%Y-%m-%d %H:%M"),
-                        archived_suffix
+                        tokens,
+                        archived_suffix,
+                        session.last_active.format("%Y-%m-%d %H:%M")
                     ));
                 }
             }
@@ -115,19 +123,38 @@ pub fn sessions_get_command(session_id: &str) -> String {
         Ok(Some(s)) => {
             let mut out = format!("Session: {}\n", s.id);
             out.push_str(&format!(
+                "  Display Name: {}\n",
+                s.display_name.as_deref().unwrap_or("none")
+            ));
+            out.push_str(&format!(
                 "  Label: {}\n",
                 s.label.as_deref().unwrap_or("none")
             ));
             out.push_str(&format!(
                 "  Channel: {}\n",
-                s.get_meta("channel").unwrap_or("unknown")
+                s.channel.as_deref().unwrap_or("unknown")
+            ));
+            out.push_str(&format!(
+                "  Chat Type: {}\n",
+                s.chat_type.as_deref().unwrap_or("unknown")
             ));
             out.push_str(&format!(
                 "  Model Override: {}\n",
                 s.model_override.as_deref().unwrap_or("none")
             ));
             out.push_str(&format!("  Verbosity: {}\n", s.verbosity.as_str()));
+            if let Some(dm) = s.delivery_mode {
+                out.push_str(&format!("  Delivery Mode: {:?}\n", dm));
+            }
+            if let Some(sp) = s.send_policy {
+                out.push_str(&format!("  Send Policy: {:?}\n", sp));
+            }
+            if let Some(tl) = s.thinking_level {
+                out.push_str(&format!("  Thinking Level: {:?}\n", tl));
+            }
             out.push_str(&format!("  Elevated: {}\n", s.elevated));
+            out.push_str(&format!("  Usage: {} in / {} out / {} total ({} ctx)\n", 
+                s.input_tokens, s.output_tokens, s.total_tokens, s.context_tokens));
             out.push_str(&format!("  Created: {}\n", s.created_at));
             out.push_str(&format!("  Last Active: {}\n", s.last_active));
 
@@ -247,10 +274,11 @@ pub fn sessions_stats_command() -> String {
             let total = sessions.len();
             let elevated = sessions.iter().filter(|s| s.elevated).count();
             let total_msgs: usize = sessions.iter().map(|s| s.transcript.len()).sum();
+            let total_tokens: u32 = sessions.iter().map(|s| s.total_tokens).sum();
 
             let mut by_channel: HashMap<String, usize> = HashMap::new();
             for s in &sessions {
-                let chan = s.get_meta("channel").unwrap_or("unknown").to_string();
+                let chan = s.channel.clone().unwrap_or_else(|| "unknown".to_string());
                 *by_channel.entry(chan).or_insert(0) += 1;
             }
 
@@ -258,6 +286,7 @@ pub fn sessions_stats_command() -> String {
             out.push_str(&format!("  Total sessions: {}\n", total));
             out.push_str(&format!("  Elevated sessions: {}\n", elevated));
             out.push_str(&format!("  Total transcript entries: {}\n", total_msgs));
+            out.push_str(&format!("  Total tokens processed: {}\n", total_tokens));
             out.push_str("  By channel:\n");
             for (chan, count) in by_channel {
                 out.push_str(&format!("    {}: {}\n", chan, count));

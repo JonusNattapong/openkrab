@@ -77,7 +77,10 @@ pub trait WizardPrompter: Send + Sync {
     async fn select(&self, params: WizardSelectParams<String>) -> anyhow::Result<String>;
 
     /// Prompt the user to select multiple options from a list.
-    async fn multiselect(&self, params: WizardMultiSelectParams<String>) -> anyhow::Result<Vec<String>>;
+    async fn multiselect(
+        &self,
+        params: WizardMultiSelectParams<String>,
+    ) -> anyhow::Result<Vec<String>>;
 
     /// Prompt the user for text input.
     async fn text(&self, params: WizardTextParams) -> anyhow::Result<String>;
@@ -154,7 +157,11 @@ impl WizardPrompter for CliPrompter {
         println!("│");
         println!("◆  {}", params.message);
         for (i, opt) in params.options.iter().enumerate() {
-            let hint = opt.hint.as_deref().map(|h| format!(" ({})", h)).unwrap_or_default();
+            let hint = opt
+                .hint
+                .as_deref()
+                .map(|h| format!(" ({})", h))
+                .unwrap_or_default();
             println!("│  {}. {}{}", i + 1, opt.label, hint);
         }
 
@@ -169,18 +176,29 @@ impl WizardPrompter for CliPrompter {
                 }
             }
             // Also check if they typed the value directly
-            if let Some(opt) = params.options.iter().find(|o| o.value == trimmed || o.label.eq_ignore_ascii_case(trimmed)) {
+            if let Some(opt) = params
+                .options
+                .iter()
+                .find(|o| o.value == trimmed || o.label.eq_ignore_ascii_case(trimmed))
+            {
                 return Ok(opt.value.clone());
             }
             println!("│  Invalid selection, try again.");
         }
     }
 
-    async fn multiselect(&self, params: WizardMultiSelectParams<String>) -> anyhow::Result<Vec<String>> {
+    async fn multiselect(
+        &self,
+        params: WizardMultiSelectParams<String>,
+    ) -> anyhow::Result<Vec<String>> {
         println!("│");
         println!("◆  {} (comma-separated numbers)", params.message);
         for (i, opt) in params.options.iter().enumerate() {
-            let hint = opt.hint.as_deref().map(|h| format!(" ({})", h)).unwrap_or_default();
+            let hint = opt
+                .hint
+                .as_deref()
+                .map(|h| format!(" ({})", h))
+                .unwrap_or_default();
             println!("│  {}. {}{}", i + 1, opt.label, hint);
         }
 

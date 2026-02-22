@@ -71,10 +71,7 @@ pub async fn setup_onboarding_shell_completion(
     } else {
         prompter
             .confirm(WizardConfirmParams {
-                message: format!(
-                    "Enable {} shell completion for {}?",
-                    shell, cli_name
-                ),
+                message: format!("Enable {} shell completion for {}?", shell, cli_name),
                 initial_value: Some(true),
             })
             .await?
@@ -124,10 +121,33 @@ fn install_shell_completion(shell: &str, cli_name: &str) -> Result<()> {
 
 fn command_words() -> &'static [&'static str] {
     &[
-        "hello", "status", "doctor", "onboard", "shell", "telegram", "slack", "discord",
-        "whatsapp", "configure", "ask", "memory", "gateway", "models", "models-auth",
-        "login", "bridge", "channels", "cron", "admin", "pairing", "sandbox", "sessions",
-        "logs", "message", "health", "config",
+        "hello",
+        "status",
+        "doctor",
+        "onboard",
+        "shell",
+        "telegram",
+        "slack",
+        "discord",
+        "whatsapp",
+        "configure",
+        "ask",
+        "memory",
+        "gateway",
+        "models",
+        "models-auth",
+        "login",
+        "bridge",
+        "channels",
+        "cron",
+        "admin",
+        "pairing",
+        "sandbox",
+        "sessions",
+        "logs",
+        "message",
+        "health",
+        "config",
     ]
 }
 

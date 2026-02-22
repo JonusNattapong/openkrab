@@ -10,10 +10,31 @@ const ALLOWED_COMMANDS: &[&str] = &[
 
 // Prevent command injection by validating command strings
 const BLOCKED_COMMAND_PATTERNS: &[&str] = &[
-    ";", "&", "|", "&&", "||", "`", "$(", "${", "<>", ">", "<",
-    "/etc/passwd", "/etc/shadow", "/etc/hosts", "/etc/sudoers",
-    "/proc/", "/dev/", "/sys/", "/boot/", "/root/",
-    "../", "..\\", "\\..", "./", ".\\",
+    ";",
+    "&",
+    "|",
+    "&&",
+    "||",
+    "`",
+    "$(",
+    "${",
+    "<>",
+    ">",
+    "<",
+    "/etc/passwd",
+    "/etc/shadow",
+    "/etc/hosts",
+    "/etc/sudoers",
+    "/proc/",
+    "/dev/",
+    "/sys/",
+    "/boot/",
+    "/root/",
+    "../",
+    "..\\",
+    "\\..",
+    "./",
+    ".\\",
 ];
 
 // Additional security: only allow specific formats

@@ -67,7 +67,8 @@ async fn send_telegram_message(_opts: &MessageSendOptions) -> anyhow::Result<Str
         .map_err(|_| anyhow::anyhow!("TELEGRAM_BOT_TOKEN is not set"))?;
     let client = crate::infra::retry_http::build_retrying_client();
     let reply_to_id = _opts.reply_to.as_ref().and_then(|s| s.parse::<i64>().ok());
-    let resp = telegram_client::send_message(&client, &token, &_opts.to, &_opts.text, reply_to_id).await?;
+    let resp =
+        telegram_client::send_message(&client, &token, &_opts.to, &_opts.text, reply_to_id).await?;
 
     if resp.get("ok").and_then(|v| v.as_bool()) != Some(true) {
         return Err(anyhow::anyhow!("Telegram API returned error: {}", resp));
@@ -91,7 +92,8 @@ async fn send_discord_message(_opts: &MessageSendOptions) -> anyhow::Result<Stri
         embeds: None,
         silent: _opts.silent,
     };
-    let res = discord_client::send_message(&client, &token, &_opts.to, &_opts.text, Some(opts)).await?;
+    let res =
+        discord_client::send_message(&client, &token, &_opts.to, &_opts.text, Some(opts)).await?;
     Ok(res.message_id)
 }
 

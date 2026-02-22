@@ -282,12 +282,9 @@ impl CdpSession {
         }
 
         // Wait for response with timeout
-        let result = timeout(
-            Duration::from_millis(self.config.operation_timeout_ms),
-            rx,
-        )
-        .await
-        .with_context(|| format!("CDP call timeout: {}", method))?;
+        let result = timeout(Duration::from_millis(self.config.operation_timeout_ms), rx)
+            .await
+            .with_context(|| format!("CDP call timeout: {}", method))?;
 
         match result {
             Ok(Ok(response)) => Ok(response),
@@ -300,10 +297,7 @@ impl CdpSession {
     pub async fn subscribe_event(&self, event: &str) -> Result<mpsc::UnboundedReceiver<Value>> {
         let (tx, rx) = mpsc::unbounded_channel();
         let mut handlers = self.event_handlers.write().await;
-        handlers
-            .entry(event.to_string())
-            .or_default()
-            .push(tx);
+        handlers.entry(event.to_string()).or_default().push(tx);
         Ok(rx)
     }
 
@@ -372,11 +366,11 @@ impl BrowserManager {
 
         let session = CdpSession::new(&ws_url, SessionConfig::default()).await?;
         let shared_session = Arc::new(session);
-        
+
         // We need to store it in a way we can clone handles
         // Since CdpSession has shutdown_tx, we store the original and return clones
         let master_session = Arc::try_unwrap(shared_session).map_err(|_| anyhow!("Arc error"))?;
-        
+
         let ws_url_clone = master_session.ws_url.clone();
         let config_clone = master_session.config.clone();
         let pending = master_session.pending_requests.clone();
@@ -425,7 +419,9 @@ impl BrowserManager {
         let session = self.get_session(tab_id).await?;
 
         // First try: Use DOM.querySelector + DOM.click
-        let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
+        let result = session
+            .call("DOM.getDocument", json!({ "depth": 0 }))
+            .await?;
 
         let root_node_id = result
             .get("result")
@@ -452,10 +448,7 @@ impl BrowserManager {
 
         // Scroll into view and click
         session
-            .call(
-                "DOM.scrollIntoViewIfNeeded",
-                json!({ "nodeId": node_id }),
-            )
+            .call("DOM.scrollIntoViewIfNeeded", json!({ "nodeId": node_id }))
             .await?;
 
         // Get box model for click coordinates
@@ -512,7 +505,9 @@ impl BrowserManager {
         let session = self.get_session(tab_id).await?;
 
         // Focus the element first
-        let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
+        let result = session
+            .call("DOM.getDocument", json!({ "depth": 0 }))
+            .await?;
 
         let root_node_id = result
             .get("result")
@@ -538,7 +533,9 @@ impl BrowserManager {
             .ok_or_else(|| anyhow!("Element not found: {}", selector))?;
 
         // Focus element
-        session.call("DOM.focus", json!({ "nodeId": node_id })).await?;
+        session
+            .call("DOM.focus", json!({ "nodeId": node_id }))
+            .await?;
 
         // Type each character
         for ch in text.chars() {
@@ -569,12 +566,7 @@ impl BrowserManager {
     }
 
     /// Upload files to a file input element
-    pub async fn upload_files(
-        &self,
-        tab_id: &str,
-        selector: &str,
-        files: &[String],
-    ) -> Result<()> {
+    pub async fn upload_files(&self, tab_id: &str, selector: &str, files: &[String]) -> Result<()> {
         let session = self.get_session(tab_id).await?;
 
         // Normalize paths to absolute paths
@@ -592,7 +584,9 @@ impl BrowserManager {
             absolute_files.push(abs.to_string_lossy().to_string());
         }
 
-        let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
+        let result = session
+            .call("DOM.getDocument", json!({ "depth": 0 }))
+            .await?;
 
         let root_node_id = result
             .get("result")
@@ -662,7 +656,9 @@ impl BrowserManager {
         let session = self.get_session(tab_id).await?;
 
         // Get document info
-        let _doc_result = session.call("DOM.getDocument", json!({ "depth": 2 })).await?;
+        let _doc_result = session
+            .call("DOM.getDocument", json!({ "depth": 2 }))
+            .await?;
 
         // Get page info via Runtime.evaluate
         let info_result = session
@@ -729,10 +725,7 @@ impl BrowserManager {
             .await?;
 
         // Check for exception
-        if let Some(exception) = result
-            .get("result")
-            .and_then(|r| r.get("exceptionDetails"))
-        {
+        if let Some(exception) = result.get("result").and_then(|r| r.get("exceptionDetails")) {
             let message = exception
                 .get("exception")
                 .and_then(|e| e.get("description"))
@@ -759,7 +752,9 @@ impl BrowserManager {
         let start = std::time::Instant::now();
 
         loop {
-            let result = session.call("DOM.getDocument", json!({ "depth": 0 })).await?;
+            let result = session
+                .call("DOM.getDocument", json!({ "depth": 0 }))
+                .await?;
 
             let root_node_id = result
                 .get("result")
@@ -966,10 +961,7 @@ async fn list_tabs(profile: &str) -> Result<Vec<BrowserTab>> {
                 .get("webSocketDebuggerUrl")
                 .and_then(Value::as_str)
                 .map(ToString::to_string),
-            target_id: t
-                .get("id")
-                .and_then(Value::as_str)
-                .map(ToString::to_string),
+            target_id: t.get("id").and_then(Value::as_str).map(ToString::to_string),
         })
         .collect())
 }
@@ -1013,10 +1005,7 @@ async fn open_tab(profile: &str, url: &str) -> Result<BrowserTab> {
             .get("webSocketDebuggerUrl")
             .and_then(Value::as_str)
             .map(ToString::to_string),
-        target_id: v
-            .get("id")
-            .and_then(Value::as_str)
-            .map(ToString::to_string),
+        target_id: v.get("id").and_then(Value::as_str).map(ToString::to_string),
     })
 }
 
@@ -1087,11 +1076,7 @@ pub async fn type_text(profile: &str, selector: &str, text: &str) -> Result<()> 
 }
 
 /// Backward-compatible upload_files function
-pub async fn upload_files(
-    profile: &str,
-    selector: &str,
-    files: &[String],
-) -> Result<()> {
+pub async fn upload_files(profile: &str, selector: &str, files: &[String]) -> Result<()> {
     let manager = BrowserManager::new(profile).await?;
     let tabs = manager.list_tabs().await?;
     let first_tab = tabs

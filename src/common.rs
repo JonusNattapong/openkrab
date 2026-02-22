@@ -74,9 +74,7 @@ pub struct PathParamOptions {
 pub type ActionGate = dyn Fn(&str, Option<bool>) -> bool + Send + Sync;
 
 /// Create an action gate from a configuration map
-pub fn create_action_gate(
-    actions: Option<HashMap<String, bool>>,
-) -> Box<ActionGate> {
+pub fn create_action_gate(actions: Option<HashMap<String, bool>>) -> Box<ActionGate> {
     let actions = actions.unwrap_or_default();
     Box::new(move |key: &str, default_value: Option<bool>| -> bool {
         actions
@@ -485,7 +483,9 @@ mod tests {
             "screenshot_url": "https://example.com/file.png?token=secret&x=1"
         });
 
-        sanitize_tool_result_images(&mut payload, None).await.unwrap();
+        sanitize_tool_result_images(&mut payload, None)
+            .await
+            .unwrap();
         assert_eq!(
             payload["screenshot_url"].as_str().unwrap(),
             "https://example.com/file.png"

@@ -821,7 +821,7 @@ impl EventHandler for DiscordEventHandler {
         tracing::debug!("[discord] inbound={:?}", inbound);
 
         mark_inbound();
-        
+
         let agent = match &self.state.agent {
             Some(agent) => agent,
             None => {
@@ -829,7 +829,7 @@ impl EventHandler for DiscordEventHandler {
                 return;
             }
         };
-        
+
         let answer = agent.answer(&inbound.text).await;
         match answer {
             Ok(text) => {

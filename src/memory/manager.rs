@@ -83,19 +83,30 @@ impl std::fmt::Debug for MemoryManager {
 use crate::memory::store::SearchResult;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Copy)]
+use crate::memory::mmr::{apply_mmr_to_results, MMRConfig};
+use crate::memory::temporal_decay::{apply_temporal_decay_to_results, TemporalDecayConfig};
+
+#[derive(Debug, Clone)]
 pub struct HybridSearchOptions {
     pub max_results: usize,
+    pub min_score: f64,
     pub vector_weight: f64,
     pub text_weight: f64,
+    pub temporal_decay: Option<TemporalDecayConfig>,
+    pub mmr: Option<MMRConfig>,
+    pub workspace_dir: PathBuf,
 }
 
 impl Default for HybridSearchOptions {
     fn default() -> Self {
         Self {
             max_results: 10,
+            min_score: 0.1,
             vector_weight: 0.7,
             text_weight: 0.3,
+            temporal_decay: None,
+            mmr: None,
+            workspace_dir: PathBuf::new(),
         }
     }
 }
@@ -119,58 +130,121 @@ impl MemoryManager {
         opts: HybridSearchOptions,
     ) -> Result<Vec<SearchResult>> {
         let model = self.provider.model();
+        let candidates = opts.max_results * 2;
 
-        // 1. Keyword search (FTS5)
-        let keyword_results = self.store.search_fts(query, model, opts.max_results * 2)?;
+        // 1. Keyword search (FTS5) - with query expansion (OR)
+        let (_original, _keywords, expanded) = crate::memory::query_expansion::expand_query_for_fts(query);
+        let search_terms = if expanded.is_empty() { query } else { &expanded };
+
+        // Use an empty string for FTS model if we want to search all models, but for now we limit to current model
+        let keyword_results = self
+            .store
+            .search_fts(search_terms, model, candidates)
+            .unwrap_or_default();
 
         // 2. Vector search (using sqlite-vec)
-        let query_vec = self.provider.embed_query(query).await?;
-        let vector_results = self.store.search_vector(&query_vec, opts.max_results * 2)?;
+        // If embedding fails, fallback to FTS only
+        let (vector_results, has_vector) = match self.provider.embed_query(query).await {
+            Ok(query_vec) => {
+                let has_v = query_vec.iter().any(|&x| x != 0.0);
+                let res = self
+                    .store
+                    .search_vector(&query_vec, candidates)
+                    .unwrap_or_default();
+                (res, has_v)
+            }
+            Err(e) => {
+                eprintln!(
+                    "Warning: Vector embedding failed, falling back to FTS only: {}",
+                    e
+                );
+                (Vec::new(), false)
+            }
+        };
 
         // 3. Merge hybrid results
-        let mut merged: HashMap<String, SearchResult> = HashMap::new();
+        let mut final_results: Vec<SearchResult> = if !has_vector {
+            keyword_results
+        } else {
+            let mut merged: HashMap<String, SearchResult> = HashMap::new();
 
-        for r in vector_results {
-            let mut entry = r;
-            entry.score *= opts.vector_weight;
-            merged.insert(entry.id.clone(), entry);
+            for r in vector_results {
+                let mut entry = r;
+                entry.score *= opts.vector_weight;
+                merged.insert(entry.id.clone(), entry);
+            }
+
+            for r in keyword_results {
+                if let Some(existing) = merged.get_mut(&r.id) {
+                    existing.score += r.score * opts.text_weight;
+                } else {
+                    let mut entry = r;
+                    entry.score *= opts.text_weight;
+                    merged.insert(entry.id.clone(), entry);
+                }
+            }
+            merged.into_values().collect()
+        };
+
+        final_results.truncate(opts.max_results * 5); // Keep more candidates for re-ranking
+
+        // 4. Temporal Decay
+        if let Some(decay_cfg) = &opts.temporal_decay {
+            final_results = apply_temporal_decay_to_results(
+                final_results,
+                Some(decay_cfg.clone()),
+                Some(&opts.workspace_dir),
+                None,
+            );
         }
 
-        for r in keyword_results {
-            if let Some(existing) = merged.get_mut(&r.id) {
-                existing.score += r.score * opts.text_weight;
-            } else {
-                let mut entry = r;
-                entry.score *= opts.text_weight;
-                merged.insert(entry.id.clone(), entry);
+        // 5. MMR Re-ranking
+        if let Some(mmr_cfg) = &opts.mmr {
+            if mmr_cfg.enabled {
+                final_results = apply_mmr_to_results(final_results, Some(mmr_cfg.clone()));
             }
         }
 
-        let mut final_results: Vec<SearchResult> = merged.into_values().collect();
+        // 6. Final Sort and Threshold Filter (Improved Flow: filter AFTER decay/rerank)
         final_results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap());
+        final_results.retain(|r| r.score >= opts.min_score);
         final_results.truncate(opts.max_results);
-
+        
         Ok(final_results)
     }
 
     pub async fn index_file(&self, workspace_dir: &Path, abs_path: &Path) -> Result<()> {
         let content = std::fs::read_to_string(abs_path)?;
-        let chunks = chunk_markdown(&content, 2000); // 2000 chars roughly 500 tokens
+        let hash = hash_text(&content);
+        
         let rel_path = abs_path
             .strip_prefix(workspace_dir)?
             .to_string_lossy()
             .replace("\\", "/");
-
+            
         let source = "memory";
         let model = self.provider.model().to_string();
 
+        // High-Performance Skip: Check if file hash + model + source matches
+        if let Some(existing_hash) = self.store.get_file_hash(&rel_path, source) {
+            if existing_hash == hash {
+                // Check if we have chunks for this model
+                if self.store.has_chunks_for_path(&rel_path, source, &model)? {
+                    return Ok(());
+                }
+            }
+        }
+
+        let chunks = chunk_markdown(&content, 2000);
+        
         // Clean up old entries
-        self.store
-            .delete_chunks_by_path(&rel_path, source, &model)?;
+        self.store.delete_chunks_by_path(&rel_path, source, &model)?;
 
-        for chunk in chunks {
-            let embedding_vec = self.provider.embed_query(&chunk.text).await?;
+        // Batch Embedding: 10x faster than sequential (where supported)
+        let chunk_texts: Vec<String> = chunks.iter().map(|c| c.text.clone()).collect();
+        let embeddings = self.provider.embed_batch(&chunk_texts).await?;
 
+        for (chunk, embedding_vec) in chunks.into_iter().zip(embeddings.into_iter()) {
             // Ensure vector index exists with these dimensions
             self.store.ensure_vector_index(embedding_vec.len())?;
 
@@ -190,6 +264,54 @@ impl MemoryManager {
                 &chunk.text,
                 &embedding_vec,
             )?;
+        }
+
+        // Update file entry with new hash
+        self.store.update_file_info(&rel_path, source, &hash)?;
+
+        Ok(())
+    }
+
+    pub async fn warm_session(&self, session: &crate::sessions::Session) -> Result<()> {
+        let transcript_text = session
+            .transcript
+            .iter()
+            .map(|t| format!("{}: {}", t.role, t.text))
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        if transcript_text.is_empty() {
+            return Ok(());
+        }
+
+        let chunks = chunk_markdown(&transcript_text, 2000);
+        let rel_path = format!("sessions/{}.md", session.id);
+        let source = "session";
+        let model = self.provider.model().to_string();
+
+        self.store
+            .delete_chunks_by_path(&rel_path, source, &model)?;
+
+        for chunk in chunks {
+            if let Ok(embedding_vec) = self.provider.embed_query(&chunk.text).await {
+                let _ = self.store.ensure_vector_index(embedding_vec.len());
+                let chunk_id = hash_text(&format!(
+                    "{}:{}:{}:{}",
+                    rel_path, chunk.start_line, chunk.end_line, model
+                ));
+
+                let _ = self.store.insert_chunk(
+                    &chunk_id,
+                    &rel_path,
+                    source,
+                    chunk.start_line,
+                    chunk.end_line,
+                    &chunk.hash,
+                    &model,
+                    &chunk.text,
+                    &embedding_vec,
+                );
+            }
         }
 
         Ok(())

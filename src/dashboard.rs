@@ -670,7 +670,8 @@ pub async fn api_chat_handler(
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({ "ok": false, "reply": format!("Agent error: {}", e) })),
-        ).into_response(),
+        )
+            .into_response(),
     }
 }
 

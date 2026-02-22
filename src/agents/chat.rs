@@ -1,8 +1,8 @@
+use crate::agents::streaming::StreamHandler;
 use anyhow::Result;
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
-use crate::agents::streaming::StreamHandler;
 use futures_util::StreamExt;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -269,17 +269,17 @@ impl ChatProvider for OpenAiChatProvider {
                             }
 
                             if let Some(args_str) = args {
-                                // Need to track which tool call this corresponds to. 
+                                // Need to track which tool call this corresponds to.
                                 // Simplified for now: assume index-based tracking or just use the last one.
                                 // In streaming.rs we use tool_call_id.
                                 if let Some(tc_id) = id.or_else(|| {
                                     // Fallback: finding the ID from the accumulator might be needed if OpenAI doesn't repeat it
-                                    None 
+                                    None
                                 }) {
-                                     handler.push_tool_arguments(tc_id, args_str)?;
+                                    handler.push_tool_arguments(tc_id, args_str)?;
                                 } else {
-                                    // If ID is missing in subsequent chunks (common in OpenAI SSE), 
-                                    // we'd need to track it by index. 
+                                    // If ID is missing in subsequent chunks (common in OpenAI SSE),
+                                    // we'd need to track it by index.
                                     // For now, let's assume we can get it or use a simpler mapping.
                                 }
                             }

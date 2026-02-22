@@ -226,10 +226,7 @@ impl Tool for SessionsSendTool {
             .get("message")
             .and_then(|v| v.as_str())
             .ok_or_else(|| anyhow::anyhow!("message is required"))?;
-        let role = args
-            .get("role")
-            .and_then(|v| v.as_str())
-            .unwrap_or("user");
+        let role = args.get("role").and_then(|v| v.as_str()).unwrap_or("user");
 
         let mut registry = self.registry.write().await;
         let session = registry.get_or_create(session_id);
@@ -367,10 +364,7 @@ mod tests {
     async fn list_sessions_with_filter() {
         let registry = make_registry().await;
         let tool = SessionsListTool::new(registry);
-        let result = tool
-            .call(r#"{"filter": "test"}"#)
-            .await
-            .unwrap();
+        let result = tool.call(r#"{"filter": "test"}"#).await.unwrap();
         assert!(result.contains("test-session"));
     }
 
@@ -390,10 +384,7 @@ mod tests {
     async fn history_missing() {
         let registry = make_registry().await;
         let tool = SessionsHistoryTool::new(registry);
-        let result = tool
-            .call(r#"{"session_id": "nonexistent"}"#)
-            .await
-            .unwrap();
+        let result = tool.call(r#"{"session_id": "nonexistent"}"#).await.unwrap();
         assert!(result.contains("not found"));
     }
 
@@ -431,13 +422,15 @@ mod tests {
         let registry = make_registry().await;
         let tool = SessionsSpawnTool::new(registry.clone());
         let result = tool
-            .call(r#"{
+            .call(
+                r#"{
                 "session_id": "spawn-test",
                 "label": "Spawned",
                 "model": "gpt-4o",
                 "system_message": "You are helpful.",
                 "initial_message": "Hello!"
-            }"#)
+            }"#,
+            )
             .await
             .unwrap();
         assert!(result.contains("is_new"));

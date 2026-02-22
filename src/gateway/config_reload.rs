@@ -215,9 +215,9 @@ fn build_reload_rules() -> Vec<ReloadRule> {
 }
 
 fn match_rule<'a>(path: &str, rules: &'a [ReloadRule]) -> Option<&'a ReloadRule> {
-    rules.iter().find(|rule| {
-        path == rule.prefix || path.starts_with(&format!("{}.", rule.prefix))
-    })
+    rules
+        .iter()
+        .find(|rule| path == rule.prefix || path.starts_with(&format!("{}.", rule.prefix)))
 }
 
 // ─── Config diffing ───────────────────────────────────────────────────────────
@@ -542,8 +542,7 @@ mod tests {
 
     #[test]
     fn plan_heartbeat_hot_reload() {
-        let plan =
-            build_gateway_reload_plan(&["agents.defaults.heartbeat.interval".to_string()]);
+        let plan = build_gateway_reload_plan(&["agents.defaults.heartbeat.interval".to_string()]);
         assert!(!plan.restart_gateway);
         assert!(plan.restart_heartbeat);
     }

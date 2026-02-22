@@ -7,6 +7,7 @@ pub mod agents;
 pub mod approvals;
 pub mod boards;
 pub mod tasks;
+pub mod web;
 
 use serde::{Deserialize, Serialize};
 

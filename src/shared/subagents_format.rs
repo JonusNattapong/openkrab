@@ -116,25 +116,27 @@ pub fn resolve_total_tokens(entry: Option<&TokenUsageLike>) -> Option<f64> {
     let input = entry.input_tokens.unwrap_or(0.0);
     let output = entry.output_tokens.unwrap_or(0.0);
     let total = input + output;
-    if total > 0.0 { Some(total) } else { None }
+    if total > 0.0 {
+        Some(total)
+    } else {
+        None
+    }
 }
 
 /// Resolve I/O token breakdown from a usage entry.
 pub fn resolve_io_tokens(entry: Option<&TokenUsageLike>) -> Option<IoTokens> {
     let entry = entry?;
-    let input = entry
-        .input_tokens
-        .filter(|v| v.is_finite())
-        .unwrap_or(0.0);
-    let output = entry
-        .output_tokens
-        .filter(|v| v.is_finite())
-        .unwrap_or(0.0);
+    let input = entry.input_tokens.filter(|v| v.is_finite()).unwrap_or(0.0);
+    let output = entry.output_tokens.filter(|v| v.is_finite()).unwrap_or(0.0);
     let total = input + output;
     if total <= 0.0 {
         return None;
     }
-    Some(IoTokens { input, output, total })
+    Some(IoTokens {
+        input,
+        output,
+        total,
+    })
 }
 
 /// Format a token usage display string like
@@ -148,7 +150,10 @@ pub fn format_token_usage_display(entry: Option<&TokenUsageLike>) -> String {
         let input_s = format_token_short(Some(io.input)).unwrap_or_else(|| "0".to_string());
         let output_s = format_token_short(Some(io.output)).unwrap_or_else(|| "0".to_string());
         let total_s = format_token_short(Some(io.total)).unwrap_or_else(|| "0".to_string());
-        parts.push(format!("tokens {} (in {} / out {})", total_s, input_s, output_s));
+        parts.push(format!(
+            "tokens {} (in {} / out {})",
+            total_s, input_s, output_s
+        ));
     } else if let Some(pc) = prompt_cache {
         if pc > 0.0 {
             let pc_s = format_token_short(Some(pc)).unwrap_or_else(|| "0".to_string());
@@ -233,7 +238,10 @@ mod tests {
 
     #[test]
     fn token_millions() {
-        assert_eq!(format_token_short(Some(1_500_000.0)), Some("1.5m".to_string()));
+        assert_eq!(
+            format_token_short(Some(1_500_000.0)),
+            Some("1.5m".to_string())
+        );
     }
 
     // ── truncate_line ───────────────────────────────────────────────────

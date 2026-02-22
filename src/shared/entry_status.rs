@@ -144,9 +144,10 @@ pub fn evaluate_requirements_from_metadata_with_remote(
     // Check any_bins
     let mut missing_any_bins = Vec::new();
     if !metadata.any_bins.is_empty() {
-        let any_found = metadata.any_bins.iter().any(|b| {
-            has_local_bin(b) || remote_bins.contains(&b.as_str())
-        });
+        let any_found = metadata
+            .any_bins
+            .iter()
+            .any(|b| has_local_bin(b) || remote_bins.contains(&b.as_str()));
         if !any_found {
             missing_any_bins = metadata.any_bins.clone();
         }
@@ -311,21 +312,14 @@ mod tests {
 
     #[test]
     fn emoji_falls_back_to_frontmatter() {
-        let (emoji, _) = resolve_emoji_and_homepage(
-            None, None,
-            Some("🐍"),
-            None, None, None,
-        );
+        let (emoji, _) = resolve_emoji_and_homepage(None, None, Some("🐍"), None, None, None);
         assert_eq!(emoji.as_deref(), Some("🐍"));
     }
 
     #[test]
     fn homepage_from_website_fallback() {
-        let (_, homepage) = resolve_emoji_and_homepage(
-            None, None, None, None,
-            Some("https://example.com"),
-            None,
-        );
+        let (_, homepage) =
+            resolve_emoji_and_homepage(None, None, None, None, Some("https://example.com"), None);
         assert_eq!(homepage.as_deref(), Some("https://example.com"));
     }
 

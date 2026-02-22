@@ -113,8 +113,8 @@ lazy_static::lazy_static! {
     static ref GLOBAL_HOOKS: Arc<RwLock<HookRegistry>> = Arc::new(RwLock::new(HookRegistry::new()));
 }
 
-use std::sync::RwLock;
 use std::sync::Arc;
+use std::sync::RwLock;
 
 /// Get the global hook registry.
 pub fn global_hooks() -> Arc<RwLock<HookRegistry>> {

@@ -4,13 +4,10 @@
 use anyhow::{Context, Result};
 
 use super::prompts::{
-    WizardCancelledError, WizardConfirmParams, WizardPrompter,
-    WizardSelectOption, WizardSelectParams, WizardTextParams,
+    WizardCancelledError, WizardConfirmParams, WizardPrompter, WizardSelectOption,
+    WizardSelectParams, WizardTextParams,
 };
-use super::types::{
-    GatewayAuthChoice, OnboardMode, OnboardOptions,
-    WizardFlow,
-};
+use super::types::{GatewayAuthChoice, OnboardMode, OnboardOptions, WizardFlow};
 
 /// Default gateway port.
 pub const DEFAULT_GATEWAY_PORT: u16 = 4120;
@@ -111,9 +108,7 @@ pub async fn run_onboarding_wizard(
     opts: &OnboardOptions,
     prompter: &dyn WizardPrompter,
 ) -> Result<OnboardingResult> {
-    prompter
-        .intro("OpenKrab onboarding")
-        .await?;
+    prompter.intro("OpenKrab onboarding").await?;
 
     // Risk acknowledgement
     require_risk_acknowledgement(prompter, opts.accept_risk).await?;
@@ -136,12 +131,16 @@ pub async fn run_onboarding_wizard(
                         WizardSelectOption {
                             value: "quickstart".to_string(),
                             label: "QuickStart".to_string(),
-                            hint: Some("Configure details later via `krabkrab configure`.".to_string()),
+                            hint: Some(
+                                "Configure details later via `krabkrab configure`.".to_string(),
+                            ),
                         },
                         WizardSelectOption {
                             value: "advanced".to_string(),
                             label: "Manual".to_string(),
-                            hint: Some("Configure port, network, Tailscale, and auth options.".to_string()),
+                            hint: Some(
+                                "Configure port, network, Tailscale, and auth options.".to_string(),
+                            ),
                         },
                     ],
                     initial_value: Some("quickstart".to_string()),
@@ -275,31 +274,30 @@ pub async fn run_onboarding_wizard(
 
     // Gateway configuration
     let gateway_settings = if mode == OnboardMode::Local {
-        Some(
-            super::gateway_config::configure_gateway(flow, &base_config, prompter).await?,
-        )
+        Some(super::gateway_config::configure_gateway(flow, &base_config, prompter).await?)
     } else {
         None
     };
 
     // Quickstart summary
     if flow == WizardFlow::Quickstart {
-        let settings = gateway_settings.as_ref().map(|s| {
-            format!(
-                "Gateway port: {}\nGateway bind: {}\nGateway auth: {}\nTailscale: {}",
-                s.port,
-                s.bind,
-                match s.auth_mode {
-                    GatewayAuthChoice::Token => "Token (default)",
-                    GatewayAuthChoice::Password => "Password",
-                },
-                s.tailscale_mode,
-            )
-        }).unwrap_or_else(|| "Remote mode — no local gateway.".to_string());
+        let settings = gateway_settings
+            .as_ref()
+            .map(|s| {
+                format!(
+                    "Gateway port: {}\nGateway bind: {}\nGateway auth: {}\nTailscale: {}",
+                    s.port,
+                    s.bind,
+                    match s.auth_mode {
+                        GatewayAuthChoice::Token => "Token (default)",
+                        GatewayAuthChoice::Password => "Password",
+                    },
+                    s.tailscale_mode,
+                )
+            })
+            .unwrap_or_else(|| "Remote mode — no local gateway.".to_string());
 
-        prompter
-            .note(&settings, Some("Configuration"))
-            .await?;
+        prompter.note(&settings, Some("Configuration")).await?;
     }
 
     prompter

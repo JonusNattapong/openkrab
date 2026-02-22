@@ -78,18 +78,41 @@ pub fn ensure_schema(conn: &Connection) -> Result<()> {
         [],
     )?;
 
+    // For development/porting, we drop and recreate the sessions table if schema changes.
+    // In production, we would use migrations.
+    // conn.execute("DROP TABLE IF EXISTS sessions", [])?;
+
     conn.execute(
         "CREATE TABLE IF NOT EXISTS sessions (
             id TEXT PRIMARY KEY,
             label TEXT,
+            display_name TEXT,
             model_override TEXT,
             verbosity TEXT NOT NULL,
+            delivery_mode TEXT NOT NULL,
             send_policy TEXT NOT NULL,
             elevated INTEGER NOT NULL DEFAULT 0,
             transcript TEXT NOT NULL,
             max_transcript INTEGER NOT NULL,
             created_at INTEGER NOT NULL,
             last_active INTEGER NOT NULL,
+            provider_override TEXT,
+            auth_profile_override TEXT,
+            auth_profile_override_source TEXT,
+            auth_profile_override_compaction_count INTEGER,
+            fallback_notice_selected_model TEXT,
+            fallback_notice_active_model TEXT,
+            fallback_notice_reason TEXT,
+            channel TEXT,
+            last_channel TEXT,
+            chat_type TEXT,
+            thinking_level TEXT,
+            reasoning_level TEXT,
+            response_usage TEXT,
+            input_tokens INTEGER NOT NULL DEFAULT 0,
+            output_tokens INTEGER NOT NULL DEFAULT 0,
+            total_tokens INTEGER NOT NULL DEFAULT 0,
+            context_tokens INTEGER NOT NULL DEFAULT 0,
             metadata TEXT NOT NULL
         )",
         [],

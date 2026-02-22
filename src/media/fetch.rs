@@ -147,7 +147,7 @@ pub async fn fetch_remote_media(options: FetchMediaOptions) -> Result<FetchMedia
         .get("content-type")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
-    
+
     // Now consume the response for the body
     let buffer = if let Some(max_bytes) = options.max_bytes {
         let limited = res.bytes().await.map_err(|e| MediaFetchError {

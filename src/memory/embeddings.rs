@@ -155,7 +155,7 @@ struct GeminiPartOwned {
 
 #[derive(Deserialize)]
 struct GeminiEmbedResponse {
-#[allow(dead_code)]
+    #[allow(dead_code)]
     embedding: Option<GeminiEmbedding>,
 }
 

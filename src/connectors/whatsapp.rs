@@ -410,9 +410,12 @@ fn validate_payload_size(payload: &serde_json::Value) -> Result<(), String> {
     let size = serde_json::to_vec(payload)
         .map_err(|e| format!("JSON serialization error: {}", e))?
         .len();
-    
+
     if size > MAX_PAYLOAD_SIZE {
-        return Err(format!("Payload too large: {} bytes (max: {})", size, MAX_PAYLOAD_SIZE));
+        return Err(format!(
+            "Payload too large: {} bytes (max: {})",
+            size, MAX_PAYLOAD_SIZE
+        ));
     }
     Ok(())
 }

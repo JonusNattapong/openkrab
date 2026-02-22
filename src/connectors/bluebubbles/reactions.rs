@@ -120,7 +120,10 @@ pub fn map_emoji_to_reaction(emoji: &str) -> Option<String> {
 pub fn parse_reaction_action(action: &str) -> (String, Option<String>) {
     let action_lower = action.to_lowercase();
 
-    if action_lower.contains("remove") || action_lower.contains("un") || action_lower.contains("delete") {
+    if action_lower.contains("remove")
+        || action_lower.contains("un")
+        || action_lower.contains("delete")
+    {
         return ("remove".to_string(), None);
     }
 

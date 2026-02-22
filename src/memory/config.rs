@@ -93,6 +93,7 @@ impl MemoryConfig {
             max_results: 10,
             vector_weight: self.vector_weight.unwrap_or(0.7),
             text_weight: self.text_weight.unwrap_or(0.3),
+            ..Default::default()
         }
     }
 }

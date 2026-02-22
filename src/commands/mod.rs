@@ -19,6 +19,7 @@ pub mod health;
 pub mod logs;
 pub mod memory;
 pub mod message;
+pub mod mission_control;
 pub mod models;
 pub mod models_auth;
 pub mod oauth;
@@ -39,7 +40,6 @@ pub mod status_update;
 pub mod telegram;
 pub mod uninstall;
 pub mod whatsapp_send;
-pub mod mission_control;
 
 pub use crate::shell::run_interactive_shell;
 pub use admin::{
@@ -87,14 +87,16 @@ pub use health::{
 };
 pub use logs::logs_tail_command;
 pub use memory::{memory_search_command, memory_sync_command};
-pub use mission_control::mission_control_command;
 pub use message::{format_message, message_send_command, MessageSendOptions};
+pub use mission_control::mission_control_command;
 pub use models::models_list_command;
 pub use models_auth::{
     models_auth_add_command, models_auth_get_command, models_auth_list_command,
     models_auth_remove_command,
 };
-pub use oauth::{is_remote_environment, login_github_copilot, login_minimax_oauth, login_qwen_oauth};
+pub use oauth::{
+    is_remote_environment, login_github_copilot, login_minimax_oauth, login_qwen_oauth,
+};
 pub use onboard::{onboard_command, onboard_quick, onboard_wizard};
 pub use onboard_types::{ChannelConfig, OnboardMode, OnboardResult, WizardState, WizardStep};
 pub use openai_codex_oauth::{login_openai_codex_oauth, login_openai_codex_oauth_interactive};

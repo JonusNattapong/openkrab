@@ -4,6 +4,7 @@ pub mod core;
 pub mod identity;
 pub mod model_catalog;
 pub mod provider_auth;
+pub mod session_repair;
 pub mod session_tools;
 pub mod streaming;
 pub mod tool;
@@ -11,6 +12,7 @@ pub mod tool;
 pub use chat::{ChatMessage, ChatProvider, OpenAiChatProvider};
 pub use core::Agent;
 pub use identity::AgentIdentity;
+pub use session_repair::*;
 pub use model_catalog::{
     find_model_in_catalog, load_model_catalog, model_supports_vision, ModelCatalogEntry,
     ModelInputCapability,

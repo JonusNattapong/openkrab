@@ -64,14 +64,17 @@ impl HotReloadManager {
             return Ok(());
         }
 
-        info!("Enabling plugin hot reload for {} directories", plugin_dirs.len());
+        info!(
+            "Enabling plugin hot reload for {} directories",
+            plugin_dirs.len()
+        );
 
         let (tx, rx) = mpsc::channel(100);
         let tx_clone = tx.clone();
 
         // Create file watcher
-        let mut watcher = notify::recommended_watcher(move |res: Result<Event, notify::Error>| {
-            match res {
+        let mut watcher =
+            notify::recommended_watcher(move |res: Result<Event, notify::Error>| match res {
                 Ok(event) => {
                     debug!("File system event: {:?}", event);
 
@@ -84,8 +87,7 @@ impl HotReloadManager {
                 Err(e) => {
                     error!("File watcher error: {}", e);
                 }
-            }
-        })?;
+            })?;
 
         // Watch plugin directories
         for dir in plugin_dirs {
@@ -126,7 +128,10 @@ impl HotReloadManager {
     }
 
     /// Process pending hot reload events
-    pub async fn process_events(&mut self, manager: &Arc<Mutex<PluginManager>>) -> Result<HotReloadSummary> {
+    pub async fn process_events(
+        &mut self,
+        manager: &Arc<Mutex<PluginManager>>,
+    ) -> Result<HotReloadSummary> {
         if !self.enabled {
             return Ok(HotReloadSummary::default());
         }
@@ -199,12 +204,14 @@ impl HotReloadManager {
         // Step 2: Discover
         let discovered = {
             let mgr = manager.lock().await;
-            mgr.loader.discover().map_err(|e| anyhow::anyhow!("Failed to discover: {}", e))?
+            mgr.loader
+                .discover()
+                .map_err(|e| anyhow::anyhow!("Failed to discover: {}", e))?
         };
 
         // Step 3: Find plugin
         let plugin = discovered.iter().find(|p| p.manifest.name == plugin_name);
-        
+
         let should_init = match plugin {
             Some(p) => {
                 // Step 4: Load
@@ -215,14 +222,15 @@ impl HotReloadManager {
                         let _ = mgr.loader.load(p, &mut *registry);
                     }
                 }
-                
+
                 // Step 5: Check if enabled
                 let mgr = manager.lock().await;
-                mgr.registry.get(&plugin_name)
+                mgr.registry
+                    .get(&plugin_name)
                     .map(|e| e.is_enabled())
                     .unwrap_or(false)
             }
-            None => false
+            None => false,
         };
 
         // Step 6: Initialize if needed
@@ -243,7 +251,10 @@ impl HotReloadManager {
             info!("Plugin '{}' hot reloaded successfully", plugin_name);
             Ok(Some(plugin_name))
         } else {
-            Err(anyhow::anyhow!("Plugin '{}' not found during rediscovery", plugin_name))
+            Err(anyhow::anyhow!(
+                "Plugin '{}' not found during rediscovery",
+                plugin_name
+            ))
         }
     }
 
@@ -254,7 +265,8 @@ impl HotReloadManager {
         // Step 1: Get loaded plugins
         let loaded: Vec<String> = {
             let mgr = manager.lock().await;
-            mgr.loader.loaded_plugins()
+            mgr.loader
+                .loaded_plugins()
                 .iter()
                 .map(|p| p.manifest.name.clone())
                 .collect()
@@ -272,9 +284,11 @@ impl HotReloadManager {
         // Step 3: Discover
         let _discovered = {
             let mgr = manager.lock().await;
-            mgr.loader.discover().map_err(|e| anyhow::anyhow!("Failed to discover: {}", e))?
+            mgr.loader
+                .discover()
+                .map_err(|e| anyhow::anyhow!("Failed to discover: {}", e))?
         };
-        
+
         // Step 4: Load all
         {
             let mut mgr = manager.lock().await;
@@ -284,7 +298,7 @@ impl HotReloadManager {
                 let _ = (*loader).load_all(&mut *registry);
             }
         }
-        
+
         // Step 5: Initialize all
         {
             let mut mgr = manager.lock().await;
@@ -317,8 +331,12 @@ impl HotReloadManager {
         let file_name = path.file_name()?.to_str()?;
 
         // Check if it's a manifest file
-        if file_name == "plugin.json" || file_name == "manifest.json" || file_name == "krabkrab.json" {
-            let plugin_name = path.parent()
+        if file_name == "plugin.json"
+            || file_name == "manifest.json"
+            || file_name == "krabkrab.json"
+        {
+            let plugin_name = path
+                .parent()
                 .and_then(|p| p.file_name())
                 .and_then(|n| n.to_str())
                 .unwrap_or("unknown")
@@ -334,7 +352,8 @@ impl HotReloadManager {
         if let Some(ext) = path.extension() {
             let ext = ext.to_str()?;
             if ["wasm", "so", "dylib", "dll"].contains(&ext) {
-                let plugin_name = path.file_stem()
+                let plugin_name = path
+                    .file_stem()
                     .and_then(|n| n.to_str())
                     .unwrap_or("unknown")
                     .to_string();
@@ -396,7 +415,10 @@ struct HotReloadTask {
 }
 
 impl HotReloadTask {
-    async fn process_events(&mut self, _manager: &Arc<Mutex<PluginManager>>) -> Result<HotReloadSummary> {
+    async fn process_events(
+        &mut self,
+        _manager: &Arc<Mutex<PluginManager>>,
+    ) -> Result<HotReloadSummary> {
         if !self.enabled {
             return Ok(HotReloadSummary::default());
         }

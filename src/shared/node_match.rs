@@ -118,7 +118,11 @@ pub fn resolve_node_id_from_candidates(
                         .unwrap_or(&n.node_id)
                 })
                 .collect();
-            Err(format!("ambiguous node: {} (matches: {})", q, names.join(", ")))
+            Err(format!(
+                "ambiguous node: {} (matches: {})",
+                q,
+                names.join(", ")
+            ))
         }
     }
 }

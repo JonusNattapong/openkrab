@@ -274,3 +274,23 @@ During the rapid port to Rust, several CLI commands were provided with stubbed i
 * **Sessions** (`src/commands/sessions.rs`): Implement `lock`, `unlock`, `archive`, and `delete`.
 * **Logs** (`src/commands/logs.rs`): Implement `--follow` tailing.
 * **Memory** (`src/commands/memory.rs`): Parity with SQLite-vec / LanceDB integrations.
+
+### 4. Detailed Module Porting Checklists
+
+#### 4.1. Sessions Module (`src/sessions/`)
+
+While the core struct and some tests were ported, there's significant logic missing from the TypeScript equivalent (`openclaw/src/sessions/`). We need to implement:
+
+* [x] **`input-provenance.ts` parity**: Add `InputProvenance` struct (kind: `external_user`, `inter_session`, `internal_system`), normalization logic, and injection into `AgentMessage`s so the agent knows where input came from.
+* [x] **`level-overrides.ts` parity**: Enhance `VerbosityLevel` logic to include `parseVerboseOverride` returning nullable variants, and `applyVerboseOverride` to properly clear or set the override on the session config.
+* [x] **`model-overrides.ts` parity**: Add `applyModelOverrideToSessionEntry` logic that manages `providerOverride`, `modelOverride`, `authProfileOverride`, checks `isDefault` flags, and properly clears `fallbackNoticeSelectedModel` when a user switches models.
+* [x] **`send-policy.ts` parity**: Fully implement `resolveSendPolicy`. It must parse config rules (`matchChannel`, `matchChatType`, `rawKeyPrefix`), strip `agent:<id>:` prefixes, and deduce channel vs group chat types based on session keys before falling back to default logic.
+* [x] **`session-key-utils.ts` parity**: The whole file is missing. Add string matching utilities: `parseAgentSessionKey`, `isCronRunSessionKey`, `isCronSessionKey`, `isSubagentSessionKey`, `getSubagentDepth`, `isAcpSessionKey`, and `resolveThreadParentSessionKey`.
+* [x] **`session-label.ts` parity**: Add label parsing logic enforcing the 64-character limit (`SESSION_LABEL_MAX_LENGTH`).
+
+#### 4.2. Memory Module (`src/memory/`)
+
+* [x] **Automatic background syncing** of Markdown files via `notify`.
+* [x] **Fallback FTS-only search** mechanism when vector search fails.
+* [x] **MMR and Temporal Decay** for relevance ranking to avoid redundancy and prioritize recent info.
+* [x] **Session integration** (`warm_session`) for proactive syncing before processing.

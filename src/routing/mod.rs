@@ -5,6 +5,7 @@
 //! inbound message and where the reply should be delivered.
 
 pub mod bindings;
+pub mod resolve_route;
 pub mod role_routing;
 pub mod session_key;
 

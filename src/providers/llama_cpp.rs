@@ -85,9 +85,12 @@ impl LlamaCppProvider {
 
     /// Try to build from the `LLAMA_CPP_HOST` environment variable.
     pub fn from_env() -> Self {
-        let host = std::env::var("LLAMA_CPP_HOST").unwrap_or_else(|_| "http://localhost:8080/v1".to_string());
-        let chat_model = std::env::var("LLAMA_CPP_CHAT_MODEL").unwrap_or_else(|_| "local-model".to_string());
-        let embed_model = std::env::var("LLAMA_CPP_EMBED_MODEL").unwrap_or_else(|_| "local-model".to_string());
+        let host = std::env::var("LLAMA_CPP_HOST")
+            .unwrap_or_else(|_| "http://localhost:8080/v1".to_string());
+        let chat_model =
+            std::env::var("LLAMA_CPP_CHAT_MODEL").unwrap_or_else(|_| "local-model".to_string());
+        let embed_model =
+            std::env::var("LLAMA_CPP_EMBED_MODEL").unwrap_or_else(|_| "local-model".to_string());
         Self::with_models(host, chat_model, embed_model)
     }
 

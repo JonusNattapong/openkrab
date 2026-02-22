@@ -7,7 +7,9 @@
 //! - Manage plugin lifecycle
 
 use crate::plugin_sdk::{PluginDeclaration, PluginTool};
-use crate::plugins::{HookPhase, HookSlots, PluginHook, PluginManifest, PluginRegistry, PluginStatus};
+use crate::plugins::{
+    HookPhase, HookSlots, PluginHook, PluginManifest, PluginRegistry, PluginStatus,
+};
 use anyhow::{bail, Context, Result};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
@@ -229,7 +231,7 @@ impl PluginLoader {
     /// Find a plugin file in a directory.
     fn find_plugin_file(&self, dir: &Path, name: &str) -> Option<PathBuf> {
         for ext in &self.config.extensions {
-            let path = dir.join(format!("{}.{}" , name, ext));
+            let path = dir.join(format!("{}.{}", name, ext));
             if path.exists() {
                 return Some(path);
             }
@@ -237,7 +239,7 @@ impl PluginLoader {
 
         // Also check for index files
         for ext in &self.config.extensions {
-            let path = dir.join(format!("index.{}" , ext));
+            let path = dir.join(format!("index.{}", ext));
             if path.exists() {
                 return Some(path);
             }
@@ -247,7 +249,11 @@ impl PluginLoader {
     }
 
     /// Load a discovered plugin into the registry.
-    pub fn load(&mut self, discovered: &DiscoveredPlugin, registry: &mut PluginRegistry) -> Result<()> {
+    pub fn load(
+        &mut self,
+        discovered: &DiscoveredPlugin,
+        registry: &mut PluginRegistry,
+    ) -> Result<()> {
         let name = discovered.manifest.name.clone();
 
         // Validate manifest
@@ -314,16 +320,16 @@ impl PluginLoader {
     ) -> Result<(PluginInstance, Option<PluginDeclaration>)> {
         match &discovered.entry_path {
             Some(path) => {
-                let ext = path
-                    .extension()
-                    .and_then(|e| e.to_str())
-                    .unwrap_or("");
+                let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
                 match ext {
                     #[cfg(feature = "native-plugins")]
                     "so" | "dylib" | "dll" => self.load_native_plugin(path).await,
                     #[cfg(feature = "wasm-plugins")]
-                    "wasm" => self.load_wasm_plugin(path, discovered.plugin_dir.as_deref()).await,
+                    "wasm" => {
+                        self.load_wasm_plugin(path, discovered.plugin_dir.as_deref())
+                            .await
+                    }
                     _ => {
                         warn!("Unknown plugin extension: {}", ext);
                         let declaration = self.read_declaration_json(path)?;
@@ -339,7 +345,7 @@ impl PluginLoader {
     }
 
     /// Load a native dynamic library plugin.
-    /// 
+    ///
     /// SECURITY: This requires explicit opt-in via config.allow_native_plugins
     #[cfg(feature = "native-plugins")]
     async fn load_native_plugin(
@@ -355,45 +361,47 @@ impl PluginLoader {
         }
 
         // SECURITY: Log native plugin load attempt
-        crate::security_audit::audit().log(
-            crate::security_audit::SecurityEvent::new(
-                crate::security_audit::SecurityEventType::PluginLoadAttempt,
-                crate::security_audit::SecuritySeverity::Warning,
-                "plugin_loader",
-                format!("Loading native plugin: {}", path.display()),
+        crate::security_audit::audit()
+            .log(
+                crate::security_audit::SecurityEvent::new(
+                    crate::security_audit::SecurityEventType::PluginLoadAttempt,
+                    crate::security_audit::SecuritySeverity::Warning,
+                    "plugin_loader",
+                    format!("Loading native plugin: {}", path.display()),
+                )
+                .with_subject(path.to_string_lossy().to_string()),
             )
-            .with_subject(path.to_string_lossy().to_string())
-        ).await;
+            .await;
 
         unsafe {
-            let lib = libloading::Library::new(path)
-                .with_context(|| format!("Failed to load native library from {}", path.display()))?;
+            let lib = libloading::Library::new(path).with_context(|| {
+                format!("Failed to load native library from {}", path.display())
+            })?;
             let native_manifest =
-                read_json_symbol::<PluginManifest>(&lib, crate::plugin_sdk::ABI_MANIFEST_SYMBOL).ok();
+                read_json_symbol::<PluginManifest>(&lib, crate::plugin_sdk::ABI_MANIFEST_SYMBOL)
+                    .ok();
             if let Some(m) = native_manifest {
-                debug!(
-                    "Native plugin manifest from ABI: {}@{}",
-                    m.name,
-                    m.version
-                );
+                debug!("Native plugin manifest from ABI: {}@{}", m.name, m.version);
             }
             let declaration = read_json_symbol::<PluginDeclaration>(
                 &lib,
                 crate::plugin_sdk::ABI_DECLARATION_SYMBOL,
             )
             .ok();
-            
+
             // SECURITY: Log successful load
-            crate::security_audit::audit().log(
-                crate::security_audit::SecurityEvent::new(
-                    crate::security_audit::SecurityEventType::PluginLoadSuccess,
-                    crate::security_audit::SecuritySeverity::Warning,
-                    "plugin_loader",
-                    format!("Native plugin loaded: {}", path.display()),
+            crate::security_audit::audit()
+                .log(
+                    crate::security_audit::SecurityEvent::new(
+                        crate::security_audit::SecurityEventType::PluginLoadSuccess,
+                        crate::security_audit::SecuritySeverity::Warning,
+                        "plugin_loader",
+                        format!("Native plugin loaded: {}", path.display()),
+                    )
+                    .with_subject(path.to_string_lossy().to_string()),
                 )
-                .with_subject(path.to_string_lossy().to_string())
-            ).await;
-            
+                .await;
+
             Ok((PluginInstance::Native(lib), declaration))
         }
     }
@@ -408,15 +416,20 @@ impl PluginLoader {
         use crate::plugins::sandbox::{Sandbox, SandboxManager};
 
         // Create sandbox for the plugin
-        let name = path.file_stem()
+        let name = path
+            .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("wasm-plugin");
 
         let manager = SandboxManager::new();
-        let sandbox = manager.create_sandbox(name, plugin_dir.map(|p| p.to_path_buf())).await;
+        let sandbox = manager
+            .create_sandbox(name, plugin_dir.map(|p| p.to_path_buf()))
+            .await;
 
-        let wasm_plugin = crate::plugins::wasm_runtime::WasmPlugin::load_with_sandbox(path, sandbox).await
-            .with_context(|| format!("Failed to load WASM plugin from {}", path.display()))?;
+        let wasm_plugin =
+            crate::plugins::wasm_runtime::WasmPlugin::load_with_sandbox(path, sandbox)
+                .await
+                .with_context(|| format!("Failed to load WASM plugin from {}", path.display()))?;
 
         let declaration = wasm_plugin.declaration.clone();
 
@@ -434,12 +447,16 @@ impl PluginLoader {
         }
         let content = std::fs::read_to_string(&declaration_path)
             .with_context(|| format!("Failed to read {}", declaration_path.display()))?;
-        let declaration: PluginDeclaration = serde_json::from_str(&content)
-            .with_context(|| format!("Invalid declaration JSON in {}", declaration_path.display()))?;
+        let declaration: PluginDeclaration = serde_json::from_str(&content).with_context(|| {
+            format!("Invalid declaration JSON in {}", declaration_path.display())
+        })?;
         Ok(Some(declaration))
     }
 
-    fn read_declaration_in_dir(&self, plugin_dir: Option<&Path>) -> Result<Option<PluginDeclaration>> {
+    fn read_declaration_in_dir(
+        &self,
+        plugin_dir: Option<&Path>,
+    ) -> Result<Option<PluginDeclaration>> {
         let Some(dir) = plugin_dir else {
             return Ok(None);
         };
@@ -449,8 +466,9 @@ impl PluginLoader {
         }
         let content = std::fs::read_to_string(&declaration_path)
             .with_context(|| format!("Failed to read {}", declaration_path.display()))?;
-        let declaration: PluginDeclaration = serde_json::from_str(&content)
-            .with_context(|| format!("Invalid declaration JSON in {}", declaration_path.display()))?;
+        let declaration: PluginDeclaration = serde_json::from_str(&content).with_context(|| {
+            format!("Invalid declaration JSON in {}", declaration_path.display())
+        })?;
         Ok(Some(declaration))
     }
 
@@ -467,7 +485,10 @@ impl PluginLoader {
                     priority: 100,
                 });
             } else {
-                warn!("Unknown hook phase '{}' from plugin '{}'", phase, plugin_name);
+                warn!(
+                    "Unknown hook phase '{}' from plugin '{}'",
+                    phase, plugin_name
+                );
             }
         }
     }
@@ -601,9 +622,9 @@ unsafe fn read_json_symbol<T: serde::de::DeserializeOwned>(
     lib: &libloading::Library,
     symbol_name: &'static [u8],
 ) -> Result<T> {
-    let symbol: libloading::Symbol<unsafe extern "C" fn() -> *const c_char> =
-        lib.get(symbol_name)
-            .with_context(|| format!("Missing symbol {:?}", symbol_name))?;
+    let symbol: libloading::Symbol<unsafe extern "C" fn() -> *const c_char> = lib
+        .get(symbol_name)
+        .with_context(|| format!("Missing symbol {:?}", symbol_name))?;
     let ptr = symbol();
     if ptr.is_null() {
         bail!("Symbol {:?} returned null pointer", symbol_name);
@@ -674,7 +695,9 @@ impl PluginManager {
     }
 
     /// Create loader config from app plugins config.
-    pub fn config_from_plugins_config(cfg: Option<&crate::openkrab_config::PluginsConfig>) -> PluginLoaderConfig {
+    pub fn config_from_plugins_config(
+        cfg: Option<&crate::openkrab_config::PluginsConfig>,
+    ) -> PluginLoaderConfig {
         let mut out = PluginLoaderConfig::default();
         if let Some(c) = cfg {
             if let Some(dirs) = &c.plugin_dirs {
@@ -705,11 +728,14 @@ impl PluginManager {
             return Ok(None);
         }
 
-        let mut manager = PluginManager::with_config(Self::config_from_plugins_config(Some(plugin_cfg)));
+        let mut manager =
+            PluginManager::with_config(Self::config_from_plugins_config(Some(plugin_cfg)));
         let load = manager.load_all()?;
         let init = manager.initialize_all().await?;
         let arc = Arc::new(AsyncMutex::new(manager));
-        let mut guard = GLOBAL_PLUGIN_MANAGER.lock().expect("plugin manager mutex poisoned");
+        let mut guard = GLOBAL_PLUGIN_MANAGER
+            .lock()
+            .expect("plugin manager mutex poisoned");
         *guard = Some(arc);
         Ok(Some(PluginBootstrapSummary { load, init }))
     }

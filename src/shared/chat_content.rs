@@ -46,7 +46,10 @@ fn default_normalize(text: &str) -> String {
 ///
 /// Returns `None` when no text could be extracted.
 pub fn extract_text_from_chat_content(content: &Value) -> Option<String> {
-    extract_text_from_chat_content_with(content, ExtractOptions::<fn(&str) -> String, fn(&str) -> String>::default())
+    extract_text_from_chat_content_with(
+        content,
+        ExtractOptions::<fn(&str) -> String, fn(&str) -> String>::default(),
+    )
 }
 
 /// Same as [`extract_text_from_chat_content`] but with custom options.
@@ -80,7 +83,11 @@ where
     if let Some(s) = content.as_str() {
         let value = do_sanitize(s);
         let normalized = do_normalize(&value);
-        return if normalized.is_empty() { None } else { Some(normalized) };
+        return if normalized.is_empty() {
+            None
+        } else {
+            Some(normalized)
+        };
     }
 
     // Case 2: array of content blocks
@@ -106,7 +113,11 @@ where
         }
 
         let joined = do_normalize(&chunks.join(join_with));
-        return if joined.is_empty() { None } else { Some(joined) };
+        return if joined.is_empty() {
+            None
+        } else {
+            Some(joined)
+        };
     }
 
     None
@@ -120,13 +131,19 @@ mod tests {
     #[test]
     fn extracts_plain_string() {
         let content = json!("hello world");
-        assert_eq!(extract_text_from_chat_content(&content), Some("hello world".into()));
+        assert_eq!(
+            extract_text_from_chat_content(&content),
+            Some("hello world".into())
+        );
     }
 
     #[test]
     fn normalizes_whitespace() {
         let content = json!("  hello   world  ");
-        assert_eq!(extract_text_from_chat_content(&content), Some("hello world".into()));
+        assert_eq!(
+            extract_text_from_chat_content(&content),
+            Some("hello world".into())
+        );
     }
 
     #[test]
@@ -142,7 +159,10 @@ mod tests {
             { "type": "image_url", "image_url": "..." },
             { "type": "text", "text": "world" }
         ]);
-        assert_eq!(extract_text_from_chat_content(&content), Some("hello world".into()));
+        assert_eq!(
+            extract_text_from_chat_content(&content),
+            Some("hello world".into())
+        );
     }
 
     #[test]

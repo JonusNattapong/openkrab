@@ -3,9 +3,9 @@
 
 use std::process::Stdio;
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use tokio::process::{Child, Command};
 use tokio::sync::mpsc;
+use tokio::sync::Mutex;
 
 /// Daemon configuration options.
 #[derive(Debug, Clone)]

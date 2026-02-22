@@ -23,9 +23,9 @@ pub use attachments::{
 };
 pub use audio_preflight::transcribe_first_audio;
 pub use format::{get_text_stats, sanitize_mime_type, xml_escape_attr};
-pub use providers::{MediaUnderstandingProvider, OpenAiVisionProvider};
 #[cfg(test)]
 pub use providers::MockMediaProvider;
+pub use providers::{MediaUnderstandingProvider, OpenAiVisionProvider};
 pub use resolve::{
     build_provider_registry, resolve_scope_decision, MediaCapability, MediaModelConfig,
     MediaUnderstandingConfig,

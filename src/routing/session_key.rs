@@ -282,11 +282,7 @@ pub fn build_agent_peer_session_key(params: PeerSessionKeyParams) -> String {
         } else {
             channel
         };
-        let peer_id = params
-            .peer_id
-            .unwrap_or_default()
-            .trim()
-            .to_lowercase();
+        let peer_id = params.peer_id.unwrap_or_default().trim().to_lowercase();
         let peer_id = if peer_id.is_empty() {
             "unknown".to_string()
         } else {
@@ -473,7 +469,10 @@ mod tests {
     #[test]
     fn classify_shapes() {
         assert_eq!(classify_session_key_shape(None), SessionKeyShape::Missing);
-        assert_eq!(classify_session_key_shape(Some("")), SessionKeyShape::Missing);
+        assert_eq!(
+            classify_session_key_shape(Some("")),
+            SessionKeyShape::Missing
+        );
         assert_eq!(
             classify_session_key_shape(Some("agent:main:main")),
             SessionKeyShape::Agent

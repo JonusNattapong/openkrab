@@ -13,8 +13,8 @@ use wasmtime::{Config, Engine, Instance, Linker, Module, Store};
 use wasmtime_wasi::{WasiCtx, WasiCtxBuilder, WasiView};
 
 use crate::plugin_sdk::{PluginContext, PluginDeclaration, PluginTool};
-use crate::plugins::{HookPhase, HookSlots, PluginHook};
 use crate::plugins::sandbox::{Sandbox, SandboxConfig, SandboxLevel};
+use crate::plugins::{HookPhase, HookSlots, PluginHook};
 
 /// WASM plugin instance state
 pub struct WasmPluginState {
@@ -45,10 +45,7 @@ impl WasiView for WasmPluginState {
 
 impl WasmPluginState {
     pub fn new(name: String, version: String) -> Self {
-        let wasi = WasiCtxBuilder::new()
-            .inherit_stdio()
-            .inherit_env()
-            .build();
+        let wasi = WasiCtxBuilder::new().inherit_stdio().inherit_env().build();
 
         Self {
             wasi,
@@ -108,7 +105,8 @@ impl WasmPlugin {
         // Try to extract declaration from custom sections
         let declaration = Self::extract_declaration(&module);
 
-        let name = declaration.as_ref()
+        let name = declaration
+            .as_ref()
             .map(|d| d.name.clone())
             .unwrap_or_else(|| {
                 path.file_stem()
@@ -117,7 +115,8 @@ impl WasmPlugin {
                     .to_string()
             });
 
-        let version = declaration.as_ref()
+        let version = declaration
+            .as_ref()
             .map(|d| d.version.clone())
             .unwrap_or_else(|| "1.0.0".to_string());
 
@@ -138,7 +137,10 @@ impl WasmPlugin {
         // Initialize the plugin with sandbox
         plugin.initialize().await?;
 
-        info!("WASM plugin '{}' v{} loaded successfully with sandbox", plugin.name, plugin.version);
+        info!(
+            "WASM plugin '{}' v{} loaded successfully with sandbox",
+            plugin.name, plugin.version
+        );
         Ok(plugin)
     }
 
@@ -176,12 +178,16 @@ impl WasmPlugin {
         Self::add_host_functions(&mut linker)?;
 
         // Instantiate the module
-        let instance = linker.instantiate_async(&mut *store, &self.module).await
+        let instance = linker
+            .instantiate_async(&mut *store, &self.module)
+            .await
             .context("Failed to instantiate WASM module")?;
 
         // Call the initialize function if it exists
         if let Ok(init_fn) = instance.get_typed_func::<(), ()>(&mut *store, "krabkrab_init") {
-            init_fn.call_async(&mut *store, ()).await
+            init_fn
+                .call_async(&mut *store, ())
+                .await
                 .context("Plugin initialization failed")?;
         }
 
@@ -194,120 +200,156 @@ impl WasmPlugin {
     /// Add krabkrab host functions to the linker
     fn add_host_functions(linker: &mut Linker<WasmPluginState>) -> Result<()> {
         // Log function for plugins
-        linker.func_wrap("krabkrab", "log", |mut caller: wasmtime::Caller<'_, WasmPluginState>, ptr: i32, len: i32| {
-            let memory = caller.get_export("memory")
-                .and_then(|e| e.into_memory())
-                .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
+        linker.func_wrap(
+            "krabkrab",
+            "log",
+            |mut caller: wasmtime::Caller<'_, WasmPluginState>, ptr: i32, len: i32| {
+                let memory = caller
+                    .get_export("memory")
+                    .and_then(|e| e.into_memory())
+                    .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
 
-            let mut buf = vec![0u8; len as usize];
-            memory.read(&caller, ptr as usize, &mut buf)?;
+                let mut buf = vec![0u8; len as usize];
+                memory.read(&caller, ptr as usize, &mut buf)?;
 
-            if let Ok(message) = std::str::from_utf8(&buf) {
-                log::info!("[WASM plugin] {}", message);
-            }
+                if let Ok(message) = std::str::from_utf8(&buf) {
+                    log::info!("[WASM plugin] {}", message);
+                }
 
-            Ok(())
-        })?;
+                Ok(())
+            },
+        )?;
 
         // Register tool function
-        linker.func_wrap("krabkrab", "register_tool", |mut caller: wasmtime::Caller<'_, WasmPluginState>,
-            name_ptr: i32, name_len: i32,
-            desc_ptr: i32, desc_len: i32,
-            schema_ptr: i32, schema_len: i32| {
+        linker.func_wrap(
+            "krabkrab",
+            "register_tool",
+            |mut caller: wasmtime::Caller<'_, WasmPluginState>,
+             name_ptr: i32,
+             name_len: i32,
+             desc_ptr: i32,
+             desc_len: i32,
+             schema_ptr: i32,
+             schema_len: i32| {
+                let memory = caller
+                    .get_export("memory")
+                    .and_then(|e| e.into_memory())
+                    .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
 
-            let memory = caller.get_export("memory")
-                .and_then(|e| e.into_memory())
-                .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
+                let name = read_string_from_memory(&memory, &caller, name_ptr, name_len)?;
+                let description = read_string_from_memory(&memory, &caller, desc_ptr, desc_len)?;
+                let schema_json =
+                    read_string_from_memory(&memory, &caller, schema_ptr, schema_len)?;
 
-            let name = read_string_from_memory(&memory, &caller, name_ptr, name_len)?;
-            let description = read_string_from_memory(&memory, &caller, desc_ptr, desc_len)?;
-            let schema_json = read_string_from_memory(&memory, &caller, schema_ptr, schema_len)?;
+                let parameters: serde_json::Value = serde_json::from_str(&schema_json)
+                    .unwrap_or_else(|_| serde_json::json!({"type": "object", "properties": {}}));
 
-            let parameters: serde_json::Value = serde_json::from_str(&schema_json)
-                .unwrap_or_else(|_| serde_json::json!({"type": "object", "properties": {}}));
+                let tool = PluginTool {
+                    name: name.clone(),
+                    description,
+                    parameters,
+                };
 
-            let tool = PluginTool {
-                name: name.clone(),
-                description,
-                parameters,
-            };
+                caller.data_mut().register_tool(tool);
+                log::debug!("WASM plugin registered tool: {}", name);
 
-            caller.data_mut().register_tool(tool);
-            log::debug!("WASM plugin registered tool: {}", name);
-
-            Ok(())
-        })?;
+                Ok(())
+            },
+        )?;
 
         // Register hook function
-        linker.func_wrap("krabkrab", "register_hook", |mut caller: wasmtime::Caller<'_, WasmPluginState>,
-            phase_ptr: i32, phase_len: i32| {
+        linker.func_wrap(
+            "krabkrab",
+            "register_hook",
+            |mut caller: wasmtime::Caller<'_, WasmPluginState>, phase_ptr: i32, phase_len: i32| {
+                let memory = caller
+                    .get_export("memory")
+                    .and_then(|e| e.into_memory())
+                    .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
 
-            let memory = caller.get_export("memory")
-                .and_then(|e| e.into_memory())
-                .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
+                let phase = read_string_from_memory(&memory, &caller, phase_ptr, phase_len)?;
+                caller.data_mut().register_hook(phase.clone());
+                log::debug!("WASM plugin registered hook: {}", phase);
 
-            let phase = read_string_from_memory(&memory, &caller, phase_ptr, phase_len)?;
-            caller.data_mut().register_hook(phase.clone());
-            log::debug!("WASM plugin registered hook: {}", phase);
-
-            Ok(())
-        })?;
+                Ok(())
+            },
+        )?;
 
         // Storage get function
-        linker.func_wrap("krabkrab", "storage_get", |mut caller: wasmtime::Caller<'_, WasmPluginState>,
-            key_ptr: i32, key_len: i32,
-            out_ptr: i32, out_cap: i32,
-            out_len: i32| -> i32 {
+        linker.func_wrap(
+            "krabkrab",
+            "storage_get",
+            |mut caller: wasmtime::Caller<'_, WasmPluginState>,
+             key_ptr: i32,
+             key_len: i32,
+             out_ptr: i32,
+             out_cap: i32,
+             out_len: i32|
+             -> i32 {
+                let memory = match caller.get_export("memory").and_then(|e| e.into_memory()) {
+                    Some(m) => m,
+                    None => return -1,
+                };
 
-            let memory = match caller.get_export("memory").and_then(|e| e.into_memory()) {
-                Some(m) => m,
-                None => return -1,
-            };
+                let key = match read_string_from_memory(&memory, &caller, key_ptr, key_len) {
+                    Ok(k) => k,
+                    Err(_) => return -1,
+                };
 
-            let key = match read_string_from_memory(&memory, &caller, key_ptr, key_len) {
-                Ok(k) => k,
-                Err(_) => return -1,
-            };
-
-            if let Some(data) = caller.data().storage.get(&key) {
-                let len = data.len().min(out_cap as usize);
-                if let Err(_) = memory.write(&mut caller, out_ptr as usize, &data[..len]) {
-                    return -1;
+                if let Some(data) = caller.data().storage.get(&key) {
+                    let len = data.len().min(out_cap as usize);
+                    if let Err(_) = memory.write(&mut caller, out_ptr as usize, &data[..len]) {
+                        return -1;
+                    }
+                    if let Err(_) =
+                        memory.write(&mut caller, out_len as usize, &(len as i32).to_le_bytes())
+                    {
+                        return -1;
+                    }
+                    len as i32
+                } else {
+                    -1
                 }
-                if let Err(_) = memory.write(&mut caller, out_len as usize, &(len as i32).to_le_bytes()) {
-                    return -1;
-                }
-                len as i32
-            } else {
-                -1
-            }
-        })?;
+            },
+        )?;
 
         // Storage set function
-        linker.func_wrap("krabkrab", "storage_set", |mut caller: wasmtime::Caller<'_, WasmPluginState>,
-            key_ptr: i32, key_len: i32,
-            val_ptr: i32, val_len: i32| {
+        linker.func_wrap(
+            "krabkrab",
+            "storage_set",
+            |mut caller: wasmtime::Caller<'_, WasmPluginState>,
+             key_ptr: i32,
+             key_len: i32,
+             val_ptr: i32,
+             val_len: i32| {
+                let memory = caller
+                    .get_export("memory")
+                    .and_then(|e| e.into_memory())
+                    .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
 
-            let memory = caller.get_export("memory")
-                .and_then(|e| e.into_memory())
-                .ok_or_else(|| anyhow::anyhow!("Memory not found"))?;
+                let key = read_string_from_memory(&memory, &caller, key_ptr, key_len)?;
+                let mut value = vec![0u8; val_len as usize];
+                memory.read(&caller, val_ptr as usize, &mut value)?;
 
-            let key = read_string_from_memory(&memory, &caller, key_ptr, key_len)?;
-            let mut value = vec![0u8; val_len as usize];
-            memory.read(&caller, val_ptr as usize, &mut value)?;
+                caller.data_mut().storage.insert(key, value);
 
-            caller.data_mut().storage.insert(key, value);
-
-            Ok(())
-        })?;
+                Ok(())
+            },
+        )?;
 
         Ok(())
     }
 
     /// Extract capabilities from the instantiated module
-    async fn extract_capabilities(&self, instance: &Instance, store: &mut Store<WasmPluginState>) -> Result<()> {
+    async fn extract_capabilities(
+        &self,
+        instance: &Instance,
+        store: &mut Store<WasmPluginState>,
+    ) -> Result<()> {
         // Call capability export if available
-        if let Ok(cap_fn) = instance.get_typed_func::<(), (i32, i32)>(&mut *store, "krabkrab_capabilities") {
+        if let Ok(cap_fn) =
+            instance.get_typed_func::<(), (i32, i32)>(&mut *store, "krabkrab_capabilities")
+        {
             let (ptr, len) = cap_fn.call_async(&mut *store, ()).await?;
 
             if let Some(memory) = instance.get_memory(&mut *store, "memory") {
@@ -333,13 +375,22 @@ impl WasmPlugin {
     }
 
     /// Call a tool in this WASM plugin
-    pub async fn call_tool(&self, tool_name: &str, args: serde_json::Value, ctx: &PluginContext) -> Result<serde_json::Value> {
+    pub async fn call_tool(
+        &self,
+        tool_name: &str,
+        args: serde_json::Value,
+        ctx: &PluginContext,
+    ) -> Result<serde_json::Value> {
         let mut store = self.store.write().await;
 
         // Get the tool call function
         let instance = self.get_instance(&mut store).await?;
 
-        let tool_fn = instance.get_typed_func::<(i32, i32, i32, i32), (i32, i32)>(&mut *store, &format!("tool_{}", tool_name))
+        let tool_fn = instance
+            .get_typed_func::<(i32, i32, i32, i32), (i32, i32)>(
+                &mut *store,
+                &format!("tool_{}", tool_name),
+            )
             .with_context(|| format!("Tool '{}' not found in plugin '{}'", tool_name, self.name))?;
 
         // Serialize arguments and context
@@ -347,15 +398,31 @@ impl WasmPlugin {
         let ctx_json = serde_json::to_string(&ctx)?;
 
         // Allocate memory in WASM for input
-        let args_ptr = self.allocate_string(&mut store, &instance, &args_json).await?;
-        let ctx_ptr = self.allocate_string(&mut store, &instance, &ctx_json).await?;
+        let args_ptr = self
+            .allocate_string(&mut store, &instance, &args_json)
+            .await?;
+        let ctx_ptr = self
+            .allocate_string(&mut store, &instance, &ctx_json)
+            .await?;
 
         // Call the tool
-        let (result_ptr, result_len) = tool_fn.call_async(&mut *store, (args_ptr, args_json.len() as i32, ctx_ptr, ctx_json.len() as i32)).await
+        let (result_ptr, result_len) = tool_fn
+            .call_async(
+                &mut *store,
+                (
+                    args_ptr,
+                    args_json.len() as i32,
+                    ctx_ptr,
+                    ctx_json.len() as i32,
+                ),
+            )
+            .await
             .with_context(|| format!("Tool '{}' execution failed", tool_name))?;
 
         // Read result
-        let result = self.read_string(&store, &instance, result_ptr, result_len).await?;
+        let result = self
+            .read_string(&store, &instance, result_ptr, result_len)
+            .await?;
 
         // Deallocate memory
         self.deallocate(&mut store, &instance, args_ptr).await?;
@@ -363,8 +430,8 @@ impl WasmPlugin {
         self.deallocate(&mut store, &instance, result_ptr).await?;
 
         // Parse result
-        let result_json: serde_json::Value = serde_json::from_str(&result)
-            .context("Failed to parse tool result")?;
+        let result_json: serde_json::Value =
+            serde_json::from_str(&result).context("Failed to parse tool result")?;
 
         Ok(result_json)
     }
@@ -380,9 +447,13 @@ impl WasmPlugin {
 
         if let Ok(hook_fn) = instance.get_typed_func::<(i32, i32), ()>(&mut *store, &hook_fn_name) {
             let ctx_json = serde_json::to_string(&ctx)?;
-            let ctx_ptr = self.allocate_string(&mut store, &instance, &ctx_json).await?;
+            let ctx_ptr = self
+                .allocate_string(&mut store, &instance, &ctx_json)
+                .await?;
 
-            hook_fn.call_async(&mut *store, (ctx_ptr, ctx_json.len() as i32)).await
+            hook_fn
+                .call_async(&mut *store, (ctx_ptr, ctx_json.len() as i32))
+                .await
                 .with_context(|| format!("Hook '{}' execution failed", hook_fn_name))?;
 
             self.deallocate(&mut store, &instance, ctx_ptr).await?;
@@ -402,8 +473,14 @@ impl WasmPlugin {
     }
 
     /// Allocate a string in WASM memory
-    async fn allocate_string(&self, store: &mut Store<WasmPluginState>, instance: &Instance, s: &str) -> Result<i32> {
-        let alloc_fn = instance.get_typed_func::<i32, i32>(&mut *store, "krabkrab_alloc")
+    async fn allocate_string(
+        &self,
+        store: &mut Store<WasmPluginState>,
+        instance: &Instance,
+        s: &str,
+    ) -> Result<i32> {
+        let alloc_fn = instance
+            .get_typed_func::<i32, i32>(&mut *store, "krabkrab_alloc")
             .context("Allocation function not found")?;
 
         let ptr = alloc_fn.call_async(&mut *store, s.len() as i32).await?;
@@ -416,7 +493,12 @@ impl WasmPlugin {
     }
 
     /// Deallocate memory in WASM
-    async fn deallocate(&self, store: &mut Store<WasmPluginState>, instance: &Instance, ptr: i32) -> Result<()> {
+    async fn deallocate(
+        &self,
+        store: &mut Store<WasmPluginState>,
+        instance: &Instance,
+        ptr: i32,
+    ) -> Result<()> {
         if let Ok(dealloc_fn) = instance.get_typed_func::<i32, ()>(&mut *store, "krabkrab_free") {
             dealloc_fn.call_async(&mut *store, ptr).await?;
         }
@@ -424,7 +506,13 @@ impl WasmPlugin {
     }
 
     /// Read a string from WASM memory
-    async fn read_string(&self, store: &Store<WasmPluginState>, instance: &Instance, ptr: i32, len: i32) -> Result<String> {
+    async fn read_string(
+        &self,
+        store: &Store<WasmPluginState>,
+        instance: &Instance,
+        ptr: i32,
+        len: i32,
+    ) -> Result<String> {
         if let Some(memory) = instance.get_memory(&mut store.clone(), "memory") {
             let mut buf = vec![0u8; len as usize];
             memory.read(&*store, ptr as usize, &mut buf)?;
@@ -448,7 +536,12 @@ impl WasmPlugin {
 }
 
 /// Helper to read a string from WASM memory
-fn read_string_from_memory(memory: &wasmtime::Memory, caller: &wasmtime::Caller<'_, WasmPluginState>, ptr: i32, len: i32) -> Result<String> {
+fn read_string_from_memory(
+    memory: &wasmtime::Memory,
+    caller: &wasmtime::Caller<'_, WasmPluginState>,
+    ptr: i32,
+    len: i32,
+) -> Result<String> {
     let mut buf = vec![0u8; len as usize];
     memory.read(&caller, ptr as usize, &mut buf)?;
     String::from_utf8(buf).context("Invalid UTF-8")
@@ -506,8 +599,16 @@ impl WasmPluginManager {
     }
 
     /// Call a tool in a plugin
-    pub async fn call_tool(&self, plugin_name: &str, tool_name: &str, args: serde_json::Value, ctx: &PluginContext) -> Result<serde_json::Value> {
-        let plugin = self.plugins.get(plugin_name)
+    pub async fn call_tool(
+        &self,
+        plugin_name: &str,
+        tool_name: &str,
+        args: serde_json::Value,
+        ctx: &PluginContext,
+    ) -> Result<serde_json::Value> {
+        let plugin = self
+            .plugins
+            .get(plugin_name)
             .ok_or_else(|| anyhow!("Plugin '{}' not found", plugin_name))?;
 
         plugin.call_tool(tool_name, args, ctx).await

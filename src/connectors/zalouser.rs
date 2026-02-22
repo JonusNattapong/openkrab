@@ -156,13 +156,8 @@ pub async fn run_zca(args: &[&str], profile: Option<&str>, timeout_ms: Option<u6
     let full_args = build_args(args, profile);
     let timeout = Duration::from_millis(timeout_ms.unwrap_or(DEFAULT_TIMEOUT_MS));
 
-    let output = tokio::time::timeout(
-        timeout,
-        TokioCommand::new("zca")
-            .args(&full_args)
-            .output(),
-    )
-    .await;
+    let output =
+        tokio::time::timeout(timeout, TokioCommand::new("zca").args(&full_args).output()).await;
 
     match output {
         Ok(Ok(out)) => ZcaResult {
@@ -193,9 +188,7 @@ pub async fn check_zca_installed() -> bool {
 
 /// Check whether the given profile is authenticated.
 pub async fn check_zca_authenticated(profile: Option<&str>) -> bool {
-    run_zca(&["auth", "status"], profile, Some(5000))
-        .await
-        .ok
+    run_zca(&["auth", "status"], profile, Some(5000)).await.ok
 }
 
 /// Strip ANSI escape codes and attempt to parse JSON from stdout.
@@ -302,16 +295,15 @@ fn extract_message_id(stdout: &str) -> Option<String> {
         .trim()
         .split_whitespace()
         .next()
-        .filter(|s| s.chars().all(|c| c.is_alphanumeric() || c == '-' || c == '_'))
+        .filter(|s| {
+            s.chars()
+                .all(|c| c.is_alphanumeric() || c == '-' || c == '_')
+        })
         .map(|s| s.to_string())
 }
 
 /// Send a text (or media) message to a Zalo thread via `zca`.
-pub async fn send_message(
-    thread_id: &str,
-    text: &str,
-    opts: &SendOptions,
-) -> SendResult {
+pub async fn send_message(thread_id: &str, text: &str, opts: &SendOptions) -> SendResult {
     let profile = opts.profile.as_deref();
 
     if thread_id.trim().is_empty() {
@@ -396,10 +388,7 @@ pub async fn get_user_info(profile: Option<&str>) -> Result<ZcaUserInfo> {
 }
 
 /// List friends, optionally filtered by query.
-pub async fn list_friends(
-    profile: Option<&str>,
-    query: Option<&str>,
-) -> Result<Vec<ZcaFriend>> {
+pub async fn list_friends(profile: Option<&str>, query: Option<&str>) -> Result<Vec<ZcaFriend>> {
     let args: &[&str] = if let Some(q) = query {
         &["friend", "find", q]
     } else {
@@ -413,10 +402,7 @@ pub async fn list_friends(
 }
 
 /// List groups, optionally filtered by name/id query.
-pub async fn list_groups(
-    profile: Option<&str>,
-    query: Option<&str>,
-) -> Result<Vec<ZcaGroup>> {
+pub async fn list_groups(profile: Option<&str>, query: Option<&str>) -> Result<Vec<ZcaGroup>> {
     let result = run_zca(&["group", "list", "-j"], profile, Some(15_000)).await;
     if !result.ok {
         bail!("zca group list failed: {}", result.stderr);
@@ -509,12 +495,7 @@ pub fn is_group_allowed(
         return false;
     }
     let slug = group_name.map(normalize_group_slug).unwrap_or_default();
-    let candidates: &[&str] = &[
-        group_id,
-        group_name.unwrap_or(""),
-        slug.as_str(),
-        "*",
-    ];
+    let candidates: &[&str] = &[group_id, group_name.unwrap_or(""), slug.as_str(), "*"];
     for key in candidates {
         if key.is_empty() {
             continue;
@@ -625,7 +606,9 @@ pub async fn execute_tool(params: ZalouserToolParams) -> serde_json::Value {
         ZalouserAction::Link => {
             let thread_id = match &params.thread_id {
                 Some(id) if !id.trim().is_empty() => id.clone(),
-                _ => return serde_json::json!({"error": "threadId and url required for link action"}),
+                _ => {
+                    return serde_json::json!({"error": "threadId and url required for link action"})
+                }
             };
             let url = match &params.url {
                 Some(u) if !u.trim().is_empty() => u.clone(),
@@ -727,7 +710,10 @@ mod tests {
 
     #[test]
     fn is_sender_allowed_exact_match() {
-        assert!(is_sender_allowed("12345", &["12345".to_string(), "67890".to_string()]));
+        assert!(is_sender_allowed(
+            "12345",
+            &["12345".to_string(), "67890".to_string()]
+        ));
         assert!(!is_sender_allowed("99999", &["12345".to_string()]));
     }
 
@@ -740,7 +726,13 @@ mod tests {
     #[test]
     fn is_group_allowed_exact_id() {
         let mut groups = HashMap::new();
-        groups.insert("g001".to_string(), GroupEntry { allow: Some(true), enabled: Some(true) });
+        groups.insert(
+            "g001".to_string(),
+            GroupEntry {
+                allow: Some(true),
+                enabled: Some(true),
+            },
+        );
         assert!(is_group_allowed("g001", None, &groups));
         assert!(!is_group_allowed("g002", None, &groups));
     }
@@ -748,7 +740,13 @@ mod tests {
     #[test]
     fn is_group_allowed_wildcard() {
         let mut groups = HashMap::new();
-        groups.insert("*".to_string(), GroupEntry { allow: Some(true), enabled: Some(true) });
+        groups.insert(
+            "*".to_string(),
+            GroupEntry {
+                allow: Some(true),
+                enabled: Some(true),
+            },
+        );
         assert!(is_group_allowed("anything", Some("Any Group"), &groups));
     }
 
@@ -779,8 +777,7 @@ mod tests {
 
     #[test]
     fn parse_json_output_valid() {
-        let parsed: Option<Vec<serde_json::Value>> =
-            parse_json_output(r#"[{"a":1}]"#);
+        let parsed: Option<Vec<serde_json::Value>> = parse_json_output(r#"[{"a":1}]"#);
         assert!(parsed.is_some());
     }
 
@@ -799,19 +796,34 @@ mod tests {
 
     #[test]
     fn media_command_for_url_video() {
-        assert_eq!(media_command_for_url("https://example.com/foo.mp4"), "video");
-        assert_eq!(media_command_for_url("https://example.com/foo.MOV"), "video");
+        assert_eq!(
+            media_command_for_url("https://example.com/foo.mp4"),
+            "video"
+        );
+        assert_eq!(
+            media_command_for_url("https://example.com/foo.MOV"),
+            "video"
+        );
     }
 
     #[test]
     fn media_command_for_url_voice() {
-        assert_eq!(media_command_for_url("https://example.com/foo.mp3"), "voice");
+        assert_eq!(
+            media_command_for_url("https://example.com/foo.mp3"),
+            "voice"
+        );
     }
 
     #[test]
     fn media_command_for_url_image() {
-        assert_eq!(media_command_for_url("https://example.com/foo.jpg"), "image");
-        assert_eq!(media_command_for_url("https://example.com/foo.png"), "image");
+        assert_eq!(
+            media_command_for_url("https://example.com/foo.jpg"),
+            "image"
+        );
+        assert_eq!(
+            media_command_for_url("https://example.com/foo.png"),
+            "image"
+        );
     }
 
     #[test]

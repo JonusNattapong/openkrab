@@ -194,11 +194,7 @@ pub async fn send_completion(
         .await?;
 
     if !resp.status().is_success() {
-        bail!(
-            "copilot-proxy: HTTP {} from {}",
-            resp.status(),
-            url
-        );
+        bail!("copilot-proxy: HTTP {} from {}", resp.status(), url);
     }
 
     Ok(resp.json().await?)

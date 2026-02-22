@@ -81,7 +81,6 @@ pub use twitch::{build_privmsg as twitch_build_privmsg, parse_privmsg as twitch_
 pub use whatsapp_client::build_whatsapp_text_payload;
 pub use zalo::{build_text_payload as zalo_build_text, parse_event as zalo_parse_event};
 pub use zalouser::{
-    normalize_inbound as zalouser_normalize_inbound,
-    normalize_target as zalouser_normalize_target,
     is_sender_allowed as zalouser_is_sender_allowed,
+    normalize_inbound as zalouser_normalize_inbound, normalize_target as zalouser_normalize_target,
 };

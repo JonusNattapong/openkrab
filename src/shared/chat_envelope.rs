@@ -82,7 +82,11 @@ pub fn strip_message_id_hints(text: &str) -> String {
     }
 
     let lines: Vec<&str> = text.lines().collect();
-    let filtered: Vec<&str> = lines.iter().copied().filter(|line| !MSG_ID_LINE.is_match(line)).collect();
+    let filtered: Vec<&str> = lines
+        .iter()
+        .copied()
+        .filter(|line| !MSG_ID_LINE.is_match(line))
+        .collect();
 
     if filtered.len() == lines.len() {
         text.to_string()
@@ -110,7 +114,10 @@ mod tests {
 
     #[test]
     fn preserves_non_envelope_brackets() {
-        assert_eq!(strip_envelope("[something random] hi"), "[something random] hi");
+        assert_eq!(
+            strip_envelope("[something random] hi"),
+            "[something random] hi"
+        );
     }
 
     #[test]

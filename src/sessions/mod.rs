@@ -4,6 +4,12 @@
 //! Tracks per-conversation state including model overrides, verbosity level
 //! overrides, send policy, and a basic session transcript.
 
+pub mod input_provenance;
+pub mod level_overrides;
+pub mod model_overrides;
+pub mod send_policy;
+pub mod session_key_utils;
+pub mod session_label;
 pub mod transcript_events;
 
 use chrono::{DateTime, Utc};
@@ -46,12 +52,12 @@ impl VerbosityLevel {
     }
 }
 
-// ─── Send policy ──────────────────────────────────────────────────────────────
+// ─── Delivery Mode ────────────────────────────────────────────────────────────
 
-/// Controls when/how replies are sent.
+/// Controls when/how replies are delivered.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
-pub enum SendPolicy {
+pub enum DeliveryMode {
     /// Send reply as soon as it is generated.
     #[default]
     Immediate,
@@ -59,6 +65,17 @@ pub enum SendPolicy {
     Batch,
     /// Stream tokens as typing indicators.
     Stream,
+}
+
+// ─── Send policy ──────────────────────────────────────────────────────────────
+
+/// Controls whether the agent is allowed to send replies at all.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum SendPolicy {
+    #[default]
+    Allow,
+    Deny,
 }
 
 // ─── Transcript entry ─────────────────────────────────────────────────────────
@@ -94,6 +111,42 @@ impl TranscriptEntry {
     }
 }
 
+// ─── Thinking level ───────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum ThinkingLevel {
+    #[default]
+    Off,
+    Minimal,
+    Low,
+    Medium,
+    High,
+    Xhigh,
+}
+
+// ─── Reasoning level ──────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum ReasoningLevel {
+    #[default]
+    Off,
+    On,
+    Stream,
+}
+
+// ─── Usage display level ──────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum UsageDisplayLevel {
+    #[default]
+    Off,
+    Tokens,
+    Full,
+}
+
 impl From<TranscriptEntry> for crate::agents::chat::ChatMessage {
     fn from(entry: TranscriptEntry) -> Self {
         match entry.role.as_str() {
@@ -117,18 +170,28 @@ impl From<TranscriptEntry> for crate::agents::chat::ChatMessage {
 // ─── Session ──────────────────────────────────────────────────────────────────
 
 /// Per-conversation session state.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Session {
     /// Unique session ID (usually connector + chat_id).
     pub id: String,
     /// Session label for display (e.g. "@alice on telegram").
     pub label: Option<String>,
+    /// Display name for the session.
+    pub display_name: Option<String>,
     /// Override the model for this session (None = use global default).
     pub model_override: Option<String>,
     /// Override the verbosity for this session.
     pub verbosity: VerbosityLevel,
-    /// Send policy override.
-    pub send_policy: SendPolicy,
+    /// Delivery mode override.
+    pub delivery_mode: Option<DeliveryMode>,
+    /// Send policy override (allow/deny).
+    pub send_policy: Option<SendPolicy>,
+    /// Thinking level override.
+    pub thinking_level: Option<ThinkingLevel>,
+    /// Reasoning level override.
+    pub reasoning_level: Option<ReasoningLevel>,
+    /// Usage display mode override.
+    pub response_usage: Option<UsageDisplayLevel>,
     /// Whether elevated (admin) mode is active.
     pub elevated: bool,
     /// Conversation transcript (last N entries).
@@ -139,6 +202,25 @@ pub struct Session {
     pub created_at: DateTime<Utc>,
     /// When the session was last active.
     pub last_active: DateTime<Utc>,
+    /// Provider override.
+    pub provider_override: Option<String>,
+    /// Authentication profile override.
+    pub auth_profile_override: Option<String>,
+    pub auth_profile_override_source: Option<String>,
+    pub auth_profile_override_compaction_count: Option<u32>,
+    /// Fallback notice config.
+    pub fallback_notice_selected_model: Option<String>,
+    pub fallback_notice_active_model: Option<String>,
+    pub fallback_notice_reason: Option<String>,
+    /// Channel details.
+    pub channel: Option<String>,
+    pub last_channel: Option<String>,
+    pub chat_type: Option<String>,
+    /// Token usage stats.
+    pub input_tokens: u32,
+    pub output_tokens: u32,
+    pub total_tokens: u32,
+    pub context_tokens: u32,
     /// Arbitrary key-value metadata.
     pub metadata: HashMap<String, String>,
 }
@@ -149,14 +231,33 @@ impl Session {
         Self {
             id: id.into(),
             label: None,
+            display_name: None,
             model_override: None,
             verbosity: VerbosityLevel::Normal,
-            send_policy: SendPolicy::Immediate,
+            delivery_mode: None,
+            send_policy: None,
+            thinking_level: None,
+            reasoning_level: None,
+            response_usage: None,
             elevated: false,
             transcript: Vec::new(),
             max_transcript: 50,
             created_at: now,
             last_active: now,
+            provider_override: None,
+            auth_profile_override: None,
+            auth_profile_override_source: None,
+            auth_profile_override_compaction_count: None,
+            fallback_notice_selected_model: None,
+            fallback_notice_active_model: None,
+            fallback_notice_reason: None,
+            channel: None,
+            last_channel: None,
+            chat_type: None,
+            input_tokens: 0,
+            output_tokens: 0,
+            total_tokens: 0,
+            context_tokens: 0,
             metadata: HashMap::new(),
         }
     }
@@ -169,6 +270,8 @@ impl Session {
             let drain_count = self.transcript.len() - self.max_transcript;
             self.transcript.drain(..drain_count);
         }
+        // Notify listeners of transcript update
+        crate::sessions::transcript_events::emit_session_transcript_update(&self.id);
     }
 
     /// Get the effective model (override or None).

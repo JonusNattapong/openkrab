@@ -39,7 +39,9 @@ impl RateLimiter {
 
             entry.attempts += 1;
             if entry.attempts > self.max_attempts {
-                let remaining = self.window.saturating_sub(now.duration_since(entry.first_attempt));
+                let remaining = self
+                    .window
+                    .saturating_sub(now.duration_since(entry.first_attempt));
                 return (false, Some(remaining.as_millis() as u64));
             }
             return (true, None);
@@ -262,9 +264,9 @@ pub struct AuthManager {
 
 impl AuthManager {
     pub fn new(auth_config: ResolvedAuth) -> Self {
-        let rate_limiter = auth_config.rate_limit_per_user.map(|max_attempts| {
-            Arc::new(RateLimiter::new(max_attempts, 60))
-        });
+        let rate_limiter = auth_config
+            .rate_limit_per_user
+            .map(|max_attempts| Arc::new(RateLimiter::new(max_attempts, 60)));
 
         let authenticator: Box<dyn Authenticator> = match auth_config.mode {
             AuthMode::None => Box::new(NoAuth),
@@ -280,7 +282,10 @@ impl AuthManager {
             AuthMode::TrustedProxy => Box::new(NoAuth), // Simplified for now
         };
 
-        Self { authenticator, rate_limiter }
+        Self {
+            authenticator,
+            rate_limiter,
+        }
     }
 
     pub async fn authenticate(&self, ctx: &AuthContext) -> AuthResult {

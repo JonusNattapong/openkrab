@@ -32,30 +32,30 @@ pub enum SecurityEventType {
     PluginSignatureMissing,
     PluginSandboxViolation,
     PluginResourceLimitExceeded,
-    
+
     // File system events
     FileReadAttempt,
     FileWriteAttempt,
     PathTraversalBlocked,
-    
+
     // Command execution events
     CommandExecutionAttempt,
     CommandBlocked,
     CommandInjectionDetected,
-    
+
     // Network events
     NetworkRequest,
     NetworkBlocked,
-    
+
     // Authentication events
     AuthSuccess,
     AuthFailure,
     TokenValidation,
-    
+
     // Configuration events
     ConfigReload,
     ConfigValidationFailure,
-    
+
     // Runtime events
     Panic,
     UnsafeBlockExecuted,
@@ -71,7 +71,9 @@ impl std::fmt::Display for SecurityEventType {
             SecurityEventType::PluginSignatureInvalid => write!(f, "plugin_signature_invalid"),
             SecurityEventType::PluginSignatureMissing => write!(f, "plugin_signature_missing"),
             SecurityEventType::PluginSandboxViolation => write!(f, "plugin_sandbox_violation"),
-            SecurityEventType::PluginResourceLimitExceeded => write!(f, "plugin_resource_limit_exceeded"),
+            SecurityEventType::PluginResourceLimitExceeded => {
+                write!(f, "plugin_resource_limit_exceeded")
+            }
             SecurityEventType::FileReadAttempt => write!(f, "file_read_attempt"),
             SecurityEventType::FileWriteAttempt => write!(f, "file_write_attempt"),
             SecurityEventType::PathTraversalBlocked => write!(f, "path_traversal_blocked"),
@@ -194,7 +196,7 @@ impl SecurityAuditLogger {
         // Store in memory
         let mut events = self.events.lock().await;
         events.push(event);
-        
+
         // Trim old events
         if events.len() > self.max_events {
             events.remove(0);
@@ -294,14 +296,12 @@ pub fn audit() -> &'static SecurityAuditLogger {
 #[macro_export]
 macro_rules! security_log {
     ($event_type:expr, $severity:expr, $source:expr, $message:expr) => {
-        $crate::security_audit::audit().log(
-            $crate::security_audit::SecurityEvent::new(
-                $event_type,
-                $severity,
-                $source,
-                $message,
-            )
-        )
+        $crate::security_audit::audit().log($crate::security_audit::SecurityEvent::new(
+            $event_type,
+            $severity,
+            $source,
+            $message,
+        ))
     };
 }
 
