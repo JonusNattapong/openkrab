@@ -574,15 +574,7 @@
         // 3. Fix Hero Section (Extract to placeholder to prevent code block rendering)
         const heroRegex = /<p align="center">[\s\S]*?<img[^>]+openkrab-logo-text[\s\S]*?<\/p>/;
         if (heroRegex.test(raw)) {
-          const id = `%%HERO_${placeholders.length}%%`;
-          placeholders.push({
-            id: id,
-            html: `
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <img src="assets/logo/logo-long-Photoroom.png" alt="OpenKrab Logo" style="width: 100%; max-width: 600px; border: none !important; box-shadow: none !important;">
-            </div>`
-          });
-          raw = raw.replace(heroRegex, id);
+          raw = raw.replace(heroRegex, ''); // Remove the hero section entirely
         }
 
         // 4. Fix General Image Paths (Exclude our official logo folder)
