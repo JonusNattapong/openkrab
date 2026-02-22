@@ -488,7 +488,8 @@
       contentBox.classList.remove('visible');
 
       const cleanPath = path.replace(/^\//, '');
-      const target = cleanPath.endsWith('.md') ? `../docs/${cleanPath}` : `../docs/${cleanPath}.md`;
+      // When deployed, we'll ensure 'docs' is a subfolder of the root
+      const target = cleanPath.endsWith('.md') ? `docs/${cleanPath}` : `docs/${cleanPath}.md`;
 
       try {
         const res = await fetch(target);
