@@ -482,7 +482,7 @@
   <div id="loader"></div>
 
   <aside id="sidebar">
-    <a href="#/" class="logo-box">
+    <a href="#/index" class="logo-box">
       <img src="assets/logo/logo-face-Photoroom.png" alt="OpenKrab Logo" class="logo-img">
       <span>OpenKrab</span>
     </a>
@@ -691,7 +691,7 @@
     }
 
     function handleRoute() {
-      const hash = window.location.hash || '#/';
+      const hash = window.location.hash || '#/index';
       loadPage(hash.substring(2));
     }
 

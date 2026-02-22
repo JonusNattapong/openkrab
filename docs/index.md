@@ -8,8 +8,7 @@ title: "OpenKrab"
 # OpenKrab 🦀 <!-- deployment-trigger-2026-02-22 -->
 
 <p align="center">
-    <img src="assets/logo/logo-long-Photoroom.png" alt="OpenKrab Logo" width="600" />
-</p>
+<!-- Logo image removed per request -->
 
 > _"EXFOLIATE! EXFOLIATE!"_ — Molty, a space lobster
 
