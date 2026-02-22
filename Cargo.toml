@@ -1,6 +1,6 @@
 [package]
 name = "krabkrab"
-version = "2026.2.19"
+version = "2026.2.22"
 edition = "2021"
 authors = ["openkrab port"]
 description = "Personal AI assistant - Rust port of krabkrab"
