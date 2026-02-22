@@ -402,13 +402,28 @@
         // Transform custom Mintlify components to something we can style
         text = text.replace(/<Columns>/g, '<div class="card-grid">');
         text = text.replace(/<\/Columns>/g, '</div>');
-        text = text.replace(/<Card\s+title="([^"]+)"\s+href="([^"]+)"\s+icon="([^"]+)">([\s\S]*?)<\/Card>/g,
-          (match, title, href, icon, body) => `
-                <a href="#${href}" class="card">
-                    <h4>${title}</h4>
-                    <p>${body.trim()}</p>
-                </a>
-            `);
+
+        // More robust regex for Card component
+        const cardRegex = /<Card\s+([^>]+)>([\s\S]*?)<\/Card>/g;
+        text = text.replace(cardRegex, (match, attrs, body) => {
+          const titleMatch = attrs.match(/title="([^"]+)"/);
+          const hrefMatch = attrs.match(/href="([^"]+)"/);
+          const title = titleMatch ? titleMatch[1] : 'Docs';
+          const href = hrefMatch ? hrefMatch[1] : '#';
+          return `
+            <a href="#${href}" class="card">
+                <h4>${title}</h4>
+                <p>${body.trim()}</p>
+            </a>`;
+        });
+
+        // Clean up any remaining Mintlify tags if necessary
+        text = text.replace(/<[^>]+>/g, (m) => {
+          if (m.startsWith('<div') || m.startsWith('</div') || m.startsWith('<a') || m.startsWith('</a') || m.startsWith('<h') || m.startsWith('</h') || m.startsWith('<p') || m.startsWith('</p') || m.startsWith('<img') || m.startsWith('<br') || m.startsWith('<ul') || m.startsWith('<ol') || m.startsWith('<li')) {
+            return m;
+          }
+          return ''; // Strip unknown tags to avoid raw display
+        });
 
         contentEl.innerHTML = marked.parse(text);
 
