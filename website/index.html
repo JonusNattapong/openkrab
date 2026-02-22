@@ -374,6 +374,53 @@
       line-height: 1.6;
     }
 
+    /* --- Steps --- */
+    .steps-container {
+      margin: 3rem 0;
+      border-left: 1px solid var(--border);
+      padding-left: 2rem;
+      margin-left: 1rem;
+    }
+
+    .doc-step {
+      position: relative;
+      margin-bottom: 3rem;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      margin-left: -2.85rem;
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      background: var(--bg-deep);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .step-header h5 {
+      margin-top: 2rem;
+      margin-bottom: 0;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+
+    .step-body p {
+      font-size: 1rem;
+    }
+
     /* --- Transitions --- */
     #loader {
       position: fixed;
@@ -553,16 +600,42 @@
           return id;
         });
 
+        // Handle Steps & Step
+        raw = raw.replace(/<Steps>([\s\S]*?)<\/Steps>/g, (match, content) => {
+          const id = `%%STEPS_${placeholders.length}%%`;
+          let stepIndex = 1;
+          let renderedContent = content.replace(/<Step\s+title="([^"]+)">([\s\S]*?)<\/Step>/g, (m, title, body) => {
+            return `
+                <div class="doc-step">
+                    <div class="step-header">
+                        <span class="step-number">${stepIndex++}</span>
+                        <h5>${title}</h5>
+                    </div>
+                    <div class="step-body">${marked.parse(body.trim())}</div>
+                </div>`;
+          });
+
+          placeholders.push({
+            id: id,
+            html: `<div class="steps-container">${renderedContent}</div>`
+          });
+          return id;
+        });
+
         // 3. Final Render and Re-insertion
         let html = marked.parse(raw);
 
         // Strip leftover Mintlify tags
-        html = html.replace(/<\/?(Steps|Step|Note|Warning|Info|Tip)[^>]*>/g, '');
+        html = html.replace(/<\/?(Note|Warning|Info|Tip)[^>]*>/g, '');
 
         // Re-insert components
         placeholders.forEach(p => {
-          html = html.replace(`<p>${p.id}</p>`, p.html); // marked often wraps placeholders in <p>
-          html = html.replace(p.id, p.html);
+          const wrap = `<p>${p.id}</p>`;
+          if (html.includes(wrap)) {
+            html = html.split(wrap).join(p.html);
+          } else {
+            html = html.split(p.id).join(p.html);
+          }
         });
 
         contentBox.innerHTML = html;
