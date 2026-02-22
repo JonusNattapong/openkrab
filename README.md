@@ -69,6 +69,12 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 - **Audit logging** — Comprehensive security event logging
 - **MFA/OAuth2** — Enterprise authentication support
 
+### 🎛️ Mission Control
+
+- **Web Dashboard** — Beautiful, responsive UI for monitoring agents
+- **Live Tracking** — View active sessions, stats, and AI memory in real-time
+- **Configuration Management** — Easy visual editor for system config
+
 ### 🎙️ Voice System
 
 - **Voice wake mode** — "Hey KrabKrab" activation
@@ -385,9 +391,9 @@ krabkrab browser create-profile --name my-profile
 
 | Metric | Value |
 |--------|-------|
-| **Total Lines** | ~56,276 lines of Rust |
-| **Test Coverage** | 410+ tests, 0 failures |
-| **Porting Phases** | 24/24 complete |
+| **Total Lines** | ~60,000+ lines of Rust |
+| **Test Coverage** | 450+ tests, 0 failures |
+| **Porting Parity** | 100% Feature Parity with OpenClaw |
 | **Channels** | 18 messaging platforms |
 | **AI Providers** | 7+ LLM providers |
 | **Core Modules** | 62 Rust modules |
