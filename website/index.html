@@ -515,36 +515,57 @@
         // 1. Remove Frontmatter
         raw = raw.replace(/^---[\s\S]*?---/, '');
 
-        // 2. Fix Indentation Issues (Pre-processing for Mintlify components)
-        // We strip leading whitespace inside Columns/Card tags to prevent marked from seeing code blocks
-        raw = raw.replace(/<Columns>([\s\S]*?)<\/Columns>/g, (m, content) => {
-          return `<Columns>${content.split('\n').map(line => line.trim()).join('\n')}</Columns>`;
-        });
+        // 2. Extract and Placeholder Custom Components
+        const placeholders = [];
 
-        // 3. Render Custom Components
-        // Columns
-        raw = raw.replace(/<Columns>/g, '<div class="card-grid">');
-        raw = raw.replace(/<\/Columns>/g, '</div>');
+        // Handle Columns & Cards together to maintain structure
+        raw = raw.replace(/<Columns>([\s\S]*?)<\/Columns>/g, (match, content) => {
+          const id = `%%COLUMNS_${placeholders.length}%%`;
 
-        // Cards
-        const cardRegex = /<Card\s+([^>]+)>([\s\S]*?)<\/Card>/g;
-        raw = raw.replace(cardRegex, (m, attrs, body) => {
-          const title = (attrs.match(/title="([^"]+)"/) || [])[1] || 'Documentation';
-          const href = (attrs.match(/href="([^"]+)"/) || [])[1] || '#';
-          // Remove any leftover markdown escaping/indentation inside body
-          const cleanBody = body.trim().replace(/^\s+|\s+$/gm, '');
-          return `
+          // Render the inner cards first
+          let renderedContent = content.replace(/<Card\s+([^>]+)>([\s\S]*?)<\/Card>/g, (m, attrs, body) => {
+            const title = (attrs.match(/title="([^"]+)"/) || [])[1] || 'Docs';
+            const href = (attrs.match(/href="([^"]+)"/) || [])[1] || '#';
+            const cleanBody = body.trim();
+            return `
                 <a href="#${href}" class="doc-card">
                     <h4>${title}</h4>
                     <p>${cleanBody}</p>
                 </a>`;
+          });
+
+          placeholders.push({
+            id: id,
+            html: `<div class="card-grid">${renderedContent}</div>`
+          });
+          return id;
         });
 
-        // Strip other Mintlify tags
-        raw = raw.replace(/<\/?(Steps|Step|Note|Warning|Info|Tip)[^>]*>/g, '');
+        // Handle standalone cards if any
+        raw = raw.replace(/<Card\s+([^>]+)>([\s\S]*?)<\/Card>/g, (m, attrs, body) => {
+          const id = `%%CARD_${placeholders.length}%%`;
+          const title = (attrs.match(/title="([^"]+)"/) || [])[1] || 'Docs';
+          const href = (attrs.match(/href="([^"]+)"/) || [])[1] || '#';
+          placeholders.push({
+            id: id,
+            html: `<a href="#${href}" class="doc-card"><h4>${title}</h4><p>${body.trim()}</p></a>`
+          });
+          return id;
+        });
 
-        // 4. Final Render
-        contentBox.innerHTML = marked.parse(raw);
+        // 3. Final Render and Re-insertion
+        let html = marked.parse(raw);
+
+        // Strip leftover Mintlify tags
+        html = html.replace(/<\/?(Steps|Step|Note|Warning|Info|Tip)[^>]*>/g, '');
+
+        // Re-insert components
+        placeholders.forEach(p => {
+          html = html.replace(`<p>${p.id}</p>`, p.html); // marked often wraps placeholders in <p>
+          html = html.replace(p.id, p.html);
+        });
+
+        contentBox.innerHTML = html;
 
         // 5. Handle Mermaid Diagrams
         const mermaidBlocks = contentBox.querySelectorAll('code.language-mermaid');
