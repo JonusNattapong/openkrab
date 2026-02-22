@@ -5,11 +5,8 @@ read_when:
 title: "OpenKrab"
 ---
 
-# OpenKrab 🦀 <!-- deployment-trigger-2026-02-22 -->
+# OpenKrab <!-- deployment-trigger-2026-02-22 -->
 
-<p align="center">
-    <img src="assets/logo/logo-long-Photoroom.png" alt="OpenKrab Logo" width="600" />
-</p>
 
 > _"EXFOLIATE! EXFOLIATE!"_ — Molty, a space lobster
 
