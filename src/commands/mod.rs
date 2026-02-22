@@ -39,6 +39,7 @@ pub mod status_update;
 pub mod telegram;
 pub mod uninstall;
 pub mod whatsapp_send;
+pub mod mission_control;
 
 pub use crate::shell::run_interactive_shell;
 pub use admin::{
@@ -86,6 +87,7 @@ pub use health::{
 };
 pub use logs::logs_tail_command;
 pub use memory::{memory_search_command, memory_sync_command};
+pub use mission_control::mission_control_command;
 pub use message::{format_message, message_send_command, MessageSendOptions};
 pub use models::models_list_command;
 pub use models_auth::{

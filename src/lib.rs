@@ -61,6 +61,7 @@ pub mod web_connector;
 pub mod webrtc;
 pub mod whatsapp;
 pub mod wizard;
+pub mod mission_control;
 
 use once_cell::sync::Lazy;
 use serde::Serialize;

@@ -7,9 +7,9 @@ use krabkrab::commands::{
     discord_send_dry_run_command, dns_command, docs_command, doctor_simple,
     exec_approvals_command, hooks_command, is_remote_environment, login_github_copilot,
     login_minimax_oauth, login_openai_codex_oauth_interactive, login_qwen_oauth, logs_tail_command,
-    memory_search_command, memory_sync_command, models_auth_add_command, models_auth_get_command,
-    models_auth_list_command, models_auth_remove_command, models_list_command, nodes_command,
-    onboard_quick, onboard_wizard, pairing_approve_command, pairing_generate_command,
+    memory_search_command, memory_sync_command, mission_control_command, models_auth_add_command,
+    models_auth_get_command, models_auth_list_command, models_auth_remove_command, models_list_command,
+    nodes_command, onboard_quick, onboard_wizard, pairing_approve_command, pairing_generate_command,
     pairing_list_command, run_interactive_shell, sandbox_command, send_whatsapp_media,
     send_whatsapp_message, skills_command, slack_send_command,
     slack_send_dry_run_command, status_simple, system_command, telegram_send_command,
@@ -206,6 +206,7 @@ enum CliCommand {
         #[arg(long, default_value = "main")]
         session: String,
     },
+    MissionControl,
 }
 
 #[derive(Subcommand)]
@@ -709,6 +710,11 @@ async fn main() -> anyhow::Result<()> {
             };
             if let Err(e) = run_tui(config) {
                 eprintln!("TUI error: {}", e);
+            }
+        }
+        CliCommand::MissionControl => {
+            if let Err(e) = mission_control_command() {
+                eprintln!("Mission Control error: {}", e);
             }
         }
     }
