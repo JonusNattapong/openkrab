@@ -8,18 +8,18 @@ title: "Linux App"
 
 # Linux App
 
-The Gateway is fully supported on Linux. **Node is the recommended runtime**.
+The Gateway is fully supported on Linux. **Rust is the recommended runtime**.
 Bun is not recommended for the Gateway (WhatsApp/Telegram bugs).
 
 Native Linux companion apps are planned. Contributions are welcome if you want to help build one.
 
 ## Beginner quick path (VPS)
 
-1. Install Node 22+
-2. `npm i -g openclaw@latest`
-3. `openclaw onboard --install-daemon`
+1. Install OpenKrab CLI (release binary or source build)
+2. `krabkrab setup`
+3. `krabkrab gateway --port 18789`
 4. From your laptop: `ssh -N -L 18789:127.0.0.1:18789 <user>@<host>`
-5. Open `http://127.0.0.1:18789/` and paste your token
+5. Open `http://127.0.0.1:18789/`
 
 Step-by-step VPS guide: [exe.dev](/install/exe-dev)
 
