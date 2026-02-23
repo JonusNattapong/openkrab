@@ -25,12 +25,12 @@ We will respond within 48 hours and provide a timeline for the fix.
 
 ### DM Access Control
 
-krabkrab connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
+openkrab connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
 
 Default behavior on Telegram/WhatsApp/Signal/Discord/Slack:
 
 - **DM pairing** (`dm_policy = "pairing"`): Unknown senders receive a pairing code
-- Approve with: `krabkrab pairing approve <channel> <code>`
+- Approve with: `openkrab pairing approve <channel> <code>`
 - Public DMs require explicit opt-in: `dm_policy = "open"` with `"*"` in allowlist
 
 ### Authentication
@@ -61,7 +61,7 @@ allow_from = ["your_user_id"]  # Whitelist specific users
 ### Deployment
 
 1. **Run as non-root user**
-2. **Restrict config file permissions**: `chmod 600 ~/.config/krabkrab/krabkrab.toml`
+2. **Restrict config file permissions**: `chmod 600 ~/.config/openkrab/openkrab.toml`
 3. **Use environment variables for secrets**
 4. **Keep the binary updated**
 5. **Monitor logs for suspicious activity**
@@ -120,4 +120,5 @@ Before deploying:
 ## Contact
 
 - Security issues: security@openkrab.dev
-- General issues: https://github.com/openkrab/krabkrab/issues
+- General issues: https://github.com/openkrab/openkrab/issues
+

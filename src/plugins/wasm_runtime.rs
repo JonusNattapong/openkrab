@@ -1,4 +1,4 @@
-//! wasm_runtime — WebAssembly plugin runtime using Wasmtime.
+﻿//! wasm_runtime â€” WebAssembly plugin runtime using Wasmtime.
 //!
 //! Provides cross-platform plugin execution with WASI support.
 
@@ -174,7 +174,7 @@ impl WasmPlugin {
         let mut linker = Linker::new(&self.engine);
         wasmtime_wasi::add_to_linker_async(&mut linker)?;
 
-        // Add krabkrab-specific host functions
+        // Add openkrab-specific host functions
         Self::add_host_functions(&mut linker)?;
 
         // Instantiate the module
@@ -184,7 +184,7 @@ impl WasmPlugin {
             .context("Failed to instantiate WASM module")?;
 
         // Call the initialize function if it exists
-        if let Ok(init_fn) = instance.get_typed_func::<(), ()>(&mut *store, "krabkrab_init") {
+        if let Ok(init_fn) = instance.get_typed_func::<(), ()>(&mut *store, "OPENKRAB_INIT") {
             init_fn
                 .call_async(&mut *store, ())
                 .await
@@ -197,11 +197,11 @@ impl WasmPlugin {
         Ok(())
     }
 
-    /// Add krabkrab host functions to the linker
+    /// Add openkrab host functions to the linker
     fn add_host_functions(linker: &mut Linker<WasmPluginState>) -> Result<()> {
         // Log function for plugins
         linker.func_wrap(
-            "krabkrab",
+            "openkrab",
             "log",
             |mut caller: wasmtime::Caller<'_, WasmPluginState>, ptr: i32, len: i32| {
                 let memory = caller
@@ -222,7 +222,7 @@ impl WasmPlugin {
 
         // Register tool function
         linker.func_wrap(
-            "krabkrab",
+            "openkrab",
             "register_tool",
             |mut caller: wasmtime::Caller<'_, WasmPluginState>,
              name_ptr: i32,
@@ -259,7 +259,7 @@ impl WasmPlugin {
 
         // Register hook function
         linker.func_wrap(
-            "krabkrab",
+            "openkrab",
             "register_hook",
             |mut caller: wasmtime::Caller<'_, WasmPluginState>, phase_ptr: i32, phase_len: i32| {
                 let memory = caller
@@ -277,7 +277,7 @@ impl WasmPlugin {
 
         // Storage get function
         linker.func_wrap(
-            "krabkrab",
+            "openkrab",
             "storage_get",
             |mut caller: wasmtime::Caller<'_, WasmPluginState>,
              key_ptr: i32,
@@ -315,7 +315,7 @@ impl WasmPlugin {
 
         // Storage set function
         linker.func_wrap(
-            "krabkrab",
+            "openkrab",
             "storage_set",
             |mut caller: wasmtime::Caller<'_, WasmPluginState>,
              key_ptr: i32,
@@ -348,7 +348,7 @@ impl WasmPlugin {
     ) -> Result<()> {
         // Call capability export if available
         if let Ok(cap_fn) =
-            instance.get_typed_func::<(), (i32, i32)>(&mut *store, "krabkrab_capabilities")
+            instance.get_typed_func::<(), (i32, i32)>(&mut *store, "OPENKRAB_CAPABILITIES")
         {
             let (ptr, len) = cap_fn.call_async(&mut *store, ()).await?;
 
@@ -480,7 +480,7 @@ impl WasmPlugin {
         s: &str,
     ) -> Result<i32> {
         let alloc_fn = instance
-            .get_typed_func::<i32, i32>(&mut *store, "krabkrab_alloc")
+            .get_typed_func::<i32, i32>(&mut *store, "OPENKRAB_ALLOC")
             .context("Allocation function not found")?;
 
         let ptr = alloc_fn.call_async(&mut *store, s.len() as i32).await?;
@@ -499,7 +499,7 @@ impl WasmPlugin {
         instance: &Instance,
         ptr: i32,
     ) -> Result<()> {
-        if let Ok(dealloc_fn) = instance.get_typed_func::<i32, ()>(&mut *store, "krabkrab_free") {
+        if let Ok(dealloc_fn) = instance.get_typed_func::<i32, ()>(&mut *store, "OPENKRAB_FREE") {
             dealloc_fn.call_async(&mut *store, ptr).await?;
         }
         Ok(())
@@ -663,3 +663,5 @@ mod tests {
         assert_eq!("on-session-end".to_kebab_case(), "on-session-end");
     }
 }
+
+

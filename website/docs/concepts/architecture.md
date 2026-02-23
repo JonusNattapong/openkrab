@@ -1,4 +1,4 @@
----
+﻿---
 summary: "WebSocket gateway architecture, components, and client flows"
 read_when:
   - Working on gateway protocol, clients, or transports
@@ -11,7 +11,7 @@ Last updated: 2026-02-20
 
 ## Overview
 
-- A single long‑lived **Gateway** owns all messaging surfaces (Telegram, Slack, Discord, WhatsApp, Signal, iMessage, WebChat).
+- A single longâ€‘lived **Gateway** owns all messaging surfaces (Telegram, Slack, Discord, WhatsApp, Signal, iMessage, WebChat).
 - Control-plane clients (CLI, web UI, automations) connect to the
   Gateway over **WebSocket** on the configured bind host (default
   `127.0.0.1:18789`).
@@ -25,7 +25,7 @@ Last updated: 2026-02-20
 ### Gateway (daemon)
 
 - Maintains provider connections.
-- Exposes a typed WS API (requests, responses, server‑push events).
+- Exposes a typed WS API (requests, responses, serverâ€‘push events).
 - Validates inbound frames.
 - Emits events like `agent`, `chat`, `presence`, `health`.
 
@@ -38,7 +38,7 @@ Last updated: 2026-02-20
 ### Nodes (macOS / iOS / Android / headless)
 
 - Connect to the **same WS server** with `role: node`.
-- Provide a device identity in `connect`; pairing is **device‑based** (role `node`) and
+- Provide a device identity in `connect`; pairing is **deviceâ€‘based** (role `node`) and
   approval lives in the device pairing store.
 - Expose commands like `canvas.*`, `camera.*`, `location.get`.
 
@@ -78,12 +78,12 @@ sequenceDiagram
 - Transport: WebSocket, text frames with JSON payloads.
 - First frame **must** be `connect`.
 - After handshake:
-  - Requests: `{type:"req", id, method, params}` → `{type:"res", id, ok, payload|error}`
+  - Requests: `{type:"req", id, method, params}` â†’ `{type:"res", id, ok, payload|error}`
   - Events: `{type:"event", event, payload, seq?, stateVersion?}`
-- If `KRABKRAB_GATEWAY_TOKEN` (or `--token`) is set, `connect.params.auth.token`
+- If `OPENKRAB_GATEWAY_TOKEN` (or `--token`) is set, `connect.params.auth.token`
   must match or the socket closes.
-- Idempotency keys are required for side‑effecting methods (`send`, `agent`) to
-  safely retry; the server keeps a short‑lived dedupe cache.
+- Idempotency keys are required for sideâ€‘effecting methods (`send`, `agent`) to
+  safely retry; the server keeps a shortâ€‘lived dedupe cache.
 - Nodes must include `role: "node"` plus caps/commands/permissions in `connect`.
 
 ## Pairing + local trust
@@ -92,8 +92,8 @@ sequenceDiagram
 - New device IDs require pairing approval; the Gateway issues a **device token**
   for subsequent connects.
 - **Local** connects (loopback or the gateway host's own tailnet address) can be
-  auto‑approved to keep same‑host UX smooth.
-- **Non‑local** connects must sign the `connect.challenge` nonce and require
+  autoâ€‘approved to keep sameâ€‘host UX smooth.
+- **Nonâ€‘local** connects must sign the `connect.challenge` nonce and require
   explicit approval.
 
 ## Architecture diagram
@@ -154,3 +154,5 @@ flowchart TB
 - **WASMtime** for plugin sandboxing
 
 See [GitHub repo](https://github.com/openkrab/openkrab) for source code.
+
+

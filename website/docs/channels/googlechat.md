@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Google Chat app support status, capabilities, and configuration"
 read_when:
   - Working on Google Chat channel features
@@ -43,7 +43,7 @@ Status: ready for DMs + spaces via Google Chat API webhooks (HTTP only).
    - Look for the **App status** section (usually near the top or bottom after saving).
    - Change the status to **Live - available to users**.
    - Click **Save** again.
-7. Configure openkrab with the service account path + webhook audience:
+7. Configure OpenKrab with the service account path + webhook audience:
    - Env: `GOOGLE_CHAT_SERVICE_ACCOUNT_FILE=/path/to/service-account.json`
    - Or config: `channels.googlechat.serviceAccountFile: "/path/to/service-account.json"`.
 8. Set the webhook audience type + value (matches your Chat app config).
@@ -63,7 +63,7 @@ Once the gateway is running and your email is added to the visibility list:
 
 ## Public URL (Webhook-only)
 
-Google Chat webhooks require a public HTTPS endpoint. For security, **only expose the `/googlechat` path** to the internet. Keep the openkrab dashboard and other sensitive endpoints on your private network.
+Google Chat webhooks require a public HTTPS endpoint. For security, **only expose the `/googlechat` path** to the internet. Keep the OpenKrab dashboard and other sensitive endpoints on your private network.
 
 ### Option A: Tailscale Funnel (Recommended)
 
@@ -127,7 +127,7 @@ your-domain.com {
 }
 ```
 
-With this config, any request to `your-domain.com/` will be ignored or returned as 404, while `your-domain.com/googlechat` is safely routed to openkrab.
+With this config, any request to `your-domain.com/` will be ignored or returned as 404, while `your-domain.com/googlechat` is safely routed to OpenKrab.
 
 ### Option C: Cloudflare Tunnel
 
@@ -139,15 +139,15 @@ Configure your tunnel's ingress rules to only route the webhook path:
 ## How it works
 
 1. Google Chat sends webhook POSTs to the gateway. Each request includes an `Authorization: Bearer <token>` header.
-2. openkrab verifies the token against the configured `audienceType` + `audience`:
-   - `audienceType: "app-url"` → audience is your HTTPS webhook URL.
-   - `audienceType: "project-number"` → audience is the Cloud project number.
+2. OpenKrab verifies the token against the configured `audienceType` + `audience`:
+   - `audienceType: "app-url"` â†’ audience is your HTTPS webhook URL.
+   - `audienceType: "project-number"` â†’ audience is the Cloud project number.
 3. Messages are routed by space:
    - DMs use session key `agent:<agentId>:googlechat:dm:<spaceId>`.
    - Spaces use session key `agent:<agentId>:googlechat:group:<spaceId>`.
 4. DM access is pairing by default. Unknown senders receive a pairing code; approve with:
    - `openkrab pairing approve googlechat <code>`
-5. Group spaces require @-mention by default. Use `botUser` if mention detection needs the app’s user name.
+5. Group spaces require @-mention by default. Use `botUser` if mention detection needs the appâ€™s user name.
 
 ## Targets
 
@@ -193,7 +193,7 @@ Use these identifiers for delivery and allowlists:
 Notes:
 
 - Service account credentials can also be passed inline with `serviceAccount` (JSON string).
-- Default webhook path is `/googlechat` if `webhookPath` isn’t set.
+- Default webhook path is `/googlechat` if `webhookPath` isnâ€™t set.
 - Reactions are available via the `reactions` tool and `channels action` when `actions.reactions` is enabled.
 - `typingIndicator` supports `none`, `message` (default), and `reaction` (reaction requires user OAuth).
 - Attachments are downloaded through the Chat API and stored in the media pipeline (size capped by `mediaMaxMb`).
@@ -213,7 +213,7 @@ This means the webhook handler isn't registered. Common causes:
 1. **Channel not configured**: The `channels.googlechat` section is missing from your config. Verify with:
 
    ```bash
-   openkrab config get channels.googlechat
+   OpenKrab config get channels.googlechat
    ```
 
    If it returns "Config path not found", add the configuration (see [Config highlights](#config-highlights)).
@@ -221,7 +221,7 @@ This means the webhook handler isn't registered. Common causes:
 2. **Plugin not enabled**: Check plugin status:
 
    ```bash
-   openkrab plugins list | grep googlechat
+   OpenKrab plugins list | grep googlechat
    ```
 
    If it shows "disabled", add `plugins.entries.googlechat.enabled: true` to your config.
@@ -229,13 +229,12 @@ This means the webhook handler isn't registered. Common causes:
 3. **Gateway not restarted**: After adding config, restart the gateway:
 
    ```bash
-   openkrab gateway restart
+   OpenKrab gateway restart
    ```
 
 Verify the channel is running:
 
-```bash
-openkrab channels status
+```bash\nOpenKrab channels status
 # Should show: Google Chat default: enabled, configured, ...
 ```
 
@@ -251,3 +250,4 @@ Related docs:
 - [Gateway configuration](/gateway/configuration)
 - [Security](/gateway/security)
 - [Reactions](/tools/reactions)
+

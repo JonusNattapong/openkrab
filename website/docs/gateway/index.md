@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Runbook for the Gateway service, lifecycle, and operations"
 read_when:
   - Running or debugging the gateway process
@@ -23,22 +23,16 @@ Use this page for day-1 startup and day-2 operations of the Gateway service.
 <Steps>
   <Step title="Start the Gateway">
 
-```bash
-openkrab gateway --port 18789
-# debug/trace mirrored to stdio
-openkrab gateway --port 18789 --verbose
-# force-kill listener on selected port, then start
-openkrab gateway --force
+```bash\nOpenKrab gateway --port 18789
+# debug/trace mirrored to stdio\nOpenKrab gateway --port 18789 --verbose
+# force-kill listener on selected port, then start\nOpenKrab gateway --force
 ```
 
   </Step>
 
   <Step title="Verify service health">
 
-```bash
-openkrab gateway status
-openkrab status
-openkrab logs --follow
+```bash\nOpenKrab gateway status\nOpenKrab status\nOpenKrab logs --follow
 ```
 
 Healthy baseline: `Runtime: running` and `RPC probe: ok`.
@@ -47,15 +41,14 @@ Healthy baseline: `Runtime: running` and `RPC probe: ok`.
 
   <Step title="Validate channel readiness">
 
-```bash
-openkrab channels status --probe
+```bash\nOpenKrab channels status --probe
 ```
 
   </Step>
 </Steps>
 
 <Note>
-Gateway config reload watches the active config file path (resolved from profile/state defaults, or `openkrab_CONFIG_PATH` when set).
+Gateway config reload watches the active config file path (resolved from profile/state defaults, or `OPENKRAB_CONFIG_PATH` when set).
 Default mode is `gateway.reload.mode="hybrid"`.
 </Note>
 
@@ -67,14 +60,14 @@ Default mode is `gateway.reload.mode="hybrid"`.
   - HTTP APIs (OpenAI-compatible, Responses, tools invoke)
   - Control UI and hooks
 - Default bind mode: `loopback`.
-- Auth is required by default (`gateway.auth.token` / `gateway.auth.password`, or `openkrab_GATEWAY_TOKEN` / `openkrab_GATEWAY_PASSWORD`).
+- Auth is required by default (`gateway.auth.token` / `gateway.auth.password`, or `OPENKRAB_GATEWAY_TOKEN` / `OPENKRAB_GATEWAY_PASSWORD`).
 
 ### Port and bind precedence
 
 | Setting      | Resolution order                                              |
 | ------------ | ------------------------------------------------------------- |
-| Gateway port | `--port` → `openkrab_GATEWAY_PORT` → `gateway.port` → `18789` |
-| Bind mode    | CLI/override → `gateway.bind` → `loopback`                    |
+| Gateway port | `--port` â†’ `OPENKRAB_GATEWAY_PORT` â†’ `gateway.port` â†’ `18789` |
+| Bind mode    | CLI/override â†’ `gateway.bind` â†’ `loopback`                    |
 
 ### Hot reload modes
 
@@ -87,15 +80,7 @@ Default mode is `gateway.reload.mode="hybrid"`.
 
 ## Operator command set
 
-```bash
-openkrab gateway status
-openkrab gateway status --deep
-openkrab gateway status --json
-openkrab gateway install
-openkrab gateway restart
-openkrab gateway stop
-openkrab logs --follow
-openkrab doctor
+```bash\nOpenKrab gateway status\nOpenKrab gateway status --deep\nOpenKrab gateway status --json\nOpenKrab gateway install\nOpenKrab gateway restart\nOpenKrab gateway stop\nOpenKrab logs --follow\nOpenKrab doctor
 ```
 
 ## Remote access
@@ -122,11 +107,7 @@ Use supervised runs for production-like reliability.
 <Tabs>
   <Tab title="macOS (launchd)">
 
-```bash
-openkrab gateway install
-openkrab gateway status
-openkrab gateway restart
-openkrab gateway stop
+```bash\nOpenKrab gateway install\nOpenKrab gateway status\nOpenKrab gateway restart\nOpenKrab gateway stop
 ```
 
 LaunchAgent labels are `ai.openkrab.gateway` (default) or `ai.openkrab.<profile>` (named profile). `openkrab doctor` audits and repairs service config drift.
@@ -135,10 +116,8 @@ LaunchAgent labels are `ai.openkrab.gateway` (default) or `ai.openkrab.<profile>
 
   <Tab title="Linux (systemd user)">
 
-```bash
-openkrab gateway install
-systemctl --user enable --now openkrab-gateway[-<profile>].service
-openkrab gateway status
+```bash\nOpenKrab gateway install
+systemctl --user enable --now openkrab-gateway[-<profile>].service\nOpenKrab gateway status
 ```
 
 For persistence after logout, enable lingering:
@@ -169,25 +148,22 @@ Use multiple only for strict isolation/redundancy (for example a rescue profile)
 Checklist per instance:
 
 - Unique `gateway.port`
-- Unique `openkrab_CONFIG_PATH`
-- Unique `openkrab_STATE_DIR`
+- Unique `OPENKRAB_CONFIG_PATH`
+- Unique `OPENKRAB_STATE_DIR`
 - Unique `agents.defaults.workspace`
 
 Example:
 
 ```bash
-openkrab_CONFIG_PATH=~/.openkrab/a.json openkrab_STATE_DIR=~/.openkrab-a openkrab gateway --port 19001
-openkrab_CONFIG_PATH=~/.openkrab/b.json openkrab_STATE_DIR=~/.openkrab-b openkrab gateway --port 19002
+OPENKRAB_CONFIG_PATH=~/.openkrab/a.json OPENKRAB_STATE_DIR=~/.openkrab-a OpenKrab gateway --port 19001
+OPENKRAB_CONFIG_PATH=~/.openkrab/b.json OPENKRAB_STATE_DIR=~/.openkrab-b OpenKrab gateway --port 19002
 ```
 
 See: [Multiple gateways](/gateway/multiple-gateways).
 
 ### Dev profile quick path
 
-```bash
-openkrab --dev setup
-openkrab --dev gateway --allow-unconfigured
-openkrab --dev status
+```bash\nOpenKrab --dev setup\nOpenKrab --dev gateway --allow-unconfigured\nOpenKrab --dev status
 ```
 
 Defaults include isolated state/config and base gateway port `19001`.
@@ -196,7 +172,7 @@ Defaults include isolated state/config and base gateway port `19001`.
 
 - First client frame must be `connect`.
 - Gateway returns `hello-ok` snapshot (`presence`, `health`, `stateVersion`, `uptimeMs`, limits/policy).
-- Requests: `req(method, params)` → `res(ok/payload|error)`.
+- Requests: `req(method, params)` â†’ `res(ok/payload|error)`.
 - Common events: `connect.challenge`, `agent`, `chat`, `presence`, `tick`, `health`, `heartbeat`, `shutdown`.
 
 Agent runs are two-stage:
@@ -215,10 +191,7 @@ See full protocol docs: [Gateway Protocol](/gateway/protocol).
 
 ### Readiness
 
-```bash
-openkrab gateway status
-openkrab channels status --probe
-openkrab health
+```bash\nOpenKrab gateway status\nOpenKrab channels status --probe\nOpenKrab health
 ```
 
 ### Gap recovery
@@ -252,3 +225,5 @@ Related:
 - [Health](/gateway/health)
 - [Doctor](/gateway/doctor)
 - [Authentication](/gateway/authentication)
+
+

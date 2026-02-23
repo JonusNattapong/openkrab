@@ -1,7 +1,7 @@
----
+﻿---
 summary: "CLI reference for `openkrab pairing` (approve/list pairing requests)"
 read_when:
-  - You’re using pairing-mode DMs and need to approve senders
+  - Youâ€™re using pairing-mode DMs and need to approve senders
 title: "pairing"
 ---
 
@@ -15,7 +15,6 @@ Related:
 
 ## Commands
 
-```bash
-openkrab pairing list whatsapp
-openkrab pairing approve whatsapp <code> --notify
+```bash\nOpenKrab pairing list whatsapp\nOpenKrab pairing approve whatsapp <code> --notify
 ```
+

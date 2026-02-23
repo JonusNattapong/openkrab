@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 集成使用 OpenResponses API 的客户端
-  - 你需要基于 item 的输入、客户端工具调用或 SSE 事件
-summary: 从 Gateway 网关暴露兼容 OpenResponses 的 /v1/responses HTTP 端点
+  - é›†æˆä½¿ç”¨ OpenResponses API çš„å®¢æˆ·ç«¯
+  - ä½ éœ€è¦åŸºäºŽ item çš„è¾“å…¥ã€å®¢æˆ·ç«¯å·¥å…·è°ƒç”¨æˆ– SSE äº‹ä»¶
+summary: ä»Ž Gateway ç½‘å…³æš´éœ²å…¼å®¹ OpenResponses çš„ /v1/responses HTTP ç«¯ç‚¹
 title: OpenResponses API
 x-i18n:
   generated_at: "2026-02-03T07:48:43Z"
@@ -13,46 +13,46 @@ x-i18n:
   workflow: 15
 ---
 
-# OpenResponses API（HTTP）
+# OpenResponses APIï¼ˆHTTPï¼‰
 
-OpenKrab 的 Gateway 网关可以提供兼容 OpenResponses 的 `POST /v1/responses` 端点。
+OpenKrab çš„ Gateway ç½‘å…³å¯ä»¥æä¾›å…¼å®¹ OpenResponses çš„ `POST /v1/responses` ç«¯ç‚¹ã€‚
 
-此端点**默认禁用**。请先在配置中启用。
+æ­¤ç«¯ç‚¹**é»˜è®¤ç¦ç”¨**ã€‚è¯·å…ˆåœ¨é…ç½®ä¸­å¯ç”¨ã€‚
 
 - `POST /v1/responses`
-- 与 Gateway 网关相同的端口（WS + HTTP 多路复用）：`http://<gateway-host>:<port>/v1/responses`
+- ä¸Ž Gateway ç½‘å…³ç›¸åŒçš„ç«¯å£ï¼ˆWS + HTTP å¤šè·¯å¤ç”¨ï¼‰ï¼š`http://<gateway-host>:<port>/v1/responses`
 
-底层实现中，请求作为正常的 Gateway 网关智能体运行执行（与 `OpenKrab agent` 相同的代码路径），因此路由/权限/配置与你的 Gateway 网关一致。
+åº•å±‚å®žçŽ°ä¸­ï¼Œè¯·æ±‚ä½œä¸ºæ­£å¸¸çš„ Gateway ç½‘å…³æ™ºèƒ½ä½“è¿è¡Œæ‰§è¡Œï¼ˆä¸Ž `OpenKrab agent` ç›¸åŒçš„ä»£ç è·¯å¾„ï¼‰ï¼Œå› æ­¤è·¯ç”±/æƒé™/é…ç½®ä¸Žä½ çš„ Gateway ç½‘å…³ä¸€è‡´ã€‚
 
-## 认证
+## è®¤è¯
 
-使用 Gateway 网关认证配置。发送 bearer 令牌：
+ä½¿ç”¨ Gateway ç½‘å…³è®¤è¯é…ç½®ã€‚å‘é€ bearer ä»¤ç‰Œï¼š
 
 - `Authorization: Bearer <token>`
 
-说明：
+è¯´æ˜Žï¼š
 
-- 当 `gateway.auth.mode="token"` 时，使用 `gateway.auth.token`（或 `OpenKrab_GATEWAY_TOKEN`）。
-- 当 `gateway.auth.mode="password"` 时，使用 `gateway.auth.password`（或 `OpenKrab_GATEWAY_PASSWORD`）。
+- å½“ `gateway.auth.mode="token"` æ—¶ï¼Œä½¿ç”¨ `gateway.auth.token`ï¼ˆæˆ– `OPENKRAB_GATEWAY_TOKEN`ï¼‰ã€‚
+- å½“ `gateway.auth.mode="password"` æ—¶ï¼Œä½¿ç”¨ `gateway.auth.password`ï¼ˆæˆ– `OPENKRAB_GATEWAY_PASSWORD`ï¼‰ã€‚
 
-## 选择智能体
+## é€‰æ‹©æ™ºèƒ½ä½“
 
-无需自定义头：在 OpenResponses `model` 字段中编码智能体 id：
+æ— éœ€è‡ªå®šä¹‰å¤´ï¼šåœ¨ OpenResponses `model` å­—æ®µä¸­ç¼–ç æ™ºèƒ½ä½“ idï¼š
 
-- `model: "OpenKrab:<agentId>"`（示例：`"OpenKrab:main"`、`"OpenKrab:beta"`）
-- `model: "agent:<agentId>"`（别名）
+- `model: "OpenKrab:<agentId>"`ï¼ˆç¤ºä¾‹ï¼š`"OpenKrab:main"`ã€`"OpenKrab:beta"`ï¼‰
+- `model: "agent:<agentId>"`ï¼ˆåˆ«åï¼‰
 
-或通过头指定特定的 OpenKrab 智能体：
+æˆ–é€šè¿‡å¤´æŒ‡å®šç‰¹å®šçš„ OpenKrab æ™ºèƒ½ä½“ï¼š
 
-- `x-OpenKrab-agent-id: <agentId>`（默认：`main`）
+- `x-OpenKrab-agent-id: <agentId>`ï¼ˆé»˜è®¤ï¼š`main`ï¼‰
 
-高级：
+é«˜çº§ï¼š
 
-- `x-OpenKrab-session-key: <sessionKey>` 完全控制会话路由。
+- `x-OpenKrab-session-key: <sessionKey>` å®Œå…¨æŽ§åˆ¶ä¼šè¯è·¯ç”±ã€‚
 
-## 启用端点
+## å¯ç”¨ç«¯ç‚¹
 
-将 `gateway.http.endpoints.responses.enabled` 设置为 `true`：
+å°† `gateway.http.endpoints.responses.enabled` è®¾ç½®ä¸º `true`ï¼š
 
 ```json5
 {
@@ -66,9 +66,9 @@ OpenKrab 的 Gateway 网关可以提供兼容 OpenResponses 的 `POST /v1/respon
 }
 ```
 
-## 禁用端点
+## ç¦ç”¨ç«¯ç‚¹
 
-将 `gateway.http.endpoints.responses.enabled` 设置为 `false`：
+å°† `gateway.http.endpoints.responses.enabled` è®¾ç½®ä¸º `false`ï¼š
 
 ```json5
 {
@@ -82,25 +82,25 @@ OpenKrab 的 Gateway 网关可以提供兼容 OpenResponses 的 `POST /v1/respon
 }
 ```
 
-## 会话行为
+## ä¼šè¯è¡Œä¸º
 
-默认情况下，端点**每个请求都是无状态的**（每次调用生成新的会话键）。
+é»˜è®¤æƒ…å†µä¸‹ï¼Œç«¯ç‚¹**æ¯ä¸ªè¯·æ±‚éƒ½æ˜¯æ— çŠ¶æ€çš„**ï¼ˆæ¯æ¬¡è°ƒç”¨ç”Ÿæˆæ–°çš„ä¼šè¯é”®ï¼‰ã€‚
 
-如果请求包含 OpenResponses `user` 字符串，Gateway 网关会从中派生稳定的会话键，这样重复调用可以共享智能体会话。
+å¦‚æžœè¯·æ±‚åŒ…å« OpenResponses `user` å­—ç¬¦ä¸²ï¼ŒGateway ç½‘å…³ä¼šä»Žä¸­æ´¾ç”Ÿç¨³å®šçš„ä¼šè¯é”®ï¼Œè¿™æ ·é‡å¤è°ƒç”¨å¯ä»¥å…±äº«æ™ºèƒ½ä½“ä¼šè¯ã€‚
 
-## 请求结构（支持的）
+## è¯·æ±‚ç»“æž„ï¼ˆæ”¯æŒçš„ï¼‰
 
-请求遵循 OpenResponses API，使用基于 item 的输入。当前支持：
+è¯·æ±‚éµå¾ª OpenResponses APIï¼Œä½¿ç”¨åŸºäºŽ item çš„è¾“å…¥ã€‚å½“å‰æ”¯æŒï¼š
 
-- `input`：字符串或 item 对象数组。
-- `instructions`：合并到系统提示中。
-- `tools`：客户端工具定义（函数工具）。
-- `tool_choice`：过滤或要求客户端工具。
-- `stream`：启用 SSE 流式传输。
-- `max_output_tokens`：尽力而为的输出限制（取决于提供商）。
-- `user`：稳定的会话路由。
+- `input`ï¼šå­—ç¬¦ä¸²æˆ– item å¯¹è±¡æ•°ç»„ã€‚
+- `instructions`ï¼šåˆå¹¶åˆ°ç³»ç»Ÿæç¤ºä¸­ã€‚
+- `tools`ï¼šå®¢æˆ·ç«¯å·¥å…·å®šä¹‰ï¼ˆå‡½æ•°å·¥å…·ï¼‰ã€‚
+- `tool_choice`ï¼šè¿‡æ»¤æˆ–è¦æ±‚å®¢æˆ·ç«¯å·¥å…·ã€‚
+- `stream`ï¼šå¯ç”¨ SSE æµå¼ä¼ è¾“ã€‚
+- `max_output_tokens`ï¼šå°½åŠ›è€Œä¸ºçš„è¾“å‡ºé™åˆ¶ï¼ˆå–å†³äºŽæä¾›å•†ï¼‰ã€‚
+- `user`ï¼šç¨³å®šçš„ä¼šè¯è·¯ç”±ã€‚
 
-接受但**当前忽略**：
+æŽ¥å—ä½†**å½“å‰å¿½ç•¥**ï¼š
 
 - `max_tool_calls`
 - `reasoning`
@@ -109,19 +109,19 @@ OpenKrab 的 Gateway 网关可以提供兼容 OpenResponses 的 `POST /v1/respon
 - `previous_response_id`
 - `truncation`
 
-## Item（输入）
+## Itemï¼ˆè¾“å…¥ï¼‰
 
 ### `message`
 
-角色：`system`、`developer`、`user`、`assistant`。
+è§’è‰²ï¼š`system`ã€`developer`ã€`user`ã€`assistant`ã€‚
 
-- `system` 和 `developer` 追加到系统提示。
-- 最近的 `user` 或 `function_call_output` item 成为"当前消息"。
-- 较早的 user/assistant 消息作为上下文历史包含。
+- `system` å’Œ `developer` è¿½åŠ åˆ°ç³»ç»Ÿæç¤ºã€‚
+- æœ€è¿‘çš„ `user` æˆ– `function_call_output` item æˆä¸º"å½“å‰æ¶ˆæ¯"ã€‚
+- è¾ƒæ—©çš„ user/assistant æ¶ˆæ¯ä½œä¸ºä¸Šä¸‹æ–‡åŽ†å²åŒ…å«ã€‚
 
-### `function_call_output`（基于回合的工具）
+### `function_call_output`ï¼ˆåŸºäºŽå›žåˆçš„å·¥å…·ï¼‰
 
-将工具结果发送回模型：
+å°†å·¥å…·ç»“æžœå‘é€å›žæ¨¡åž‹ï¼š
 
 ```json
 {
@@ -131,19 +131,19 @@ OpenKrab 的 Gateway 网关可以提供兼容 OpenResponses 的 `POST /v1/respon
 }
 ```
 
-### `reasoning` 和 `item_reference`
+### `reasoning` å’Œ `item_reference`
 
-为了 schema 兼容性而接受，但在构建提示时忽略。
+ä¸ºäº† schema å…¼å®¹æ€§è€ŒæŽ¥å—ï¼Œä½†åœ¨æž„å»ºæç¤ºæ—¶å¿½ç•¥ã€‚
 
-## 工具（客户端函数工具）
+## å·¥å…·ï¼ˆå®¢æˆ·ç«¯å‡½æ•°å·¥å…·ï¼‰
 
-使用 `tools: [{ type: "function", function: { name, description?, parameters? } }]` 提供工具。
+ä½¿ç”¨ `tools: [{ type: "function", function: { name, description?, parameters? } }]` æä¾›å·¥å…·ã€‚
 
-如果智能体决定调用工具，响应返回一个 `function_call` 输出 item。然后你发送带有 `function_call_output` 的后续请求以继续回合。
+å¦‚æžœæ™ºèƒ½ä½“å†³å®šè°ƒç”¨å·¥å…·ï¼Œå“åº”è¿”å›žä¸€ä¸ª `function_call` è¾“å‡º itemã€‚ç„¶åŽä½ å‘é€å¸¦æœ‰ `function_call_output` çš„åŽç»­è¯·æ±‚ä»¥ç»§ç»­å›žåˆã€‚
 
-## 图像（`input_image`）
+## å›¾åƒï¼ˆ`input_image`ï¼‰
 
-支持 base64 或 URL 来源：
+æ”¯æŒ base64 æˆ– URL æ¥æºï¼š
 
 ```json
 {
@@ -152,12 +152,12 @@ OpenKrab 的 Gateway 网关可以提供兼容 OpenResponses 的 `POST /v1/respon
 }
 ```
 
-允许的 MIME 类型（当前）：`image/jpeg`、`image/png`、`image/gif`、`image/webp`。
-最大大小（当前）：10MB。
+å…è®¸çš„ MIME ç±»åž‹ï¼ˆå½“å‰ï¼‰ï¼š`image/jpeg`ã€`image/png`ã€`image/gif`ã€`image/webp`ã€‚
+æœ€å¤§å¤§å°ï¼ˆå½“å‰ï¼‰ï¼š10MBã€‚
 
-## 文件（`input_file`）
+## æ–‡ä»¶ï¼ˆ`input_file`ï¼‰
 
-支持 base64 或 URL 来源：
+æ”¯æŒ base64 æˆ– URL æ¥æºï¼š
 
 ```json
 {
@@ -171,26 +171,26 @@ OpenKrab 的 Gateway 网关可以提供兼容 OpenResponses 的 `POST /v1/respon
 }
 ```
 
-允许的 MIME 类型（当前）：`text/plain`、`text/markdown`、`text/html`、`text/csv`、`application/json`、`application/pdf`。
+å…è®¸çš„ MIME ç±»åž‹ï¼ˆå½“å‰ï¼‰ï¼š`text/plain`ã€`text/markdown`ã€`text/html`ã€`text/csv`ã€`application/json`ã€`application/pdf`ã€‚
 
-最大大小（当前）：5MB。
+æœ€å¤§å¤§å°ï¼ˆå½“å‰ï¼‰ï¼š5MBã€‚
 
-当前行为：
+å½“å‰è¡Œä¸ºï¼š
 
-- 文件内容被解码并添加到**系统提示**，而不是用户消息，所以它保持临时性（不持久化在会话历史中）。
-- PDF 被解析提取文本。如果发现的文本很少，前几页会被栅格化为图像并传递给模型。
+- æ–‡ä»¶å†…å®¹è¢«è§£ç å¹¶æ·»åŠ åˆ°**ç³»ç»Ÿæç¤º**ï¼Œè€Œä¸æ˜¯ç”¨æˆ·æ¶ˆæ¯ï¼Œæ‰€ä»¥å®ƒä¿æŒä¸´æ—¶æ€§ï¼ˆä¸æŒä¹…åŒ–åœ¨ä¼šè¯åŽ†å²ä¸­ï¼‰ã€‚
+- PDF è¢«è§£æžæå–æ–‡æœ¬ã€‚å¦‚æžœå‘çŽ°çš„æ–‡æœ¬å¾ˆå°‘ï¼Œå‰å‡ é¡µä¼šè¢«æ …æ ¼åŒ–ä¸ºå›¾åƒå¹¶ä¼ é€’ç»™æ¨¡åž‹ã€‚
 
-PDF 解析使用 Node 友好的 `pdfjs-dist` legacy 构建（无 worker）。现代 PDF.js 构建期望浏览器 worker/DOM 全局变量，因此不在 Gateway 网关中使用。
+PDF è§£æžä½¿ç”¨ Node å‹å¥½çš„ `pdfjs-dist` legacy æž„å»ºï¼ˆæ—  workerï¼‰ã€‚çŽ°ä»£ PDF.js æž„å»ºæœŸæœ›æµè§ˆå™¨ worker/DOM å…¨å±€å˜é‡ï¼Œå› æ­¤ä¸åœ¨ Gateway ç½‘å…³ä¸­ä½¿ç”¨ã€‚
 
-URL 获取默认值：
+URL èŽ·å–é»˜è®¤å€¼ï¼š
 
-- `files.allowUrl`：`true`
-- `images.allowUrl`：`true`
-- 请求受到保护（DNS 解析、私有 IP 阻止、重定向限制、超时）。
+- `files.allowUrl`ï¼š`true`
+- `images.allowUrl`ï¼š`true`
+- è¯·æ±‚å—åˆ°ä¿æŠ¤ï¼ˆDNS è§£æžã€ç§æœ‰ IP é˜»æ­¢ã€é‡å®šå‘é™åˆ¶ã€è¶…æ—¶ï¼‰ã€‚
 
-## 文件 + 图像限制（配置）
+## æ–‡ä»¶ + å›¾åƒé™åˆ¶ï¼ˆé…ç½®ï¼‰
 
-默认值可在 `gateway.http.endpoints.responses` 下调整：
+é»˜è®¤å€¼å¯åœ¨ `gateway.http.endpoints.responses` ä¸‹è°ƒæ•´ï¼š
 
 ```json5
 {
@@ -234,29 +234,29 @@ URL 获取默认值：
 }
 ```
 
-省略时的默认值：
+çœç•¥æ—¶çš„é»˜è®¤å€¼ï¼š
 
-- `maxBodyBytes`：20MB
-- `files.maxBytes`：5MB
-- `files.maxChars`：200k
-- `files.maxRedirects`：3
-- `files.timeoutMs`：10s
-- `files.pdf.maxPages`：4
-- `files.pdf.maxPixels`：4,000,000
-- `files.pdf.minTextChars`：200
-- `images.maxBytes`：10MB
-- `images.maxRedirects`：3
-- `images.timeoutMs`：10s
+- `maxBodyBytes`ï¼š20MB
+- `files.maxBytes`ï¼š5MB
+- `files.maxChars`ï¼š200k
+- `files.maxRedirects`ï¼š3
+- `files.timeoutMs`ï¼š10s
+- `files.pdf.maxPages`ï¼š4
+- `files.pdf.maxPixels`ï¼š4,000,000
+- `files.pdf.minTextChars`ï¼š200
+- `images.maxBytes`ï¼š10MB
+- `images.maxRedirects`ï¼š3
+- `images.timeoutMs`ï¼š10s
 
-## 流式传输（SSE）
+## æµå¼ä¼ è¾“ï¼ˆSSEï¼‰
 
-设置 `stream: true` 接收 Server-Sent Events（SSE）：
+è®¾ç½® `stream: true` æŽ¥æ”¶ Server-Sent Eventsï¼ˆSSEï¼‰ï¼š
 
 - `Content-Type: text/event-stream`
-- 每个事件行是 `event: <type>` 和 `data: <json>`
-- 流以 `data: [DONE]` 结束
+- æ¯ä¸ªäº‹ä»¶è¡Œæ˜¯ `event: <type>` å’Œ `data: <json>`
+- æµä»¥ `data: [DONE]` ç»“æŸ
 
-当前发出的事件类型：
+å½“å‰å‘å‡ºçš„äº‹ä»¶ç±»åž‹ï¼š
 
 - `response.created`
 - `response.in_progress`
@@ -267,29 +267,29 @@ URL 获取默认值：
 - `response.content_part.done`
 - `response.output_item.done`
 - `response.completed`
-- `response.failed`（出错时）
+- `response.failed`ï¼ˆå‡ºé”™æ—¶ï¼‰
 
-## 用量
+## ç”¨é‡
 
-当底层提供商报告令牌计数时，`usage` 会被填充。
+å½“åº•å±‚æä¾›å•†æŠ¥å‘Šä»¤ç‰Œè®¡æ•°æ—¶ï¼Œ`usage` ä¼šè¢«å¡«å……ã€‚
 
-## 错误
+## é”™è¯¯
 
-错误使用如下 JSON 对象：
+é”™è¯¯ä½¿ç”¨å¦‚ä¸‹ JSON å¯¹è±¡ï¼š
 
 ```json
 { "error": { "message": "...", "type": "invalid_request_error" } }
 ```
 
-常见情况：
+å¸¸è§æƒ…å†µï¼š
 
-- `401` 缺少/无效认证
-- `400` 无效请求体
-- `405` 错误的方法
+- `401` ç¼ºå°‘/æ— æ•ˆè®¤è¯
+- `400` æ— æ•ˆè¯·æ±‚ä½“
+- `405` é”™è¯¯çš„æ–¹æ³•
 
-## 示例
+## ç¤ºä¾‹
 
-非流式：
+éžæµå¼ï¼š
 
 ```bash
 curl -sS http://127.0.0.1:18789/v1/responses \
@@ -302,7 +302,7 @@ curl -sS http://127.0.0.1:18789/v1/responses \
   }'
 ```
 
-流式：
+æµå¼ï¼š
 
 ```bash
 curl -N http://127.0.0.1:18789/v1/responses \
@@ -315,4 +315,5 @@ curl -N http://127.0.0.1:18789/v1/responses \
     "input": "hi"
   }'
 ```
+
 

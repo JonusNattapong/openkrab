@@ -170,7 +170,7 @@ x-i18n:
 ## 工作区 + 模板
 
 - [Skills](/tools/skills)
-- [ClawHub](/tools/clawhub)
+- [KrabHub](/tools/KrabHub)
 - [Skills 配置](/tools/skills-config)
 - [默认 AGENTS](/reference/AGENTS.default)
 - [模板：AGENTS](/reference/templates/AGENTS)
@@ -198,4 +198,5 @@ x-i18n:
 - [测试](/reference/test)
 - [发布检查清单](/reference/RELEASING)
 - [设备型号](/reference/device-models)
+
 

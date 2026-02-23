@@ -20,7 +20,7 @@ final class MenuBarController {
     func install() {
         if let button = statusItem.button {
             button.title = "KR"
-            button.toolTip = "KrabKrab Voice Wake/Talk"
+            button.toolTip = "openkrab Voice Wake/Talk"
         }
 
         statusMenuItem.isEnabled = false
@@ -90,3 +90,4 @@ final class MenuBarController {
         NSApp.terminate(nil)
     }
 }
+

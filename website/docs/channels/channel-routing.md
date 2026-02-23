@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Routing rules per channel (WhatsApp, Telegram, Discord, Slack) and shared context"
 read_when:
   - Changing channel routing or inbox behavior
@@ -6,21 +6,20 @@ title: "Channel Routing"
 ---
 
 # Channels & routing
-
-openkrab routes replies **back to the channel where a message came from**. The
+\nOpenKrab routes replies **back to the channel where a message came from**. The
 model does not choose a channel; routing is deterministic and controlled by the
 host configuration.
 
 ## Key terms
 
 - **Channel**: `whatsapp`, `telegram`, `discord`, `slack`, `signal`, `imessage`, `webchat`.
-- **AccountId**: per‑channel account instance (when supported).
-- **AgentId**: an isolated workspace + session store (“brain”).
+- **AccountId**: perâ€‘channel account instance (when supported).
+- **AgentId**: an isolated workspace + session store (â€œbrainâ€).
 - **SessionKey**: the bucket key used to store context and control concurrency.
 
 ## Session key shapes (examples)
 
-Direct messages collapse to the agent’s **main** session:
+Direct messages collapse to the agentâ€™s **main** session:
 
 - `agent:<agentId>:<mainKey>` (default: `agent:main:main`)
 
@@ -58,7 +57,7 @@ The matched agent determines which workspace and session store are used.
 
 ## Broadcast groups (run multiple agents)
 
-Broadcast groups let you run **multiple agents** for the same peer **when openkrab would normally reply** (for example: in WhatsApp groups, after mention/activation gating).
+Broadcast groups let you run **multiple agents** for the same peer **when OpenKrab would normally reply** (for example: in WhatsApp groups, after mention/activation gating).
 
 Config:
 
@@ -104,8 +103,8 @@ You can override the store path via `session.store` and `{agentId}` templating.
 
 ## WebChat behavior
 
-WebChat attaches to the **selected agent** and defaults to the agent’s main
-session. Because of this, WebChat lets you see cross‑channel context for that
+WebChat attaches to the **selected agent** and defaults to the agentâ€™s main
+session. Because of this, WebChat lets you see crossâ€‘channel context for that
 agent in one place.
 
 ## Reply context
@@ -116,3 +115,4 @@ Inbound replies include:
 - Quoted context is appended to `Body` as a `[Replying to ...]` block.
 
 This is consistent across channels.
+

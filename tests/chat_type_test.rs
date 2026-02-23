@@ -1,4 +1,4 @@
-use krabkrab::channels::chat_type::*;
+use openkrab::channels::chat_type::*;
 
 #[test]
 fn test_normalize_chat_type_direct() {
@@ -21,3 +21,4 @@ fn test_normalize_chat_type_unknown_or_empty() {
     assert_eq!(normalize_chat_type(None), None);
     assert_eq!(normalize_chat_type(Some("   ")), None);
 }
+

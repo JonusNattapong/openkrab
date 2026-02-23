@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Run the ACP bridge for IDE integrations"
 read_when:
   - Setting up ACP-based IDE integrations
@@ -8,30 +8,24 @@ title: "acp"
 
 # acp
 
-Run the ACP (Agent Client Protocol) bridge that talks to a openkrab Gateway.
+Run the ACP (Agent Client Protocol) bridge that talks to a OpenKrab Gateway.
 
 This command speaks ACP over stdio for IDEs and forwards prompts to the Gateway
 over WebSocket. It keeps ACP sessions mapped to Gateway session keys.
 
 ## Usage
 
-```bash
-openkrab acp
+```bash\nOpenKrab acp
 
-# Remote Gateway
-openkrab acp --url wss://gateway-host:18789 --token <token>
+# Remote Gateway\nOpenKrab acp --url wss://gateway-host:18789 --token <token>
 
-# Remote Gateway (token from file)
-openkrab acp --url wss://gateway-host:18789 --token-file ~/.openkrab/gateway.token
+# Remote Gateway (token from file)\nOpenKrab acp --url wss://gateway-host:18789 --token-file ~/.openkrab/gateway.token
 
-# Attach to an existing session key
-openkrab acp --session agent:main:main
+# Attach to an existing session key\nOpenKrab acp --session agent:main:main
 
-# Attach by label (must already exist)
-openkrab acp --session-label "support inbox"
+# Attach by label (must already exist)\nOpenKrab acp --session-label "support inbox"
 
-# Reset the session key before the first prompt
-openkrab acp --session agent:main:main --reset-session
+# Reset the session key before the first prompt\nOpenKrab acp --session agent:main:main --reset-session
 ```
 
 ## ACP client (debug)
@@ -39,20 +33,17 @@ openkrab acp --session agent:main:main --reset-session
 Use the built-in ACP client to sanity-check the bridge without an IDE.
 It spawns the ACP bridge and lets you type prompts interactively.
 
-```bash
-openkrab acp client
+```bash\nOpenKrab acp client
 
-# Point the spawned bridge at a remote Gateway
-openkrab acp client --server-args --url wss://gateway-host:18789 --token-file ~/.openkrab/gateway.token
+# Point the spawned bridge at a remote Gateway\nOpenKrab acp client --server-args --url wss://gateway-host:18789 --token-file ~/.openkrab/gateway.token
 
-# Override the server command (default: openkrab)
-openkrab acp client --server "node" --server-args openkrab.mjs acp --url ws://127.0.0.1:19001
+# Override the server command (default: openkrab)\nOpenKrab acp client --server "node" --server-args OpenKrab.mjs acp --url ws://127.0.0.1:19001
 ```
 
 ## How to use this
 
 Use ACP when an IDE (or other client) speaks Agent Client Protocol and you want
-it to drive a openkrab Gateway session.
+it to drive a OpenKrab Gateway session.
 
 1. Ensure the Gateway is running (local or remote).
 2. Configure the Gateway target (config or flags).
@@ -60,17 +51,13 @@ it to drive a openkrab Gateway session.
 
 Example config (persisted):
 
-```bash
-openkrab config set gateway.remote.url wss://gateway-host:18789
-openkrab config set gateway.remote.token <token>
+```bash\nOpenKrab config set gateway.remote.url wss://gateway-host:18789\nOpenKrab config set gateway.remote.token <token>
 ```
 
 Example direct run (no config write):
 
-```bash
-openkrab acp --url wss://gateway-host:18789 --token <token>
-# preferred for local process safety
-openkrab acp --url wss://gateway-host:18789 --token-file ~/.openkrab/gateway.token
+```bash\nOpenKrab acp --url wss://gateway-host:18789 --token <token>
+# preferred for local process safety\nOpenKrab acp --url wss://gateway-host:18789 --token-file ~/.openkrab/gateway.token
 ```
 
 ## Selecting agents
@@ -79,10 +66,7 @@ ACP does not pick agents directly. It routes by the Gateway session key.
 
 Use agent-scoped session keys to target a specific agent:
 
-```bash
-openkrab acp --session agent:main:main
-openkrab acp --session agent:design:main
-openkrab acp --session agent:qa:bug-123
+```bash\nOpenKrab acp --session agent:main:main\nOpenKrab acp --session agent:design:main\nOpenKrab acp --session agent:qa:bug-123
 ```
 
 Each ACP session maps to a single Gateway session key. One agent can have many
@@ -91,7 +75,7 @@ the key or label.
 
 ## Zed editor setup
 
-Add a custom ACP agent in `~/.config/zed/settings.json` (or use Zed’s Settings UI):
+Add a custom ACP agent in `~/.config/zed/settings.json` (or use Zedâ€™s Settings UI):
 
 ```json
 {
@@ -129,7 +113,7 @@ To target a specific Gateway or agent:
 }
 ```
 
-In Zed, open the Agent panel and select “openkrab ACP” to start a thread.
+In Zed, open the Agent panel and select â€œopenkrab ACPâ€ to start a thread.
 
 ## Session mapping
 
@@ -171,7 +155,7 @@ Learn more about session keys at [/concepts/session](/concepts/session).
 Security note:
 
 - `--token` and `--password` can be visible in local process listings on some systems.
-- Prefer `--token-file`/`--password-file` or environment variables (`openkrab_GATEWAY_TOKEN`, `openkrab_GATEWAY_PASSWORD`).
+- Prefer `--token-file`/`--password-file` or environment variables (`OPENKRAB_GATEWAY_TOKEN`, `OPENKRAB_GATEWAY_PASSWORD`).
 
 ### `acp client` options
 
@@ -180,3 +164,5 @@ Security note:
 - `--server-args <args...>`: extra arguments passed to the ACP server.
 - `--server-verbose`: enable verbose logging on the ACP server.
 - `--verbose, -v`: verbose client logging.
+
+

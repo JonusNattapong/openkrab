@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab agents` (list/add/delete/set identity)"
 read_when:
   - You want multiple isolated agents (workspaces + routing + auth)
@@ -16,12 +16,7 @@ Related:
 
 ## Examples
 
-```bash
-openkrab agents list
-openkrab agents add work --workspace ~/.openkrab/workspace-work
-openkrab agents set-identity --workspace ~/.openkrab/workspace --from-identity
-openkrab agents set-identity --agent main --avatar avatars/openkrab.png
-openkrab agents delete work
+```bash\nOpenKrab agents list\nOpenKrab agents add work --workspace ~/.openkrab/workspace-work\nOpenKrab agents set-identity --workspace ~/.openkrab/workspace --from-identity\nOpenKrab agents set-identity --agent main --avatar avatars/openkrab.png\nOpenKrab agents delete work
 ```
 
 ## Identity files
@@ -44,14 +39,12 @@ Avatar paths resolve relative to the workspace root.
 
 Load from `IDENTITY.md`:
 
-```bash
-openkrab agents set-identity --workspace ~/.openkrab/workspace --from-identity
+```bash\nOpenKrab agents set-identity --workspace ~/.openkrab/workspace --from-identity
 ```
 
 Override fields explicitly:
 
-```bash
-openkrab agents set-identity --agent main --name "openkrab" --emoji "🦞" --avatar avatars/openkrab.png
+```bash\nOpenKrab agents set-identity --agent main --name "openkrab" --emoji "ðŸ¦ž" --avatar avatars/openkrab.png
 ```
 
 Config sample:
@@ -65,7 +58,7 @@ Config sample:
         identity: {
           name: "openkrab",
           theme: "space lobster",
-          emoji: "🦞",
+          emoji: "ðŸ¦ž",
           avatar: "avatars/openkrab.png",
         },
       },
@@ -73,3 +66,4 @@ Config sample:
   },
 }
 ```
+

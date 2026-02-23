@@ -15,7 +15,7 @@ Looking for chat channel docs (Telegram/Discord/Slack/WhatsApp/etc.)? See [Chann
 
 ## Quick start
 
-1. Authenticate with the provider via `krabkrab config`.
+1. Authenticate with the provider via `openkrab config`.
 2. Set the default model:
 
 ```toml
@@ -118,3 +118,4 @@ OpenKrab supports local models via:
 - **llama.cpp** — For edge devices
 
 See [Local Models](/gateway/local-models) for setup details.
+

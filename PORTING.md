@@ -1,6 +1,6 @@
-# Porting Status — OpenClaw → OpenKrab
+# Porting Status — OpenKrab → OpenKrab
 
-> **Source**: `../openclaw` (TypeScript/Node.js)
+> **Source**: `../OpenKrab` (TypeScript/Node.js)
 > **Target**: `openkrab/` (Rust)
 > **Last Updated**: 2026-02-20
 
@@ -71,7 +71,7 @@
 | `acp/` | `src/acp/` | ⚡ Core types only |
 | `browser/` | `src/browser/` | ⚡ Simplified CDP |
 | `canvas-host/` | `src/canvas_host/` | ⚡ Simplified A2UI |
-| `config/` | `src/config.rs` + `openkrab_config.rs` | ⚡ Some fields missing |
+| `config/` | `src/config.rs` + `OPENKRAB_CONFIG.rs` | ⚡ Some fields missing |
 | `discord/` | `src/connectors/discord.rs` | ⚡ Merged, simplified vs 70+ TS files |
 | `hooks/` | `src/hooks/` | ⚡ Core types only |
 | `security/` | `src/security.rs` + `secure.rs` | ⚡ Partial features |
@@ -185,7 +185,7 @@
 
 ## Statistics
 
-| Metric | OpenClaw | OpenKrab |
+| Metric | OpenKrab | OpenKrab |
 |--------|----------|----------|
 | src/ modules | 68 | 48 ported + 8 partial |
 | Extensions | 37 | 30 ported / 7 not ported |
@@ -203,7 +203,7 @@
 cd openkrab
 cargo test                  # all tests
 cargo test --lib            # unit tests only
-cargo test -p krabkrab-cli  # CLI tests
+cargo test -p openkrab-cli  # CLI tests
 cargo build                 # check compilation
 ```
 
@@ -243,13 +243,13 @@ cargo build                 # check compilation
 
 ## De-mocking Plan (CLI & Wizard Parity)
 
-During the rapid port to Rust, several CLI commands were provided with stubbed implementations (`format!("... (not yet implemented)")`) or simplified logic compared to the original Node.js OpenClaw codebase.
+During the rapid port to Rust, several CLI commands were provided with stubbed implementations (`format!("... (not yet implemented)")`) or simplified logic compared to the original Node.js OpenKrab codebase.
 
 ### 1. Onboarding Wizard (`src/commands/onboard.rs`)
 
 * **OS Detection**: Implement checks for Windows/WSL2 and print the WSL2 recommendation banner.
 * **Security Warnings**: Add the detailed security baseline warning (sandbox, least-privilege tools, tailscale) and prompt for acknowledgment.
-* **Config Discovery**: Discover existing `gateway.port`, `gateway.bind`, and `models` from existing `openclaw.json` instead of starting from scratch every time.
+* **Config Discovery**: Discover existing `gateway.port`, `gateway.bind`, and `models` from existing `OpenKrab.json` instead of starting from scratch every time.
 * **Channel Probing**: Fetch and display the status of all available channels (e.g., "Telegram: configured", "Feishu: install plugin to enable").
 * **Health Checks**: Attempt to connect to the Gateway WS endpoint (`ws://127.0.0.1...`) and report health status accurately during the "Restarting Gateway" phase.
 * **Browser Launch**: Automatically open the Web UI URL with the generated authentication token after onboarding.
@@ -279,7 +279,7 @@ During the rapid port to Rust, several CLI commands were provided with stubbed i
 
 #### 4.1. Sessions Module (`src/sessions/`)
 
-While the core struct and some tests were ported, there's significant logic missing from the TypeScript equivalent (`openclaw/src/sessions/`). We need to implement:
+While the core struct and some tests were ported, there's significant logic missing from the TypeScript equivalent (`OpenKrab/src/sessions/`). We need to implement:
 
 * [x] **`input-provenance.ts` parity**: Add `InputProvenance` struct (kind: `external_user`, `inter_session`, `internal_system`), normalization logic, and injection into `AgentMessage`s so the agent knows where input came from.
 * [x] **`level-overrides.ts` parity**: Enhance `VerbosityLevel` logic to include `parseVerboseOverride` returning nullable variants, and `applyVerboseOverride` to properly clear or set the override on the session config.
@@ -294,3 +294,5 @@ While the core struct and some tests were ported, there's significant logic miss
 * [x] **Fallback FTS-only search** mechanism when vector search fails.
 * [x] **MMR and Temporal Decay** for relevance ranking to avoid redundancy and prioritize recent info.
 * [x] **Session integration** (`warm_session`) for proactive syncing before processing.
+
+

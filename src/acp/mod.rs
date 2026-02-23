@@ -2,7 +2,7 @@
 //! Ported from `openkrab/src/acp/` (Phase 9).
 //!
 //! ACP provides a structured JSON-over-HTTP/WS protocol so external processes
-//! (e.g. desktop apps, mobile apps) can communicate with a running krabkrab
+//! (e.g. desktop apps, mobile apps) can communicate with a running openkrab
 //! agent instance.
 
 use serde::{Deserialize, Serialize};
@@ -521,3 +521,4 @@ mod tests {
         assert_eq!(resp.request_id.as_deref(), Some("req-1"));
     }
 }
+

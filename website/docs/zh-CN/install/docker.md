@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 你想要容器化的 Gateway 网关而不是本地安装
-  - 你正在验证 Docker 流程
-summary: OpenKrab 的可选 Docker 设置和新手引导
+  - ä½ æƒ³è¦å®¹å™¨åŒ–çš„ Gateway ç½‘å…³è€Œä¸æ˜¯æœ¬åœ°å®‰è£…
+  - ä½ æ­£åœ¨éªŒè¯ Docker æµç¨‹
+summary: OpenKrab çš„å¯é€‰ Docker è®¾ç½®å’Œæ–°æ‰‹å¼•å¯¼
 title: Docker
 x-i18n:
   generated_at: "2026-02-03T07:51:20Z"
@@ -13,66 +13,66 @@ x-i18n:
   workflow: 15
 ---
 
-# Docker（可选）
+# Dockerï¼ˆå¯é€‰ï¼‰
 
-Docker 是**可选的**。仅当你想要容器化的 Gateway 网关或验证 Docker 流程时才使用它。
+Docker æ˜¯**å¯é€‰çš„**ã€‚ä»…å½“ä½ æƒ³è¦å®¹å™¨åŒ–çš„ Gateway ç½‘å…³æˆ–éªŒè¯ Docker æµç¨‹æ—¶æ‰ä½¿ç”¨å®ƒã€‚
 
-## Docker 适合我吗？
+## Docker é€‚åˆæˆ‘å—ï¼Ÿ
 
-- **是**：你想要一个隔离的、可丢弃的 Gateway 网关环境，或在没有本地安装的主机上运行 OpenKrab。
-- **否**：你在自己的机器上运行，只想要最快的开发循环。请改用正常的安装流程。
-- **沙箱注意事项**：智能体沙箱隔离也使用 Docker，但它**不需要**完整的 Gateway 网关在 Docker 中运行。参阅[沙箱隔离](/gateway/sandboxing)。
+- **æ˜¯**ï¼šä½ æƒ³è¦ä¸€ä¸ªéš”ç¦»çš„ã€å¯ä¸¢å¼ƒçš„ Gateway ç½‘å…³çŽ¯å¢ƒï¼Œæˆ–åœ¨æ²¡æœ‰æœ¬åœ°å®‰è£…çš„ä¸»æœºä¸Šè¿è¡Œ OpenKrabã€‚
+- **å¦**ï¼šä½ åœ¨è‡ªå·±çš„æœºå™¨ä¸Šè¿è¡Œï¼Œåªæƒ³è¦æœ€å¿«çš„å¼€å‘å¾ªçŽ¯ã€‚è¯·æ”¹ç”¨æ­£å¸¸çš„å®‰è£…æµç¨‹ã€‚
+- **æ²™ç®±æ³¨æ„äº‹é¡¹**ï¼šæ™ºèƒ½ä½“æ²™ç®±éš”ç¦»ä¹Ÿä½¿ç”¨ Dockerï¼Œä½†å®ƒ**ä¸éœ€è¦**å®Œæ•´çš„ Gateway ç½‘å…³åœ¨ Docker ä¸­è¿è¡Œã€‚å‚é˜…[æ²™ç®±éš”ç¦»](/gateway/sandboxing)ã€‚
 
-本指南涵盖：
+æœ¬æŒ‡å—æ¶µç›–ï¼š
 
-- 容器化 Gateway 网关（完整的 OpenKrab 在 Docker 中）
-- 每会话智能体沙箱（主机 Gateway 网关 + Docker 隔离的智能体工具）
+- å®¹å™¨åŒ– Gateway ç½‘å…³ï¼ˆå®Œæ•´çš„ OpenKrab åœ¨ Docker ä¸­ï¼‰
+- æ¯ä¼šè¯æ™ºèƒ½ä½“æ²™ç®±ï¼ˆä¸»æœº Gateway ç½‘å…³ + Docker éš”ç¦»çš„æ™ºèƒ½ä½“å·¥å…·ï¼‰
 
-沙箱隔离详情：[沙箱隔离](/gateway/sandboxing)
+æ²™ç®±éš”ç¦»è¯¦æƒ…ï¼š[æ²™ç®±éš”ç¦»](/gateway/sandboxing)
 
-## 要求
+## è¦æ±‚
 
-- Docker Desktop（或 Docker Engine）+ Docker Compose v2
-- 足够的磁盘空间用于镜像 + 日志
+- Docker Desktopï¼ˆæˆ– Docker Engineï¼‰+ Docker Compose v2
+- è¶³å¤Ÿçš„ç£ç›˜ç©ºé—´ç”¨äºŽé•œåƒ + æ—¥å¿—
 
-## 容器化 Gateway 网关（Docker Compose）
+## å®¹å™¨åŒ– Gateway ç½‘å…³ï¼ˆDocker Composeï¼‰
 
-### 快速开始（推荐）
+### å¿«é€Ÿå¼€å§‹ï¼ˆæŽ¨èï¼‰
 
-从仓库根目录：
+ä»Žä»“åº“æ ¹ç›®å½•ï¼š
 
 ```bash
 ./docker-setup.sh
 ```
 
-此脚本：
+æ­¤è„šæœ¬ï¼š
 
-- 构建 Gateway 网关镜像
-- 运行新手引导向导
-- 打印可选的提供商设置提示
-- 通过 Docker Compose 启动 Gateway 网关
-- 生成 Gateway 网关令牌并写入 `.env`
+- æž„å»º Gateway ç½‘å…³é•œåƒ
+- è¿è¡Œæ–°æ‰‹å¼•å¯¼å‘å¯¼
+- æ‰“å°å¯é€‰çš„æä¾›å•†è®¾ç½®æç¤º
+- é€šè¿‡ Docker Compose å¯åŠ¨ Gateway ç½‘å…³
+- ç”Ÿæˆ Gateway ç½‘å…³ä»¤ç‰Œå¹¶å†™å…¥ `.env`
 
-可选环境变量：
+å¯é€‰çŽ¯å¢ƒå˜é‡ï¼š
 
-- `OpenKrab_DOCKER_APT_PACKAGES` — 在构建期间安装额外的 apt 包
-- `OpenKrab_EXTRA_MOUNTS` — 添加额外的主机绑定挂载
-- `OpenKrab_HOME_VOLUME` — 在命名卷中持久化 `/home/node`
+- `OPENKRAB_DOCKER_APT_PACKAGES` â€” åœ¨æž„å»ºæœŸé—´å®‰è£…é¢å¤–çš„ apt åŒ…
+- `OPENKRAB_EXTRA_MOUNTS` â€” æ·»åŠ é¢å¤–çš„ä¸»æœºç»‘å®šæŒ‚è½½
+- `OPENKRAB_HOME_VOLUME` â€” åœ¨å‘½åå·ä¸­æŒä¹…åŒ– `/home/node`
 
-完成后：
+å®ŒæˆåŽï¼š
 
-- 在浏览器中打开 `http://127.0.0.1:18789/`。
-- 将令牌粘贴到控制 UI（设置 → token）。
-- 需要再次获取带令牌的 URL？运行 `docker compose run --rm OpenKrab-cli dashboard --no-open`。
+- åœ¨æµè§ˆå™¨ä¸­æ‰“å¼€ `http://127.0.0.1:18789/`ã€‚
+- å°†ä»¤ç‰Œç²˜è´´åˆ°æŽ§åˆ¶ UIï¼ˆè®¾ç½® â†’ tokenï¼‰ã€‚
+- éœ€è¦å†æ¬¡èŽ·å–å¸¦ä»¤ç‰Œçš„ URLï¼Ÿè¿è¡Œ `docker compose run --rm OpenKrab-cli dashboard --no-open`ã€‚
 
-它在主机上写入配置/工作区：
+å®ƒåœ¨ä¸»æœºä¸Šå†™å…¥é…ç½®/å·¥ä½œåŒºï¼š
 
 - `~/.OpenKrab/`
 - `~/.OpenKrab/workspace`
 
-在 VPS 上运行？参阅 [Hetzner（Docker VPS）](/install/hetzner)。
+åœ¨ VPS ä¸Šè¿è¡Œï¼Ÿå‚é˜… [Hetznerï¼ˆDocker VPSï¼‰](/install/hetzner)ã€‚
 
-### 手动流程（compose）
+### æ‰‹åŠ¨æµç¨‹ï¼ˆcomposeï¼‰
 
 ```bash
 docker build -t OpenKrab:local -f Dockerfile .
@@ -80,15 +80,15 @@ docker compose run --rm OpenKrab-cli onboard
 docker compose up -d OpenKrab-gateway
 ```
 
-注意：从仓库根目录运行 `docker compose ...`。如果你启用了 `OpenKrab_EXTRA_MOUNTS` 或 `OpenKrab_HOME_VOLUME`，设置脚本会写入 `docker-compose.extra.yml`；在其他地方运行 Compose 时包含它：
+æ³¨æ„ï¼šä»Žä»“åº“æ ¹ç›®å½•è¿è¡Œ `docker compose ...`ã€‚å¦‚æžœä½ å¯ç”¨äº† `OPENKRAB_EXTRA_MOUNTS` æˆ– `OPENKRAB_HOME_VOLUME`ï¼Œè®¾ç½®è„šæœ¬ä¼šå†™å…¥ `docker-compose.extra.yml`ï¼›åœ¨å…¶ä»–åœ°æ–¹è¿è¡Œ Compose æ—¶åŒ…å«å®ƒï¼š
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.extra.yml <command>
 ```
 
-### 控制 UI 令牌 + 配对（Docker）
+### æŽ§åˆ¶ UI ä»¤ç‰Œ + é…å¯¹ï¼ˆDockerï¼‰
 
-如果你看到"unauthorized"或"disconnected (1008): pairing required"，获取新的仪表板链接并批准浏览器设备：
+å¦‚æžœä½ çœ‹åˆ°"unauthorized"æˆ–"disconnected (1008): pairing required"ï¼ŒèŽ·å–æ–°çš„ä»ªè¡¨æ¿é“¾æŽ¥å¹¶æ‰¹å‡†æµè§ˆå™¨è®¾å¤‡ï¼š
 
 ```bash
 docker compose run --rm OpenKrab-cli dashboard --no-open
@@ -96,123 +96,123 @@ docker compose run --rm OpenKrab-cli devices list
 docker compose run --rm OpenKrab-cli devices approve <requestId>
 ```
 
-更多详情：[仪表板](/web/dashboard)，[设备](/cli/devices)。
+æ›´å¤šè¯¦æƒ…ï¼š[ä»ªè¡¨æ¿](/web/dashboard)ï¼Œ[è®¾å¤‡](/cli/devices)ã€‚
 
-### 额外挂载（可选）
+### é¢å¤–æŒ‚è½½ï¼ˆå¯é€‰ï¼‰
 
-如果你想将额外的主机目录挂载到容器中，在运行 `docker-setup.sh` 之前设置 `OpenKrab_EXTRA_MOUNTS`。这接受逗号分隔的 Docker 绑定挂载列表，并通过生成 `docker-compose.extra.yml` 将它们应用到 `OpenKrab-gateway` 和 `OpenKrab-cli`。
+å¦‚æžœä½ æƒ³å°†é¢å¤–çš„ä¸»æœºç›®å½•æŒ‚è½½åˆ°å®¹å™¨ä¸­ï¼Œåœ¨è¿è¡Œ `docker-setup.sh` ä¹‹å‰è®¾ç½® `OPENKRAB_EXTRA_MOUNTS`ã€‚è¿™æŽ¥å—é€—å·åˆ†éš”çš„ Docker ç»‘å®šæŒ‚è½½åˆ—è¡¨ï¼Œå¹¶é€šè¿‡ç”Ÿæˆ `docker-compose.extra.yml` å°†å®ƒä»¬åº”ç”¨åˆ° `OpenKrab-gateway` å’Œ `OpenKrab-cli`ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```bash
-export OpenKrab_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+export OPENKRAB_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
 ./docker-setup.sh
 ```
 
-注意：
+æ³¨æ„ï¼š
 
-- 路径必须在 macOS/Windows 上与 Docker Desktop 共享。
-- 如果你编辑 `OpenKrab_EXTRA_MOUNTS`，重新运行 `docker-setup.sh` 以重新生成额外的 compose 文件。
-- `docker-compose.extra.yml` 是生成的。不要手动编辑它。
+- è·¯å¾„å¿…é¡»åœ¨ macOS/Windows ä¸Šä¸Ž Docker Desktop å…±äº«ã€‚
+- å¦‚æžœä½ ç¼–è¾‘ `OPENKRAB_EXTRA_MOUNTS`ï¼Œé‡æ–°è¿è¡Œ `docker-setup.sh` ä»¥é‡æ–°ç”Ÿæˆé¢å¤–çš„ compose æ–‡ä»¶ã€‚
+- `docker-compose.extra.yml` æ˜¯ç”Ÿæˆçš„ã€‚ä¸è¦æ‰‹åŠ¨ç¼–è¾‘å®ƒã€‚
 
-### 持久化整个容器 home（可选）
+### æŒä¹…åŒ–æ•´ä¸ªå®¹å™¨ homeï¼ˆå¯é€‰ï¼‰
 
-如果你想让 `/home/node` 在容器重建后持久化，通过 `OpenKrab_HOME_VOLUME` 设置一个命名卷。这会创建一个 Docker 卷并将其挂载到 `/home/node`，同时保持标准的配置/工作区绑定挂载。这里使用命名卷（不是绑定路径）；对于绑定挂载，使用 `OpenKrab_EXTRA_MOUNTS`。
+å¦‚æžœä½ æƒ³è®© `/home/node` åœ¨å®¹å™¨é‡å»ºåŽæŒä¹…åŒ–ï¼Œé€šè¿‡ `OPENKRAB_HOME_VOLUME` è®¾ç½®ä¸€ä¸ªå‘½åå·ã€‚è¿™ä¼šåˆ›å»ºä¸€ä¸ª Docker å·å¹¶å°†å…¶æŒ‚è½½åˆ° `/home/node`ï¼ŒåŒæ—¶ä¿æŒæ ‡å‡†çš„é…ç½®/å·¥ä½œåŒºç»‘å®šæŒ‚è½½ã€‚è¿™é‡Œä½¿ç”¨å‘½åå·ï¼ˆä¸æ˜¯ç»‘å®šè·¯å¾„ï¼‰ï¼›å¯¹äºŽç»‘å®šæŒ‚è½½ï¼Œä½¿ç”¨ `OPENKRAB_EXTRA_MOUNTS`ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```bash
-export OpenKrab_HOME_VOLUME="OpenKrab_home"
+export OPENKRAB_HOME_VOLUME="OPENKRAB_HOME"
 ./docker-setup.sh
 ```
 
-你可以将其与额外挂载结合使用：
+ä½ å¯ä»¥å°†å…¶ä¸Žé¢å¤–æŒ‚è½½ç»“åˆä½¿ç”¨ï¼š
 
 ```bash
-export OpenKrab_HOME_VOLUME="OpenKrab_home"
-export OpenKrab_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+export OPENKRAB_HOME_VOLUME="OPENKRAB_HOME"
+export OPENKRAB_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
 ./docker-setup.sh
 ```
 
-注意：
+æ³¨æ„ï¼š
 
-- 如果你更改 `OpenKrab_HOME_VOLUME`，重新运行 `docker-setup.sh` 以重新生成额外的 compose 文件。
-- 命名卷会持久化直到使用 `docker volume rm <name>` 删除。
+- å¦‚æžœä½ æ›´æ”¹ `OPENKRAB_HOME_VOLUME`ï¼Œé‡æ–°è¿è¡Œ `docker-setup.sh` ä»¥é‡æ–°ç”Ÿæˆé¢å¤–çš„ compose æ–‡ä»¶ã€‚
+- å‘½åå·ä¼šæŒä¹…åŒ–ç›´åˆ°ä½¿ç”¨ `docker volume rm <name>` åˆ é™¤ã€‚
 
-### 安装额外的 apt 包（可选）
+### å®‰è£…é¢å¤–çš„ apt åŒ…ï¼ˆå¯é€‰ï¼‰
 
-如果你需要镜像内的系统包（例如构建工具或媒体库），在运行 `docker-setup.sh` 之前设置 `OpenKrab_DOCKER_APT_PACKAGES`。这会在镜像构建期间安装包，因此即使容器被删除它们也会持久化。
+å¦‚æžœä½ éœ€è¦é•œåƒå†…çš„ç³»ç»ŸåŒ…ï¼ˆä¾‹å¦‚æž„å»ºå·¥å…·æˆ–åª’ä½“åº“ï¼‰ï¼Œåœ¨è¿è¡Œ `docker-setup.sh` ä¹‹å‰è®¾ç½® `OPENKRAB_DOCKER_APT_PACKAGES`ã€‚è¿™ä¼šåœ¨é•œåƒæž„å»ºæœŸé—´å®‰è£…åŒ…ï¼Œå› æ­¤å³ä½¿å®¹å™¨è¢«åˆ é™¤å®ƒä»¬ä¹Ÿä¼šæŒä¹…åŒ–ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```bash
-export OpenKrab_DOCKER_APT_PACKAGES="ffmpeg build-essential"
+export OPENKRAB_DOCKER_APT_PACKAGES="ffmpeg build-essential"
 ./docker-setup.sh
 ```
 
-注意：
+æ³¨æ„ï¼š
 
-- 这接受空格分隔的 apt 包名称列表。
-- 如果你更改 `OpenKrab_DOCKER_APT_PACKAGES`，重新运行 `docker-setup.sh` 以重建镜像。
+- è¿™æŽ¥å—ç©ºæ ¼åˆ†éš”çš„ apt åŒ…åç§°åˆ—è¡¨ã€‚
+- å¦‚æžœä½ æ›´æ”¹ `OPENKRAB_DOCKER_APT_PACKAGES`ï¼Œé‡æ–°è¿è¡Œ `docker-setup.sh` ä»¥é‡å»ºé•œåƒã€‚
 
-### 高级用户/功能完整的容器（选择加入）
+### é«˜çº§ç”¨æˆ·/åŠŸèƒ½å®Œæ•´çš„å®¹å™¨ï¼ˆé€‰æ‹©åŠ å…¥ï¼‰
 
-默认的 Docker 镜像是**安全优先**的，以非 root 的 `node` 用户运行。这保持了较小的攻击面，但这意味着：
+é»˜è®¤çš„ Docker é•œåƒæ˜¯**å®‰å…¨ä¼˜å…ˆ**çš„ï¼Œä»¥éž root çš„ `node` ç”¨æˆ·è¿è¡Œã€‚è¿™ä¿æŒäº†è¾ƒå°çš„æ”»å‡»é¢ï¼Œä½†è¿™æ„å‘³ç€ï¼š
 
-- 运行时无法安装系统包
-- 默认没有 Homebrew
-- 没有捆绑的 Chromium/Playwright 浏览器
+- è¿è¡Œæ—¶æ— æ³•å®‰è£…ç³»ç»ŸåŒ…
+- é»˜è®¤æ²¡æœ‰ Homebrew
+- æ²¡æœ‰æ†ç»‘çš„ Chromium/Playwright æµè§ˆå™¨
 
-如果你想要功能更完整的容器，使用这些选择加入选项：
+å¦‚æžœä½ æƒ³è¦åŠŸèƒ½æ›´å®Œæ•´çš„å®¹å™¨ï¼Œä½¿ç”¨è¿™äº›é€‰æ‹©åŠ å…¥é€‰é¡¹ï¼š
 
-1. **持久化 `/home/node`** 以便浏览器下载和工具缓存能够保留：
+1. **æŒä¹…åŒ– `/home/node`** ä»¥ä¾¿æµè§ˆå™¨ä¸‹è½½å’Œå·¥å…·ç¼“å­˜èƒ½å¤Ÿä¿ç•™ï¼š
 
 ```bash
-export OpenKrab_HOME_VOLUME="OpenKrab_home"
+export OPENKRAB_HOME_VOLUME="OPENKRAB_HOME"
 ./docker-setup.sh
 ```
 
-2. **将系统依赖烘焙到镜像中**（可重复 + 持久化）：
+2. **å°†ç³»ç»Ÿä¾èµ–çƒ˜ç„™åˆ°é•œåƒä¸­**ï¼ˆå¯é‡å¤ + æŒä¹…åŒ–ï¼‰ï¼š
 
 ```bash
-export OpenKrab_DOCKER_APT_PACKAGES="git curl jq"
+export OPENKRAB_DOCKER_APT_PACKAGES="git curl jq"
 ./docker-setup.sh
 ```
 
-3. **不使用 `npx` 安装 Playwright 浏览器**（避免 npm 覆盖冲突）：
+3. **ä¸ä½¿ç”¨ `npx` å®‰è£… Playwright æµè§ˆå™¨**ï¼ˆé¿å… npm è¦†ç›–å†²çªï¼‰ï¼š
 
 ```bash
 docker compose run --rm OpenKrab-cli \
   node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
-如果你需要 Playwright 安装系统依赖，使用 `OpenKrab_DOCKER_APT_PACKAGES` 重建镜像，而不是在运行时使用 `--with-deps`。
+å¦‚æžœä½ éœ€è¦ Playwright å®‰è£…ç³»ç»Ÿä¾èµ–ï¼Œä½¿ç”¨ `OPENKRAB_DOCKER_APT_PACKAGES` é‡å»ºé•œåƒï¼Œè€Œä¸æ˜¯åœ¨è¿è¡Œæ—¶ä½¿ç”¨ `--with-deps`ã€‚
 
-4. **持久化 Playwright 浏览器下载**：
+4. **æŒä¹…åŒ– Playwright æµè§ˆå™¨ä¸‹è½½**ï¼š
 
-- 在 `docker-compose.yml` 中设置 `PLAYWRIGHT_BROWSERS_PATH=/home/node/.cache/ms-playwright`。
-- 确保 `/home/node` 通过 `OpenKrab_HOME_VOLUME` 持久化，或通过 `OpenKrab_EXTRA_MOUNTS` 挂载 `/home/node/.cache/ms-playwright`。
+- åœ¨ `docker-compose.yml` ä¸­è®¾ç½® `PLAYWRIGHT_BROWSERS_PATH=/home/node/.cache/ms-playwright`ã€‚
+- ç¡®ä¿ `/home/node` é€šè¿‡ `OPENKRAB_HOME_VOLUME` æŒä¹…åŒ–ï¼Œæˆ–é€šè¿‡ `OPENKRAB_EXTRA_MOUNTS` æŒ‚è½½ `/home/node/.cache/ms-playwright`ã€‚
 
-### 权限 + EACCES
+### æƒé™ + EACCES
 
-镜像以 `node`（uid 1000）运行。如果你在 `/home/node/.OpenKrab` 上看到权限错误，确保你的主机绑定挂载由 uid 1000 拥有。
+é•œåƒä»¥ `node`ï¼ˆuid 1000ï¼‰è¿è¡Œã€‚å¦‚æžœä½ åœ¨ `/home/node/.OpenKrab` ä¸Šçœ‹åˆ°æƒé™é”™è¯¯ï¼Œç¡®ä¿ä½ çš„ä¸»æœºç»‘å®šæŒ‚è½½ç”± uid 1000 æ‹¥æœ‰ã€‚
 
-示例（Linux 主机）：
+ç¤ºä¾‹ï¼ˆLinux ä¸»æœºï¼‰ï¼š
 
 ```bash
 sudo chown -R 1000:1000 /path/to/OpenKrab-config /path/to/OpenKrab-workspace
 ```
 
-如果你选择以 root 运行以方便使用，你接受了安全权衡。
+å¦‚æžœä½ é€‰æ‹©ä»¥ root è¿è¡Œä»¥æ–¹ä¾¿ä½¿ç”¨ï¼Œä½ æŽ¥å—äº†å®‰å…¨æƒè¡¡ã€‚
 
-### 更快的重建（推荐）
+### æ›´å¿«çš„é‡å»ºï¼ˆæŽ¨èï¼‰
 
-要加速重建，排序你的 Dockerfile 以便依赖层被缓存。这避免了除非锁文件更改否则重新运行 `pnpm install`：
+è¦åŠ é€Ÿé‡å»ºï¼ŒæŽ’åºä½ çš„ Dockerfile ä»¥ä¾¿ä¾èµ–å±‚è¢«ç¼“å­˜ã€‚è¿™é¿å…äº†é™¤éžé”æ–‡ä»¶æ›´æ”¹å¦åˆ™é‡æ–°è¿è¡Œ `pnpm install`ï¼š
 
 ```dockerfile
 FROM node:22-bookworm
 
-# 安装 Bun（构建脚本需要）
+# å®‰è£… Bunï¼ˆæž„å»ºè„šæœ¬éœ€è¦ï¼‰
 RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
 
@@ -220,7 +220,7 @@ RUN corepack enable
 
 WORKDIR /app
 
-# 缓存依赖，除非包元数据更改
+# ç¼“å­˜ä¾èµ–ï¼Œé™¤éžåŒ…å…ƒæ•°æ®æ›´æ”¹
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY ui/package.json ./ui/package.json
 COPY scripts ./scripts
@@ -237,105 +237,105 @@ ENV NODE_ENV=production
 CMD ["node","dist/index.js"]
 ```
 
-### 渠道设置（可选）
+### æ¸ é“è®¾ç½®ï¼ˆå¯é€‰ï¼‰
 
-使用 CLI 容器配置渠道，然后在需要时重启 Gateway 网关。
+ä½¿ç”¨ CLI å®¹å™¨é…ç½®æ¸ é“ï¼Œç„¶åŽåœ¨éœ€è¦æ—¶é‡å¯ Gateway ç½‘å…³ã€‚
 
-WhatsApp（QR）：
+WhatsAppï¼ˆQRï¼‰ï¼š
 
 ```bash
 docker compose run --rm OpenKrab-cli channels login
 ```
 
-Telegram（bot token）：
+Telegramï¼ˆbot tokenï¼‰ï¼š
 
 ```bash
 docker compose run --rm OpenKrab-cli channels add --channel telegram --token "<token>"
 ```
 
-Discord（bot token）：
+Discordï¼ˆbot tokenï¼‰ï¼š
 
 ```bash
 docker compose run --rm OpenKrab-cli channels add --channel discord --token "<token>"
 ```
 
-文档：[WhatsApp](/channels/whatsapp)，[Telegram](/channels/telegram)，[Discord](/channels/discord)
+æ–‡æ¡£ï¼š[WhatsApp](/channels/whatsapp)ï¼Œ[Telegram](/channels/telegram)ï¼Œ[Discord](/channels/discord)
 
-### OpenAI Codex OAuth（无头 Docker）
+### OpenAI Codex OAuthï¼ˆæ— å¤´ Dockerï¼‰
 
-如果你在向导中选择 OpenAI Codex OAuth，它会打开浏览器 URL 并尝试在 `http://127.0.0.1:1455/auth/callback` 捕获回调。在 Docker 或无头设置中，该回调可能显示浏览器错误。复制你到达的完整重定向 URL 并将其粘贴回向导以完成认证。
+å¦‚æžœä½ åœ¨å‘å¯¼ä¸­é€‰æ‹© OpenAI Codex OAuthï¼Œå®ƒä¼šæ‰“å¼€æµè§ˆå™¨ URL å¹¶å°è¯•åœ¨ `http://127.0.0.1:1455/auth/callback` æ•èŽ·å›žè°ƒã€‚åœ¨ Docker æˆ–æ— å¤´è®¾ç½®ä¸­ï¼Œè¯¥å›žè°ƒå¯èƒ½æ˜¾ç¤ºæµè§ˆå™¨é”™è¯¯ã€‚å¤åˆ¶ä½ åˆ°è¾¾çš„å®Œæ•´é‡å®šå‘ URL å¹¶å°†å…¶ç²˜è´´å›žå‘å¯¼ä»¥å®Œæˆè®¤è¯ã€‚
 
-### 健康检查
+### å¥åº·æ£€æŸ¥
 
 ```bash
-docker compose exec OpenKrab-gateway node dist/index.js health --token "$OpenKrab_GATEWAY_TOKEN"
+docker compose exec OpenKrab-gateway node dist/index.js health --token "$OPENKRAB_GATEWAY_TOKEN"
 ```
 
-### E2E 冒烟测试（Docker）
+### E2E å†’çƒŸæµ‹è¯•ï¼ˆDockerï¼‰
 
 ```bash
 scripts/e2e/onboard-docker.sh
 ```
 
-### QR 导入冒烟测试（Docker）
+### QR å¯¼å…¥å†’çƒŸæµ‹è¯•ï¼ˆDockerï¼‰
 
 ```bash
 pnpm test:docker:qr
 ```
 
-### 注意
+### æ³¨æ„
 
-- Gateway 网关绑定默认为 `lan` 用于容器使用。
-- Dockerfile CMD 使用 `--allow-unconfigured`；挂载的配置如果 `gateway.mode` 不是 `local` 仍会启动。覆盖 CMD 以强制执行检查。
-- Gateway 网关容器是会话的真实来源（`~/.OpenKrab/agents/<agentId>/sessions/`）。
+- Gateway ç½‘å…³ç»‘å®šé»˜è®¤ä¸º `lan` ç”¨äºŽå®¹å™¨ä½¿ç”¨ã€‚
+- Dockerfile CMD ä½¿ç”¨ `--allow-unconfigured`ï¼›æŒ‚è½½çš„é…ç½®å¦‚æžœ `gateway.mode` ä¸æ˜¯ `local` ä»ä¼šå¯åŠ¨ã€‚è¦†ç›– CMD ä»¥å¼ºåˆ¶æ‰§è¡Œæ£€æŸ¥ã€‚
+- Gateway ç½‘å…³å®¹å™¨æ˜¯ä¼šè¯çš„çœŸå®žæ¥æºï¼ˆ`~/.OpenKrab/agents/<agentId>/sessions/`ï¼‰ã€‚
 
-## 智能体沙箱（主机 Gateway 网关 + Docker 工具）
+## æ™ºèƒ½ä½“æ²™ç®±ï¼ˆä¸»æœº Gateway ç½‘å…³ + Docker å·¥å…·ï¼‰
 
-深入了解：[沙箱隔离](/gateway/sandboxing)
+æ·±å…¥äº†è§£ï¼š[æ²™ç®±éš”ç¦»](/gateway/sandboxing)
 
-### 它做什么
+### å®ƒåšä»€ä¹ˆ
 
-当启用 `agents.defaults.sandbox` 时，**非主会话**在 Docker 容器内运行工具。Gateway 网关保持在你的主机上，但工具执行是隔离的：
+å½“å¯ç”¨ `agents.defaults.sandbox` æ—¶ï¼Œ**éžä¸»ä¼šè¯**åœ¨ Docker å®¹å™¨å†…è¿è¡Œå·¥å…·ã€‚Gateway ç½‘å…³ä¿æŒåœ¨ä½ çš„ä¸»æœºä¸Šï¼Œä½†å·¥å…·æ‰§è¡Œæ˜¯éš”ç¦»çš„ï¼š
 
-- scope：默认为 `"agent"`（每个智能体一个容器 + 工作区）
-- scope：`"session"` 用于每会话隔离
-- 每作用域工作区文件夹挂载在 `/workspace`
-- 可选的智能体工作区访问（`agents.defaults.sandbox.workspaceAccess`）
-- 允许/拒绝工具策略（拒绝优先）
-- 入站媒体被复制到活动沙箱工作区（`media/inbound/*`），以便工具可以读取它（使用 `workspaceAccess: "rw"` 时，这会落在智能体工作区中）
+- scopeï¼šé»˜è®¤ä¸º `"agent"`ï¼ˆæ¯ä¸ªæ™ºèƒ½ä½“ä¸€ä¸ªå®¹å™¨ + å·¥ä½œåŒºï¼‰
+- scopeï¼š`"session"` ç”¨äºŽæ¯ä¼šè¯éš”ç¦»
+- æ¯ä½œç”¨åŸŸå·¥ä½œåŒºæ–‡ä»¶å¤¹æŒ‚è½½åœ¨ `/workspace`
+- å¯é€‰çš„æ™ºèƒ½ä½“å·¥ä½œåŒºè®¿é—®ï¼ˆ`agents.defaults.sandbox.workspaceAccess`ï¼‰
+- å…è®¸/æ‹’ç»å·¥å…·ç­–ç•¥ï¼ˆæ‹’ç»ä¼˜å…ˆï¼‰
+- å…¥ç«™åª’ä½“è¢«å¤åˆ¶åˆ°æ´»åŠ¨æ²™ç®±å·¥ä½œåŒºï¼ˆ`media/inbound/*`ï¼‰ï¼Œä»¥ä¾¿å·¥å…·å¯ä»¥è¯»å–å®ƒï¼ˆä½¿ç”¨ `workspaceAccess: "rw"` æ—¶ï¼Œè¿™ä¼šè½åœ¨æ™ºèƒ½ä½“å·¥ä½œåŒºä¸­ï¼‰
 
-警告：`scope: "shared"` 禁用跨会话隔离。所有会话共享一个容器和一个工作区。
+è­¦å‘Šï¼š`scope: "shared"` ç¦ç”¨è·¨ä¼šè¯éš”ç¦»ã€‚æ‰€æœ‰ä¼šè¯å…±äº«ä¸€ä¸ªå®¹å™¨å’Œä¸€ä¸ªå·¥ä½œåŒºã€‚
 
-### 每智能体沙箱配置文件（多智能体）
+### æ¯æ™ºèƒ½ä½“æ²™ç®±é…ç½®æ–‡ä»¶ï¼ˆå¤šæ™ºèƒ½ä½“ï¼‰
 
-如果你使用多智能体路由，每个智能体可以覆盖沙箱 + 工具设置：`agents.list[].sandbox` 和 `agents.list[].tools`（加上 `agents.list[].tools.sandbox.tools`）。这让你可以在一个 Gateway 网关中运行混合访问级别：
+å¦‚æžœä½ ä½¿ç”¨å¤šæ™ºèƒ½ä½“è·¯ç”±ï¼Œæ¯ä¸ªæ™ºèƒ½ä½“å¯ä»¥è¦†ç›–æ²™ç®± + å·¥å…·è®¾ç½®ï¼š`agents.list[].sandbox` å’Œ `agents.list[].tools`ï¼ˆåŠ ä¸Š `agents.list[].tools.sandbox.tools`ï¼‰ã€‚è¿™è®©ä½ å¯ä»¥åœ¨ä¸€ä¸ª Gateway ç½‘å…³ä¸­è¿è¡Œæ··åˆè®¿é—®çº§åˆ«ï¼š
 
-- 完全访问（个人智能体）
-- 只读工具 + 只读工作区（家庭/工作智能体）
-- 无文件系统/shell 工具（公共智能体）
+- å®Œå…¨è®¿é—®ï¼ˆä¸ªäººæ™ºèƒ½ä½“ï¼‰
+- åªè¯»å·¥å…· + åªè¯»å·¥ä½œåŒºï¼ˆå®¶åº­/å·¥ä½œæ™ºèƒ½ä½“ï¼‰
+- æ— æ–‡ä»¶ç³»ç»Ÿ/shell å·¥å…·ï¼ˆå…¬å…±æ™ºèƒ½ä½“ï¼‰
 
-参阅[多智能体沙箱与工具](/tools/multi-agent-sandbox-tools)了解示例、优先级和故障排除。
+å‚é˜…[å¤šæ™ºèƒ½ä½“æ²™ç®±ä¸Žå·¥å…·](/tools/multi-agent-sandbox-tools)äº†è§£ç¤ºä¾‹ã€ä¼˜å…ˆçº§å’Œæ•…éšœæŽ’é™¤ã€‚
 
-### 默认行为
+### é»˜è®¤è¡Œä¸º
 
-- 镜像：`OpenKrab-sandbox:bookworm-slim`
-- 每个智能体一个容器
-- 智能体工作区访问：`workspaceAccess: "none"`（默认）使用 `~/.OpenKrab/sandboxes`
-  - `"ro"` 保持沙箱工作区在 `/workspace` 并将智能体工作区只读挂载在 `/agent`（禁用 `write`/`edit`/`apply_patch`）
-  - `"rw"` 将智能体工作区读写挂载在 `/workspace`
-- 自动清理：空闲 > 24h 或 年龄 > 7d
-- 网络：默认为 `none`（如果需要出站则明确选择加入）
-- 默认允许：`exec`、`process`、`read`、`write`、`edit`、`sessions_list`、`sessions_history`、`sessions_send`、`sessions_spawn`、`session_status`
-- 默认拒绝：`browser`、`canvas`、`nodes`、`cron`、`discord`、`gateway`
+- é•œåƒï¼š`OpenKrab-sandbox:bookworm-slim`
+- æ¯ä¸ªæ™ºèƒ½ä½“ä¸€ä¸ªå®¹å™¨
+- æ™ºèƒ½ä½“å·¥ä½œåŒºè®¿é—®ï¼š`workspaceAccess: "none"`ï¼ˆé»˜è®¤ï¼‰ä½¿ç”¨ `~/.OpenKrab/sandboxes`
+  - `"ro"` ä¿æŒæ²™ç®±å·¥ä½œåŒºåœ¨ `/workspace` å¹¶å°†æ™ºèƒ½ä½“å·¥ä½œåŒºåªè¯»æŒ‚è½½åœ¨ `/agent`ï¼ˆç¦ç”¨ `write`/`edit`/`apply_patch`ï¼‰
+  - `"rw"` å°†æ™ºèƒ½ä½“å·¥ä½œåŒºè¯»å†™æŒ‚è½½åœ¨ `/workspace`
+- è‡ªåŠ¨æ¸…ç†ï¼šç©ºé—² > 24h æˆ– å¹´é¾„ > 7d
+- ç½‘ç»œï¼šé»˜è®¤ä¸º `none`ï¼ˆå¦‚æžœéœ€è¦å‡ºç«™åˆ™æ˜Žç¡®é€‰æ‹©åŠ å…¥ï¼‰
+- é»˜è®¤å…è®¸ï¼š`exec`ã€`process`ã€`read`ã€`write`ã€`edit`ã€`sessions_list`ã€`sessions_history`ã€`sessions_send`ã€`sessions_spawn`ã€`session_status`
+- é»˜è®¤æ‹’ç»ï¼š`browser`ã€`canvas`ã€`nodes`ã€`cron`ã€`discord`ã€`gateway`
 
-### 启用沙箱隔离
+### å¯ç”¨æ²™ç®±éš”ç¦»
 
-如果你计划在 `setupCommand` 中安装包，请注意：
+å¦‚æžœä½ è®¡åˆ’åœ¨ `setupCommand` ä¸­å®‰è£…åŒ…ï¼Œè¯·æ³¨æ„ï¼š
 
-- 默认 `docker.network` 是 `"none"`（无出站）。
-- `readOnlyRoot: true` 阻止包安装。
-- `user` 必须是 root 才能运行 `apt-get`（省略 `user` 或设置 `user: "0:0"`）。
-  当 `setupCommand`（或 docker 配置）更改时，OpenKrab 会自动重建容器，除非容器是**最近使用的**（在约 5 分钟内）。热容器会记录警告，包含确切的 `OpenKrab sandbox recreate ...` 命令。
+- é»˜è®¤ `docker.network` æ˜¯ `"none"`ï¼ˆæ— å‡ºç«™ï¼‰ã€‚
+- `readOnlyRoot: true` é˜»æ­¢åŒ…å®‰è£…ã€‚
+- `user` å¿…é¡»æ˜¯ root æ‰èƒ½è¿è¡Œ `apt-get`ï¼ˆçœç•¥ `user` æˆ–è®¾ç½® `user: "0:0"`ï¼‰ã€‚
+  å½“ `setupCommand`ï¼ˆæˆ– docker é…ç½®ï¼‰æ›´æ”¹æ—¶ï¼ŒOpenKrab ä¼šè‡ªåŠ¨é‡å»ºå®¹å™¨ï¼Œé™¤éžå®¹å™¨æ˜¯**æœ€è¿‘ä½¿ç”¨çš„**ï¼ˆåœ¨çº¦ 5 åˆ†é’Ÿå†…ï¼‰ã€‚çƒ­å®¹å™¨ä¼šè®°å½•è­¦å‘Šï¼ŒåŒ…å«ç¡®åˆ‡çš„ `OpenKrab sandbox recreate ...` å‘½ä»¤ã€‚
 
 ```json5
 {
@@ -343,7 +343,7 @@ pnpm test:docker:qr
     defaults: {
       sandbox: {
         mode: "non-main", // off | non-main | all
-        scope: "agent", // session | agent | shared（默认为 agent）
+        scope: "agent", // session | agent | sharedï¼ˆé»˜è®¤ä¸º agentï¼‰
         workspaceAccess: "none", // none | ro | rw
         workspaceRoot: "~/.OpenKrab/sandboxes",
         docker: {
@@ -370,8 +370,8 @@ pnpm test:docker:qr
           extraHosts: ["internal.service:10.0.0.5"],
         },
         prune: {
-          idleHours: 24, // 0 禁用空闲清理
-          maxAgeDays: 7, // 0 禁用最大年龄清理
+          idleHours: 24, // 0 ç¦ç”¨ç©ºé—²æ¸…ç†
+          maxAgeDays: 7, // 0 ç¦ç”¨æœ€å¤§å¹´é¾„æ¸…ç†
         },
       },
     },
@@ -398,27 +398,27 @@ pnpm test:docker:qr
 }
 ```
 
-加固选项位于 `agents.defaults.sandbox.docker` 下：`network`、`user`、`pidsLimit`、`memory`、`memorySwap`、`cpus`、`ulimits`、`seccompProfile`、`apparmorProfile`、`dns`、`extraHosts`。
+åŠ å›ºé€‰é¡¹ä½äºŽ `agents.defaults.sandbox.docker` ä¸‹ï¼š`network`ã€`user`ã€`pidsLimit`ã€`memory`ã€`memorySwap`ã€`cpus`ã€`ulimits`ã€`seccompProfile`ã€`apparmorProfile`ã€`dns`ã€`extraHosts`ã€‚
 
-多智能体：通过 `agents.list[].sandbox.{docker,browser,prune}.*` 按智能体覆盖 `agents.defaults.sandbox.{docker,browser,prune}.*`（当 `agents.defaults.sandbox.scope` / `agents.list[].sandbox.scope` 是 `"shared"` 时忽略）。
+å¤šæ™ºèƒ½ä½“ï¼šé€šè¿‡ `agents.list[].sandbox.{docker,browser,prune}.*` æŒ‰æ™ºèƒ½ä½“è¦†ç›– `agents.defaults.sandbox.{docker,browser,prune}.*`ï¼ˆå½“ `agents.defaults.sandbox.scope` / `agents.list[].sandbox.scope` æ˜¯ `"shared"` æ—¶å¿½ç•¥ï¼‰ã€‚
 
-### 构建默认沙箱镜像
+### æž„å»ºé»˜è®¤æ²™ç®±é•œåƒ
 
 ```bash
 scripts/sandbox-setup.sh
 ```
 
-这使用 `Dockerfile.sandbox` 构建 `OpenKrab-sandbox:bookworm-slim`。
+è¿™ä½¿ç”¨ `Dockerfile.sandbox` æž„å»º `OpenKrab-sandbox:bookworm-slim`ã€‚
 
-### 沙箱通用镜像（可选）
+### æ²™ç®±é€šç”¨é•œåƒï¼ˆå¯é€‰ï¼‰
 
-如果你想要一个带有常见构建工具（Node、Go、Rust 等）的沙箱镜像，构建通用镜像：
+å¦‚æžœä½ æƒ³è¦ä¸€ä¸ªå¸¦æœ‰å¸¸è§æž„å»ºå·¥å…·ï¼ˆNodeã€Goã€Rust ç­‰ï¼‰çš„æ²™ç®±é•œåƒï¼Œæž„å»ºé€šç”¨é•œåƒï¼š
 
 ```bash
 scripts/sandbox-common-setup.sh
 ```
 
-这构建 `OpenKrab-sandbox-common:bookworm-slim`。要使用它：
+è¿™æž„å»º `OpenKrab-sandbox-common:bookworm-slim`ã€‚è¦ä½¿ç”¨å®ƒï¼š
 
 ```json5
 {
@@ -430,23 +430,23 @@ scripts/sandbox-common-setup.sh
 }
 ```
 
-### 沙箱浏览器镜像
+### æ²™ç®±æµè§ˆå™¨é•œåƒ
 
-要在沙箱内运行浏览器工具，构建浏览器镜像：
+è¦åœ¨æ²™ç®±å†…è¿è¡Œæµè§ˆå™¨å·¥å…·ï¼Œæž„å»ºæµè§ˆå™¨é•œåƒï¼š
 
 ```bash
 scripts/sandbox-browser-setup.sh
 ```
 
-这使用 `Dockerfile.sandbox-browser` 构建 `OpenKrab-sandbox-browser:bookworm-slim`。容器运行启用 CDP 的 Chromium 和可选的 noVNC 观察器（通过 Xvfb 有头）。
+è¿™ä½¿ç”¨ `Dockerfile.sandbox-browser` æž„å»º `OpenKrab-sandbox-browser:bookworm-slim`ã€‚å®¹å™¨è¿è¡Œå¯ç”¨ CDP çš„ Chromium å’Œå¯é€‰çš„ noVNC è§‚å¯Ÿå™¨ï¼ˆé€šè¿‡ Xvfb æœ‰å¤´ï¼‰ã€‚
 
-注意：
+æ³¨æ„ï¼š
 
-- 有头（Xvfb）比无头减少机器人阻止。
-- 通过设置 `agents.defaults.sandbox.browser.headless=true` 仍然可以使用无头模式。
-- 不需要完整的桌面环境（GNOME）；Xvfb 提供显示。
+- æœ‰å¤´ï¼ˆXvfbï¼‰æ¯”æ— å¤´å‡å°‘æœºå™¨äººé˜»æ­¢ã€‚
+- é€šè¿‡è®¾ç½® `agents.defaults.sandbox.browser.headless=true` ä»ç„¶å¯ä»¥ä½¿ç”¨æ— å¤´æ¨¡å¼ã€‚
+- ä¸éœ€è¦å®Œæ•´çš„æ¡Œé¢çŽ¯å¢ƒï¼ˆGNOMEï¼‰ï¼›Xvfb æä¾›æ˜¾ç¤ºã€‚
 
-使用配置：
+ä½¿ç”¨é…ç½®ï¼š
 
 ```json5
 {
@@ -460,7 +460,7 @@ scripts/sandbox-browser-setup.sh
 }
 ```
 
-自定义浏览器镜像：
+è‡ªå®šä¹‰æµè§ˆå™¨é•œåƒï¼š
 
 ```json5
 {
@@ -472,17 +472,17 @@ scripts/sandbox-browser-setup.sh
 }
 ```
 
-启用后，智能体接收：
+å¯ç”¨åŽï¼Œæ™ºèƒ½ä½“æŽ¥æ”¶ï¼š
 
-- 沙箱浏览器控制 URL（用于 `browser` 工具）
-- noVNC URL（如果启用且 headless=false）
+- æ²™ç®±æµè§ˆå™¨æŽ§åˆ¶ URLï¼ˆç”¨äºŽ `browser` å·¥å…·ï¼‰
+- noVNC URLï¼ˆå¦‚æžœå¯ç”¨ä¸” headless=falseï¼‰
 
-记住：如果你使用工具允许列表，添加 `browser`（并从拒绝中移除它）否则工具仍然被阻止。
-清理规则（`agents.defaults.sandbox.prune`）也适用于浏览器容器。
+è®°ä½ï¼šå¦‚æžœä½ ä½¿ç”¨å·¥å…·å…è®¸åˆ—è¡¨ï¼Œæ·»åŠ  `browser`ï¼ˆå¹¶ä»Žæ‹’ç»ä¸­ç§»é™¤å®ƒï¼‰å¦åˆ™å·¥å…·ä»ç„¶è¢«é˜»æ­¢ã€‚
+æ¸…ç†è§„åˆ™ï¼ˆ`agents.defaults.sandbox.prune`ï¼‰ä¹Ÿé€‚ç”¨äºŽæµè§ˆå™¨å®¹å™¨ã€‚
 
-### 自定义沙箱镜像
+### è‡ªå®šä¹‰æ²™ç®±é•œåƒ
 
-构建你自己的镜像并将配置指向它：
+æž„å»ºä½ è‡ªå·±çš„é•œåƒå¹¶å°†é…ç½®æŒ‡å‘å®ƒï¼š
 
 ```bash
 docker build -t my-OpenKrab-sbx -f Dockerfile.sandbox .
@@ -498,36 +498,37 @@ docker build -t my-OpenKrab-sbx -f Dockerfile.sandbox .
 }
 ```
 
-### 工具策略（允许/拒绝）
+### å·¥å…·ç­–ç•¥ï¼ˆå…è®¸/æ‹’ç»ï¼‰
 
-- `deny` 优先于 `allow`。
-- 如果 `allow` 为空：所有工具（除了 deny）都可用。
-- 如果 `allow` 非空：只有 `allow` 中的工具可用（减去 deny）。
+- `deny` ä¼˜å…ˆäºŽ `allow`ã€‚
+- å¦‚æžœ `allow` ä¸ºç©ºï¼šæ‰€æœ‰å·¥å…·ï¼ˆé™¤äº† denyï¼‰éƒ½å¯ç”¨ã€‚
+- å¦‚æžœ `allow` éžç©ºï¼šåªæœ‰ `allow` ä¸­çš„å·¥å…·å¯ç”¨ï¼ˆå‡åŽ» denyï¼‰ã€‚
 
-### 清理策略
+### æ¸…ç†ç­–ç•¥
 
-两个选项：
+ä¸¤ä¸ªé€‰é¡¹ï¼š
 
-- `prune.idleHours`：移除 X 小时未使用的容器（0 = 禁用）
-- `prune.maxAgeDays`：移除超过 X 天的容器（0 = 禁用）
+- `prune.idleHours`ï¼šç§»é™¤ X å°æ—¶æœªä½¿ç”¨çš„å®¹å™¨ï¼ˆ0 = ç¦ç”¨ï¼‰
+- `prune.maxAgeDays`ï¼šç§»é™¤è¶…è¿‡ X å¤©çš„å®¹å™¨ï¼ˆ0 = ç¦ç”¨ï¼‰
 
-示例：
+ç¤ºä¾‹ï¼š
 
-- 保留繁忙会话但限制生命周期：
-  `idleHours: 24`、`maxAgeDays: 7`
-- 永不清理：
-  `idleHours: 0`、`maxAgeDays: 0`
+- ä¿ç•™ç¹å¿™ä¼šè¯ä½†é™åˆ¶ç”Ÿå‘½å‘¨æœŸï¼š
+  `idleHours: 24`ã€`maxAgeDays: 7`
+- æ°¸ä¸æ¸…ç†ï¼š
+  `idleHours: 0`ã€`maxAgeDays: 0`
 
-### 安全注意事项
+### å®‰å…¨æ³¨æ„äº‹é¡¹
 
-- 硬隔离仅适用于**工具**（exec/read/write/edit/apply_patch）。
-- 仅主机工具如 browser/camera/canvas 默认被阻止。
-- 在沙箱中允许 `browser` **会破坏隔离**（浏览器在主机上运行）。
+- ç¡¬éš”ç¦»ä»…é€‚ç”¨äºŽ**å·¥å…·**ï¼ˆexec/read/write/edit/apply_patchï¼‰ã€‚
+- ä»…ä¸»æœºå·¥å…·å¦‚ browser/camera/canvas é»˜è®¤è¢«é˜»æ­¢ã€‚
+- åœ¨æ²™ç®±ä¸­å…è®¸ `browser` **ä¼šç ´åéš”ç¦»**ï¼ˆæµè§ˆå™¨åœ¨ä¸»æœºä¸Šè¿è¡Œï¼‰ã€‚
 
-## 故障排除
+## æ•…éšœæŽ’é™¤
 
-- 镜像缺失：使用 [`scripts/sandbox-setup.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/sandbox-setup.sh) 构建或设置 `agents.defaults.sandbox.docker.image`。
-- 容器未运行：它会按需为每个会话自动创建。
-- 沙箱中的权限错误：将 `docker.user` 设置为与你挂载的工作区所有权匹配的 UID:GID（或 chown 工作区文件夹）。
-- 找不到自定义工具：OpenKrab 使用 `sh -lc`（登录 shell）运行命令，这会 source `/etc/profile` 并可能重置 PATH。设置 `docker.env.PATH` 以在前面添加你的自定义工具路径（例如 `/custom/bin:/usr/local/share/npm-global/bin`），或在你的 Dockerfile 中在 `/etc/profile.d/` 下添加脚本。
+- é•œåƒç¼ºå¤±ï¼šä½¿ç”¨ [`scripts/sandbox-setup.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/sandbox-setup.sh) æž„å»ºæˆ–è®¾ç½® `agents.defaults.sandbox.docker.image`ã€‚
+- å®¹å™¨æœªè¿è¡Œï¼šå®ƒä¼šæŒ‰éœ€ä¸ºæ¯ä¸ªä¼šè¯è‡ªåŠ¨åˆ›å»ºã€‚
+- æ²™ç®±ä¸­çš„æƒé™é”™è¯¯ï¼šå°† `docker.user` è®¾ç½®ä¸ºä¸Žä½ æŒ‚è½½çš„å·¥ä½œåŒºæ‰€æœ‰æƒåŒ¹é…çš„ UID:GIDï¼ˆæˆ– chown å·¥ä½œåŒºæ–‡ä»¶å¤¹ï¼‰ã€‚
+- æ‰¾ä¸åˆ°è‡ªå®šä¹‰å·¥å…·ï¼šOpenKrab ä½¿ç”¨ `sh -lc`ï¼ˆç™»å½• shellï¼‰è¿è¡Œå‘½ä»¤ï¼Œè¿™ä¼š source `/etc/profile` å¹¶å¯èƒ½é‡ç½® PATHã€‚è®¾ç½® `docker.env.PATH` ä»¥åœ¨å‰é¢æ·»åŠ ä½ çš„è‡ªå®šä¹‰å·¥å…·è·¯å¾„ï¼ˆä¾‹å¦‚ `/custom/bin:/usr/local/share/npm-global/bin`ï¼‰ï¼Œæˆ–åœ¨ä½ çš„ Dockerfile ä¸­åœ¨ `/etc/profile.d/` ä¸‹æ·»åŠ è„šæœ¬ã€‚
+
 

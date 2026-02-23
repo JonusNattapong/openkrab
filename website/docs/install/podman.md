@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Run OpenKrab in a rootless Podman container"
 read_when:
   - You want a containerized gateway with Podman instead of Docker
@@ -30,7 +30,7 @@ By default the container is **not** installed as a systemd service, you start it
 ./setup-podman.sh --quadlet
 ```
 
-(Or set `OpenKrab_PODMAN_QUADLET=1`; use `--container` to install only the container and launch script.)
+(Or set `OPENKRAB_PODMAN_QUADLET=1`; use `--container` to install only the container and launch script.)
 
 **2. Start gateway** (manual, for quick smoke testing):
 
@@ -48,7 +48,7 @@ Then open `http://127.0.0.1:18789/` and use the token from `~OpenKrab/.OpenKrab/
 
 ## Systemd (Quadlet, optional)
 
-If you ran `./setup-podman.sh --quadlet` (or `OpenKrab_PODMAN_QUADLET=1`), a [Podman Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html) unit is installed so the gateway runs as a systemd user service for the OpenKrab user. The service is enabled and started at the end of setup.
+If you ran `./setup-podman.sh --quadlet` (or `OPENKRAB_PODMAN_QUADLET=1`), a [Podman Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html) unit is installed so the gateway runs as a systemd user service for the OpenKrab user. The service is enabled and started at the end of setup.
 
 - **Start:** `sudo systemctl --machine OpenKrab@ --user start OpenKrab.service`
 - **Stop:** `sudo systemctl --machine OpenKrab@ --user stop OpenKrab.service`
@@ -63,8 +63,8 @@ To add quadlet **after** an initial setup that did not use it, re-run: `./setup-
 
 `setup-podman.sh` creates a dedicated system user `OpenKrab`:
 
-- **Shell:** `nologin` — no interactive login; reduces attack surface.
-- **Home:** e.g. `/home/OpenKrab` — holds `~/.OpenKrab` (config, workspace) and the launch script `run-OpenKrab-podman.sh`.
+- **Shell:** `nologin` â€” no interactive login; reduces attack surface.
+- **Home:** e.g. `/home/OpenKrab` â€” holds `~/.OpenKrab` (config, workspace) and the launch script `run-OpenKrab-podman.sh`.
 - **Rootless Podman:** The user must have a **subuid** and **subgid** range. Many distros assign these automatically when the user is created. If setup prints a warning, add lines to `/etc/subuid` and `/etc/subgid`:
 
   ```text
@@ -82,28 +82,29 @@ To add quadlet **after** an initial setup that did not use it, re-run: `./setup-
 
 ## Environment and config
 
-- **Token:** Stored in `~OpenKrab/.OpenKrab/.env` as `OpenKrab_GATEWAY_TOKEN`. `setup-podman.sh` and `run-OpenKrab-podman.sh` generate it if missing (uses `openssl`, `python3`, or `od`).
+- **Token:** Stored in `~OpenKrab/.OpenKrab/.env` as `OPENKRAB_GATEWAY_TOKEN`. `setup-podman.sh` and `run-OpenKrab-podman.sh` generate it if missing (uses `openssl`, `python3`, or `od`).
 - **Optional:** In that `.env` you can set provider keys (e.g. `GROQ_API_KEY`, `OLLAMA_API_KEY`) and other OpenKrab env vars.
-- **Host ports:** By default the script maps `18789` (gateway) and `18790` (bridge). Override the **host** port mapping with `OpenKrab_PODMAN_GATEWAY_HOST_PORT` and `OpenKrab_PODMAN_BRIDGE_HOST_PORT` when launching.
-- **Paths:** Host config and workspace default to `~OpenKrab/.OpenKrab` and `~OpenKrab/.OpenKrab/workspace`. Override the host paths used by the launch script with `OpenKrab_CONFIG_DIR` and `OpenKrab_WORKSPACE_DIR`.
+- **Host ports:** By default the script maps `18789` (gateway) and `18790` (bridge). Override the **host** port mapping with `OPENKRAB_PODMAN_GATEWAY_HOST_PORT` and `OPENKRAB_PODMAN_BRIDGE_HOST_PORT` when launching.
+- **Paths:** Host config and workspace default to `~OpenKrab/.OpenKrab` and `~OpenKrab/.OpenKrab/workspace`. Override the host paths used by the launch script with `OPENKRAB_CONFIG_DIR` and `OPENKRAB_WORKSPACE_DIR`.
 
 ## Useful commands
 
 - **Logs:** With quadlet: `sudo journalctl --machine OpenKrab@ --user -u OpenKrab.service -f`. With script: `sudo -u OpenKrab podman logs -f OpenKrab`
 - **Stop:** With quadlet: `sudo systemctl --machine OpenKrab@ --user stop OpenKrab.service`. With script: `sudo -u OpenKrab podman stop OpenKrab`
 - **Start again:** With quadlet: `sudo systemctl --machine OpenKrab@ --user start OpenKrab.service`. With script: re-run the launch script or `podman start OpenKrab`
-- **Remove container:** `sudo -u OpenKrab podman rm -f OpenKrab` — config and workspace on the host are kept
+- **Remove container:** `sudo -u OpenKrab podman rm -f OpenKrab` â€” config and workspace on the host are kept
 
 ## Troubleshooting
 
-- **Permission denied (EACCES) on config or auth-profiles:** The container defaults to `--userns=keep-id` and runs as the same uid/gid as the host user running the script. Ensure your host `OpenKrab_CONFIG_DIR` and `OpenKrab_WORKSPACE_DIR` are owned by that user.
+- **Permission denied (EACCES) on config or auth-profiles:** The container defaults to `--userns=keep-id` and runs as the same uid/gid as the host user running the script. Ensure your host `OPENKRAB_CONFIG_DIR` and `OPENKRAB_WORKSPACE_DIR` are owned by that user.
 - **Gateway start blocked (missing `gateway.mode=local`):** Ensure `~OpenKrab/.OpenKrab/OpenKrab.json` exists and sets `gateway.mode="local"`. `setup-podman.sh` creates this file if missing.
 - **Rootless Podman fails for user OpenKrab:** Check `/etc/subuid` and `/etc/subgid` contain a line for `OpenKrab` (e.g. `OpenKrab:100000:65536`). Add it if missing and restart.
 - **Container name in use:** The launch script uses `podman run --replace`, so the existing container is replaced when you start again. To clean up manually: `podman rm -f OpenKrab`.
-- **Script not found when running as OpenKrab:** Ensure `setup-podman.sh` was run so that `run-OpenKrab-podman.sh` is copied to OpenKrab’s home (e.g. `/home/OpenKrab/run-OpenKrab-podman.sh`).
+- **Script not found when running as OpenKrab:** Ensure `setup-podman.sh` was run so that `run-OpenKrab-podman.sh` is copied to OpenKrabâ€™s home (e.g. `/home/OpenKrab/run-OpenKrab-podman.sh`).
 - **Quadlet service not found or fails to start:** Run `sudo systemctl --machine OpenKrab@ --user daemon-reload` after editing the `.container` file. Quadlet requires cgroups v2: `podman info --format '{{.Host.CgroupsVersion}}'` should show `2`.
 
 ## Optional: run as your own user
 
-To run the gateway as your normal user (no dedicated OpenKrab user): build the image, create `~/.OpenKrab/.env` with `OpenKrab_GATEWAY_TOKEN`, and run the container with `--userns=keep-id` and mounts to your `~/.OpenKrab`. The launch script is designed for the OpenKrab-user flow; for a single-user setup you can instead run the `podman run` command from the script manually, pointing config and workspace to your home. Recommended for most users: use `setup-podman.sh` and run as the OpenKrab user so config and process are isolated.
+To run the gateway as your normal user (no dedicated OpenKrab user): build the image, create `~/.OpenKrab/.env` with `OPENKRAB_GATEWAY_TOKEN`, and run the container with `--userns=keep-id` and mounts to your `~/.OpenKrab`. The launch script is designed for the OpenKrab-user flow; for a single-user setup you can instead run the `podman run` command from the script manually, pointing config and workspace to your home. Recommended for most users: use `setup-podman.sh` and run as the OpenKrab user so config and process are isolated.
+
 

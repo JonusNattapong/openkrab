@@ -1,7 +1,7 @@
-//! Wizard Onboarding Module
+﻿//! Wizard Onboarding Module
 //!
 //! Provides an interactive step-by-step wizard for first-time users to configure
-//! their krabkrab assistant, including agent identity, channels, memory, and providers.
+//! their openkrab assistant, including agent identity, channels, memory, and providers.
 
 use crate::config_io;
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
@@ -139,8 +139,8 @@ impl Default for OnboardingConfig {
         Self {
             profile: "default".to_string(),
             agent: AgentConfig {
-                name: "krabkrab".to_string(),
-                emoji: "🦀".to_string(),
+                name: "openkrab".to_string(),
+                emoji: "ðŸ¦€".to_string(),
                 personality: "A helpful and precise AI assistant.".to_string(),
                 system_prompt: None,
                 workspace: None,
@@ -261,24 +261,24 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     let theme = ColorfulTheme::default();
     let mut config = OnboardingConfig::default();
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // WELCOME SCREEN
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print_welcome_banner();
 
     if cfg!(target_os = "windows") {
-        println!("Windows detected — krabkrab runs great on WSL2!");
+        println!("Windows detected â€” openkrab runs great on WSL2!");
         println!("Native Windows might be trickier.");
         println!("Quick setup: wsl --install (one command, one reboot)");
-        println!("Guide: https://docs.openclaw.ai/windows\n");
+        println!("Guide: https://docs.OpenKrab.ai/windows\n");
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 0: FLOW SELECTION
-    // ─────────────────────────────────────────────────────────────────────
-    println!("{}", "━".repeat(60));
-    println!("📋 STEP 0: Onboarding Mode");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("{}", "â”".repeat(60));
+    println!("ðŸ“‹ STEP 0: Onboarding Mode");
+    println!("{}", "â”".repeat(60));
     println!("Select the onboarding mode that suits your needs.\n");
 
     let flow_options = vec!["QuickStart", "Manual"];
@@ -294,20 +294,20 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         OnboardMode::Manual
     };
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // RISK ACKNOWLEDGMENT
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("⚠️  Security Warning");
-    println!("{}", "━".repeat(60));
-    println!("Security warning — please read.");
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("âš ï¸  Security Warning");
+    println!("{}", "â”".repeat(60));
+    println!("Security warning â€” please read.");
     println!();
-    println!(" is a hobby projectkrabkrab and still in beta. Expect sharp edges.");
+    println!(" is a hobby projectopenkrab and still in beta. Expect sharp edges.");
     println!("This bot can read files and run actions if tools are enabled.");
     println!("A bad prompt can trick it into doing unsafe things.");
     println!();
     println!(
-        "If you're not comfortable with basic security and access control, don't run krabkrab."
+        "If you're not comfortable with basic security and access control, don't run openkrab."
     );
     println!(
         "Ask someone experienced to help before enabling tools or exposing it to the internet."
@@ -320,10 +320,10 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     println!("- Use the strongest available model for any bot with tools or untrusted inboxes.");
     println!();
     println!("Run regularly:");
-    println!("krabkrab security audit --deep");
-    println!("krabkrab security audit --fix");
+    println!("openkrab security audit --deep");
+    println!("openkrab security audit --fix");
     println!();
-    println!("Must read: https://docs.openclaw.ai/gateway/security\n");
+    println!("Must read: https://docs.OpenKrab.ai/gateway/security\n");
 
     let ready = Confirm::with_theme(&theme)
         .with_prompt("I understand this is powerful and inherently risky. Continue?")
@@ -332,7 +332,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
 
     if !ready {
         println!(
-            "Onboarding cancelled. Run 'krabkrab onboard' when you're ready to accept the risks."
+            "Onboarding cancelled. Run 'openkrab onboard' when you're ready to accept the risks."
         );
         return Ok(config);
     }
@@ -340,29 +340,29 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     // Check existing config validity
     let config_path = dirs::config_dir()
         .unwrap_or_else(|| std::path::PathBuf::from("."))
-        .join("krabkrab")
+        .join("openkrab")
         .join("default.toml");
 
     if config_path.exists() {
-        println!("\n{}", "━".repeat(60));
-        println!("📋 Checking existing configuration...");
-        println!("{}", "━".repeat(60));
+        println!("\n{}", "â”".repeat(60));
+        println!("ðŸ“‹ Checking existing configuration...");
+        println!("{}", "â”".repeat(60));
 
         match config_io::load_config() {
             Ok(cfg) => match config_io::validate_config(&cfg) {
                 Ok(_) => {
-                    println!("  ✅ Configuration is valid");
+                    println!("  âœ… Configuration is valid");
                 }
                 Err(e) => {
-                    println!("\n⚠️  Configuration is invalid!");
+                    println!("\nâš ï¸  Configuration is invalid!");
                     println!("\nValidation errors:");
                     println!("  - {}", e.to_string().replace("\n", "\n  - "));
-                    println!("\nRun 'krabkrab doctor' to fix, then re-run onboarding.");
+                    println!("\nRun 'openkrab doctor' to fix, then re-run onboarding.");
                     return Err(anyhow::anyhow!("Invalid configuration: {}", e));
                 }
             },
             Err(e) => {
-                println!("\n⚠️  Could not load configuration: {}", e);
+                println!("\nâš ï¸  Could not load configuration: {}", e);
                 println!("  Will create a new configuration.");
             }
         }
@@ -371,9 +371,9 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     // Probe existing config
     let existing_cfg = config_io::load_config().ok();
     if let Some(cfg) = &existing_cfg {
-        println!("\n{}", "━".repeat(60));
-        println!("📁 Existing Configuration Detected");
-        println!("{}", "━".repeat(60));
+        println!("\n{}", "â”".repeat(60));
+        println!("ðŸ“ Existing Configuration Detected");
+        println!("{}", "â”".repeat(60));
 
         let port = cfg.gateway.as_ref().and_then(|g| g.port).unwrap_or(18789);
         let bind = cfg
@@ -407,7 +407,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
             }
             1 => {
                 // Modify - continue with wizard
-                println!("\n→ Proceeding with wizard to update values...\n");
+                println!("\nâ†’ Proceeding with wizard to update values...\n");
             }
             2 => {
                 // Reset
@@ -430,7 +430,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
 
                 handle_reset_scope(&scope)?;
                 config = OnboardingConfig::default();
-                println!("\n✅ Configuration reset complete.\n");
+                println!("\nâœ… Configuration reset complete.\n");
             }
             _ => {}
         }
@@ -438,14 +438,14 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
 
     // For QuickStart mode, apply sensible defaults
     if mode == OnboardMode::QuickStart {
-        println!("\n{}", "━".repeat(60));
-        println!("🚀 Applying QuickStart defaults");
-        println!("{}", "━".repeat(60));
+        println!("\n{}", "â”".repeat(60));
+        println!("ðŸš€ Applying QuickStart defaults");
+        println!("{}", "â”".repeat(60));
 
         // Use defaults for QuickStart
         config.profile = "default".to_string();
-        config.agent.name = "krabkrab".to_string();
-        config.agent.emoji = "🦀".to_string();
+        config.agent.name = "openkrab".to_string();
+        config.agent.emoji = "ðŸ¦€".to_string();
         config.agent.personality = "A helpful and precise AI assistant.".to_string();
         config.llm.provider = "openai".to_string();
         config.llm.model = "gpt-4".to_string();
@@ -461,15 +461,15 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
             }
         }
 
-        println!("✅ QuickStart defaults applied.");
+        println!("âœ… QuickStart defaults applied.");
         println!("   - Provider: {}", config.llm.provider);
         println!("   - Model: {}", config.llm.model);
         println!("   - Dashboard: http://{}\n", config.dashboard.bind);
 
         // QuickStart gateway settings
-        println!("{}", "━".repeat(60));
-        println!("🚀 QuickStart Gateway Settings");
-        println!("{}", "━".repeat(60));
+        println!("{}", "â”".repeat(60));
+        println!("ðŸš€ QuickStart Gateway Settings");
+        println!("{}", "â”".repeat(60));
         println!("Gateway port: 18789");
         println!("Gateway bind: Loopback (127.0.0.1)");
         println!("Gateway auth: Token");
@@ -477,12 +477,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         println!();
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP X: GATEWAY MODE (local or remote)
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🌐 STEP X: Gateway Mode");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸŒ STEP X: Gateway Mode");
+    println!("{}", "â”".repeat(60));
 
     let mode_options = vec!["Local gateway (this machine)", "Remote gateway (info-only)"];
     let mode_selection = Select::with_theme(&theme)
@@ -494,18 +494,18 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     let is_remote = mode_selection == 1;
 
     if is_remote {
-        println!("\n📡 Remote gateway mode selected.");
+        println!("\nðŸ“¡ Remote gateway mode selected.");
         println!("   You'll need to configure the remote gateway URL separately.");
-        println!("   Run 'krabkrab configure' after onboarding to add remote gateway.");
+        println!("   Run 'openkrab configure' after onboarding to add remote gateway.");
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP X: GATEWAY CONFIGURATION (for Manual mode + local)
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if mode == OnboardMode::Manual && !is_remote {
-        println!("\n{}", "━".repeat(60));
-        println!("🌐 STEP X: Gateway Configuration");
-        println!("{}", "━".repeat(60));
+        println!("\n{}", "â”".repeat(60));
+        println!("ðŸŒ STEP X: Gateway Configuration");
+        println!("{}", "â”".repeat(60));
 
         // Port
         let port_str = Input::with_theme(&theme)
@@ -550,38 +550,38 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
             _ => "funnel",
         };
 
-        println!("\n✅ Gateway configured:");
+        println!("\nâœ… Gateway configured:");
         println!("   - Port: {}", port);
         println!("   - Bind: {}", bind);
         println!("   - Auth: {}", auth_mode);
         println!("   - Tailscale: {}", tailscale_mode);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // PROBE GATEWAY REACHABILITY
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🔍 Checking gateway reachability...");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ” Checking gateway reachability...");
+    println!("{}", "â”".repeat(60));
 
     let gateway_url = "ws://127.0.0.1:18789";
     let gateway_reachable = probe_gateway(gateway_url);
 
     if gateway_reachable {
-        println!("✅ Gateway reachable at {}", gateway_url);
+        println!("âœ… Gateway reachable at {}", gateway_url);
     } else {
-        println!("⚠️  Gateway not detected at {}", gateway_url);
-        println!("   It will be started when you run 'krabkrab gateway start'");
+        println!("âš ï¸  Gateway not detected at {}", gateway_url);
+        println!("   It will be started when you run 'openkrab gateway start'");
     }
 
-    println!("Security warning — please read.");
+    println!("Security warning â€” please read.");
     println!();
-    println!("krabkrab is a hobby project and still in beta. Expect sharp edges.");
+    println!("openkrab is a hobby project and still in beta. Expect sharp edges.");
     println!("This bot can read files and run actions if tools are enabled.");
     println!("A bad prompt can trick it into doing unsafe things.");
     println!();
     println!(
-        "If you’re not comfortable with basic security and access control, don’t run krabkrab."
+        "If youâ€™re not comfortable with basic security and access control, donâ€™t run openkrab."
     );
     println!(
         "Ask someone experienced to help before enabling tools or exposing it to the internet."
@@ -590,14 +590,14 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     println!("Recommended baseline:");
     println!("- Pairing/allowlists + mention gating.");
     println!("- Sandbox + least-privilege tools.");
-    println!("- Keep secrets out of the agent’s reachable filesystem.");
+    println!("- Keep secrets out of the agentâ€™s reachable filesystem.");
     println!("- Use the strongest available model for any bot with tools or untrusted inboxes.");
     println!();
     println!("Run regularly:");
-    println!("krabkrab security audit --deep");
-    println!("krabkrab security audit --fix");
+    println!("openkrab security audit --deep");
+    println!("openkrab security audit --fix");
     println!();
-    println!("Must read: https://docs.openclaw.ai/gateway/security\n");
+    println!("Must read: https://docs.OpenKrab.ai/gateway/security\n");
 
     let ready = Confirm::with_theme(&theme)
         .with_prompt("I understand this is powerful and inherently risky. Continue?")
@@ -606,7 +606,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
 
     if !ready {
         println!(
-            "Onboarding cancelled. Run 'krabkrab onboard' when you're ready to accept the risks."
+            "Onboarding cancelled. Run 'openkrab onboard' when you're ready to accept the risks."
         );
         return Ok(config);
     }
@@ -614,9 +614,9 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     // Probe existing config
     let existing_cfg = config_io::load_config().ok();
     if let Some(cfg) = &existing_cfg {
-        println!("\n{}", "━".repeat(60));
+        println!("\n{}", "â”".repeat(60));
         println!("Existing config detected");
-        println!("{}", "━".repeat(60));
+        println!("{}", "â”".repeat(60));
 
         let ws = "none".to_string(); // Workspace might not be in config directly, or handled differently
         let port = cfg.gateway.as_ref().and_then(|g| g.port).unwrap_or(18789);
@@ -636,12 +636,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 1: PROFILE SELECTION
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("📋 STEP 1: Profile Selection");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ“‹ STEP 1: Profile Selection");
+    println!("{}", "â”".repeat(60));
     println!("Profiles allow you to have multiple configurations (e.g., work, personal).\n");
 
     config.profile = Input::with_theme(&theme)
@@ -649,12 +649,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         .default("default".to_string())
         .interact_text()?;
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 2: AGENT IDENTITY
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🤖 STEP 2: Agent Identity");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ¤– STEP 2: Agent Identity");
+    println!("{}", "â”".repeat(60));
     println!("Define your assistant's personality and how it identifies itself.\n");
 
     config.agent.name = Input::with_theme(&theme)
@@ -689,12 +689,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         );
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 3: LLM PROVIDER
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🧠 STEP 3: LLM Provider");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ§  STEP 3: LLM Provider");
+    println!("{}", "â”".repeat(60));
     println!("Select the AI model provider for conversations.\n");
 
     let llm_providers = vec![
@@ -768,7 +768,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         let has_env_key = std::env::var(env_var).is_ok();
 
         if has_env_key {
-            println!("✅ Found {} in environment", env_var);
+            println!("âœ… Found {} in environment", env_var);
             let use_env = Confirm::with_theme(&theme)
                 .with_prompt("Use the API key from environment?")
                 .default(true)
@@ -809,12 +809,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         );
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 3.5: AUTH PROFILES
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🔐 STEP 3.5: Auth Profile Setup");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ” STEP 3.5: Auth Profile Setup");
+    println!("{}", "â”".repeat(60));
     println!("Auth profiles allow you to manage multiple provider credentials.\n");
 
     let auth_type_options = vec![
@@ -853,7 +853,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
             {
                 println!("  macOS Keychain selected.");
                 println!(
-                    "  Run 'krabkrab auth store --provider {}' after onboarding.",
+                    "  Run 'openkrab auth store --provider {}' after onboarding.",
                     config.llm.provider
                 );
             }
@@ -861,7 +861,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
             {
                 println!("  Windows Credential Manager selected.");
                 println!(
-                    "  Run 'krabkrab auth store --provider {}' after onboarding.",
+                    "  Run 'openkrab auth store --provider {}' after onboarding.",
                     config.llm.provider
                 );
             }
@@ -873,12 +873,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         _ => {}
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 4: MEMORY CONFIGURATION
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("💾 STEP 4: Memory Configuration");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ’¾ STEP 4: Memory Configuration");
+    println!("{}", "â”".repeat(60));
     println!("Memory allows your assistant to remember past conversations and context.\n");
 
     config.memory.enabled = Confirm::with_theme(&theme)
@@ -914,12 +914,12 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         config.memory.provider = "disabled".to_string();
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 5: CHANNEL CONFIGURATION
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("📡 STEP 5: Channel Configuration");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ“¡ STEP 5: Channel Configuration");
+    println!("{}", "â”".repeat(60));
     println!("Select which messaging platforms to enable.\n");
 
     let channels = vec!["Telegram", "Slack", "Discord", "LINE", "WhatsApp"];
@@ -938,7 +938,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     for channel in &config.channels.enabled_channels {
         match channel.as_str() {
             "telegram" => {
-                println!("\n📱 Telegram Configuration:");
+                println!("\nðŸ“± Telegram Configuration:");
                 println!("   Get a bot token from @BotFather on Telegram.");
                 config.channels.telegram_token = Some(
                     Input::with_theme(&theme)
@@ -948,7 +948,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
                 );
             }
             "slack" => {
-                println!("\n💼 Slack Configuration:");
+                println!("\nðŸ’¼ Slack Configuration:");
                 println!("   Get a Bot User OAuth Token from your Slack App.");
                 config.channels.slack_token = Some(
                     Input::with_theme(&theme)
@@ -958,7 +958,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
                 );
             }
             "discord" => {
-                println!("\n🎮 Discord Configuration:");
+                println!("\nðŸŽ® Discord Configuration:");
                 println!("   Get a Bot Token from the Discord Developer Portal.");
                 config.channels.discord_token = Some(
                     Input::with_theme(&theme)
@@ -968,7 +968,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
                 );
             }
             "line" => {
-                println!("\n💚 LINE Configuration:");
+                println!("\nðŸ’š LINE Configuration:");
                 println!("   Get a Channel Access Token from LINE Developers Console.");
                 config.channels.line_token = Some(
                     Input::with_theme(&theme)
@@ -978,7 +978,7 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
                 );
             }
             "whatsapp" => {
-                println!("\n💬 WhatsApp Configuration:");
+                println!("\nðŸ’¬ WhatsApp Configuration:");
                 println!("   Enter your WhatsApp Business phone number ID.");
                 config.channels.whatsapp_phone = Some(
                     Input::with_theme(&theme)
@@ -992,27 +992,27 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
     }
 
     // Channel plugins info
-    println!("\n📦 Available channel plugins:");
+    println!("\nðŸ“¦ Available channel plugins:");
     println!("  Built-in:");
-    println!("    ✓ telegram   - Telegram messaging");
-    println!("    ✓ discord    - Discord server");
-    println!("    ✓ slack      - Slack workspace");
-    println!("    ✓ whatsapp   - WhatsApp Business");
-    println!("    ✓ line       - LINE messaging");
+    println!("    âœ“ telegram   - Telegram messaging");
+    println!("    âœ“ discord    - Discord server");
+    println!("    âœ“ slack      - Slack workspace");
+    println!("    âœ“ whatsapp   - WhatsApp Business");
+    println!("    âœ“ line       - LINE messaging");
     println!("  Additional:");
-    println!("    ○ matrix     - Matrix protocol");
-    println!("    ○ signal     - Signal messaging");
-    println!("    ○ imessage   - Apple Messages");
+    println!("    â—‹ matrix     - Matrix protocol");
+    println!("    â—‹ signal     - Signal messaging");
+    println!("    â—‹ imessage   - Apple Messages");
     println!();
-    println!("  Plugin registry: https://clawdhub.com");
-    println!("  Install more: krabkrab channels install <plugin>");
+    println!("  Plugin registry: https://Krabdhub.com");
+    println!("  Install more: openkrab channels install <plugin>");
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 6: DASHBOARD CONFIGURATION
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("📊 STEP 6: Dashboard Configuration");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ“Š STEP 6: Dashboard Configuration");
+    println!("{}", "â”".repeat(60));
     println!("The web dashboard provides a UI for monitoring and control.\n");
 
     config.dashboard.enabled = Confirm::with_theme(&theme)
@@ -1027,17 +1027,17 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
             .interact_text()?;
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 7: SAVE CONFIGURATION
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("💾 STEP 7: Save Configuration");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ’¾ STEP 7: Save Configuration");
+    println!("{}", "â”".repeat(60));
 
     // Determine config path
     let config_dir = dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("krabkrab");
+        .join("openkrab");
 
     let default_path = config_dir.join(format!("{}.toml", config.profile));
     config.config_path = default_path.to_string_lossy().to_string();
@@ -1061,63 +1061,63 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
 
         match std::fs::write(&config.config_path, &toml_content) {
             Ok(_) => {
-                println!("\n✅ Configuration saved successfully!");
+                println!("\nâœ… Configuration saved successfully!");
                 println!("\nGenerated configuration:\n");
-                println!("{}", "─".repeat(50));
+                println!("{}", "â”€".repeat(50));
                 println!("{}", toml_content);
-                println!("{}", "─".repeat(50));
+                println!("{}", "â”€".repeat(50));
             }
             Err(e) => {
-                println!("\n❌ Failed to save configuration: {}", e);
+                println!("\nâŒ Failed to save configuration: {}", e);
                 println!("\nHere's your configuration to save manually:\n");
-                println!("{}", "─".repeat(50));
+                println!("{}", "â”€".repeat(50));
                 println!("{}", toml_content);
-                println!("{}", "─".repeat(50));
+                println!("{}", "â”€".repeat(50));
             }
         }
     } else {
         println!("\nConfiguration not saved. Here's a preview:\n");
         let toml_content = generate_toml_config(&config);
-        println!("{}", "─".repeat(50));
+        println!("{}", "â”€".repeat(50));
         println!("{}", toml_content);
-        println!("{}", "─".repeat(50));
+        println!("{}", "â”€".repeat(50));
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 8: WORKSPACE SETUP
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("📁 STEP 8: Workspace Setup");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ“ STEP 8: Workspace Setup");
+    println!("{}", "â”".repeat(60));
 
     let home = dirs::home_dir().unwrap_or_else(|| std::path::PathBuf::from("."));
     let base_dir = home.join(".openkrab");
-    let workspace_dir = base_dir.join("krabkrab-workspace");
+    let workspace_dir = base_dir.join("openkrab-workspace");
     let sessions_dir = base_dir.join("sessions");
 
     // Create workspace directory
     if let Err(e) = std::fs::create_dir_all(&workspace_dir) {
-        println!("  ⚠️  Could not create workspace: {}", e);
+        println!("  âš ï¸  Could not create workspace: {}", e);
     } else {
-        println!("  ✅ Workspace created: {}", workspace_dir.display());
+        println!("  âœ… Workspace created: {}", workspace_dir.display());
     }
 
     // Create sessions directory
     if let Err(e) = std::fs::create_dir_all(&sessions_dir) {
-        println!("  ⚠️  Could not create sessions dir: {}", e);
+        println!("  âš ï¸  Could not create sessions dir: {}", e);
     } else {
         println!(
-            "  ✅ Sessions directory created: {}",
+            "  âœ… Sessions directory created: {}",
             sessions_dir.display()
         );
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 9: BOOTSTRAP SETUP
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🐣 STEP 9: Bootstrap Message");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ£ STEP 9: Bootstrap Message");
+    println!("{}", "â”".repeat(60));
     println!("Set a message to wake up your agent on first launch.\n");
 
     let use_bootstrap = Confirm::with_theme(&theme)
@@ -1134,43 +1134,43 @@ pub fn onboard_wizard() -> anyhow::Result<OnboardingConfig> {
         // Save bootstrap to workspace
         let bootstrap_file = workspace_dir.join("bootstrap.txt");
         if let Err(e) = std::fs::write(&bootstrap_file, &bootstrap_message) {
-            println!("  ⚠️  Could not save bootstrap: {}", e);
+            println!("  âš ï¸  Could not save bootstrap: {}", e);
         } else {
-            println!("  ✅ Bootstrap message saved");
+            println!("  âœ… Bootstrap message saved");
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 10: SKILLS SETUP
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🧩 STEP 10: Skills Setup");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ§© STEP 10: Skills Setup");
+    println!("{}", "â”".repeat(60));
 
     let skills_dir = base_dir.join("skills");
     if let Err(e) = std::fs::create_dir_all(&skills_dir) {
-        println!("  ⚠️  Could not create skills dir: {}", e);
+        println!("  âš ï¸  Could not create skills dir: {}", e);
     } else {
-        println!("  ✅ Skills directory created: {}", skills_dir.display());
+        println!("  âœ… Skills directory created: {}", skills_dir.display());
     }
 
     println!("\n  Skills can extend your agent's capabilities.");
     println!("  Add skills by placing skill files in the skills directory.");
-    println!("  Learn more: https://docs.openclaw.ai/tools/skills\n");
+    println!("  Learn more: https://docs.OpenKrab.ai/tools/skills\n");
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 11: HOOKS SETUP
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🪝 STEP 11: Internal Hooks Setup");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸª STEP 11: Internal Hooks Setup");
+    println!("{}", "â”".repeat(60));
     println!("Hooks allow your agent to respond to specific events.\n");
 
     let hooks_dir = base_dir.join("hooks");
     if let Err(e) = std::fs::create_dir_all(&hooks_dir) {
-        println!("  ⚠️  Could not create hooks dir: {}", e);
+        println!("  âš ï¸  Could not create hooks dir: {}", e);
     } else {
-        println!("  ✅ Hooks directory created: {}", hooks_dir.display());
+        println!("  âœ… Hooks directory created: {}", hooks_dir.display());
     }
 
     // Create default hooks
@@ -1185,9 +1185,9 @@ fn on_new_session(session: &Session) {
 }
 "#;
         if let Err(e) = std::fs::write(&new_session_hook, default_hook) {
-            println!("  ⚠️  Could not create default hook: {}", e);
+            println!("  âš ï¸  Could not create default hook: {}", e);
         } else {
-            println!("  ✅ Default session hook created");
+            println!("  âœ… Default session hook created");
         }
     }
 
@@ -1196,18 +1196,18 @@ fn on_new_session(session: &Session) {
     println!("  - on_message: Triggered on every message");
     println!("  - on_tool_call: Triggered when a tool is called\n");
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 12: GATEWAY SERVICE INSTALL
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("⚙️  STEP 12: Gateway Service Setup");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("âš™ï¸  STEP 12: Gateway Service Setup");
+    println!("{}", "â”".repeat(60));
 
     #[cfg(target_os = "windows")]
     {
         println!("Windows detected.");
         println!("Gateway service on Windows requires manual setup.");
-        println!("Run 'krabkrab gateway start' to start the gateway.\n");
+        println!("Run 'openkrab gateway start' to start the gateway.\n");
     }
 
     #[cfg(target_os = "macos")]
@@ -1220,8 +1220,8 @@ fn on_new_session(session: &Session) {
         if install_service {
             println!("\n  macOS service setup:");
             println!("  To install manually, run:");
-            println!("    brew services start krabkrab");
-            println!("  Or use: krabkrab gateway start");
+            println!("    brew services start openkrab");
+            println!("  Or use: openkrab gateway start");
         }
     }
 
@@ -1235,18 +1235,18 @@ fn on_new_session(session: &Session) {
         if install_service {
             println!("\n  Linux service setup:");
             println!("  To install manually, run:");
-            println!("    sudo systemctl enable krabkrab");
-            println!("    sudo systemctl start krabkrab");
-            println!("  Or use: krabkrab gateway start");
+            println!("    sudo systemctl enable openkrab");
+            println!("    sudo systemctl start openkrab");
+            println!("  Or use: openkrab gateway start");
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // STEP 13: GATEWAY TOKEN GENERATION
-    // ─────────────────────────────────────────────────────────────────────
-    println!("\n{}", "━".repeat(60));
-    println!("🔑 STEP 13: Gateway Token Setup");
-    println!("{}", "━".repeat(60));
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    println!("\n{}", "â”".repeat(60));
+    println!("ðŸ”‘ STEP 13: Gateway Token Setup");
+    println!("{}", "â”".repeat(60));
 
     let generate_token = Confirm::with_theme(&theme)
         .with_prompt("Generate a secure gateway token? (recommended)")
@@ -1255,7 +1255,7 @@ fn on_new_session(session: &Session) {
 
     let gateway_token = if generate_token {
         let token = generate_gateway_token();
-        println!("  ✅ Generated gateway token: {}...", &token[..8]);
+        println!("  âœ… Generated gateway token: {}...", &token[..8]);
         println!("  Token will be saved to configuration.");
         Some(token)
     } else {
@@ -1278,12 +1278,12 @@ fn on_new_session(session: &Session) {
     // Save token to credentials directory
     if let Some(token) = &gateway_token {
         save_gateway_token(token)?;
-        println!("  ✅ Token saved to ~/.openkrab/credentials/gateway_token");
+        println!("  âœ… Token saved to ~/.openkrab/credentials/gateway_token");
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // COMPLETION
-    // ─────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let _hatch_choice = print_completion_banner_and_choice(&config)?;
 
     // Try to check gateway health if it's running
@@ -1301,16 +1301,16 @@ fn handle_reset_scope(scope: &ResetScope) -> anyhow::Result<()> {
     let base_dir = home.join(".openkrab");
     let credentials = base_dir.join("credentials");
     let sessions = base_dir.join("sessions");
-    let workspace = base_dir.join("krabkrab-workspace");
+    let workspace = base_dir.join("openkrab-workspace");
 
-    println!("\n🔄 Resetting configuration...");
+    println!("\nðŸ”„ Resetting configuration...");
 
     match scope {
         ResetScope::Config => {
             if let Ok(_cfg) = config_io::load_config() {
                 if let Some(path) = config_io::resolve_config_path().ok() {
                     std::fs::remove_file(&path).ok();
-                    println!("  ✅ Removed config file: {}", path.display());
+                    println!("  âœ… Removed config file: {}", path.display());
                 }
             }
         }
@@ -1324,12 +1324,12 @@ fn handle_reset_scope(scope: &ResetScope) -> anyhow::Result<()> {
             // Credentials
             if credentials.exists() {
                 std::fs::remove_dir_all(&credentials).ok();
-                println!("  ✅ Removed credentials dir");
+                println!("  âœ… Removed credentials dir");
             }
             // Sessions
             if sessions.exists() {
                 std::fs::remove_dir_all(&sessions).ok();
-                println!("  ✅ Removed sessions dir");
+                println!("  âœ… Removed sessions dir");
             }
         }
         ResetScope::Full => {
@@ -1342,22 +1342,22 @@ fn handle_reset_scope(scope: &ResetScope) -> anyhow::Result<()> {
             // Credentials
             if credentials.exists() {
                 std::fs::remove_dir_all(&credentials).ok();
-                println!("  ✅ Removed credentials dir");
+                println!("  âœ… Removed credentials dir");
             }
             // Sessions
             if sessions.exists() {
                 std::fs::remove_dir_all(&sessions).ok();
-                println!("  ✅ Removed sessions dir");
+                println!("  âœ… Removed sessions dir");
             }
             // Workspace
             if workspace.exists() {
                 std::fs::remove_dir_all(&workspace).ok();
-                println!("  ✅ Removed workspace dir");
+                println!("  âœ… Removed workspace dir");
             }
         }
     }
 
-    println!("  ✅ Reset complete.\n");
+    println!("  âœ… Reset complete.\n");
     Ok(())
 }
 
@@ -1366,7 +1366,7 @@ fn check_gateway_health(_config: &OnboardingConfig) {
     let port = 18789u16;
     let url = format!("http://127.0.0.1:{}/health", port);
 
-    println!("\n🔍 Checking gateway health...");
+    println!("\nðŸ” Checking gateway health...");
 
     let client = reqwest::blocking::Client::builder()
         .timeout(std::time::Duration::from_secs(3))
@@ -1376,16 +1376,16 @@ fn check_gateway_health(_config: &OnboardingConfig) {
         Ok(c) => {
             if let Ok(resp) = c.get(&url).send() {
                 if resp.status().is_success() {
-                    println!("  ✅ Gateway is running and healthy!");
+                    println!("  âœ… Gateway is running and healthy!");
                     return;
                 }
             }
-            println!("  ⚠️  Gateway not reachable at http://127.0.0.1:{}", port);
-            println!("     Start it with: krabkrab gateway start");
+            println!("  âš ï¸  Gateway not reachable at http://127.0.0.1:{}", port);
+            println!("     Start it with: openkrab gateway start");
         }
         Err(_) => {
-            println!("  ⚠️  Could not connect to gateway");
-            println!("     Start it with: krabkrab gateway start");
+            println!("  âš ï¸  Could not connect to gateway");
+            println!("     Start it with: openkrab gateway start");
         }
     }
 }
@@ -1499,9 +1499,9 @@ fn load_gateway_token() -> anyhow::Result<String> {
     Ok(content.trim().to_string())
 }
 
-/// Setup shell completion for krabkrab
+/// Setup shell completion for openkrab
 fn setup_shell_completion() -> anyhow::Result<()> {
-    println!("\n{}", "🐚 Setting up shell completion...");
+    println!("\n{}", "ðŸš Setting up shell completion...");
 
     let shell = std::env::var("SHELL")
         .ok()
@@ -1519,15 +1519,15 @@ fn setup_shell_completion() -> anyhow::Result<()> {
         .unwrap_or("unknown");
 
     if shell == "unknown" {
-        println!("  ⚠️  Could not detect shell. Skipping completion setup.");
+        println!("  âš ï¸  Could not detect shell. Skipping completion setup.");
         println!("  To set up manually, run:");
-        println!("    krabkrab completion --shell <bash|zsh|fish>");
+        println!("    openkrab completion --shell <bash|zsh|fish>");
         return Ok(());
     }
 
-    println!("  ✅ Shell completion available for {}", shell);
+    println!("  âœ… Shell completion available for {}", shell);
     println!("  To enable, add to your shell config:");
-    println!("    source $(krabkrab completion --shell {})", shell);
+    println!("    source $(openkrab completion --shell {})", shell);
 
     Ok(())
 }
@@ -1535,12 +1535,12 @@ fn setup_shell_completion() -> anyhow::Result<()> {
 /// Print the welcome banner
 fn print_welcome_banner() {
     println!();
-    println!("{}", "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄");
-    println!("{}", "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██");
-    println!("{}", "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██");
-    println!("{}", "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██");
-    println!("{}", "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀");
-    println!("{}", "                  🦀 OPENKRAB 🦀                    ");
+    println!("{}", "â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„");
+    println!("{}", "â–ˆâ–ˆâ–‘â–„â–„â–„â–‘â–ˆâ–ˆâ–‘â–„â–„â–‘â–ˆâ–ˆâ–‘â–„â–„â–„â–ˆâ–ˆâ–‘â–€â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–‘â–„â–„â–€â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–ˆâ–ˆâ–‘â–„â–„â–€â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–ˆâ–‘â–ˆâ–ˆ");
+    println!("{}", "â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–ˆâ–‘â–ˆâ–ˆâ–‘â–€â–€â–‘â–ˆâ–ˆâ–‘â–„â–„â–„â–ˆâ–ˆâ–‘â–ˆâ–‘â–ˆâ–‘â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–‘â–ˆâ–ˆâ–ˆâ–ˆâ–‘â–€â–€â–‘â–ˆâ–ˆâ–‘â–ˆâ–‘â–ˆâ–‘â–ˆâ–ˆ");
+    println!("{}", "â–ˆâ–ˆâ–‘â–€â–€â–€â–‘â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–‘â–€â–€â–€â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–„â–‘â–ˆâ–ˆâ–‘â–€â–€â–„â–ˆâ–ˆâ–‘â–€â–€â–‘â–ˆâ–‘â–ˆâ–ˆâ–‘â–ˆâ–ˆâ–„â–€â–„â–€â–„â–ˆâ–ˆ");
+    println!("{}", "â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€");
+    println!("{}", "                  ðŸ¦€ OPENKRAB ðŸ¦€                    ");
     println!();
 }
 
@@ -1553,17 +1553,17 @@ pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::
     let token_display = gateway_token.as_ref().map(|t| t.as_str());
 
     println!();
-    println!("{}", "════════════════════════════════════════════════════");
+    println!("{}", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
     println!("{}", "Onboarding complete!");
-    println!("{}", "════════════════════════════════════════════════════");
+    println!("{}", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
     println!();
     println!("Next steps:");
     println!();
     println!("  1. Review your configuration:");
-    println!("     krabkrab config show");
+    println!("     openkrab config show");
     println!();
     println!("  2. Start the daemon:");
-    println!("     krabkrab gateway start");
+    println!("     openkrab gateway start");
     println!();
     println!("  3. Open the dashboard:");
     if config.dashboard.enabled {
@@ -1580,38 +1580,38 @@ pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::
     println!("  4. Gateway token:");
     if let Some(token) = token_display {
         println!("     Token: {}", token);
-        println!("     View: krabkrab config get gateway.auth.token");
+        println!("     View: openkrab config get gateway.auth.token");
     } else {
-        println!("     Generate: krabkrab doctor --generate-gateway-token");
+        println!("     Generate: openkrab doctor --generate-gateway-token");
     }
     println!();
     println!("  5. Test your agent:");
-    println!("     krabkrab ask \"Hello, {}!\"", config.agent.name);
+    println!("     openkrab ask \"Hello, {}!\"", config.agent.name);
     println!();
 
     // Optional apps
-    println!("{}", "━".repeat(60));
-    println!("📱 Optional Apps");
-    println!("{}", "━".repeat(60));
+    println!("{}", "â”".repeat(60));
+    println!("ðŸ“± Optional Apps");
+    println!("{}", "â”".repeat(60));
     println!("Add nodes for extra features:");
     println!("  - macOS app (system + notifications)");
     println!("  - iOS app (camera/canvas)");
     println!("  - Android app (camera/canvas)");
-    println!("Learn more: https://docs.openclaw.ai/nodes");
+    println!("Learn more: https://docs.OpenKrab.ai/nodes");
     println!();
 
     // Control UI info
-    println!("{}", "━".repeat(60));
-    println!("🌐 Control UI");
-    println!("{}", "━".repeat(60));
-    println!("Docs: https://docs.openclaw.ai/web/control-ui");
-    println!("Open anytime: krabkrab dashboard --no-open");
+    println!("{}", "â”".repeat(60));
+    println!("ðŸŒ Control UI");
+    println!("{}", "â”".repeat(60));
+    println!("Docs: https://docs.OpenKrab.ai/web/control-ui");
+    println!("Open anytime: openkrab dashboard --no-open");
     println!();
 
     // Hatch choice
-    println!("{}", "━".repeat(60));
-    println!("🐣 How do you want to start your agent?");
-    println!("{}", "━".repeat(60));
+    println!("{}", "â”".repeat(60));
+    println!("ðŸ£ How do you want to start your agent?");
+    println!("{}", "â”".repeat(60));
 
     let hatch_options = vec!["Launch TUI (recommended)", "Open Web UI", "Do this later"];
 
@@ -1630,39 +1630,39 @@ pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::
     // Handle user choice
     match choice {
         "tui" => {
-            println!("\n🐣 Launching TUI...");
+            println!("\nðŸ£ Launching TUI...");
             println!("   Starting your agent with: 'Wake up, my friend!'\n");
 
             // Try to launch TUI
             #[cfg(target_os = "windows")]
             {
                 std::process::Command::new("cmd")
-                    .args(["/c", "start", "krabkrab", "tui"])
+                    .args(["/c", "start", "openkrab", "tui"])
                     .spawn()
                     .ok();
             }
             #[cfg(target_os = "macos")]
             {
                 std::process::Command::new("open")
-                    .args(["-a", "Terminal", "--args", "-c", "krabkrab tui"])
+                    .args(["-a", "Terminal", "--args", "-c", "openkrab tui"])
                     .spawn()
                     .ok();
             }
             #[cfg(target_os = "linux")]
             {
                 std::process::Command::new("x-terminal-emulator")
-                    .args(["-e", "krabkrab tui"])
+                    .args(["-e", "openkrab tui"])
                     .spawn()
                     .ok();
             }
 
             // Fallback: show instructions
             println!("   If TUI didn't start, run manually:");
-            println!("   krabkrab tui");
+            println!("   openkrab tui");
         }
         "web" => {
             let url = format!("http://{}", config.dashboard.bind);
-            println!("\n🌐 Opening Web UI...");
+            println!("\nðŸŒ Opening Web UI...");
 
             #[cfg(target_os = "windows")]
             std::process::Command::new("cmd")
@@ -1681,7 +1681,7 @@ pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::
     }
 
     println!();
-    println!("For more help, run: krabkrab --help");
+    println!("For more help, run: openkrab --help");
     println!();
 
     Ok(choice.to_string())
@@ -1691,7 +1691,7 @@ pub fn print_completion_banner_and_choice(config: &OnboardingConfig) -> anyhow::
 fn generate_toml_config(config: &OnboardingConfig) -> String {
     let mut lines = vec![];
 
-    lines.push("# krabkrab Configuration".to_string());
+    lines.push("# openkrab Configuration".to_string());
     lines.push(format!(
         "# Generated by onboarding wizard on {}",
         chrono::Local::now().format("%Y-%m-%d %H:%M:%S")
@@ -1792,12 +1792,12 @@ pub fn onboard_quick() -> anyhow::Result<OnboardingConfig> {
     let theme = ColorfulTheme::default();
     let mut config = OnboardingConfig::default();
 
-    println!("🦀 krabkrab Quick Setup\n");
+    println!("ðŸ¦€ openkrab Quick Setup\n");
 
     // Just ask for essentials
     config.agent.name = Input::with_theme(&theme)
         .with_prompt("Agent name")
-        .default("krabkrab".to_string())
+        .default("openkrab".to_string())
         .interact_text()?;
 
     let llm_providers = vec!["OpenAI", "Anthropic", "Google", "Ollama"];
@@ -1826,7 +1826,7 @@ pub fn onboard_quick() -> anyhow::Result<OnboardingConfig> {
 
     if let Some(var) = env_var {
         if std::env::var(var).is_ok() {
-            println!("✅ Found {} in environment", var);
+            println!("âœ… Found {} in environment", var);
         } else {
             config.llm.api_key = Some(
                 Input::with_theme(&theme)
@@ -1840,7 +1840,7 @@ pub fn onboard_quick() -> anyhow::Result<OnboardingConfig> {
     // Save configuration
     let config_dir = dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("krabkrab");
+        .join("openkrab");
 
     let config_path = config_dir.join("default.toml");
     config.config_path = config_path.to_string_lossy().to_string();
@@ -1852,7 +1852,7 @@ pub fn onboard_quick() -> anyhow::Result<OnboardingConfig> {
     let toml_content = generate_toml_config(&config);
     std::fs::write(&config_path, &toml_content)?;
 
-    println!("\n✅ Quick setup complete! Run 'krabkrab onboard' for full configuration.");
+    println!("\nâœ… Quick setup complete! Run 'openkrab onboard' for full configuration.");
 
     Ok(config)
 }
@@ -1865,7 +1865,7 @@ mod tests {
     fn test_default_config() {
         let config = OnboardingConfig::default();
         assert_eq!(config.profile, "default");
-        assert_eq!(config.agent.name, "krabkrab");
+        assert_eq!(config.agent.name, "openkrab");
         assert!(config.memory.enabled);
         assert!(config.dashboard.enabled);
     }
@@ -1880,3 +1880,6 @@ mod tests {
         assert!(toml.contains("[dashboard]"));
     }
 }
+
+
+

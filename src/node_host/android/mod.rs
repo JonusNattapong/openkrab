@@ -1,4 +1,4 @@
-//! Android Native Module for node_host
+﻿//! Android Native Module for node_host
 //!
 //! This module provides Kotlin-based native functionality for Android devices:
 //! - Camera snap (photo capture)
@@ -123,7 +123,7 @@ import androidx.core.content.ContextCompat
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
-class KrabKrabCameraHandler(private val context: Context) {
+class openkrabCameraHandler(private val context: Context) {
     
     private var cameraDevice: CameraDevice? = null
     private var captureSession: CameraCaptureSession? = null
@@ -153,7 +153,7 @@ class KrabKrabCameraHandler(private val context: Context) {
         payload.put("height", getCaptureSize(quality).height)
         payload.put(
             "data",
-            Base64.encodeToString("krabkrab-camera".toByteArray(), Base64.NO_WRAP)
+            Base64.encodeToString("openkrab-camera".toByteArray(), Base64.NO_WRAP)
         )
         callback(Result.success(payload))
     }
@@ -213,7 +213,7 @@ import android.os.Looper
 import java.io.File
 import org.json.JSONObject
 
-class KrabKrabScreenRecordHandler(private val context: Context) {
+class openkrabScreenRecordHandler(private val context: Context) {
     
     private var mediaProjection: MediaProjection? = null
     private var isRecording = false
@@ -302,7 +302,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import org.json.JSONObject
 
-class KrabKrabLocationHandler(private val context: Context) {
+class openkrabLocationHandler(private val context: Context) {
     
     private val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
@@ -414,11 +414,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import org.json.JSONObject
 
-class KrabKrabNotificationHandler(private val context: Context) {
+class openkrabNotificationHandler(private val context: Context) {
     
     companion object {
-        const val CHANNEL_ID = "krabkrab_notifications"
-        const val CHANNEL_NAME = "KrabKrab Notifications"
+        const val CHANNEL_ID = "OPENKRAB_NOTIFICATIONS"
+        const val CHANNEL_NAME = "openkrab Notifications"
     }
     
     init {
@@ -485,7 +485,7 @@ class KrabKrabNotificationHandler(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
-                description = "Notifications from KrabKrab agent"
+                description = "Notifications from openkrab agent"
             }
             
             val notificationManager = 
@@ -523,3 +523,5 @@ pub fn generate_all_kotlin() -> String {
         kotlin::notification_handler_kotlin()
     )
 }
+
+

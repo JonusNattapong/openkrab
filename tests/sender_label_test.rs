@@ -1,4 +1,4 @@
-use krabkrab::channels::sender_label::*;
+use openkrab::channels::sender_label::*;
 
 #[test]
 fn test_resolve_sender_label_display_and_id() {
@@ -38,3 +38,4 @@ fn test_list_sender_label_candidates_includes_resolved() {
     let list = list_sender_label_candidates(&params);
     assert!(list.iter().any(|s| s == "Bob (+999)" || s == "Bob"));
 }
+

@@ -1,9 +1,9 @@
----
+﻿---
 title: IRC
-description: Connect openkrab to IRC channels and direct messages.
+description: Connect OpenKrab to IRC channels and direct messages.
 ---
 
-Use IRC when you want openkrab in classic channels (`#room`) and direct messages.
+Use IRC when you want OpenKrab in classic channels (`#room`) and direct messages.
 IRC ships as an extension plugin, but it is configured in the main config under `channels.irc`.
 
 ## Quick start
@@ -28,8 +28,7 @@ IRC ships as an extension plugin, but it is configured in the main config under 
 
 3. Start/restart gateway:
 
-```bash
-openkrab gateway run
+```bash\nOpenKrab gateway run
 ```
 
 ## Security defaults
@@ -41,7 +40,7 @@ openkrab gateway run
 
 ## Access control
 
-There are two separate “gates” for IRC channels:
+There are two separate â€œgatesâ€ for IRC channels:
 
 1. **Channel access** (`groupPolicy` + `groups`): whether the bot accepts messages from a channel at all.
 2. **Sender access** (`groupAllowFrom` / per-channel `groups["#channel"].allowFrom`): who is allowed to trigger the bot inside that channel.
@@ -61,7 +60,7 @@ If you see logs like:
 
 - `irc: drop group sender alice!ident@host (policy=allowlist)`
 
-…it means the sender wasn’t allowed for **group/channel** messages. Fix it by either:
+â€¦it means the sender wasnâ€™t allowed for **group/channel** messages. Fix it by either:
 
 - setting `channels.irc.groupAllowFrom` (global for all channels), or
 - setting per-channel sender allowlists: `channels.irc.groups["#channel"].allowFrom`
@@ -83,9 +82,9 @@ Example (allow anyone in `#tuirc-dev` to talk to the bot):
 
 ## Reply triggering (mentions)
 
-Even if a channel is allowed (via `groupPolicy` + `groups`) and the sender is allowed, openkrab defaults to **mention-gating** in group contexts.
+Even if a channel is allowed (via `groupPolicy` + `groups`) and the sender is allowed, OpenKrab defaults to **mention-gating** in group contexts.
 
-That means you may see logs like `drop channel … (missing-mention)` unless the message includes a mention pattern that matches the bot.
+That means you may see logs like `drop channel â€¦ (missing-mention)` unless the message includes a mention pattern that matches the bot.
 
 To make the bot reply in an IRC channel **without needing a mention**, disable mention gating for that channel:
 
@@ -232,3 +231,4 @@ Default account supports:
 - If the bot connects but never replies in channels, verify `channels.irc.groups` **and** whether mention-gating is dropping messages (`missing-mention`). If you want it to reply without pings, set `requireMention:false` for the channel.
 - If login fails, verify nick availability and server password.
 - If TLS fails on a custom network, verify host/port and certificate setup.
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Agent-controlled Canvas panel embedded via WKWebView + custom URL scheme"
 read_when:
   - Implementing the macOS Canvas panel
@@ -9,7 +9,7 @@ title: "Canvas"
 
 # Canvas (macOS app)
 
-The macOS app embeds an agent‑controlled **Canvas panel** using `WKWebView`. It
+The macOS app embeds an agentâ€‘controlled **Canvas panel** using `WKWebView`. It
 is a lightweight visual workspace for HTML/CSS/JS, A2UI, and small interactive
 UI surfaces.
 
@@ -25,20 +25,20 @@ The Canvas panel serves those files via a **custom URL scheme**:
 
 Examples:
 
-- `OpenKrab-canvas://main/` → `<canvasRoot>/main/index.html`
-- `OpenKrab-canvas://main/assets/app.css` → `<canvasRoot>/main/assets/app.css`
-- `OpenKrab-canvas://main/widgets/todo/` → `<canvasRoot>/main/widgets/todo/index.html`
+- `OpenKrab-canvas://main/` â†’ `<canvasRoot>/main/index.html`
+- `OpenKrab-canvas://main/assets/app.css` â†’ `<canvasRoot>/main/assets/app.css`
+- `OpenKrab-canvas://main/widgets/todo/` â†’ `<canvasRoot>/main/widgets/todo/index.html`
 
-If no `index.html` exists at the root, the app shows a **built‑in scaffold page**.
+If no `index.html` exists at the root, the app shows a **builtâ€‘in scaffold page**.
 
 ## Panel behavior
 
 - Borderless, resizable panel anchored near the menu bar (or mouse cursor).
 - Remembers size/position per session.
-- Auto‑reloads when local canvas files change.
+- Autoâ€‘reloads when local canvas files change.
 - Only one Canvas panel is visible at a time (session is switched as needed).
 
-Canvas can be disabled from Settings → **Allow Canvas**. When disabled, canvas
+Canvas can be disabled from Settings â†’ **Allow Canvas**. When disabled, canvas
 node commands return `CANVAS_DISABLED`.
 
 ## Agent API surface
@@ -67,18 +67,18 @@ Notes:
 ## A2UI in Canvas
 
 A2UI is hosted by the Gateway canvas host and rendered inside the Canvas panel.
-When the Gateway advertises a Canvas host, the macOS app auto‑navigates to the
+When the Gateway advertises a Canvas host, the macOS app autoâ€‘navigates to the
 A2UI host page on first open.
 
 Default A2UI host URL:
 
 ```
-http://<gateway-host>:18789/__OpenKrab__/a2ui/
+http://<gateway-host>:18789/__OPENKRAB__/a2ui/
 ```
 
 ### A2UI commands (v0.8)
 
-Canvas currently accepts **A2UI v0.8** server→client messages:
+Canvas currently accepts **A2UI v0.8** serverâ†’client messages:
 
 - `beginRendering`
 - `surfaceUpdate`
@@ -123,4 +123,5 @@ The app prompts for confirmation unless a valid key is provided.
 - Canvas scheme blocks directory traversal; files must live under the session root.
 - Local Canvas content uses a custom scheme (no loopback server required).
 - External `http(s)` URLs are allowed only when explicitly navigated.
+
 

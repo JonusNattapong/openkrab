@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 配对或重新连接 Android 节点
-  - 调试 Android Gateway 网关发现或认证
-  - 验证跨客户端的聊天历史一致性
-summary: Android 应用（节点）：连接操作手册 + Canvas/Chat/Camera
-title: Android 应用
+  - é…å¯¹æˆ–é‡æ–°è¿žæŽ¥ Android èŠ‚ç‚¹
+  - è°ƒè¯• Android Gateway ç½‘å…³å‘çŽ°æˆ–è®¤è¯
+  - éªŒè¯è·¨å®¢æˆ·ç«¯çš„èŠå¤©åŽ†å²ä¸€è‡´æ€§
+summary: Android åº”ç”¨ï¼ˆèŠ‚ç‚¹ï¼‰ï¼šè¿žæŽ¥æ“ä½œæ‰‹å†Œ + Canvas/Chat/Camera
+title: Android åº”ç”¨
 x-i18n:
   generated_at: "2026-02-03T07:51:34Z"
   model: claude-opus-4-5
@@ -14,143 +14,144 @@ x-i18n:
   workflow: 15
 ---
 
-# Android 应用（节点）
+# Android åº”ç”¨ï¼ˆèŠ‚ç‚¹ï¼‰
 
-## 支持概览
+## æ”¯æŒæ¦‚è§ˆ
 
-- 角色：配套节点应用（Android 不托管 Gateway 网关）。
-- 需要 Gateway 网关：是（在 macOS、Linux 或通过 WSL2 的 Windows 上运行）。
-- 安装：[入门指南](/start/getting-started) + [配对](/gateway/pairing)。
-- Gateway 网关：[操作手册](/gateway) + [配置](/gateway/configuration)。
-  - 协议：[Gateway 网关协议](/gateway/protocol)（节点 + 控制平面）。
+- è§’è‰²ï¼šé…å¥—èŠ‚ç‚¹åº”ç”¨ï¼ˆAndroid ä¸æ‰˜ç®¡ Gateway ç½‘å…³ï¼‰ã€‚
+- éœ€è¦ Gateway ç½‘å…³ï¼šæ˜¯ï¼ˆåœ¨ macOSã€Linux æˆ–é€šè¿‡ WSL2 çš„ Windows ä¸Šè¿è¡Œï¼‰ã€‚
+- å®‰è£…ï¼š[å…¥é—¨æŒ‡å—](/start/getting-started) + [é…å¯¹](/gateway/pairing)ã€‚
+- Gateway ç½‘å…³ï¼š[æ“ä½œæ‰‹å†Œ](/gateway) + [é…ç½®](/gateway/configuration)ã€‚
+  - åè®®ï¼š[Gateway ç½‘å…³åè®®](/gateway/protocol)ï¼ˆèŠ‚ç‚¹ + æŽ§åˆ¶å¹³é¢ï¼‰ã€‚
 
-## 系统控制
+## ç³»ç»ŸæŽ§åˆ¶
 
-系统控制（launchd/systemd）位于 Gateway 网关主机上。参见 [Gateway 网关](/gateway)。
+ç³»ç»ŸæŽ§åˆ¶ï¼ˆlaunchd/systemdï¼‰ä½äºŽ Gateway ç½‘å…³ä¸»æœºä¸Šã€‚å‚è§ [Gateway ç½‘å…³](/gateway)ã€‚
 
-## 连接操作手册
+## è¿žæŽ¥æ“ä½œæ‰‹å†Œ
 
-Android 节点应用 ⇄（mDNS/NSD + WebSocket）⇄ **Gateway 网关**
+Android èŠ‚ç‚¹åº”ç”¨ â‡„ï¼ˆmDNS/NSD + WebSocketï¼‰â‡„ **Gateway ç½‘å…³**
 
-Android 直接连接到 Gateway 网关 WebSocket（默认 `ws://<host>:18789`）并使用 Gateway 网关拥有的配对。
+Android ç›´æŽ¥è¿žæŽ¥åˆ° Gateway ç½‘å…³ WebSocketï¼ˆé»˜è®¤ `ws://<host>:18789`ï¼‰å¹¶ä½¿ç”¨ Gateway ç½‘å…³æ‹¥æœ‰çš„é…å¯¹ã€‚
 
-### 前置条件
+### å‰ç½®æ¡ä»¶
 
-- 你可以在"主"机器上运行 Gateway 网关。
-- Android 设备/模拟器可以访问 Gateway 网关 WebSocket：
-  - 使用 mDNS/NSD 的同一局域网，**或**
-  - 使用 Wide-Area Bonjour / unicast DNS-SD 的同一 Tailscale tailnet（见下文），**或**
-  - 手动 Gateway 网关主机/端口（回退方案）
-- 你可以在 Gateway 网关机器上运行 CLI（`OpenKrab`）（或通过 SSH）。
+- ä½ å¯ä»¥åœ¨"ä¸»"æœºå™¨ä¸Šè¿è¡Œ Gateway ç½‘å…³ã€‚
+- Android è®¾å¤‡/æ¨¡æ‹Ÿå™¨å¯ä»¥è®¿é—® Gateway ç½‘å…³ WebSocketï¼š
+  - ä½¿ç”¨ mDNS/NSD çš„åŒä¸€å±€åŸŸç½‘ï¼Œ**æˆ–**
+  - ä½¿ç”¨ Wide-Area Bonjour / unicast DNS-SD çš„åŒä¸€ Tailscale tailnetï¼ˆè§ä¸‹æ–‡ï¼‰ï¼Œ**æˆ–**
+  - æ‰‹åŠ¨ Gateway ç½‘å…³ä¸»æœº/ç«¯å£ï¼ˆå›žé€€æ–¹æ¡ˆï¼‰
+- ä½ å¯ä»¥åœ¨ Gateway ç½‘å…³æœºå™¨ä¸Šè¿è¡Œ CLIï¼ˆ`OpenKrab`ï¼‰ï¼ˆæˆ–é€šè¿‡ SSHï¼‰ã€‚
 
-### 1）启动 Gateway 网关
+### 1ï¼‰å¯åŠ¨ Gateway ç½‘å…³
 
 ```bash
 OpenKrab gateway --port 18789 --verbose
 ```
 
-在日志中确认你看到类似内容：
+åœ¨æ—¥å¿—ä¸­ç¡®è®¤ä½ çœ‹åˆ°ç±»ä¼¼å†…å®¹ï¼š
 
 - `listening on ws://0.0.0.0:18789`
 
-对于仅 tailnet 设置（推荐用于维也纳 ⇄ 伦敦），将 Gateway 网关绑定到 tailnet IP：
+å¯¹äºŽä»… tailnet è®¾ç½®ï¼ˆæŽ¨èç”¨äºŽç»´ä¹Ÿçº³ â‡„ ä¼¦æ•¦ï¼‰ï¼Œå°† Gateway ç½‘å…³ç»‘å®šåˆ° tailnet IPï¼š
 
-- 在 Gateway 网关主机的 `~/.OpenKrab/OpenKrab.json` 中设置 `gateway.bind: "tailnet"`。
-- 重启 Gateway 网关 / macOS 菜单栏应用。
+- åœ¨ Gateway ç½‘å…³ä¸»æœºçš„ `~/.OpenKrab/OpenKrab.json` ä¸­è®¾ç½® `gateway.bind: "tailnet"`ã€‚
+- é‡å¯ Gateway ç½‘å…³ / macOS èœå•æ åº”ç”¨ã€‚
 
-### 2）验证发现（可选）
+### 2ï¼‰éªŒè¯å‘çŽ°ï¼ˆå¯é€‰ï¼‰
 
-从 Gateway 网关机器：
+ä»Ž Gateway ç½‘å…³æœºå™¨ï¼š
 
 ```bash
 dns-sd -B _OpenKrab-gw._tcp local.
 ```
 
-更多调试说明：[Bonjour](/gateway/bonjour)。
+æ›´å¤šè°ƒè¯•è¯´æ˜Žï¼š[Bonjour](/gateway/bonjour)ã€‚
 
-#### 通过 unicast DNS-SD 的 Tailnet（维也纳 ⇄ 伦敦）发现
+#### é€šè¿‡ unicast DNS-SD çš„ Tailnetï¼ˆç»´ä¹Ÿçº³ â‡„ ä¼¦æ•¦ï¼‰å‘çŽ°
 
-Android NSD/mDNS 发现无法跨网络。如果你的 Android 节点和 Gateway 网关在不同网络但通过 Tailscale 连接，请改用 Wide-Area Bonjour / unicast DNS-SD：
+Android NSD/mDNS å‘çŽ°æ— æ³•è·¨ç½‘ç»œã€‚å¦‚æžœä½ çš„ Android èŠ‚ç‚¹å’Œ Gateway ç½‘å…³åœ¨ä¸åŒç½‘ç»œä½†é€šè¿‡ Tailscale è¿žæŽ¥ï¼Œè¯·æ”¹ç”¨ Wide-Area Bonjour / unicast DNS-SDï¼š
 
-1. 在 Gateway 网关主机上设置 DNS-SD 区域（示例 `OpenKrab.internal.`）并发布 `_OpenKrab-gw._tcp` 记录。
-2. 配置 Tailscale split DNS，将你选择的域指向该 DNS 服务器。
+1. åœ¨ Gateway ç½‘å…³ä¸»æœºä¸Šè®¾ç½® DNS-SD åŒºåŸŸï¼ˆç¤ºä¾‹ `OpenKrab.internal.`ï¼‰å¹¶å‘å¸ƒ `_OpenKrab-gw._tcp` è®°å½•ã€‚
+2. é…ç½® Tailscale split DNSï¼Œå°†ä½ é€‰æ‹©çš„åŸŸæŒ‡å‘è¯¥ DNS æœåŠ¡å™¨ã€‚
 
-详情和示例 CoreDNS 配置：[Bonjour](/gateway/bonjour)。
+è¯¦æƒ…å’Œç¤ºä¾‹ CoreDNS é…ç½®ï¼š[Bonjour](/gateway/bonjour)ã€‚
 
-### 3）从 Android 连接
+### 3ï¼‰ä»Ž Android è¿žæŽ¥
 
-在 Android 应用中：
+åœ¨ Android åº”ç”¨ä¸­ï¼š
 
-- 应用通过**前台服务**（持久通知）保持 Gateway 网关连接活动。
-- 打开**设置**。
-- 在**发现的 Gateway 网关**下，选择你的 Gateway 网关并点击**连接**。
-- 如果 mDNS 被阻止，使用**高级 → 手动 Gateway 网关**（主机 + 端口）并**连接（手动）**。
+- åº”ç”¨é€šè¿‡**å‰å°æœåŠ¡**ï¼ˆæŒä¹…é€šçŸ¥ï¼‰ä¿æŒ Gateway ç½‘å…³è¿žæŽ¥æ´»åŠ¨ã€‚
+- æ‰“å¼€**è®¾ç½®**ã€‚
+- åœ¨**å‘çŽ°çš„ Gateway ç½‘å…³**ä¸‹ï¼Œé€‰æ‹©ä½ çš„ Gateway ç½‘å…³å¹¶ç‚¹å‡»**è¿žæŽ¥**ã€‚
+- å¦‚æžœ mDNS è¢«é˜»æ­¢ï¼Œä½¿ç”¨**é«˜çº§ â†’ æ‰‹åŠ¨ Gateway ç½‘å…³**ï¼ˆä¸»æœº + ç«¯å£ï¼‰å¹¶**è¿žæŽ¥ï¼ˆæ‰‹åŠ¨ï¼‰**ã€‚
 
-首次成功配对后，Android 在启动时自动重连：
+é¦–æ¬¡æˆåŠŸé…å¯¹åŽï¼ŒAndroid åœ¨å¯åŠ¨æ—¶è‡ªåŠ¨é‡è¿žï¼š
 
-- 手动端点（如果启用），否则
-- 上次发现的 Gateway 网关（尽力而为）。
+- æ‰‹åŠ¨ç«¯ç‚¹ï¼ˆå¦‚æžœå¯ç”¨ï¼‰ï¼Œå¦åˆ™
+- ä¸Šæ¬¡å‘çŽ°çš„ Gateway ç½‘å…³ï¼ˆå°½åŠ›è€Œä¸ºï¼‰ã€‚
 
-### 4）批准配对（CLI）
+### 4ï¼‰æ‰¹å‡†é…å¯¹ï¼ˆCLIï¼‰
 
-在 Gateway 网关机器上：
+åœ¨ Gateway ç½‘å…³æœºå™¨ä¸Šï¼š
 
 ```bash
 OpenKrab nodes pending
 OpenKrab nodes approve <requestId>
 ```
 
-配对详情：[Gateway 网关配对](/gateway/pairing)。
+é…å¯¹è¯¦æƒ…ï¼š[Gateway ç½‘å…³é…å¯¹](/gateway/pairing)ã€‚
 
-### 5）验证节点已连接
+### 5ï¼‰éªŒè¯èŠ‚ç‚¹å·²è¿žæŽ¥
 
-- 通过节点状态：
+- é€šè¿‡èŠ‚ç‚¹çŠ¶æ€ï¼š
   ```bash
   OpenKrab nodes status
   ```
-- 通过 Gateway 网关：
+- é€šè¿‡ Gateway ç½‘å…³ï¼š
   ```bash
   OpenKrab gateway call node.list --params "{}"
   ```
 
-### 6）聊天 + 历史
+### 6ï¼‰èŠå¤© + åŽ†å²
 
-Android 节点的 Chat 面板使用 Gateway 网关的**主会话键**（`main`），因此历史和回复与 WebChat 和其他客户端共享：
+Android èŠ‚ç‚¹çš„ Chat é¢æ¿ä½¿ç”¨ Gateway ç½‘å…³çš„**ä¸»ä¼šè¯é”®**ï¼ˆ`main`ï¼‰ï¼Œå› æ­¤åŽ†å²å’Œå›žå¤ä¸Ž WebChat å’Œå…¶ä»–å®¢æˆ·ç«¯å…±äº«ï¼š
 
-- 历史：`chat.history`
-- 发送：`chat.send`
-- 推送更新（尽力而为）：`chat.subscribe` → `event:"chat"`
+- åŽ†å²ï¼š`chat.history`
+- å‘é€ï¼š`chat.send`
+- æŽ¨é€æ›´æ–°ï¼ˆå°½åŠ›è€Œä¸ºï¼‰ï¼š`chat.subscribe` â†’ `event:"chat"`
 
-### 7）Canvas + 摄像头
+### 7ï¼‰Canvas + æ‘„åƒå¤´
 
-#### Gateway 网关 Canvas 主机（推荐用于 web 内容）
+#### Gateway ç½‘å…³ Canvas ä¸»æœºï¼ˆæŽ¨èç”¨äºŽ web å†…å®¹ï¼‰
 
-如果你想让节点显示智能体可以在磁盘上编辑的真实 HTML/CSS/JS，请将节点指向 Gateway 网关 canvas 主机。
+å¦‚æžœä½ æƒ³è®©èŠ‚ç‚¹æ˜¾ç¤ºæ™ºèƒ½ä½“å¯ä»¥åœ¨ç£ç›˜ä¸Šç¼–è¾‘çš„çœŸå®ž HTML/CSS/JSï¼Œè¯·å°†èŠ‚ç‚¹æŒ‡å‘ Gateway ç½‘å…³ canvas ä¸»æœºã€‚
 
-注意：节点使用 `canvasHost.port`（默认 `18793`）上的独立 canvas 主机。
+æ³¨æ„ï¼šèŠ‚ç‚¹ä½¿ç”¨ `canvasHost.port`ï¼ˆé»˜è®¤ `18793`ï¼‰ä¸Šçš„ç‹¬ç«‹ canvas ä¸»æœºã€‚
 
-1. 在 Gateway 网关主机上创建 `~/.OpenKrab/workspace/canvas/index.html`。
+1. åœ¨ Gateway ç½‘å…³ä¸»æœºä¸Šåˆ›å»º `~/.OpenKrab/workspace/canvas/index.html`ã€‚
 
-2. 将节点导航到它（局域网）：
+2. å°†èŠ‚ç‚¹å¯¼èˆªåˆ°å®ƒï¼ˆå±€åŸŸç½‘ï¼‰ï¼š
 
 ```bash
-OpenKrab nodes invoke --node "<Android Node>" --command canvas.navigate --params '{"url":"http://<gateway-hostname>.local:18793/__OpenKrab__/canvas/"}'
+OpenKrab nodes invoke --node "<Android Node>" --command canvas.navigate --params '{"url":"http://<gateway-hostname>.local:18793/__OPENKRAB__/canvas/"}'
 ```
 
-Tailnet（可选）：如果两个设备都在 Tailscale 上，使用 MagicDNS 名称或 tailnet IP 而不是 `.local`，例如 `http://<gateway-magicdns>:18793/__OpenKrab__/canvas/`。
+Tailnetï¼ˆå¯é€‰ï¼‰ï¼šå¦‚æžœä¸¤ä¸ªè®¾å¤‡éƒ½åœ¨ Tailscale ä¸Šï¼Œä½¿ç”¨ MagicDNS åç§°æˆ– tailnet IP è€Œä¸æ˜¯ `.local`ï¼Œä¾‹å¦‚ `http://<gateway-magicdns>:18793/__OPENKRAB__/canvas/`ã€‚
 
-此服务器将实时重载客户端注入 HTML 并在文件更改时重新加载。
-A2UI 主机位于 `http://<gateway-host>:18793/__OpenKrab__/a2ui/`。
+æ­¤æœåŠ¡å™¨å°†å®žæ—¶é‡è½½å®¢æˆ·ç«¯æ³¨å…¥ HTML å¹¶åœ¨æ–‡ä»¶æ›´æ”¹æ—¶é‡æ–°åŠ è½½ã€‚
+A2UI ä¸»æœºä½äºŽ `http://<gateway-host>:18793/__OPENKRAB__/a2ui/`ã€‚
 
-Canvas 命令（仅前台）：
+Canvas å‘½ä»¤ï¼ˆä»…å‰å°ï¼‰ï¼š
 
-- `canvas.eval`、`canvas.snapshot`、`canvas.navigate`（使用 `{"url":""}` 或 `{"url":"/"}` 返回默认脚手架）。`canvas.snapshot` 返回 `{ format, base64 }`（默认 `format="jpeg"`）。
-- A2UI：`canvas.a2ui.push`、`canvas.a2ui.reset`（`canvas.a2ui.pushJSONL` 遗留别名）
+- `canvas.eval`ã€`canvas.snapshot`ã€`canvas.navigate`ï¼ˆä½¿ç”¨ `{"url":""}` æˆ– `{"url":"/"}` è¿”å›žé»˜è®¤è„šæ‰‹æž¶ï¼‰ã€‚`canvas.snapshot` è¿”å›ž `{ format, base64 }`ï¼ˆé»˜è®¤ `format="jpeg"`ï¼‰ã€‚
+- A2UIï¼š`canvas.a2ui.push`ã€`canvas.a2ui.reset`ï¼ˆ`canvas.a2ui.pushJSONL` é—ç•™åˆ«åï¼‰
 
-摄像头命令（仅前台；权限限制）：
+æ‘„åƒå¤´å‘½ä»¤ï¼ˆä»…å‰å°ï¼›æƒé™é™åˆ¶ï¼‰ï¼š
 
-- `camera.snap`（jpg）
-- `camera.clip`（mp4）
+- `camera.snap`ï¼ˆjpgï¼‰
+- `camera.clip`ï¼ˆmp4ï¼‰
 
-参见 [Camera 节点](/nodes/camera) 了解参数和 CLI 助手。
+å‚è§ [Camera èŠ‚ç‚¹](/nodes/camera) äº†è§£å‚æ•°å’Œ CLI åŠ©æ‰‹ã€‚
+
 

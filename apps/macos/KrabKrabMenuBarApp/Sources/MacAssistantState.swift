@@ -7,7 +7,7 @@ final class MacAssistantState: ObservableObject {
     @Published var statusText = "idle"
     @Published var lastTranscript = ""
     @Published var lastReply = ""
-    @Published var wakePhrase = "hey krabkrab"
+    @Published var wakePhrase = "hey openkrab"
 
     let permissions = TCCPermissionManager()
     let notifications = NotificationManager()
@@ -123,7 +123,7 @@ final class MacAssistantState: ObservableObject {
                     self.statusText = "responding"
                     self.speechOutput.speak(reply)
                 }
-                await notifications.send(title: "KrabKrab Reply", body: reply)
+                await notifications.send(title: "openkrab Reply", body: reply)
                 await MainActor.run {
                     self.statusText = self.talkModeEnabled ? "listening" : "idle"
                     self.isHandlingCommand = false
@@ -170,3 +170,4 @@ final class MacAssistantState: ObservableObject {
             .joined(separator: " ")
     }
 }
+

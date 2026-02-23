@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Stable, beta, and dev channels: semantics, switching, and tagging"
 read_when:
   - You want to switch between stable/beta/dev
@@ -9,24 +9,20 @@ title: "Development Channels"
 # Development channels
 
 Last updated: 2026-01-21
-
-openkrab ships three update channels:
+\nOpenKrab ships three update channels:
 
 - **stable**: npm dist-tag `latest`.
 - **beta**: npm dist-tag `beta` (builds under test).
 - **dev**: moving head of `main` (git). npm dist-tag: `dev` (when published).
 
 We ship builds to **beta**, test them, then **promote a vetted build to `latest`**
-without changing the version number — dist-tags are the source of truth for npm installs.
+without changing the version number â€” dist-tags are the source of truth for npm installs.
 
 ## Switching channels
 
 Git checkout:
 
-```bash
-openkrab update --channel stable
-openkrab update --channel beta
-openkrab update --channel dev
+```bash\nOpenKrab update --channel stable\nOpenKrab update --channel beta\nOpenKrab update --channel dev
 ```
 
 - `stable`/`beta` check out the latest matching tag (often the same tag).
@@ -34,18 +30,15 @@ openkrab update --channel dev
 
 npm/pnpm global install:
 
-```bash
-openkrab update --channel stable
-openkrab update --channel beta
-openkrab update --channel dev
+```bash\nOpenKrab update --channel stable\nOpenKrab update --channel beta\nOpenKrab update --channel dev
 ```
 
 This updates via the corresponding npm dist-tag (`latest`, `beta`, `dev`).
 
-When you **explicitly** switch channels with `--channel`, openkrab also aligns
+When you **explicitly** switch channels with `--channel`, OpenKrab also aligns
 the install method:
 
-- `dev` ensures a git checkout (default `~/openkrab`, override with `openkrab_GIT_DIR`),
+- `dev` ensures a git checkout (default `~/openkrab`, override with `OPENKRAB_GIT_DIR`),
   updates it, and installs the global CLI from that checkout.
 - `stable`/`beta` installs from npm using the matching dist-tag.
 
@@ -53,7 +46,7 @@ Tip: if you want stable + dev in parallel, keep two clones and point your gatewa
 
 ## Plugins and channels
 
-When you switch channels with `openkrab update`, openkrab also syncs plugin sources:
+When you switch channels with `openkrab update`, OpenKrab also syncs plugin sources:
 
 - `dev` prefers bundled plugins from the git checkout.
 - `stable` and `beta` restore npm-installed plugin packages.
@@ -63,13 +56,15 @@ When you switch channels with `openkrab update`, openkrab also syncs plugin sour
 - Tag releases you want git checkouts to land on (`vYYYY.M.D` or `vYYYY.M.D-<patch>`).
 - Keep tags immutable: never move or reuse a tag.
 - npm dist-tags remain the source of truth for npm installs:
-  - `latest` → stable
-  - `beta` → candidate build
-  - `dev` → main snapshot (optional)
+  - `latest` â†’ stable
+  - `beta` â†’ candidate build
+  - `dev` â†’ main snapshot (optional)
 
 ## macOS app availability
 
-Beta and dev builds may **not** include a macOS app release. That’s OK:
+Beta and dev builds may **not** include a macOS app release. Thatâ€™s OK:
 
 - The git tag and npm dist-tag can still be published.
-- Call out “no macOS build for this beta” in release notes or changelog.
+- Call out â€œno macOS build for this betaâ€ in release notes or changelog.
+
+

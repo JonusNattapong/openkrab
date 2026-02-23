@@ -1,4 +1,4 @@
----
+﻿---
 title: "Default AGENTS.md"
 summary: "Default OpenKrab agent instructions and skills roster for the personal assistant setup"
 read_when:
@@ -6,13 +6,13 @@ read_when:
   - Enabling or auditing default skills
 ---
 
-# AGENTS.md — OpenKrab Personal Assistant (default)
+# AGENTS.md â€” OpenKrab Personal Assistant (default)
 
 ## First run (recommended)
 
 OpenKrab uses a dedicated workspace directory for the agent. Default: `~/.OpenKrab/workspace` (configurable via `agents.defaults.workspace`).
 
-1. Create the workspace (if it doesn’t already exist):
+1. Create the workspace (if it doesnâ€™t already exist):
 
 ```bash
 mkdir -p ~/.OpenKrab/workspace
@@ -42,9 +42,9 @@ cp docs/reference/AGENTS.default.md ~/.OpenKrab/workspace/AGENTS.md
 
 ## Safety defaults
 
-- Don’t dump directories or secrets into chat.
-- Don’t run destructive commands unless explicitly asked.
-- Don’t send partial/streaming replies to external messaging surfaces (only final replies).
+- Donâ€™t dump directories or secrets into chat.
+- Donâ€™t run destructive commands unless explicitly asked.
+- Donâ€™t send partial/streaming replies to external messaging surfaces (only final replies).
 
 ## Session start (required)
 
@@ -59,8 +59,8 @@ cp docs/reference/AGENTS.default.md ~/.OpenKrab/workspace/AGENTS.md
 
 ## Shared spaces (recommended)
 
-- You’re not the user’s voice; be careful in group chats or public channels.
-- Don’t share private data, contact info, or internal notes.
+- Youâ€™re not the userâ€™s voice; be careful in group chats or public channels.
+- Donâ€™t share private data, contact info, or internal notes.
 
 ## Memory system (recommended)
 
@@ -72,18 +72,18 @@ cp docs/reference/AGENTS.default.md ~/.OpenKrab/workspace/AGENTS.md
 
 ## Tools & skills
 
-- Tools live in skills; follow each skill’s `SKILL.md` when you need it.
+- Tools live in skills; follow each skillâ€™s `SKILL.md` when you need it.
 - Keep environment-specific notes in `TOOLS.md` (Notes for Skills).
 
 ## Backup tip (recommended)
 
-If you treat this workspace as Clawd’s “memory”, make it a git repo (ideally private) so `AGENTS.md` and your memory files are backed up.
+If you treat this workspace as Krabdâ€™s â€œmemoryâ€, make it a git repo (ideally private) so `AGENTS.md` and your memory files are backed up.
 
 ```bash
 cd ~/.OpenKrab/workspace
 git init
 git add AGENTS.md
-git commit -m "Add Clawd workspace"
+git commit -m "Add Krabd workspace"
 # Optional: add a private remote + push
 ```
 
@@ -93,33 +93,34 @@ git commit -m "Add Clawd workspace"
 - macOS app manages permissions (screen recording, notifications, microphone) and exposes the `OpenKrab` CLI via its bundled binary.
 - Direct chats collapse into the agent's `main` session by default; groups stay isolated as `agent:<agentId>:<channel>:group:<id>` (rooms/channels: `agent:<agentId>:<channel>:channel:<id>`); heartbeats keep background tasks alive.
 
-## Core Skills (enable in Settings → Skills)
+## Core Skills (enable in Settings â†’ Skills)
 
-- **mcporter** — Tool server runtime/CLI for managing external skill backends.
-- **Peekaboo** — Fast macOS screenshots with optional AI vision analysis.
-- **camsnap** — Capture frames, clips, or motion alerts from RTSP/ONVIF security cams.
-- **oracle** — OpenAI-ready agent CLI with session replay and browser control.
-- **eightctl** — Control your sleep, from the terminal.
-- **imsg** — Send, read, stream iMessage & SMS.
-- **wacli** — WhatsApp CLI: sync, search, send.
-- **discord** — Discord actions: react, stickers, polls. Use `user:<id>` or `channel:<id>` targets (bare numeric ids are ambiguous).
-- **gog** — Google Suite CLI: Gmail, Calendar, Drive, Contacts.
-- **spotify-player** — Terminal Spotify client to search/queue/control playback.
-- **sag** — ElevenLabs speech with mac-style say UX; streams to speakers by default.
-- **Sonos CLI** — Control Sonos speakers (discover/status/playback/volume/grouping) from scripts.
-- **blucli** — Play, group, and automate BluOS players from scripts.
-- **OpenHue CLI** — Philips Hue lighting control for scenes and automations.
-- **OpenAI Whisper** — Local speech-to-text for quick dictation and voicemail transcripts.
-- **Gemini CLI** — Google Gemini models from the terminal for fast Q&A.
-- **agent-tools** — Utility toolkit for automations and helper scripts.
+- **mcporter** â€” Tool server runtime/CLI for managing external skill backends.
+- **Peekaboo** â€” Fast macOS screenshots with optional AI vision analysis.
+- **camsnap** â€” Capture frames, clips, or motion alerts from RTSP/ONVIF security cams.
+- **oracle** â€” OpenAI-ready agent CLI with session replay and browser control.
+- **eightctl** â€” Control your sleep, from the terminal.
+- **imsg** â€” Send, read, stream iMessage & SMS.
+- **wacli** â€” WhatsApp CLI: sync, search, send.
+- **discord** â€” Discord actions: react, stickers, polls. Use `user:<id>` or `channel:<id>` targets (bare numeric ids are ambiguous).
+- **gog** â€” Google Suite CLI: Gmail, Calendar, Drive, Contacts.
+- **spotify-player** â€” Terminal Spotify client to search/queue/control playback.
+- **sag** â€” ElevenLabs speech with mac-style say UX; streams to speakers by default.
+- **Sonos CLI** â€” Control Sonos speakers (discover/status/playback/volume/grouping) from scripts.
+- **blucli** â€” Play, group, and automate BluOS players from scripts.
+- **OpenHue CLI** â€” Philips Hue lighting control for scenes and automations.
+- **OpenAI Whisper** â€” Local speech-to-text for quick dictation and voicemail transcripts.
+- **Gemini CLI** â€” Google Gemini models from the terminal for fast Q&A.
+- **agent-tools** â€” Utility toolkit for automations and helper scripts.
 
 ## Usage Notes
 
 - Prefer the `OpenKrab` CLI for scripting; mac app handles permissions.
 - Run installs from the Skills tab; it hides the button if a binary is already present.
 - Keep heartbeats enabled so the assistant can schedule reminders, monitor inboxes, and trigger camera captures.
-- Canvas UI runs full-screen with native overlays. Avoid placing critical controls in the top-left/top-right/bottom edges; add explicit gutters in the layout and don’t rely on safe-area insets.
+- Canvas UI runs full-screen with native overlays. Avoid placing critical controls in the top-left/top-right/bottom edges; add explicit gutters in the layout and donâ€™t rely on safe-area insets.
 - For browser-driven verification, use `OpenKrab browser` (tabs/status/screenshot) with the OpenKrab-managed Chrome profile.
 - For DOM inspection, use `OpenKrab browser eval|query|dom|snapshot` (and `--json`/`--out` when you need machine output).
 - For interactions, use `OpenKrab browser click|type|hover|drag|select|upload|press|wait|navigate|back|evaluate|run` (click/type require snapshot refs; use `evaluate` for CSS selectors).
+
 

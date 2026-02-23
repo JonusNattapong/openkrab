@@ -1,4 +1,4 @@
-//! agents::provider_auth — Provider authentication wiring.
+﻿//! agents::provider_auth â€” Provider authentication wiring.
 //! Ported from `openkrab/src/agents/model-auth.ts` (Phase 15).
 
 use serde::{Deserialize, Serialize};
@@ -14,17 +14,17 @@ fn read_api_key_from_config(provider: &str) -> Option<String> {
         }
 
         match &profile.credential {
-            crate::openkrab_config::Credential::Token { token } => {
+            crate::OPENKRAB_CONFIG::Credential::Token { token } => {
                 if !token.trim().is_empty() {
                     return Some(token.clone());
                 }
             }
-            crate::openkrab_config::Credential::OAuth { access, .. } => {
+            crate::OPENKRAB_CONFIG::Credential::OAuth { access, .. } => {
                 if !access.trim().is_empty() {
                     return Some(access.clone());
                 }
             }
-            crate::openkrab_config::Credential::EncryptedToken { .. } => {
+            crate::OPENKRAB_CONFIG::Credential::EncryptedToken { .. } => {
                 // Encrypted credentials require secure store integration.
                 continue;
             }
@@ -214,3 +214,4 @@ mod tests {
         env::remove_var("OPENAI_API_KEY");
     }
 }
+

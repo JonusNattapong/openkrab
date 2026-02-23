@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Hooks: event-driven automation for commands and lifecycle events"
 read_when:
   - You want event-driven automation for /new, /reset, /stop, and agent lifecycle events
@@ -8,14 +8,14 @@ title: "Hooks"
 
 # Hooks
 
-Hooks provide an extensible event-driven system for automating actions in response to agent commands and events. Hooks are automatically discovered from directories and can be managed via CLI commands, similar to how skills work in openkrab.
+Hooks provide an extensible event-driven system for automating actions in response to agent commands and events. Hooks are automatically discovered from directories and can be managed via CLI commands, similar to how skills work in OpenKrab.
 
 ## Getting Oriented
 
 Hooks are small scripts that run when something happens. There are two kinds:
 
 - **Hooks** (this page): run inside the Gateway when agent events fire, like `/new`, `/reset`, `/stop`, or lifecycle events.
-- **Webhooks**: external HTTP webhooks that let other systems trigger work in openkrab. See [Webhook Hooks](/automation/webhook) or use `openkrab webhooks` for Gmail helper commands.
+- **Webhooks**: external HTTP webhooks that let other systems trigger work in OpenKrab. See [Webhook Hooks](/automation/webhook) or use `openkrab webhooks` for Gmail helper commands.
 
 Hooks can also be bundled inside plugins; see [Plugins](/tools/plugin#plugin-hooks).
 
@@ -40,36 +40,31 @@ The hooks system allows you to:
 ## Getting Started
 
 ### Bundled Hooks
+\nOpenKrab ships with four bundled hooks that are automatically discovered:
 
-openkrab ships with four bundled hooks that are automatically discovered:
-
-- **💾 session-memory**: Saves session context to your agent workspace (default `~/.openkrab/workspace/memory/`) when you issue `/new`
-- **📎 bootstrap-extra-files**: Injects additional workspace bootstrap files from configured glob/path patterns during `agent:bootstrap`
-- **📝 command-logger**: Logs all command events to `~/.openkrab/logs/commands.log`
-- **🚀 boot-md**: Runs `BOOT.md` when the gateway starts (requires internal hooks enabled)
+- **ðŸ’¾ session-memory**: Saves session context to your agent workspace (default `~/.openkrab/workspace/memory/`) when you issue `/new`
+- **ðŸ“Ž bootstrap-extra-files**: Injects additional workspace bootstrap files from configured glob/path patterns during `agent:bootstrap`
+- **ðŸ“ command-logger**: Logs all command events to `~/.openkrab/logs/commands.log`
+- **ðŸš€ boot-md**: Runs `BOOT.md` when the gateway starts (requires internal hooks enabled)
 
 List available hooks:
 
-```bash
-openkrab hooks list
+```bash\nOpenKrab hooks list
 ```
 
 Enable a hook:
 
-```bash
-openkrab hooks enable session-memory
+```bash\nOpenKrab hooks enable session-memory
 ```
 
 Check hook status:
 
-```bash
-openkrab hooks check
+```bash\nOpenKrab hooks check
 ```
 
 Get detailed information:
 
-```bash
-openkrab hooks info session-memory
+```bash\nOpenKrab hooks info session-memory
 ```
 
 ### Onboarding
@@ -90,8 +85,8 @@ Each hook is a directory containing:
 
 ```
 my-hook/
-├── HOOK.md          # Metadata + documentation
-└── handler.ts       # Handler implementation
+â”œâ”€â”€ HOOK.md          # Metadata + documentation
+â””â”€â”€ handler.ts       # Handler implementation
 ```
 
 ## Hook Packs (npm/archives)
@@ -99,8 +94,7 @@ my-hook/
 Hook packs are standard npm packages that export one or more hooks via `openkrab.hooks` in
 `package.json`. Install them with:
 
-```bash
-openkrab hooks install <path-or-spec>
+```bash\nOpenKrab hooks install <path-or-spec>
 ```
 
 Npm specs are registry-only (package name + optional version/tag). Git/URL/file specs are rejected.
@@ -138,7 +132,7 @@ name: my-hook
 description: "Short description of what this hook does"
 homepage: https://docs.openkrab.ai/automation/hooks#my-hook
 metadata:
-  { "openkrab": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
+  { "openkrab": { "emoji": "ðŸ”—", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
 
 # My Hook
@@ -164,7 +158,7 @@ No configuration needed.
 
 The `metadata.openkrab` object supports:
 
-- **`emoji`**: Display emoji for CLI (e.g., `"💾"`)
+- **`emoji`**: Display emoji for CLI (e.g., `"ðŸ’¾"`)
 - **`events`**: Array of events to listen for (e.g., `["command:new", "command:reset"]`)
 - **`export`**: Named export to use (defaults to `"default"`)
 - **`homepage`**: Documentation URL
@@ -197,7 +191,7 @@ const myHandler: HookHandler = async (event) => {
   // Your custom logic here
 
   // Optionally send message to user
-  event.messages.push("✨ My hook executed!");
+  event.messages.push("âœ¨ My hook executed!");
 };
 
 export default myHandler;
@@ -321,7 +315,7 @@ export default handler;
 
 ### Tool Result Hooks (Plugin API)
 
-These hooks are not event-stream listeners; they let plugins synchronously adjust tool results before openkrab persists them.
+These hooks are not event-stream listeners; they let plugins synchronously adjust tool results before OpenKrab persists them.
 
 - **`tool_result_persist`**: transform tool results before they are written to the session transcript. Must be synchronous; return the updated tool result payload or `undefined` to keep it as-is. See [Agent Loop](/concepts/agent-loop).
 
@@ -353,7 +347,7 @@ cd ~/.openkrab/hooks/my-hook
 ---
 name: my-hook
 description: "Does something useful"
-metadata: { "openkrab": { "emoji": "🎯", "events": ["command:new"] } }
+metadata: { "openkrab": { "emoji": "ðŸŽ¯", "events": ["command:new"] } }
 ---
 
 # My Custom Hook
@@ -381,11 +375,9 @@ export default handler;
 ### 5. Enable and Test
 
 ```bash
-# Verify hook is discovered
-openkrab hooks list
+# Verify hook is discovered\nOpenKrab hooks list
 
-# Enable it
-openkrab hooks enable my-hook
+# Enable it\nOpenKrab hooks enable my-hook
 
 # Restart your gateway process (menu bar app restart on macOS, or restart your dev process)
 
@@ -480,47 +472,37 @@ Note: `module` must be a workspace-relative path. Absolute paths and traversal o
 ### List Hooks
 
 ```bash
-# List all hooks
-openkrab hooks list
+# List all hooks\nOpenKrab hooks list
 
-# Show only eligible hooks
-openkrab hooks list --eligible
+# Show only eligible hooks\nOpenKrab hooks list --eligible
 
-# Verbose output (show missing requirements)
-openkrab hooks list --verbose
+# Verbose output (show missing requirements)\nOpenKrab hooks list --verbose
 
-# JSON output
-openkrab hooks list --json
+# JSON output\nOpenKrab hooks list --json
 ```
 
 ### Hook Information
 
 ```bash
-# Show detailed info about a hook
-openkrab hooks info session-memory
+# Show detailed info about a hook\nOpenKrab hooks info session-memory
 
-# JSON output
-openkrab hooks info session-memory --json
+# JSON output\nOpenKrab hooks info session-memory --json
 ```
 
 ### Check Eligibility
 
 ```bash
-# Show eligibility summary
-openkrab hooks check
+# Show eligibility summary\nOpenKrab hooks check
 
-# JSON output
-openkrab hooks check --json
+# JSON output\nOpenKrab hooks check --json
 ```
 
 ### Enable/Disable
 
 ```bash
-# Enable a hook
-openkrab hooks enable session-memory
+# Enable a hook\nOpenKrab hooks enable session-memory
 
-# Disable a hook
-openkrab hooks disable command-logger
+# Disable a hook\nOpenKrab hooks disable command-logger
 ```
 
 ## Bundled hook reference
@@ -560,8 +542,7 @@ Saves session context to memory when you issue `/new`.
 
 **Enable**:
 
-```bash
-openkrab hooks enable session-memory
+```bash\nOpenKrab hooks enable session-memory
 ```
 
 ### bootstrap-extra-files
@@ -601,8 +582,7 @@ Injects additional bootstrap files (for example monorepo-local `AGENTS.md` / `TO
 
 **Enable**:
 
-```bash
-openkrab hooks enable bootstrap-extra-files
+```bash\nOpenKrab hooks enable bootstrap-extra-files
 ```
 
 ### command-logger
@@ -643,8 +623,7 @@ grep '"action":"new"' ~/.openkrab/logs/commands.log | jq .
 
 **Enable**:
 
-```bash
-openkrab hooks enable command-logger
+```bash\nOpenKrab hooks enable command-logger
 ```
 
 ### boot-md
@@ -664,8 +643,7 @@ Internal hooks must be enabled for this to run.
 
 **Enable**:
 
-```bash
-openkrab hooks enable boot-md
+```bash\nOpenKrab hooks enable boot-md
 ```
 
 ## Best Practices
@@ -675,12 +653,12 @@ openkrab hooks enable boot-md
 Hooks run during command processing. Keep them lightweight:
 
 ```typescript
-// ✓ Good - async work, returns immediately
+// âœ“ Good - async work, returns immediately
 const handler: HookHandler = async (event) => {
   void processInBackground(event); // Fire and forget
 };
 
-// ✗ Bad - blocks command processing
+// âœ— Bad - blocks command processing
 const handler: HookHandler = async (event) => {
   await slowDatabaseQuery(event);
   await evenSlowerAPICall(event);
@@ -748,8 +726,7 @@ Registered hook: boot-md -> gateway:startup
 
 List all discovered hooks:
 
-```bash
-openkrab hooks list --verbose
+```bash\nOpenKrab hooks list --verbose
 ```
 
 ### Check Registration
@@ -767,8 +744,7 @@ const handler: HookHandler = async (event) => {
 
 Check why a hook isn't eligible:
 
-```bash
-openkrab hooks info my-hook
+```bash\nOpenKrab hooks info my-hook
 ```
 
 Look for missing requirements in the output.
@@ -825,15 +801,15 @@ test("my handler works", async () => {
 
 ```
 Gateway startup
-    ↓
-Scan directories (workspace → managed → bundled)
-    ↓
+    â†“
+Scan directories (workspace â†’ managed â†’ bundled)
+    â†“
 Parse HOOK.md files
-    ↓
+    â†“
 Check eligibility (bins, env, config, os)
-    ↓
+    â†“
 Load handlers from eligible hooks
-    ↓
+    â†“
 Register handlers for events
 ```
 
@@ -841,15 +817,15 @@ Register handlers for events
 
 ```
 User sends /new
-    ↓
+    â†“
 Command validation
-    ↓
+    â†“
 Create hook event
-    ↓
+    â†“
 Trigger hook (all registered handlers)
-    ↓
+    â†“
 Command processing continues
-    ↓
+    â†“
 Session reset
 ```
 
@@ -874,15 +850,14 @@ Session reset
 3. List all discovered hooks:
 
    ```bash
-   openkrab hooks list
+   OpenKrab hooks list
    ```
 
 ### Hook Not Eligible
 
 Check requirements:
 
-```bash
-openkrab hooks info my-hook
+```bash\nOpenKrab hooks info my-hook
 ```
 
 Look for missing:
@@ -897,8 +872,8 @@ Look for missing:
 1. Verify hook is enabled:
 
    ```bash
-   openkrab hooks list
-   # Should show ✓ next to enabled hooks
+   OpenKrab hooks list
+   # Should show âœ“ next to enabled hooks
    ```
 
 2. Restart your gateway process so hooks reload.
@@ -955,7 +930,7 @@ node -e "import('./path/to/handler.ts').then(console.log)"
    ---
    name: my-hook
    description: "My custom hook"
-   metadata: { "openkrab": { "emoji": "🎯", "events": ["command:new"] } }
+   metadata: { "openkrab": { "emoji": "ðŸŽ¯", "events": ["command:new"] } }
    ---
 
    # My Hook
@@ -981,8 +956,8 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 4. Verify and restart your gateway process:
 
    ```bash
-   openkrab hooks list
-   # Should show: 🎯 my-hook ✓
+   OpenKrab hooks list
+   # Should show: ðŸŽ¯ my-hook âœ“
    ```
 
 **Benefits of migration**:
@@ -999,3 +974,4 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 - [Bundled Hooks README](https://github.com/openkrab/openkrab/tree/main/src/hooks/bundled)
 - [Webhook Hooks](/automation/webhook)
 - [Configuration](/gateway/configuration#hooks)
+

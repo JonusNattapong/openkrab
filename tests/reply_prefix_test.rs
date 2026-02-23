@@ -1,4 +1,4 @@
-use krabkrab::channels::reply_prefix::*;
+use openkrab::channels::reply_prefix::*;
 use serde_json::json;
 
 #[test]
@@ -30,3 +30,4 @@ fn test_response_prefix_auto_uses_identity() {
     assert_eq!(ctx2.model_full.unwrap(), "openai/gpt-x");
     assert_eq!(ctx2.thinking_level.unwrap(), "medium");
 }
+

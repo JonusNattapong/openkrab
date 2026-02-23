@@ -1,7 +1,7 @@
----
+﻿---
 summary: "CLI reference for `openkrab setup` (initialize config + workspace)"
 read_when:
-  - You’re doing first-run setup without the full onboarding wizard
+  - Youâ€™re doing first-run setup without the full onboarding wizard
   - You want to set the default workspace path
 title: "setup"
 ---
@@ -17,13 +17,11 @@ Related:
 
 ## Examples
 
-```bash
-openkrab setup
-openkrab setup --workspace ~/.openkrab/workspace
+```bash\nOpenKrab setup\nOpenKrab setup --workspace ~/.openkrab/workspace
 ```
 
 To run the wizard via setup:
 
-```bash
-openkrab setup --wizard
+```bash\nOpenKrab setup --wizard
 ```
+

@@ -40,15 +40,15 @@ download_binary() {
     local os=$1
     local arch=$2
     local ver=$3
-    local fname="krabkrab-cli-$os-$arch"
+    local fname="openkrab-cli-$os-$arch"
     local url="https://github.com/$REPO/releases/download/v$ver/$fname.tar.gz"
     
     echo "Downloading OpenKrab v$ver for $os-$arch..."
     
-    if curl -fsSL "$url" -o /tmp/krabkrab.tar.gz; then
-        tar -xzf /tmp/krabkrab.tar.gz -C /tmp/
-        mv "/tmp/$fname/krabkrab-cli" "$INSTALL_DIR/krabkrab" 2>/dev/null || mv "/tmp/$fname" "$INSTALL_DIR/krabkrab"
-        rm -rf /tmp/krabkrab.tar.gz /tmp/$fname
+    if curl -fsSL "$url" -o /tmp/openkrab.tar.gz; then
+        tar -xzf /tmp/openkrab.tar.gz -C /tmp/
+        mv "/tmp/$fname/openkrab-cli" "$INSTALL_DIR/openkrab" 2>/dev/null || mv "/tmp/$fname" "$INSTALL_DIR/openkrab"
+        rm -rf /tmp/openkrab.tar.gz /tmp/$fname
         return 0
     else
         echo "Failed to download from GitHub releases, trying to build from source..."
@@ -70,12 +70,12 @@ build_from_source() {
         git clone --depth 1 "file://$(pwd)" "$tmpdir"
     
     cd "$tmpdir"
-    cargo build --release -p krabkrab-cli 2>/dev/null || cargo build --release 2>/dev/null || cargo build -p krabkrab-cli
+    cargo build --release -p openkrab-cli 2>/dev/null || cargo build --release 2>/dev/null || cargo build -p openkrab-cli
     
     mkdir -p "$INSTALL_DIR"
-    cp -f "./target/release/krabkrab-cli" "$INSTALL_DIR/krabkrab" 2>/dev/null || \
-        cp -f "./target/debug/krabkrab-cli" "$INSTALL_DIR/krabkrab" 2>/dev/null || \
-        cp -f "./target/release/krabkrab" "$INSTALL_DIR/krabkrab"
+    cp -f "./target/release/openkrab-cli" "$INSTALL_DIR/openkrab" 2>/dev/null || \
+        cp -f "./target/debug/openkrab-cli" "$INSTALL_DIR/openkrab" 2>/dev/null || \
+        cp -f "./target/release/openkrab" "$INSTALL_DIR/openkrab"
     
     cd -
     rm -rf "$tmpdir"
@@ -147,7 +147,7 @@ main() {
         build_from_source
     fi
     
-    chmod +x "$INSTALL_DIR/krabkrab"
+    chmod +x "$INSTALL_DIR/openkrab"
     
     setup_config
     add_to_path
@@ -157,9 +157,10 @@ main() {
     echo "  ✅ Installation complete!"
     echo "============================================"
     echo ""
-    echo "Run: krabkrab --help"
-    echo "Or:  krabkrab onboard"
+    echo "Run: openkrab --help"
+    echo "Or:  openkrab onboard"
     echo ""
 }
 
 main "$@"
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab devices` (device pairing + token rotation/revocation)"
 read_when:
   - You are approving device pairing requests
@@ -16,9 +16,7 @@ Manage device pairing requests and device-scoped tokens.
 
 List pending pairing requests and paired devices.
 
-```
-openkrab devices list
-openkrab devices list --json
+```\nOpenKrab devices list\nOpenKrab devices list --json
 ```
 
 ### `openkrab devices approve [requestId] [--latest]`
@@ -26,34 +24,28 @@ openkrab devices list --json
 Approve a pending device pairing request. If `requestId` is omitted, openkrab
 automatically approves the most recent pending request.
 
-```
-openkrab devices approve
-openkrab devices approve <requestId>
-openkrab devices approve --latest
+```\nOpenKrab devices approve\nOpenKrab devices approve <requestId>\nOpenKrab devices approve --latest
 ```
 
 ### `openkrab devices reject <requestId>`
 
 Reject a pending device pairing request.
 
-```
-openkrab devices reject <requestId>
+```\nOpenKrab devices reject <requestId>
 ```
 
 ### `openkrab devices rotate --device <id> --role <role> [--scope <scope...>]`
 
 Rotate a device token for a specific role (optionally updating scopes).
 
-```
-openkrab devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
+```\nOpenKrab devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
 ```
 
 ### `openkrab devices revoke --device <id> --role <role>`
 
 Revoke a device token for a specific role.
 
-```
-openkrab devices revoke --device <deviceId> --role node
+```\nOpenKrab devices revoke --device <deviceId> --role node
 ```
 
 ## Common options
@@ -71,3 +63,4 @@ Pass `--token` or `--password` explicitly. Missing explicit credentials is an er
 
 - Token rotation returns a new token (sensitive). Treat it like a secret.
 - These commands require `operator.pairing` (or `operator.admin`) scope.
+

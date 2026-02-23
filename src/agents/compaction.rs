@@ -1,5 +1,5 @@
 //! compaction — Transcript compaction for context window management.
-//! Ported from `openclaw/src/agents/compaction.ts`.
+//! Ported from `OpenKrab/src/agents/compaction.ts`.
 //!
 //! Provides methods to split, chunk, and summarize long transcripts so
 //! that they stay within a model's context window.
@@ -455,3 +455,4 @@ mod tests {
         assert_eq!(resolve_context_window_tokens(Some(0)), 1);
     }
 }
+

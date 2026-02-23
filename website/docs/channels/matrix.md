@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Matrix support status, capabilities, and configuration"
 read_when:
   - Working on Matrix channel features
@@ -7,7 +7,7 @@ title: "Matrix"
 
 # Matrix (plugin)
 
-Matrix is an open, decentralized messaging protocol. openkrab connects as a Matrix **user**
+Matrix is an open, decentralized messaging protocol. OpenKrab connects as a Matrix **user**
 on any homeserver, so you need a Matrix account for the bot. Once it is logged in, you can DM
 the bot directly or invite it to rooms (Matrix "groups"). Beeper is a valid client option too,
 but it requires E2EE to be enabled.
@@ -21,18 +21,15 @@ Matrix ships as a plugin and is not bundled with the core install.
 
 Install via CLI (npm registry):
 
-```bash
-openkrab plugins install @openkrab/matrix
+```bash\nOpenKrab plugins install @openkrab/matrix
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/matrix
+```bash\nOpenKrab plugins install ./extensions/matrix
 ```
 
-If you choose Matrix during configure/onboarding and a git checkout is detected,
-openkrab will offer the local install path automatically.
+If you choose Matrix during configure/onboarding and a git checkout is detected,\nOpenKrab will offer the local install path automatically.
 
 Details: [Plugins](/tools/plugin)
 
@@ -62,7 +59,7 @@ Details: [Plugins](/tools/plugin)
    ```
 
    - Replace `matrix.example.org` with your homeserver URL.
-   - Or set `channels.matrix.userId` + `channels.matrix.password`: openkrab calls the same
+   - Or set `channels.matrix.userId` + `channels.matrix.password`: OpenKrab calls the same
      login endpoint, stores the access token in `~/.openkrab/credentials/matrix/credentials.json`,
      and reuses it on next start.
 
@@ -116,10 +113,10 @@ Enable with `channels.matrix.encryption: true`:
 
 - If the crypto module loads, encrypted rooms are decrypted automatically.
 - Outbound media is encrypted when sending to encrypted rooms.
-- On first connection, openkrab requests device verification from your other sessions.
+- On first connection, OpenKrab requests device verification from your other sessions.
 - Verify the device in another Matrix client (Element, etc.) to enable key sharing.
 - If the crypto module cannot be loaded, E2EE is disabled and encrypted rooms will not decrypt;
-  openkrab logs a warning.
+  OpenKrab logs a warning.
 - If you see missing crypto module errors (for example, `@matrix-org/matrix-sdk-crypto-nodejs-*`),
   allow build scripts for `@matrix-org/matrix-sdk-crypto-nodejs` and run
   `pnpm rebuild @matrix-org/matrix-sdk-crypto-nodejs` or fetch the binary with
@@ -217,7 +214,7 @@ Notes:
 - `groupAllowFrom` restricts which senders can trigger the bot in rooms (full Matrix user IDs).
 - Per-room `users` allowlists can further restrict senders inside a specific room (use full Matrix user IDs).
 - The configure wizard prompts for room allowlists (room IDs, aliases, or names) and resolves names only on an exact, unique match.
-- On startup, openkrab resolves room/user names in allowlists to IDs and logs the mapping; unresolved entries are ignored for allowlist matching.
+- On startup, OpenKrab resolves room/user names in allowlists to IDs and logs the mapping; unresolved entries are ignored for allowlist matching.
 - Invites are auto-joined by default; control with `channels.matrix.autoJoin` and `channels.matrix.autoJoinAllowlist`.
 - To allow **no rooms**, set `channels.matrix.groupPolicy: "disabled"` (or keep an empty allowlist).
 - Legacy key: `channels.matrix.rooms` (same shape as `groups`).
@@ -234,32 +231,26 @@ Notes:
 
 | Feature         | Status                                                                                |
 | --------------- | ------------------------------------------------------------------------------------- |
-| Direct messages | ✅ Supported                                                                          |
-| Rooms           | ✅ Supported                                                                          |
-| Threads         | ✅ Supported                                                                          |
-| Media           | ✅ Supported                                                                          |
-| E2EE            | ✅ Supported (crypto module required)                                                 |
-| Reactions       | ✅ Supported (send/read via tools)                                                    |
-| Polls           | ✅ Send supported; inbound poll starts are converted to text (responses/ends ignored) |
-| Location        | ✅ Supported (geo URI; altitude ignored)                                              |
-| Native commands | ✅ Supported                                                                          |
+| Direct messages | âœ… Supported                                                                          |
+| Rooms           | âœ… Supported                                                                          |
+| Threads         | âœ… Supported                                                                          |
+| Media           | âœ… Supported                                                                          |
+| E2EE            | âœ… Supported (crypto module required)                                                 |
+| Reactions       | âœ… Supported (send/read via tools)                                                    |
+| Polls           | âœ… Send supported; inbound poll starts are converted to text (responses/ends ignored) |
+| Location        | âœ… Supported (geo URI; altitude ignored)                                              |
+| Native commands | âœ… Supported                                                                          |
 
 ## Troubleshooting
 
 Run this ladder first:
 
-```bash
-openkrab status
-openkrab gateway status
-openkrab logs --follow
-openkrab doctor
-openkrab channels status --probe
+```bash\nOpenKrab status\nOpenKrab gateway status\nOpenKrab logs --follow\nOpenKrab doctor\nOpenKrab channels status --probe
 ```
 
 Then confirm DM pairing state if needed:
 
-```bash
-openkrab pairing list matrix
+```bash\nOpenKrab pairing list matrix
 ```
 
 Common failures:
@@ -300,3 +291,4 @@ Provider options:
 - `channels.matrix.autoJoinAllowlist`: allowed room IDs/aliases for auto-join.
 - `channels.matrix.accounts`: multi-account configuration keyed by account ID (each account inherits top-level settings).
 - `channels.matrix.actions`: per-action tool gating (reactions/messages/pins/memberInfo/channelInfo).
+

@@ -1,14 +1,13 @@
----
+﻿---
 title: "Memory"
-summary: "How openkrab memory works (workspace files + automatic memory flush)"
+summary: "How OpenKrab memory works (workspace files + automatic memory flush)"
 read_when:
   - You want the memory file layout and workflow
   - You want to tune the automatic pre-compaction memory flush
 ---
 
 # Memory
-
-openkrab memory is **plain Markdown in the agent workspace**. The files are the
+\nOpenKrab memory is **plain Markdown in the agent workspace**. The files are the
 source of truth; the model only "remembers" what gets written to disk.
 
 Memory search tools are provided by the active memory plugin (default:
@@ -38,7 +37,7 @@ These files live under the workspace (`agents.defaults.workspace`, default
 
 ## Automatic memory flush (pre-compaction ping)
 
-When a session is **close to auto-compaction**, openkrab triggers a **silent,
+When a session is **close to auto-compaction**, OpenKrab triggers a **silent,
 agentic turn** that reminds the model to write durable memory **before** the
 context is compacted. The default prompts explicitly say the model _may reply_,
 but usually `NO_REPLY` is the correct response so the user never sees this turn.
@@ -77,8 +76,7 @@ For the full compaction lifecycle, see
 [Session management + compaction](/reference/session-management-compaction).
 
 ## Vector memory search
-
-openkrab can build a small vector index over `MEMORY.md` and `memory/*.md` so
+\nOpenKrab can build a small vector index over `MEMORY.md` and `memory/*.md` so
 semantic queries can find related notes even when wording differs.
 
 Defaults:
@@ -87,7 +85,7 @@ Defaults:
 - Watches memory files for changes (debounced).
 - Configure memory search under `agents.defaults.memorySearch` (not top-level
   `memorySearch`).
-- Uses remote embeddings by default. If `memorySearch.provider` is not set, openkrab auto-selects:
+- Uses remote embeddings by default. If `memorySearch.provider` is not set, OpenKrab auto-selects:
   1. `local` if a `memorySearch.local.modelPath` is configured and the file exists.
   2. `openai` if an OpenAI key can be resolved.
   3. `gemini` if a Gemini key can be resolved.
@@ -108,14 +106,14 @@ set `memorySearch.remote.apiKey` (and optional `memorySearch.remote.headers`).
 
 Set `memory.backend = "qmd"` to swap the built-in SQLite indexer for
 [QMD](https://github.com/tobi/qmd): a local-first search sidecar that combines
-BM25 + vectors + reranking. Markdown stays the source of truth; openkrab shells
+BM25 + vectors + reranking. Markdown stays the source of truth; OpenKrab shells
 out to QMD for retrieval. Key points:
 
 **Prereqs**
 
 - Disabled by default. Opt in per-config (`memory.backend = "qmd"`).
 - Install the QMD CLI separately (`bun install -g https://github.com/tobi/qmd` or grab
-  a release) and make sure the `qmd` binary is on the gateway’s `PATH`.
+  a release) and make sure the `qmd` binary is on the gatewayâ€™s `PATH`.
 - QMD needs an SQLite build that allows extensions (`brew install sqlite` on
   macOS).
 - QMD runs fully locally via Bun + `node-llama-cpp` and auto-downloads GGUF
@@ -133,7 +131,7 @@ out to QMD for retrieval. Key points:
 - Collections are created via `qmd collection add` from `memory.qmd.paths`
   (plus default workspace memory files), then `qmd update` + `qmd embed` run
   on boot and on a configurable interval (`memory.qmd.update.interval`,
-  default 5 m).
+  default 5â€¯m).
 - The gateway now initializes the QMD manager on startup, so periodic update
   timers are armed even before the first `memory_search` call.
 - Boot refresh now runs in the background by default so chat startup is not
@@ -141,24 +139,24 @@ out to QMD for retrieval. Key points:
   blocking behavior.
 - Searches run via `memory.qmd.searchMode` (default `qmd search --json`; also
   supports `vsearch` and `query`). If the selected mode rejects flags on your
-  QMD build, openkrab retries with `qmd query`. If QMD fails or the binary is
-  missing, openkrab automatically falls back to the builtin SQLite manager so
+  QMD build, OpenKrab retries with `qmd query`. If QMD fails or the binary is
+  missing, OpenKrab automatically falls back to the builtin SQLite manager so
   memory tools keep working.
-- openkrab does not expose QMD embed batch-size tuning today; batch behavior is
+- OpenKrab does not expose QMD embed batch-size tuning today; batch behavior is
   controlled by QMD itself.
 - **First search may be slow**: QMD may download local GGUF models (reranker/query
   expansion) on the first `qmd query` run.
-  - openkrab sets `XDG_CONFIG_HOME`/`XDG_CACHE_HOME` automatically when it runs QMD.
+  - OpenKrab sets `XDG_CONFIG_HOME`/`XDG_CACHE_HOME` automatically when it runs QMD.
   - If you want to pre-download models manually (and warm the same index openkrab
-    uses), run a one-off query with the agent’s XDG dirs.
+    uses), run a one-off query with the agentâ€™s XDG dirs.
 
-    openkrab’s QMD state lives under your **state dir** (defaults to `~/.openkrab`).
+    openkrabâ€™s QMD state lives under your **state dir** (defaults to `~/.openkrab`).
     You can point `qmd` at the exact same index by exporting the same XDG vars
-    openkrab uses:
+    OpenKrab uses:
 
     ```bash
-    # Pick the same state dir openkrab uses
-    STATE_DIR="${openkrab_STATE_DIR:-$HOME/.openkrab}"
+    # Pick the same state dir OpenKrab uses
+    STATE_DIR="${OPENKRAB_STATE_DIR:-$HOME/.openkrab}"
 
     export XDG_CONFIG_HOME="$STATE_DIR/agents/main/qmd/xdg-config"
     export XDG_CACHE_HOME="$STATE_DIR/agents/main/qmd/xdg-cache"
@@ -195,12 +193,12 @@ out to QMD for retrieval. Key points:
     `agent:<id>:`. Example: `agent:main:discord:`.
   - Legacy: `match.keyPrefix: "agent:..."` is still treated as a raw-key prefix,
     but prefer `rawKeyPrefix` for clarity.
-- When `scope` denies a search, openkrab logs a warning with the derived
+- When `scope` denies a search, OpenKrab logs a warning with the derived
   `channel`/`chatType` so empty results are easier to debug.
 - Snippets sourced outside the workspace show up as
   `qmd/<collection>/<relative-path>` in `memory_search` results; `memory_get`
   understands that prefix and reads from the configured QMD collection root.
-- When `memory.qmd.sessions.enabled = true`, openkrab exports sanitized session
+- When `memory.qmd.sessions.enabled = true`, OpenKrab exports sanitized session
   transcripts (User/Assistant turns) into a dedicated QMD collection under
   `~/.openkrab/agents/<id>/qmd/sessions/`, so `memory_search` can recall recent
   conversations without touching the builtin SQLite index.
@@ -241,7 +239,7 @@ memory: {
 
 - `memory.citations` applies regardless of backend (`auto`/`on`/`off`).
 - When `qmd` runs, we tag `status().backend = "qmd"` so diagnostics show which
-  engine served the results. If the QMD subprocess exits or JSON output can’t be
+  engine served the results. If the QMD subprocess exits or JSON output canâ€™t be
   parsed, the search manager logs a warning and returns the builtin provider
   (existing Markdown embeddings) until QMD recovers.
 
@@ -354,8 +352,8 @@ agents: {
 
 Tools:
 
-- `memory_search` — returns snippets with file + line ranges.
-- `memory_get` — read memory file content by path.
+- `memory_search` â€” returns snippets with file + line ranges.
+- `memory_get` â€” read memory file content by path.
 
 Local mode:
 
@@ -365,7 +363,7 @@ Local mode:
 
 ### How the memory tools work
 
-- `memory_search` semantically searches Markdown chunks (~400 token target, 80-token overlap) from `MEMORY.md` + `memory/**/*.md`. It returns snippet text (capped ~700 chars), file path, line range, score, provider/model, and whether we fell back from local → remote embeddings. No full file payload is returned.
+- `memory_search` semantically searches Markdown chunks (~400 token target, 80-token overlap) from `MEMORY.md` + `memory/**/*.md`. It returns snippet text (capped ~700 chars), file path, line range, score, provider/model, and whether we fell back from local â†’ remote embeddings. No full file payload is returned.
 - `memory_get` reads a specific memory Markdown file (workspace-relative), optionally from a starting line and for N lines. Paths outside `MEMORY.md` / `memory/` are rejected.
 - Both tools are enabled only when `memorySearch.enabled` resolves true for the agent.
 
@@ -374,27 +372,27 @@ Local mode:
 - File type: Markdown only (`MEMORY.md`, `memory/**/*.md`).
 - Index storage: per-agent SQLite at `~/.openkrab/memory/<agentId>.sqlite` (configurable via `agents.defaults.memorySearch.store.path`, supports `{agentId}` token).
 - Freshness: watcher on `MEMORY.md` + `memory/` marks the index dirty (debounce 1.5s). Sync is scheduled on session start, on search, or on an interval and runs asynchronously. Session transcripts use delta thresholds to trigger background sync.
-- Reindex triggers: the index stores the embedding **provider/model + endpoint fingerprint + chunking params**. If any of those change, openkrab automatically resets and reindexes the entire store.
+- Reindex triggers: the index stores the embedding **provider/model + endpoint fingerprint + chunking params**. If any of those change, OpenKrab automatically resets and reindexes the entire store.
 
 ### Hybrid search (BM25 + vector)
 
-When enabled, openkrab combines:
+When enabled, OpenKrab combines:
 
 - **Vector similarity** (semantic match, wording can differ)
 - **BM25 keyword relevance** (exact tokens like IDs, env vars, code symbols)
 
-If full-text search is unavailable on your platform, openkrab falls back to vector-only search.
+If full-text search is unavailable on your platform, OpenKrab falls back to vector-only search.
 
 #### Why hybrid?
 
-Vector search is great at “this means the same thing”:
+Vector search is great at â€œthis means the same thingâ€:
 
-- “Mac Studio gateway host” vs “the machine running the gateway”
-- “debounce file updates” vs “avoid indexing on every write”
+- â€œMac Studio gateway hostâ€ vs â€œthe machine running the gatewayâ€
+- â€œdebounce file updatesâ€ vs â€œavoid indexing on every writeâ€
 
 But it can be weak at exact, high-signal tokens:
 
-- IDs (`a828e60`, `b3b9895a…`)
+- IDs (`a828e60`, `b3b9895aâ€¦`)
 - code symbols (`memorySearch.query.hybrid`)
 - error strings ("sqlite-vec unavailable")
 
@@ -435,7 +433,7 @@ After merging vector and keyword scores, two optional post-processing stages
 refine the result list before it reaches the agent:
 
 ```
-Vector + Keyword → Weighted Merge → Temporal Decay → Sort → MMR → Top-K Results
+Vector + Keyword â†’ Weighted Merge â†’ Temporal Decay â†’ Sort â†’ MMR â†’ Top-K Results
 ```
 
 Both stages are **off by default** and can be enabled independently.
@@ -452,40 +450,40 @@ ensuring the top results cover different aspects of the query instead of repeati
 How it works:
 
 1. Results are scored by their original relevance (vector + BM25 weighted score).
-2. MMR iteratively selects results that maximize: `λ × relevance − (1−λ) × max_similarity_to_selected`.
+2. MMR iteratively selects results that maximize: `Î» Ã— relevance âˆ’ (1âˆ’Î») Ã— max_similarity_to_selected`.
 3. Similarity between results is measured using Jaccard text similarity on tokenized content.
 
 The `lambda` parameter controls the trade-off:
 
-- `lambda = 1.0` → pure relevance (no diversity penalty)
-- `lambda = 0.0` → maximum diversity (ignores relevance)
+- `lambda = 1.0` â†’ pure relevance (no diversity penalty)
+- `lambda = 0.0` â†’ maximum diversity (ignores relevance)
 - Default: `0.7` (balanced, slight relevance bias)
 
-**Example — query: "home network setup"**
+**Example â€” query: "home network setup"**
 
 Given these memory files:
 
 ```
-memory/2026-02-10.md  → "Configured Omada router, set VLAN 10 for IoT devices"
-memory/2026-02-08.md  → "Configured Omada router, moved IoT to VLAN 10"
-memory/2026-02-05.md  → "Set up AdGuard DNS on 192.168.10.2"
-memory/network.md     → "Router: Omada ER605, AdGuard: 192.168.10.2, VLAN 10: IoT"
+memory/2026-02-10.md  â†’ "Configured Omada router, set VLAN 10 for IoT devices"
+memory/2026-02-08.md  â†’ "Configured Omada router, moved IoT to VLAN 10"
+memory/2026-02-05.md  â†’ "Set up AdGuard DNS on 192.168.10.2"
+memory/network.md     â†’ "Router: Omada ER605, AdGuard: 192.168.10.2, VLAN 10: IoT"
 ```
 
-Without MMR — top 3 results:
+Without MMR â€” top 3 results:
 
 ```
-1. memory/2026-02-10.md  (score: 0.92)  ← router + VLAN
-2. memory/2026-02-08.md  (score: 0.89)  ← router + VLAN (near-duplicate!)
-3. memory/network.md     (score: 0.85)  ← reference doc
+1. memory/2026-02-10.md  (score: 0.92)  â† router + VLAN
+2. memory/2026-02-08.md  (score: 0.89)  â† router + VLAN (near-duplicate!)
+3. memory/network.md     (score: 0.85)  â† reference doc
 ```
 
-With MMR (λ=0.7) — top 3 results:
+With MMR (Î»=0.7) â€” top 3 results:
 
 ```
-1. memory/2026-02-10.md  (score: 0.92)  ← router + VLAN
-2. memory/network.md     (score: 0.85)  ← reference doc (diverse!)
-3. memory/2026-02-05.md  (score: 0.78)  ← AdGuard DNS (diverse!)
+1. memory/2026-02-10.md  (score: 0.92)  â† router + VLAN
+2. memory/network.md     (score: 0.85)  â† reference doc (diverse!)
+3. memory/2026-02-05.md  (score: 0.78)  â† AdGuard DNS (diverse!)
 ```
 
 The near-duplicate from Feb 8 drops out, and the agent gets three distinct pieces of information.
@@ -502,10 +500,10 @@ a well-worded note from six months ago can outrank yesterday's update on the sam
 so recent memories naturally rank higher while old ones fade:
 
 ```
-decayedScore = score × e^(-λ × ageInDays)
+decayedScore = score Ã— e^(-Î» Ã— ageInDays)
 ```
 
-where `λ = ln(2) / halfLifeDays`.
+where `Î» = ln(2) / halfLifeDays`.
 
 With the default half-life of 30 days:
 
@@ -524,20 +522,20 @@ With the default half-life of 30 days:
 **Dated daily files** (`memory/YYYY-MM-DD.md`) use the date extracted from the filename.
 Other sources (e.g., session transcripts) fall back to file modification time (`mtime`).
 
-**Example — query: "what's Rod's work schedule?"**
+**Example â€” query: "what's Rod's work schedule?"**
 
 Given these memory files (today is Feb 10):
 
 ```
-memory/2025-09-15.md  → "Rod works Mon-Fri, standup at 10am, pairing at 2pm"  (148 days old)
-memory/2026-02-10.md  → "Rod has standup at 14:15, 1:1 with Zeb at 14:45"    (today)
-memory/2026-02-03.md  → "Rod started new team, standup moved to 14:15"        (7 days old)
+memory/2025-09-15.md  â†’ "Rod works Mon-Fri, standup at 10am, pairing at 2pm"  (148 days old)
+memory/2026-02-10.md  â†’ "Rod has standup at 14:15, 1:1 with Zeb at 14:45"    (today)
+memory/2026-02-03.md  â†’ "Rod started new team, standup moved to 14:15"        (7 days old)
 ```
 
 Without decay:
 
 ```
-1. memory/2025-09-15.md  (score: 0.91)  ← best semantic match, but stale!
+1. memory/2025-09-15.md  (score: 0.91)  â† best semantic match, but stale!
 2. memory/2026-02-10.md  (score: 0.82)
 3. memory/2026-02-03.md  (score: 0.80)
 ```
@@ -545,9 +543,9 @@ Without decay:
 With decay (halfLife=30):
 
 ```
-1. memory/2026-02-10.md  (score: 0.82 × 1.00 = 0.82)  ← today, no decay
-2. memory/2026-02-03.md  (score: 0.80 × 0.85 = 0.68)  ← 7 days, mild decay
-3. memory/2025-09-15.md  (score: 0.91 × 0.03 = 0.03)  ← 148 days, nearly gone
+1. memory/2026-02-10.md  (score: 0.82 Ã— 1.00 = 0.82)  â† today, no decay
+2. memory/2026-02-03.md  (score: 0.80 Ã— 0.85 = 0.68)  â† 7 days, mild decay
+3. memory/2025-09-15.md  (score: 0.91 Ã— 0.03 = 0.03)  â† 148 days, nearly gone
 ```
 
 The stale September note drops to the bottom despite having the best raw semantic match.
@@ -589,13 +587,12 @@ agents: {
 
 You can enable either feature independently:
 
-- **MMR only** — useful when you have many similar notes but age doesn't matter.
-- **Temporal decay only** — useful when recency matters but your results are already diverse.
-- **Both** — recommended for agents with large, long-running daily note histories.
+- **MMR only** â€” useful when you have many similar notes but age doesn't matter.
+- **Temporal decay only** â€” useful when recency matters but your results are already diverse.
+- **Both** â€” recommended for agents with large, long-running daily note histories.
 
 ### Embedding cache
-
-openkrab can cache **chunk embeddings** in SQLite so reindexing and frequent updates (especially session transcripts) don't re-embed unchanged text.
+\nOpenKrab can cache **chunk embeddings** in SQLite so reindexing and frequent updates (especially session transcripts) don't re-embed unchanged text.
 
 Config:
 
@@ -634,7 +631,7 @@ Notes:
 - Session updates are debounced and **indexed asynchronously** once they cross delta thresholds (best-effort).
 - `memory_search` never blocks on indexing; results can be slightly stale until background sync finishes.
 - Results still include snippets only; `memory_get` remains limited to memory files.
-- Session indexing is isolated per agent (only that agent’s session logs are indexed).
+- Session indexing is isolated per agent (only that agentâ€™s session logs are indexed).
 - Session logs live on disk (`~/.openkrab/agents/<agentId>/sessions/*.jsonl`). Any process/user with filesystem access can read them, so treat disk access as the trust boundary. For stricter isolation, run agents under separate OS users or hosts.
 
 Delta thresholds (defaults shown):
@@ -656,7 +653,7 @@ agents: {
 
 ### SQLite vector acceleration (sqlite-vec)
 
-When the sqlite-vec extension is available, openkrab stores embeddings in a
+When the sqlite-vec extension is available, OpenKrab stores embeddings in a
 SQLite virtual table (`vec0`) and performs vector distance queries in the
 database. This keeps search fast without loading every embedding into JS.
 
@@ -681,7 +678,7 @@ Notes:
 
 - `enabled` defaults to true; when disabled, search falls back to in-process
   cosine similarity over stored embeddings.
-- If the sqlite-vec extension is missing or fails to load, openkrab logs the
+- If the sqlite-vec extension is missing or fails to load, OpenKrab logs the
   error and continues with the JS fallback (no vector table).
 - `extensionPath` overrides the bundled sqlite-vec path (useful for custom builds
   or non-standard install locations).
@@ -718,3 +715,5 @@ Notes:
 
 - `remote.*` takes precedence over `models.providers.openai.*`.
 - `remote.headers` merge with OpenAI headers; remote wins on key conflicts. Omit `remote.headers` to use the OpenAI defaults.
+
+

@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 发布新的 npm 版本
-  - 发布新的 macOS 应用版本
-  - 发布前验证元数据
-summary: npm + macOS 应用的逐步发布清单
+  - å‘å¸ƒæ–°çš„ npm ç‰ˆæœ¬
+  - å‘å¸ƒæ–°çš„ macOS åº”ç”¨ç‰ˆæœ¬
+  - å‘å¸ƒå‰éªŒè¯å…ƒæ•°æ®
+summary: npm + macOS åº”ç”¨çš„é€æ­¥å‘å¸ƒæ¸…å•
 x-i18n:
   generated_at: "2026-02-03T10:09:28Z"
   model: claude-opus-4-5
@@ -13,100 +13,100 @@ x-i18n:
   workflow: 15
 ---
 
-# 发布清单（npm + macOS）
+# å‘å¸ƒæ¸…å•ï¼ˆnpm + macOSï¼‰
 
-从仓库根目录使用 `pnpm`（Node 22+）。在打标签/发布前保持工作树干净。
+ä»Žä»“åº“æ ¹ç›®å½•ä½¿ç”¨ `pnpm`ï¼ˆNode 22+ï¼‰ã€‚åœ¨æ‰“æ ‡ç­¾/å‘å¸ƒå‰ä¿æŒå·¥ä½œæ ‘å¹²å‡€ã€‚
 
-## 操作员触发
+## æ“ä½œå‘˜è§¦å‘
 
-当操作员说"release"时，立即执行此预检（除非遇到阻碍否则不要额外提问）：
+å½“æ“ä½œå‘˜è¯´"release"æ—¶ï¼Œç«‹å³æ‰§è¡Œæ­¤é¢„æ£€ï¼ˆé™¤éžé‡åˆ°é˜»ç¢å¦åˆ™ä¸è¦é¢å¤–æé—®ï¼‰ï¼š
 
-- 阅读本文档和 `docs/platforms/mac/release.md`。
-- 从 `~/.profile` 加载环境变量并确认 `SPARKLE_PRIVATE_KEY_FILE` + App Store Connect 变量已设置（SPARKLE_PRIVATE_KEY_FILE 应位于 `~/.profile` 中）。
-- 如需要，使用 `~/Library/CloudStorage/Dropbox/Backup/Sparkle` 中的 Sparkle 密钥。
+- é˜…è¯»æœ¬æ–‡æ¡£å’Œ `docs/platforms/mac/release.md`ã€‚
+- ä»Ž `~/.profile` åŠ è½½çŽ¯å¢ƒå˜é‡å¹¶ç¡®è®¤ `SPARKLE_PRIVATE_KEY_FILE` + App Store Connect å˜é‡å·²è®¾ç½®ï¼ˆSPARKLE_PRIVATE_KEY_FILE åº”ä½äºŽ `~/.profile` ä¸­ï¼‰ã€‚
+- å¦‚éœ€è¦ï¼Œä½¿ç”¨ `~/Library/CloudStorage/Dropbox/Backup/Sparkle` ä¸­çš„ Sparkle å¯†é’¥ã€‚
 
-1. **版本和元数据**
+1. **ç‰ˆæœ¬å’Œå…ƒæ•°æ®**
 
-- [ ] 更新 `package.json` 版本（例如 `2026.1.29`）。
-- [ ] 运行 `pnpm plugins:sync` 以对齐扩展包版本和变更日志。
-- [ ] 更新 CLI/版本字符串：[`src/cli/program.ts`](https://github.com/OpenKrab/OpenKrab/blob/main/src/cli/program.ts) 和 [`src/provider-web.ts`](https://github.com/OpenKrab/OpenKrab/blob/main/src/provider-web.ts) 中的 Baileys user agent。
-- [ ] 确认包元数据（name、description、repository、keywords、license）以及 `bin` 映射指向 [`OpenKrab.mjs`](https://github.com/OpenKrab/OpenKrab/blob/main/OpenKrab.mjs) 作为 `OpenKrab`。
-- [ ] 如果依赖项有变化，运行 `pnpm install` 确保 `pnpm-lock.yaml` 是最新的。
+- [ ] æ›´æ–° `package.json` ç‰ˆæœ¬ï¼ˆä¾‹å¦‚ `2026.1.29`ï¼‰ã€‚
+- [ ] è¿è¡Œ `pnpm plugins:sync` ä»¥å¯¹é½æ‰©å±•åŒ…ç‰ˆæœ¬å’Œå˜æ›´æ—¥å¿—ã€‚
+- [ ] æ›´æ–° CLI/ç‰ˆæœ¬å­—ç¬¦ä¸²ï¼š[`src/cli/program.ts`](https://github.com/OpenKrab/OpenKrab/blob/main/src/cli/program.ts) å’Œ [`src/provider-web.ts`](https://github.com/OpenKrab/OpenKrab/blob/main/src/provider-web.ts) ä¸­çš„ Baileys user agentã€‚
+- [ ] ç¡®è®¤åŒ…å…ƒæ•°æ®ï¼ˆnameã€descriptionã€repositoryã€keywordsã€licenseï¼‰ä»¥åŠ `bin` æ˜ å°„æŒ‡å‘ [`OpenKrab.mjs`](https://github.com/OpenKrab/OpenKrab/blob/main/OpenKrab.mjs) ä½œä¸º `OpenKrab`ã€‚
+- [ ] å¦‚æžœä¾èµ–é¡¹æœ‰å˜åŒ–ï¼Œè¿è¡Œ `pnpm install` ç¡®ä¿ `pnpm-lock.yaml` æ˜¯æœ€æ–°çš„ã€‚
 
-2. **构建和产物**
+2. **æž„å»ºå’Œäº§ç‰©**
 
-- [ ] 如果 A2UI 输入有变化，运行 `pnpm canvas:a2ui:bundle` 并提交更新后的 [`src/canvas-host/a2ui/a2ui.bundle.js`](https://github.com/OpenKrab/OpenKrab/blob/main/src/canvas-host/a2ui/a2ui.bundle.js)。
-- [ ] `pnpm run build`（重新生成 `dist/`）。
-- [ ] 验证 npm 包的 `files` 包含所有必需的 `dist/*` 文件夹（特别是用于 headless node + ACP CLI 的 `dist/node-host/**` 和 `dist/acp/**`）。
-- [ ] 确认 `dist/build-info.json` 存在并包含预期的 `commit` 哈希（CLI 横幅在 npm 安装时使用此信息）。
-- [ ] 可选：构建后运行 `npm pack --pack-destination /tmp`；检查 tarball 内容并保留以备 GitHub 发布使用（**不要**提交它）。
+- [ ] å¦‚æžœ A2UI è¾“å…¥æœ‰å˜åŒ–ï¼Œè¿è¡Œ `pnpm canvas:a2ui:bundle` å¹¶æäº¤æ›´æ–°åŽçš„ [`src/canvas-host/a2ui/a2ui.bundle.js`](https://github.com/OpenKrab/OpenKrab/blob/main/src/canvas-host/a2ui/a2ui.bundle.js)ã€‚
+- [ ] `pnpm run build`ï¼ˆé‡æ–°ç”Ÿæˆ `dist/`ï¼‰ã€‚
+- [ ] éªŒè¯ npm åŒ…çš„ `files` åŒ…å«æ‰€æœ‰å¿…éœ€çš„ `dist/*` æ–‡ä»¶å¤¹ï¼ˆç‰¹åˆ«æ˜¯ç”¨äºŽ headless node + ACP CLI çš„ `dist/node-host/**` å’Œ `dist/acp/**`ï¼‰ã€‚
+- [ ] ç¡®è®¤ `dist/build-info.json` å­˜åœ¨å¹¶åŒ…å«é¢„æœŸçš„ `commit` å“ˆå¸Œï¼ˆCLI æ¨ªå¹…åœ¨ npm å®‰è£…æ—¶ä½¿ç”¨æ­¤ä¿¡æ¯ï¼‰ã€‚
+- [ ] å¯é€‰ï¼šæž„å»ºåŽè¿è¡Œ `npm pack --pack-destination /tmp`ï¼›æ£€æŸ¥ tarball å†…å®¹å¹¶ä¿ç•™ä»¥å¤‡ GitHub å‘å¸ƒä½¿ç”¨ï¼ˆ**ä¸è¦**æäº¤å®ƒï¼‰ã€‚
 
-3. **变更日志和文档**
+3. **å˜æ›´æ—¥å¿—å’Œæ–‡æ¡£**
 
-- [ ] 更新 `CHANGELOG.md`，添加面向用户的亮点（如果文件不存在则创建）；按版本严格降序排列条目。
-- [ ] 确保 README 示例/标志与当前 CLI 行为匹配（特别是新命令或选项）。
+- [ ] æ›´æ–° `CHANGELOG.md`ï¼Œæ·»åŠ é¢å‘ç”¨æˆ·çš„äº®ç‚¹ï¼ˆå¦‚æžœæ–‡ä»¶ä¸å­˜åœ¨åˆ™åˆ›å»ºï¼‰ï¼›æŒ‰ç‰ˆæœ¬ä¸¥æ ¼é™åºæŽ’åˆ—æ¡ç›®ã€‚
+- [ ] ç¡®ä¿ README ç¤ºä¾‹/æ ‡å¿—ä¸Žå½“å‰ CLI è¡Œä¸ºåŒ¹é…ï¼ˆç‰¹åˆ«æ˜¯æ–°å‘½ä»¤æˆ–é€‰é¡¹ï¼‰ã€‚
 
-4. **验证**
+4. **éªŒè¯**
 
 - [ ] `pnpm build`
 - [ ] `pnpm check`
-- [ ] `pnpm test`（如需覆盖率输出则使用 `pnpm test:coverage`）
-- [ ] `pnpm release:check`（验证 npm pack 内容）
-- [ ] `OpenKrab_INSTALL_SMOKE_SKIP_NONROOT=1 pnpm test:install:smoke`（Docker 安装冒烟测试，快速路径；发布前必需）
-  - 如果已知上一个 npm 发布版本有问题，为预安装步骤设置 `OpenKrab_INSTALL_SMOKE_PREVIOUS=<last-good-version>` 或 `OpenKrab_INSTALL_SMOKE_SKIP_PREVIOUS=1`。
-- [ ]（可选）完整安装程序冒烟测试（添加非 root + CLI 覆盖）：`pnpm test:install:smoke`
-- [ ]（可选）安装程序 E2E（Docker，运行 `curl -fsSL https://OpenKrab.ai/install.sh | bash`，新手引导，然后运行真实工具调用）：
-  - `pnpm test:install:e2e:openai`（需要 `OPENAI_API_KEY`）
-  - `pnpm test:install:e2e:anthropic`（需要 `ANTHROPIC_API_KEY`）
-  - `pnpm test:install:e2e`（需要两个密钥；运行两个提供商）
-- [ ]（可选）如果你的更改影响发送/接收路径，抽查 Web Gateway 网关。
+- [ ] `pnpm test`ï¼ˆå¦‚éœ€è¦†ç›–çŽ‡è¾“å‡ºåˆ™ä½¿ç”¨ `pnpm test:coverage`ï¼‰
+- [ ] `pnpm release:check`ï¼ˆéªŒè¯ npm pack å†…å®¹ï¼‰
+- [ ] `OPENKRAB_INSTALL_SMOKE_SKIP_NONROOT=1 pnpm test:install:smoke`ï¼ˆDocker å®‰è£…å†’çƒŸæµ‹è¯•ï¼Œå¿«é€Ÿè·¯å¾„ï¼›å‘å¸ƒå‰å¿…éœ€ï¼‰
+  - å¦‚æžœå·²çŸ¥ä¸Šä¸€ä¸ª npm å‘å¸ƒç‰ˆæœ¬æœ‰é—®é¢˜ï¼Œä¸ºé¢„å®‰è£…æ­¥éª¤è®¾ç½® `OPENKRAB_INSTALL_SMOKE_PREVIOUS=<last-good-version>` æˆ– `OPENKRAB_INSTALL_SMOKE_SKIP_PREVIOUS=1`ã€‚
+- [ ]ï¼ˆå¯é€‰ï¼‰å®Œæ•´å®‰è£…ç¨‹åºå†’çƒŸæµ‹è¯•ï¼ˆæ·»åŠ éž root + CLI è¦†ç›–ï¼‰ï¼š`pnpm test:install:smoke`
+- [ ]ï¼ˆå¯é€‰ï¼‰å®‰è£…ç¨‹åº E2Eï¼ˆDockerï¼Œè¿è¡Œ `curl -fsSL https://OpenKrab.ai/install.sh | bash`ï¼Œæ–°æ‰‹å¼•å¯¼ï¼Œç„¶åŽè¿è¡ŒçœŸå®žå·¥å…·è°ƒç”¨ï¼‰ï¼š
+  - `pnpm test:install:e2e:openai`ï¼ˆéœ€è¦ `OPENAI_API_KEY`ï¼‰
+  - `pnpm test:install:e2e:anthropic`ï¼ˆéœ€è¦ `ANTHROPIC_API_KEY`ï¼‰
+  - `pnpm test:install:e2e`ï¼ˆéœ€è¦ä¸¤ä¸ªå¯†é’¥ï¼›è¿è¡Œä¸¤ä¸ªæä¾›å•†ï¼‰
+- [ ]ï¼ˆå¯é€‰ï¼‰å¦‚æžœä½ çš„æ›´æ”¹å½±å“å‘é€/æŽ¥æ”¶è·¯å¾„ï¼ŒæŠ½æŸ¥ Web Gateway ç½‘å…³ã€‚
 
-5. **macOS 应用（Sparkle）**
+5. **macOS åº”ç”¨ï¼ˆSparkleï¼‰**
 
-- [ ] 构建并签名 macOS 应用，然后压缩以供分发。
-- [ ] 生成 Sparkle appcast（通过 [`scripts/make_appcast.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/make_appcast.sh) 生成 HTML 注释）并更新 `appcast.xml`。
-- [ ] 保留应用 zip（和可选的 dSYM zip）以便附加到 GitHub 发布。
-- [ ] 按照 [macOS 发布](/platforms/mac/release) 获取确切命令和所需环境变量。
-  - `APP_BUILD` 必须是数字且单调递增（不带 `-beta`），以便 Sparkle 正确比较版本。
-  - 如果进行公证，使用从 App Store Connect API 环境变量创建的 `OpenKrab-notary` 钥匙串配置文件（参见 [macOS 发布](/platforms/mac/release)）。
+- [ ] æž„å»ºå¹¶ç­¾å macOS åº”ç”¨ï¼Œç„¶åŽåŽ‹ç¼©ä»¥ä¾›åˆ†å‘ã€‚
+- [ ] ç”Ÿæˆ Sparkle appcastï¼ˆé€šè¿‡ [`scripts/make_appcast.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/make_appcast.sh) ç”Ÿæˆ HTML æ³¨é‡Šï¼‰å¹¶æ›´æ–° `appcast.xml`ã€‚
+- [ ] ä¿ç•™åº”ç”¨ zipï¼ˆå’Œå¯é€‰çš„ dSYM zipï¼‰ä»¥ä¾¿é™„åŠ åˆ° GitHub å‘å¸ƒã€‚
+- [ ] æŒ‰ç…§ [macOS å‘å¸ƒ](/platforms/mac/release) èŽ·å–ç¡®åˆ‡å‘½ä»¤å’Œæ‰€éœ€çŽ¯å¢ƒå˜é‡ã€‚
+  - `APP_BUILD` å¿…é¡»æ˜¯æ•°å­—ä¸”å•è°ƒé€’å¢žï¼ˆä¸å¸¦ `-beta`ï¼‰ï¼Œä»¥ä¾¿ Sparkle æ­£ç¡®æ¯”è¾ƒç‰ˆæœ¬ã€‚
+  - å¦‚æžœè¿›è¡Œå…¬è¯ï¼Œä½¿ç”¨ä»Ž App Store Connect API çŽ¯å¢ƒå˜é‡åˆ›å»ºçš„ `OpenKrab-notary` é’¥åŒ™ä¸²é…ç½®æ–‡ä»¶ï¼ˆå‚è§ [macOS å‘å¸ƒ](/platforms/mac/release)ï¼‰ã€‚
 
-6. **发布（npm）**
+6. **å‘å¸ƒï¼ˆnpmï¼‰**
 
-- [ ] 确认 git 状态干净；根据需要提交并推送。
-- [ ] 如需要，`npm login`（验证 2FA）。
-- [ ] `npm publish --access public`（预发布版本使用 `--tag beta`）。
-- [ ] 验证注册表：`npm view OpenKrab version`、`npm view OpenKrab dist-tags` 和 `npx -y OpenKrab@X.Y.Z --version`（或 `--help`）。
+- [ ] ç¡®è®¤ git çŠ¶æ€å¹²å‡€ï¼›æ ¹æ®éœ€è¦æäº¤å¹¶æŽ¨é€ã€‚
+- [ ] å¦‚éœ€è¦ï¼Œ`npm login`ï¼ˆéªŒè¯ 2FAï¼‰ã€‚
+- [ ] `npm publish --access public`ï¼ˆé¢„å‘å¸ƒç‰ˆæœ¬ä½¿ç”¨ `--tag beta`ï¼‰ã€‚
+- [ ] éªŒè¯æ³¨å†Œè¡¨ï¼š`npm view OpenKrab version`ã€`npm view OpenKrab dist-tags` å’Œ `npx -y OpenKrab@X.Y.Z --version`ï¼ˆæˆ– `--help`ï¼‰ã€‚
 
-### 故障排除（来自 2.0.0-beta2 发布的笔记）
+### æ•…éšœæŽ’é™¤ï¼ˆæ¥è‡ª 2.0.0-beta2 å‘å¸ƒçš„ç¬”è®°ï¼‰
 
-- **npm pack/publish 挂起或产生巨大 tarball**：`dist/OpenKrab.app` 中的 macOS 应用包（和发布 zip）被扫入包中。通过 `package.json` 的 `files` 白名单发布内容来修复（包含 dist 子目录、docs、skills；排除应用包）。用 `npm pack --dry-run` 确认 `dist/OpenKrab.app` 未列出。
-- **npm auth dist-tags 的 Web 循环**：使用旧版认证以获取 OTP 提示：
+- **npm pack/publish æŒ‚èµ·æˆ–äº§ç”Ÿå·¨å¤§ tarball**ï¼š`dist/OpenKrab.app` ä¸­çš„ macOS åº”ç”¨åŒ…ï¼ˆå’Œå‘å¸ƒ zipï¼‰è¢«æ‰«å…¥åŒ…ä¸­ã€‚é€šè¿‡ `package.json` çš„ `files` ç™½åå•å‘å¸ƒå†…å®¹æ¥ä¿®å¤ï¼ˆåŒ…å« dist å­ç›®å½•ã€docsã€skillsï¼›æŽ’é™¤åº”ç”¨åŒ…ï¼‰ã€‚ç”¨ `npm pack --dry-run` ç¡®è®¤ `dist/OpenKrab.app` æœªåˆ—å‡ºã€‚
+- **npm auth dist-tags çš„ Web å¾ªçŽ¯**ï¼šä½¿ç”¨æ—§ç‰ˆè®¤è¯ä»¥èŽ·å– OTP æç¤ºï¼š
   - `NPM_CONFIG_AUTH_TYPE=legacy npm dist-tag add OpenKrab@X.Y.Z latest`
-- **`npx` 验证失败并显示 `ECOMPROMISED: Lock compromised`**：使用新缓存重试：
+- **`npx` éªŒè¯å¤±è´¥å¹¶æ˜¾ç¤º `ECOMPROMISED: Lock compromised`**ï¼šä½¿ç”¨æ–°ç¼“å­˜é‡è¯•ï¼š
   - `NPM_CONFIG_CACHE=/tmp/npm-cache-$(date +%s) npx -y OpenKrab@X.Y.Z --version`
-- **延迟修复后需要重新指向标签**：强制更新并推送标签，然后确保 GitHub 发布资产仍然匹配：
+- **å»¶è¿Ÿä¿®å¤åŽéœ€è¦é‡æ–°æŒ‡å‘æ ‡ç­¾**ï¼šå¼ºåˆ¶æ›´æ–°å¹¶æŽ¨é€æ ‡ç­¾ï¼Œç„¶åŽç¡®ä¿ GitHub å‘å¸ƒèµ„äº§ä»ç„¶åŒ¹é…ï¼š
   - `git tag -f vX.Y.Z && git push -f origin vX.Y.Z`
 
-7. **GitHub 发布 + appcast**
+7. **GitHub å‘å¸ƒ + appcast**
 
-- [ ] 打标签并推送：`git tag vX.Y.Z && git push origin vX.Y.Z`（或 `git push --tags`）。
-- [ ] 为 `vX.Y.Z` 创建/刷新 GitHub 发布，**标题为 `OpenKrab X.Y.Z`**（不仅仅是标签）；正文应包含该版本的**完整**变更日志部分（亮点 + 更改 + 修复），内联显示（无裸链接），且**不得在正文中重复标题**。
-- [ ] 附加产物：`npm pack` tarball（可选）、`OpenKrab-X.Y.Z.zip` 和 `OpenKrab-X.Y.Z.dSYM.zip`（如果生成）。
-- [ ] 提交更新后的 `appcast.xml` 并推送（Sparkle 从 main 获取源）。
-- [ ] 从干净的临时目录（无 `package.json`），运行 `npx -y OpenKrab@X.Y.Z send --help` 确认安装/CLI 入口点正常工作。
-- [ ] 宣布/分享发布说明。
+- [ ] æ‰“æ ‡ç­¾å¹¶æŽ¨é€ï¼š`git tag vX.Y.Z && git push origin vX.Y.Z`ï¼ˆæˆ– `git push --tags`ï¼‰ã€‚
+- [ ] ä¸º `vX.Y.Z` åˆ›å»º/åˆ·æ–° GitHub å‘å¸ƒï¼Œ**æ ‡é¢˜ä¸º `OpenKrab X.Y.Z`**ï¼ˆä¸ä»…ä»…æ˜¯æ ‡ç­¾ï¼‰ï¼›æ­£æ–‡åº”åŒ…å«è¯¥ç‰ˆæœ¬çš„**å®Œæ•´**å˜æ›´æ—¥å¿—éƒ¨åˆ†ï¼ˆäº®ç‚¹ + æ›´æ”¹ + ä¿®å¤ï¼‰ï¼Œå†…è”æ˜¾ç¤ºï¼ˆæ— è£¸é“¾æŽ¥ï¼‰ï¼Œä¸”**ä¸å¾—åœ¨æ­£æ–‡ä¸­é‡å¤æ ‡é¢˜**ã€‚
+- [ ] é™„åŠ äº§ç‰©ï¼š`npm pack` tarballï¼ˆå¯é€‰ï¼‰ã€`OpenKrab-X.Y.Z.zip` å’Œ `OpenKrab-X.Y.Z.dSYM.zip`ï¼ˆå¦‚æžœç”Ÿæˆï¼‰ã€‚
+- [ ] æäº¤æ›´æ–°åŽçš„ `appcast.xml` å¹¶æŽ¨é€ï¼ˆSparkle ä»Ž main èŽ·å–æºï¼‰ã€‚
+- [ ] ä»Žå¹²å‡€çš„ä¸´æ—¶ç›®å½•ï¼ˆæ—  `package.json`ï¼‰ï¼Œè¿è¡Œ `npx -y OpenKrab@X.Y.Z send --help` ç¡®è®¤å®‰è£…/CLI å…¥å£ç‚¹æ­£å¸¸å·¥ä½œã€‚
+- [ ] å®£å¸ƒ/åˆ†äº«å‘å¸ƒè¯´æ˜Žã€‚
 
-## 插件发布范围（npm）
+## æ’ä»¶å‘å¸ƒèŒƒå›´ï¼ˆnpmï¼‰
 
-我们只发布 `@OpenKrab/*` 范围下的**现有 npm 插件**。不在 npm 上的内置插件保持**仅磁盘树**（仍在 `extensions/**` 中发布）。
+æˆ‘ä»¬åªå‘å¸ƒ `@OpenKrab/*` èŒƒå›´ä¸‹çš„**çŽ°æœ‰ npm æ’ä»¶**ã€‚ä¸åœ¨ npm ä¸Šçš„å†…ç½®æ’ä»¶ä¿æŒ**ä»…ç£ç›˜æ ‘**ï¼ˆä»åœ¨ `extensions/**` ä¸­å‘å¸ƒï¼‰ã€‚
 
-获取列表的流程：
+èŽ·å–åˆ—è¡¨çš„æµç¨‹ï¼š
 
-1. `npm search @OpenKrab --json` 并捕获包名。
-2. 与 `extensions/*/package.json` 名称比较。
-3. 只发布**交集**（已在 npm 上）。
+1. `npm search @OpenKrab --json` å¹¶æ•èŽ·åŒ…åã€‚
+2. ä¸Ž `extensions/*/package.json` åç§°æ¯”è¾ƒã€‚
+3. åªå‘å¸ƒ**äº¤é›†**ï¼ˆå·²åœ¨ npm ä¸Šï¼‰ã€‚
 
-当前 npm 插件列表（根据需要更新）：
+å½“å‰ npm æ’ä»¶åˆ—è¡¨ï¼ˆæ ¹æ®éœ€è¦æ›´æ–°ï¼‰ï¼š
 
 - @OpenKrab/bluebubbles
 - @OpenKrab/diagnostics-otel
@@ -120,5 +120,6 @@ x-i18n:
 - @OpenKrab/zalo
 - @OpenKrab/zalouser
 
-发布说明还必须标注**默认未启用**的**新可选内置插件**（例如：`tlon`）。
+å‘å¸ƒè¯´æ˜Žè¿˜å¿…é¡»æ ‡æ³¨**é»˜è®¤æœªå¯ç”¨**çš„**æ–°å¯é€‰å†…ç½®æ’ä»¶**ï¼ˆä¾‹å¦‚ï¼š`tlon`ï¼‰ã€‚
+
 

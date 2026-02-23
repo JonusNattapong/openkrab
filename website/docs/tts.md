@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Text-to-speech (TTS) for outbound replies"
 read_when:
   - Enabling text-to-speech for replies
@@ -21,14 +21,14 @@ It works anywhere OpenKrab can send audio; Telegram gets a round voice-note bubb
 ### Edge TTS notes
 
 Edge TTS uses Microsoft Edge's online neural TTS service via the `node-edge-tts`
-library. It's a hosted service (not local), uses Microsoft’s endpoints, and does
+library. It's a hosted service (not local), uses Microsoftâ€™s endpoints, and does
 not require an API key. `node-edge-tts` exposes speech configuration options and
-output formats, but not all options are supported by the Edge service. citeturn2search0
+output formats, but not all options are supported by the Edge service. îˆ€citeîˆ‚turn2search0îˆ
 
 Because Edge TTS is a public web service without a published SLA or quota, treat it
 as best-effort. If you need guaranteed limits and support, use OpenAI or ElevenLabs.
-Microsoft's Speech REST API documents a 10‑minute audio limit per request; Edge TTS
-does not publish limits, so assume similar or lower limits. citeturn0search3
+Microsoft's Speech REST API documents a 10â€‘minute audio limit per request; Edge TTS
+does not publish limits, so assume similar or lower limits. îˆ€citeîˆ‚turn0search3îˆ
 
 ## Optional keys
 
@@ -55,7 +55,7 @@ so that provider must also be authenticated if you enable summaries.
 
 ## Is it enabled by default?
 
-No. Auto‑TTS is **off** by default. Enable it in config with
+No. Autoâ€‘TTS is **off** by default. Enable it in config with
 `messages.tts.auto` or per session with `/tts always` (alias: `/tts on`).
 
 Edge TTS **is** enabled by default once TTS is on, and is used automatically
@@ -199,7 +199,7 @@ Then run:
 
 ### Notes on fields
 
-- `auto`: auto‑TTS mode (`off`, `always`, `inbound`, `tagged`).
+- `auto`: autoâ€‘TTS mode (`off`, `always`, `inbound`, `tagged`).
   - `inbound` only sends audio after an inbound voice note.
   - `tagged` only sends audio when the reply includes `[[tts]]` tags.
 - `enabled`: legacy toggle (doctor migrates this to `auto`).
@@ -294,7 +294,7 @@ Optional allowlist (disable specific overrides while keeping tags enabled):
 ## Per-user preferences
 
 Slash commands write local overrides to `prefsPath` (default:
-`~/.OpenKrab/settings/tts.json`, override with `OpenKrab_TTS_PREFS` or
+`~/.OpenKrab/settings/tts.json`, override with `OPENKRAB_TTS_PREFS` or
 `messages.tts.prefsPath`).
 
 Stored fields:
@@ -314,10 +314,10 @@ These override `messages.tts.*` for that host.
   - 44.1kHz / 128kbps is the default balance for speech clarity.
 - **Edge TTS**: uses `edge.outputFormat` (default `audio-24khz-48kbitrate-mono-mp3`).
   - `node-edge-tts` accepts an `outputFormat`, but not all formats are available
-    from the Edge service. citeturn2search0
-  - Output format values follow Microsoft Speech output formats (including Ogg/WebM Opus). citeturn1search0
+    from the Edge service. îˆ€citeîˆ‚turn2search0îˆ
+  - Output format values follow Microsoft Speech output formats (including Ogg/WebM Opus). îˆ€citeîˆ‚turn1search0îˆ
   - Telegram `sendVoice` accepts OGG/MP3/M4A; use OpenAI/ElevenLabs if you need
-    guaranteed Opus voice notes. citeturn1search1
+    guaranteed Opus voice notes. îˆ€citeîˆ‚turn1search1îˆ
   - If the configured Edge output format fails, OpenKrab retries with MP3.
 
 OpenAI/ElevenLabs formats are fixed; Telegram expects Opus for voice-note UX.
@@ -374,7 +374,7 @@ Notes:
 
 - Commands require an authorized sender (allowlist/owner rules still apply).
 - `commands.text` or native command registration must be enabled.
-- `off|always|inbound|tagged` are per‑session toggles (`/tts on` is an alias for `/tts always`).
+- `off|always|inbound|tagged` are perâ€‘session toggles (`/tts on` is an alias for `/tts always`).
 - `limit` and `summary` are stored in local prefs, not the main config.
 - `/tts audio` generates a one-off audio reply (does not toggle TTS on).
 
@@ -394,4 +394,5 @@ Gateway methods:
 - `tts.convert`
 - `tts.setProvider`
 - `tts.providers`
+
 

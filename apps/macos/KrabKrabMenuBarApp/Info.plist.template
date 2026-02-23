@@ -3,12 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDisplayName</key>
-    <string>KrabKrab</string>
+    <string>openkrab</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSMicrophoneUsageDescription</key>
-    <string>KrabKrab uses microphone audio for voice wake and talk mode.</string>
+    <string>openkrab uses microphone audio for voice wake and talk mode.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
-    <string>KrabKrab transcribes speech locally for wake phrase detection.</string>
+    <string>openkrab transcribes speech locally for wake phrase detection.</string>
 </dict>
 </plist>
+

@@ -43,7 +43,7 @@ const DASHBOARD_HTML: &str = r#"<!DOCTYPE html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>🦀 Krabkrab Dashboard</title>
+<title>🦀 openkrab Dashboard</title>
 <style>
   :root {
     --bg: #0f1117;
@@ -342,7 +342,7 @@ const DASHBOARD_HTML: &str = r#"<!DOCTYPE html>
 
 <header>
   <span style="font-size:24px">🦀</span>
-  <h1>Krabkrab Dashboard</h1>
+  <h1>openkrab Dashboard</h1>
   <span class="badge">v0.1.0</span>
   <span style="flex:1"></span>
   <span id="uptime" style="font-size:0.78rem;color:var(--muted)">Loading…</span>
@@ -396,7 +396,7 @@ const DASHBOARD_HTML: &str = r#"<!DOCTYPE html>
     <div class="chat-messages" id="chat-messages">
       <div class="msg bot">
         <div class="avatar bot-av">🤖</div>
-        <div class="bubble">Hello! I'm the Krabkrab agent. Ask me anything, or use the Memory Search panel on the left to explore stored knowledge.</div>
+        <div class="bubble">Hello! I'm the openkrab agent. Ask me anything, or use the Memory Search panel on the left to explore stored knowledge.</div>
       </div>
     </div>
 
@@ -633,7 +633,7 @@ pub async fn api_status_handler(State(state): State<Arc<GatewayState>>) -> impl 
         "healthy": true,
         "endpoint": "http://127.0.0.1:3000",
         "version": env!("CARGO_PKG_VERSION"),
-        "agent_name": "Krabkrab Agent",
+        "agent_name": "openkrab Agent",
         "memory_count": memory_count,
         "connectors": connectors,
     });
@@ -740,3 +740,4 @@ pub async fn health_handler() -> impl IntoResponse {
         r#"{"status":"ok"}"#,
     )
 }
+

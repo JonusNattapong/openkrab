@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab message` (send + channel actions)"
 read_when:
   - Adding or modifying message CLI actions
@@ -13,8 +13,7 @@ Single outbound command for sending messages and channel actions
 
 ## Usage
 
-```
-openkrab message <subcommand> [flags]
+```\nOpenKrab message <subcommand> [flags]
 ```
 
 Channel selection:
@@ -38,7 +37,7 @@ Target formats (`--target`):
 Name lookup:
 
 - For supported providers (Discord/Slack/etc), channel names like `Help` or `#help` are resolved via the directory cache.
-- On cache miss, openkrab will attempt a live directory lookup when the provider supports it.
+- On cache miss, OpenKrab will attempt a live directory lookup when the provider supports it.
 
 ## Common flags
 
@@ -186,15 +185,13 @@ Name lookup:
 
 Send a Discord reply:
 
-```
-openkrab message send --channel discord \
+```\nOpenKrab message send --channel discord \
   --target channel:123 --message "hi" --reply-to 456
 ```
 
 Send a Discord message with components:
 
-```
-openkrab message send --channel discord \
+```\nOpenKrab message send --channel discord \
   --target channel:123 --message "Choose:" \
   --components '{"text":"Choose a path","blocks":[{"type":"actions","buttons":[{"label":"Approve","style":"success"},{"label":"Decline","style":"danger"}]}]}'
 ```
@@ -203,8 +200,7 @@ See [Discord components](/channels/discord#interactive-components) for the full 
 
 Create a Discord poll:
 
-```
-openkrab message poll --channel discord \
+```\nOpenKrab message poll --channel discord \
   --target channel:123 \
   --poll-question "Snack?" \
   --poll-option Pizza --poll-option Sushi \
@@ -213,8 +209,7 @@ openkrab message poll --channel discord \
 
 Create a Telegram poll (auto-close in 2 minutes):
 
-```
-openkrab message poll --channel telegram \
+```\nOpenKrab message poll --channel telegram \
   --target @mychat \
   --poll-question "Lunch?" \
   --poll-option Pizza --poll-option Sushi \
@@ -223,15 +218,13 @@ openkrab message poll --channel telegram \
 
 Send a Teams proactive message:
 
-```
-openkrab message send --channel msteams \
+```\nOpenKrab message send --channel msteams \
   --target conversation:19:abc@thread.tacv2 --message "hi"
 ```
 
 Create a Teams poll:
 
-```
-openkrab message poll --channel msteams \
+```\nOpenKrab message poll --channel msteams \
   --target conversation:19:abc@thread.tacv2 \
   --poll-question "Lunch?" \
   --poll-option Pizza --poll-option Sushi
@@ -239,22 +232,20 @@ openkrab message poll --channel msteams \
 
 React in Slack:
 
-```
-openkrab message react --channel slack \
-  --target C123 --message-id 456 --emoji "✅"
+```\nOpenKrab message react --channel slack \
+  --target C123 --message-id 456 --emoji "âœ…"
 ```
 
 React in a Signal group:
 
-```
-openkrab message react --channel signal \
+```\nOpenKrab message react --channel signal \
   --target signal:group:abc123 --message-id 1737630212345 \
-  --emoji "✅" --target-author-uuid 123e4567-e89b-12d3-a456-426614174000
+  --emoji "âœ…" --target-author-uuid 123e4567-e89b-12d3-a456-426614174000
 ```
 
 Send Telegram inline buttons:
 
-```
-openkrab message send --channel telegram --target @mychat --message "Choose:" \
+```\nOpenKrab message send --channel telegram --target @mychat --message "Choose:" \
   --buttons '[ [{"text":"Yes","callback_data":"cmd:yes"}], [{"text":"No","callback_data":"cmd:no"}] ]'
 ```
+

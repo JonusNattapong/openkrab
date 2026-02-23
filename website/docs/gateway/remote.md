@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Remote access using SSH tunnels (Gateway WS) and tailnets"
 read_when:
   - Running or troubleshooting remote gateway setups
@@ -7,7 +7,7 @@ title: "Remote Access"
 
 # Remote access (SSH, tunnels, and tailnets)
 
-This repo supports “remote over SSH” by keeping a single Gateway (the master) running on a dedicated host (desktop/server) and connecting clients to it.
+This repo supports â€œremote over SSHâ€ by keeping a single Gateway (the master) running on a dedicated host (desktop/server) and connecting clients to it.
 
 - For **operators (you / the macOS app)**: SSH tunneling is the universal fallback.
 - For **nodes (iOS/Android and future devices)**: connect to the Gateway **WebSocket** (LAN/tailnet or SSH tunnel as needed).
@@ -19,7 +19,7 @@ This repo supports “remote over SSH” by keeping a single Gateway (the master
 
 ## Common VPN/tailnet setups (where the agent lives)
 
-Think of the **Gateway host** as “where the agent lives.” It owns sessions, auth profiles, channels, and state.
+Think of the **Gateway host** as â€œwhere the agent lives.â€ It owns sessions, auth profiles, channels, and state.
 Your laptop/desktop (and nodes) connect to that host.
 
 ### 1) Always-on Gateway in your tailnet (VPS or home server)
@@ -36,8 +36,8 @@ This is ideal when your laptop sleeps often but you want the agent always-on.
 
 The laptop does **not** run the agent. It connects remotely:
 
-- Use the macOS app’s **Remote over SSH** mode (Settings → General → “openkrab runs”).
-- The app opens and manages the tunnel, so WebChat + health checks “just work.”
+- Use the macOS appâ€™s **Remote over SSH** mode (Settings â†’ General â†’ â€œopenkrab runsâ€).
+- The app opens and manages the tunnel, so WebChat + health checks â€œjust work.â€
 
 Runbook: [macOS remote access](/platforms/mac/remote).
 
@@ -54,7 +54,7 @@ Guide: [Tailscale](/gateway/tailscale) and [Web overview](/web).
 
 One gateway service owns state + channels. Nodes are peripherals.
 
-Flow example (Telegram → node):
+Flow example (Telegram â†’ node):
 
 - Telegram message arrives at the **Gateway**.
 - Gateway runs the **agent** and decides whether to call a node tool.
@@ -64,7 +64,7 @@ Flow example (Telegram → node):
 Notes:
 
 - **Nodes do not run the gateway service.** Only one gateway should run per host unless you intentionally run isolated profiles (see [Multiple gateways](/gateway/multiple-gateways)).
-- macOS app “node mode” is just a node client over the Gateway WebSocket.
+- macOS app â€œnode modeâ€ is just a node client over the Gateway WebSocket.
 
 ## SSH tunnel (CLI + tools)
 
@@ -79,7 +79,7 @@ With the tunnel up:
 - `openkrab health` and `openkrab status --deep` now reach the remote gateway via `ws://127.0.0.1:18789`.
 - `openkrab gateway {status,health,send,agent,call}` can also target the forwarded URL via `--url` when needed.
 
-Note: replace `18789` with your configured `gateway.port` (or `--port`/`openkrab_GATEWAY_PORT`).
+Note: replace `18789` with your configured `gateway.port` (or `--port`/`OPENKRAB_GATEWAY_PORT`).
 Note: when you pass `--url`, the CLI does not fall back to config or environment credentials.
 Include `--token` or `--password` explicitly. Missing explicit credentials is an error.
 
@@ -106,9 +106,9 @@ When the gateway is loopback-only, keep the URL at `ws://127.0.0.1:18789` and op
 WebChat no longer uses a separate HTTP port. The SwiftUI chat UI connects directly to the Gateway WebSocket.
 
 - Forward `18789` over SSH (see above), then connect clients to `ws://127.0.0.1:18789`.
-- On macOS, prefer the app’s “Remote over SSH” mode, which manages the tunnel automatically.
+- On macOS, prefer the appâ€™s â€œRemote over SSHâ€ mode, which manages the tunnel automatically.
 
-## macOS app “Remote over SSH”
+## macOS app â€œRemote over SSHâ€
 
 The macOS menu bar app can drive the same setup end-to-end (remote status checks, WebChat, and Voice Wake forwarding).
 
@@ -116,14 +116,15 @@ Runbook: [macOS remote access](/platforms/mac/remote).
 
 ## Security rules (remote/VPN)
 
-Short version: **keep the Gateway loopback-only** unless you’re sure you need a bind.
+Short version: **keep the Gateway loopback-only** unless youâ€™re sure you need a bind.
 
 - **Loopback + SSH/Tailscale Serve** is the safest default (no public exposure).
 - **Non-loopback binds** (`lan`/`tailnet`/`custom`, or `auto` when loopback is unavailable) must use auth tokens/passwords.
-- `gateway.remote.token` is **only** for remote CLI calls — it does **not** enable local auth.
+- `gateway.remote.token` is **only** for remote CLI calls â€” it does **not** enable local auth.
 - `gateway.remote.tlsFingerprint` pins the remote TLS cert when using `wss://`.
 - **Tailscale Serve** can authenticate via identity headers when `gateway.auth.allowTailscale: true`.
   Set it to `false` if you want tokens/passwords instead.
 - Treat browser control like operator access: tailnet-only + deliberate node pairing.
 
 Deep dive: [Security](/gateway/security).
+

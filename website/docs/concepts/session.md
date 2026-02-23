@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Session management rules, keys, and persistence for chats"
 read_when:
   - Modifying session handling or storage
@@ -6,8 +6,7 @@ title: "Session Management"
 ---
 
 # Session Management
-
-openkrab treats **one direct-chat session per agent** as primary. Direct chats collapse to `agent:<agentId>:<mainKey>` (default `main`), while group/channel chats get their own keys. `session.mainKey` is honored.
+\nOpenKrab treats **one direct-chat session per agent** as primary. Direct chats collapse to `agent:<agentId>:<mainKey>` (default `main`), while group/channel chats get their own keys. `session.mainKey` is honored.
 
 Use `session.dmScope` to control how **direct messages** are grouped:
 
@@ -55,10 +54,10 @@ Notes:
 
 ## Gateway is the source of truth
 
-All session state is **owned by the gateway** (the “master” openkrab). UI clients (macOS app, WebChat, etc.) must query the gateway for session lists and token counts instead of reading local files.
+All session state is **owned by the gateway** (the â€œmasterâ€ openkrab). UI clients (macOS app, WebChat, etc.) must query the gateway for session lists and token counts instead of reading local files.
 
 - In **remote mode**, the session store you care about lives on the remote gateway host, not your Mac.
-- Token counts shown in UIs come from the gateway’s store fields (`inputTokens`, `outputTokens`, `totalTokens`, `contextTokens`). Clients do not parse JSONL transcripts to “fix up” totals.
+- Token counts shown in UIs come from the gatewayâ€™s store fields (`inputTokens`, `outputTokens`, `totalTokens`, `contextTokens`). Clients do not parse JSONL transcripts to â€œfix upâ€ totals.
 
 ## Where state lives
 
@@ -68,21 +67,20 @@ All session state is **owned by the gateway** (the “master” openkrab). UI cl
 - The store is a map `sessionKey -> { sessionId, updatedAt, ... }`. Deleting entries is safe; they are recreated on demand.
 - Group entries may include `displayName`, `channel`, `subject`, `room`, and `space` to label sessions in UIs.
 - Session entries include `origin` metadata (label + routing hints) so UIs can explain where a session came from.
-- openkrab does **not** read legacy Pi/Tau session folders.
+- OpenKrab does **not** read legacy Pi/Tau session folders.
 
 ## Session pruning
-
-openkrab trims **old tool results** from the in-memory context right before LLM calls by default.
+\nOpenKrab trims **old tool results** from the in-memory context right before LLM calls by default.
 This does **not** rewrite JSONL history. See [/concepts/session-pruning](/concepts/session-pruning).
 
 ## Pre-compaction memory flush
 
-When a session nears auto-compaction, openkrab can run a **silent memory flush**
+When a session nears auto-compaction, OpenKrab can run a **silent memory flush**
 turn that reminds the model to write durable notes to disk. This only runs when
 the workspace is writable. See [Memory](/concepts/memory) and
 [Compaction](/concepts/compaction).
 
-## Mapping transports → session keys
+## Mapping transports â†’ session keys
 
 - Direct chats follow `session.dmScope` (default `main`).
   - `main`: `agent:<agentId>:<mainKey>` (continuity across devices/channels).
@@ -105,10 +103,10 @@ the workspace is writable. See [Memory](/concepts/memory) and
 - Reset policy: sessions are reused until they expire, and expiry is evaluated on the next inbound message.
 - Daily reset: defaults to **4:00 AM local time on the gateway host**. A session is stale once its last update is earlier than the most recent daily reset time.
 - Idle reset (optional): `idleMinutes` adds a sliding idle window. When both daily and idle resets are configured, **whichever expires first** forces a new session.
-- Legacy idle-only: if you set `session.idleMinutes` without any `session.reset`/`resetByType` config, openkrab stays in idle-only mode for backward compatibility.
+- Legacy idle-only: if you set `session.idleMinutes` without any `session.reset`/`resetByType` config, OpenKrab stays in idle-only mode for backward compatibility.
 - Per-type overrides (optional): `resetByType` lets you override the policy for `direct`, `group`, and `thread` sessions (thread = Slack/Discord threads, Telegram topics, Matrix threads when provided by the connector).
 - Per-channel overrides (optional): `resetByChannel` overrides the reset policy for a channel (applies to all session types for that channel and takes precedence over `reset`/`resetByType`).
-- Reset triggers: exact `/new` or `/reset` (plus any extras in `resetTriggers`) start a fresh session id and pass the remainder of the message through. `/new <model>` accepts a model alias, `provider/model`, or provider name (fuzzy match) to set the new session model. If `/new` or `/reset` is sent alone, openkrab runs a short “hello” greeting turn to confirm the reset.
+- Reset triggers: exact `/new` or `/reset` (plus any extras in `resetTriggers`) start a fresh session id and pass the remainder of the message through. `/new <model>` accepts a model alias, `provider/model`, or provider name (fuzzy match) to set the new session model. If `/new` or `/reset` is sent alone, OpenKrab runs a short â€œhelloâ€ greeting turn to confirm the reset.
 - Manual reset: delete specific keys from the store or remove the JSONL transcript; the next message recreates them.
 - Isolated cron jobs always mint a fresh `sessionId` per run (no idle reuse).
 
@@ -134,9 +132,9 @@ Block delivery for specific session types without listing individual ids.
 
 Runtime override (owner only):
 
-- `/send on` → allow for this session
-- `/send off` → deny for this session
-- `/send inherit` → clear override and use config rules
+- `/send on` â†’ allow for this session
+- `/send off` â†’ deny for this session
+- `/send inherit` â†’ clear override and use config rules
   Send these as standalone messages so they register.
 
 ## Configuration (optional rename example)
@@ -174,11 +172,11 @@ Runtime override (owner only):
 
 ## Inspecting
 
-- `openkrab status` — shows store path and recent sessions.
-- `openkrab sessions --json` — dumps every entry (filter with `--active <minutes>`).
-- `openkrab gateway call sessions.list --params '{}'` — fetch sessions from the running gateway (use `--url`/`--token` for remote gateway access).
+- `openkrab status` â€” shows store path and recent sessions.
+- `openkrab sessions --json` â€” dumps every entry (filter with `--active <minutes>`).
+- `openkrab gateway call sessions.list --params '{}'` â€” fetch sessions from the running gateway (use `--url`/`--token` for remote gateway access).
 - Send `/status` as a standalone message in chat to see whether the agent is reachable, how much of the session context is used, current thinking/verbose toggles, and when your WhatsApp web creds were last refreshed (helps spot relink needs).
-- Send `/context list` or `/context detail` to see what’s in the system prompt and injected workspace files (and the biggest context contributors).
+- Send `/context list` or `/context detail` to see whatâ€™s in the system prompt and injected workspace files (and the biggest context contributors).
 - Send `/stop` as a standalone message to abort the current run, clear queued followups for that session, and stop any sub-agent runs spawned from it (the reply includes the stopped count).
 - Send `/compact` (optional instructions) as a standalone message to summarize older context and free up window space. See [/concepts/compaction](/concepts/compaction).
 - JSONL transcripts can be opened directly to review full turns.
@@ -204,3 +202,4 @@ Each session entry records where it came from (best-effort) in `origin`:
   `GroupSubject`, `GroupChannel`, `GroupSpace`, and `SenderName` in the inbound
   context and calling `recordSessionMetaFromInbound` (or passing the same context
   to `updateLastRoute`).
+

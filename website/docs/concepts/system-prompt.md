@@ -1,5 +1,5 @@
----
-summary: "What the openkrab system prompt contains and how it is assembled"
+﻿---
+summary: "What the OpenKrab system prompt contains and how it is assembled"
 read_when:
   - Editing system prompt text, tools list, or time/heartbeat sections
   - Changing workspace bootstrap or skills injection behavior
@@ -7,10 +7,9 @@ title: "System Prompt"
 ---
 
 # System Prompt
+\nOpenKrab builds a custom system prompt for every agent run. The prompt is **openkrab-owned** and does not use the pi-coding-agent default prompt.
 
-openkrab builds a custom system prompt for every agent run. The prompt is **openkrab-owned** and does not use the pi-coding-agent default prompt.
-
-The prompt is assembled by openkrab and injected into each agent run.
+The prompt is assembled by OpenKrab and injected into each agent run.
 
 ## Structure
 
@@ -21,7 +20,7 @@ The prompt is intentionally compact and uses fixed sections:
 - **Skills** (when available): tells the model how to load skill instructions on demand.
 - **openkrab Self-Update**: how to run `config.apply` and `update.run`.
 - **Workspace**: working directory (`agents.defaults.workspace`).
-- **Documentation**: local path to openkrab docs (repo or npm package) and when to read them.
+- **Documentation**: local path to OpenKrab docs (repo or npm package) and when to read them.
 - **Workspace Files (injected)**: indicates bootstrap files are included below.
 - **Sandbox** (when enabled): indicates sandboxed runtime, sandbox paths, and whether elevated exec is available.
 - **Current Date & Time**: user-local time, timezone, and time format.
@@ -33,8 +32,7 @@ The prompt is intentionally compact and uses fixed sections:
 Safety guardrails in the system prompt are advisory. They guide model behavior but do not enforce policy. Use tool policy, exec approvals, sandboxing, and channel allowlists for hard enforcement; operators can disable these by design.
 
 ## Prompt modes
-
-openkrab can render smaller system prompts for sub-agents. The runtime sets a
+\nOpenKrab can render smaller system prompts for sub-agents. The runtime sets a
 `promptMode` for each run (not a user-facing config):
 
 - `full` (default): includes all sections above.
@@ -62,7 +60,7 @@ Bootstrap files are trimmed and appended under **Project Context** so the model 
 - `MEMORY.md` and/or `memory.md` (when present in the workspace; either or both may be injected)
 
 All of these files are **injected into the context window** on every turn, which
-means they consume tokens. Keep them concise — especially `MEMORY.md`, which can
+means they consume tokens. Keep them concise â€” especially `MEMORY.md`, which can
 grow over time and lead to unexpectedly high context usage and more frequent
 compaction.
 
@@ -101,7 +99,7 @@ See [Date & Time](/date-time) for full behavior details.
 
 ## Skills
 
-When eligible skills exist, openkrab injects a compact **available skills list**
+When eligible skills exist, OpenKrab injects a compact **available skills list**
 (`formatSkillsForPrompt`) that includes the **file path** for each skill. The
 prompt instructs the model to use `read` to load the SKILL.md at the listed
 location (workspace, managed, or bundled). If no skills are eligible, the
@@ -122,8 +120,10 @@ This keeps the base prompt small while still enabling targeted skill usage.
 ## Documentation
 
 When available, the system prompt includes a **Documentation** section that points to the
-local openkrab docs directory (either `docs/` in the repo workspace or the bundled npm
+local OpenKrab docs directory (either `docs/` in the repo workspace or the bundled npm
 package docs) and also notes the public mirror, source repo, community Discord, and
-ClawHub ([https://clawhub.com](https://clawhub.com)) for skills discovery. The prompt instructs the model to consult local docs first
-for openkrab behavior, commands, configuration, or architecture, and to run
+KrabHub ([https://KrabHub.com](https://KrabHub.com)) for skills discovery. The prompt instructs the model to consult local docs first
+for OpenKrab behavior, commands, configuration, or architecture, and to run
 `openkrab status` itself when possible (asking the user only when it lacks access).
+
+

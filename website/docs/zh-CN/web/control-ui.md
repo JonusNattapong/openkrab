@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 你想从浏览器操作 Gateway 网关
-  - 你想要无需 SSH 隧道的 Tailnet 访问
-summary: Gateway 网关的浏览器控制 UI（聊天、节点、配置）
-title: 控制 UI
+  - ä½ æƒ³ä»Žæµè§ˆå™¨æ“ä½œ Gateway ç½‘å…³
+  - ä½ æƒ³è¦æ— éœ€ SSH éš§é“çš„ Tailnet è®¿é—®
+summary: Gateway ç½‘å…³çš„æµè§ˆå™¨æŽ§åˆ¶ UIï¼ˆèŠå¤©ã€èŠ‚ç‚¹ã€é…ç½®ï¼‰
+title: æŽ§åˆ¶ UI
 x-i18n:
   generated_at: "2026-02-03T10:13:20Z"
   model: claude-opus-4-5
@@ -13,121 +13,121 @@ x-i18n:
   workflow: 15
 ---
 
-# 控制 UI（浏览器）
+# æŽ§åˆ¶ UIï¼ˆæµè§ˆå™¨ï¼‰
 
-控制 UI 是一个由 Gateway 网关提供服务的小型 **Vite + Lit** 单页应用：
+æŽ§åˆ¶ UI æ˜¯ä¸€ä¸ªç”± Gateway ç½‘å…³æä¾›æœåŠ¡çš„å°åž‹ **Vite + Lit** å•é¡µåº”ç”¨ï¼š
 
-- 默认：`http://<host>:18789/`
-- 可选前缀：设置 `gateway.controlUi.basePath`（例如 `/OpenKrab`）
+- é»˜è®¤ï¼š`http://<host>:18789/`
+- å¯é€‰å‰ç¼€ï¼šè®¾ç½® `gateway.controlUi.basePath`ï¼ˆä¾‹å¦‚ `/OpenKrab`ï¼‰
 
-它**直接与同一端口上的 Gateway 网关 WebSocket** 通信。
+å®ƒ**ç›´æŽ¥ä¸ŽåŒä¸€ç«¯å£ä¸Šçš„ Gateway ç½‘å…³ WebSocket** é€šä¿¡ã€‚
 
-## 快速打开（本地）
+## å¿«é€Ÿæ‰“å¼€ï¼ˆæœ¬åœ°ï¼‰
 
-如果 Gateway 网关在同一台计算机上运行，打开：
+å¦‚æžœ Gateway ç½‘å…³åœ¨åŒä¸€å°è®¡ç®—æœºä¸Šè¿è¡Œï¼Œæ‰“å¼€ï¼š
 
-- http://127.0.0.1:18789/（或 http://localhost:18789/）
+- http://127.0.0.1:18789/ï¼ˆæˆ– http://localhost:18789/ï¼‰
 
-如果页面加载失败，请先启动 Gateway 网关：`OpenKrab gateway`。
+å¦‚æžœé¡µé¢åŠ è½½å¤±è´¥ï¼Œè¯·å…ˆå¯åŠ¨ Gateway ç½‘å…³ï¼š`OpenKrab gateway`ã€‚
 
-认证在 WebSocket 握手期间通过以下方式提供：
+è®¤è¯åœ¨ WebSocket æ¡æ‰‹æœŸé—´é€šè¿‡ä»¥ä¸‹æ–¹å¼æä¾›ï¼š
 
 - `connect.params.auth.token`
 - `connect.params.auth.password`
-  仪表板设置面板允许你存储 token；密码不会被持久化。
-  新手引导向导默认生成一个 Gateway 网关 token，所以在首次连接时将其粘贴到这里。
+  ä»ªè¡¨æ¿è®¾ç½®é¢æ¿å…è®¸ä½ å­˜å‚¨ tokenï¼›å¯†ç ä¸ä¼šè¢«æŒä¹…åŒ–ã€‚
+  æ–°æ‰‹å¼•å¯¼å‘å¯¼é»˜è®¤ç”Ÿæˆä¸€ä¸ª Gateway ç½‘å…³ tokenï¼Œæ‰€ä»¥åœ¨é¦–æ¬¡è¿žæŽ¥æ—¶å°†å…¶ç²˜è´´åˆ°è¿™é‡Œã€‚
 
-## 设备配对（首次连接）
+## è®¾å¤‡é…å¯¹ï¼ˆé¦–æ¬¡è¿žæŽ¥ï¼‰
 
-当你从新浏览器或设备连接到控制 UI 时，Gateway 网关需要**一次性配对批准** — 即使你在同一个 Tailnet 上且 `gateway.auth.allowTailscale: true`。这是防止未授权访问的安全措施。
+å½“ä½ ä»Žæ–°æµè§ˆå™¨æˆ–è®¾å¤‡è¿žæŽ¥åˆ°æŽ§åˆ¶ UI æ—¶ï¼ŒGateway ç½‘å…³éœ€è¦**ä¸€æ¬¡æ€§é…å¯¹æ‰¹å‡†** â€” å³ä½¿ä½ åœ¨åŒä¸€ä¸ª Tailnet ä¸Šä¸” `gateway.auth.allowTailscale: true`ã€‚è¿™æ˜¯é˜²æ­¢æœªæŽˆæƒè®¿é—®çš„å®‰å…¨æŽªæ–½ã€‚
 
-**你会看到：** "disconnected (1008): pairing required"
+**ä½ ä¼šçœ‹åˆ°ï¼š** "disconnected (1008): pairing required"
 
-**批准设备：**
+**æ‰¹å‡†è®¾å¤‡ï¼š**
 
 ```bash
-# 列出待处理的请求
+# åˆ—å‡ºå¾…å¤„ç†çš„è¯·æ±‚
 OpenKrab devices list
 
-# 按请求 ID 批准
+# æŒ‰è¯·æ±‚ ID æ‰¹å‡†
 OpenKrab devices approve <requestId>
 ```
 
-一旦批准，设备会被记住，除非你使用 `OpenKrab devices revoke --device <id> --role <role>` 撤销它，否则不需要重新批准。参见 [Devices CLI](/cli/devices) 了解 token 轮换和撤销。
+ä¸€æ—¦æ‰¹å‡†ï¼Œè®¾å¤‡ä¼šè¢«è®°ä½ï¼Œé™¤éžä½ ä½¿ç”¨ `OpenKrab devices revoke --device <id> --role <role>` æ’¤é”€å®ƒï¼Œå¦åˆ™ä¸éœ€è¦é‡æ–°æ‰¹å‡†ã€‚å‚è§ [Devices CLI](/cli/devices) äº†è§£ token è½®æ¢å’Œæ’¤é”€ã€‚
 
-**注意：**
+**æ³¨æ„ï¼š**
 
-- 本地连接（`127.0.0.1`）会自动批准。
-- 远程连接（LAN、Tailnet 等）需要显式批准。
-- 每个浏览器配置文件生成唯一的设备 ID，因此切换浏览器或清除浏览器数据将需要重新配对。
+- æœ¬åœ°è¿žæŽ¥ï¼ˆ`127.0.0.1`ï¼‰ä¼šè‡ªåŠ¨æ‰¹å‡†ã€‚
+- è¿œç¨‹è¿žæŽ¥ï¼ˆLANã€Tailnet ç­‰ï¼‰éœ€è¦æ˜¾å¼æ‰¹å‡†ã€‚
+- æ¯ä¸ªæµè§ˆå™¨é…ç½®æ–‡ä»¶ç”Ÿæˆå”¯ä¸€çš„è®¾å¤‡ IDï¼Œå› æ­¤åˆ‡æ¢æµè§ˆå™¨æˆ–æ¸…é™¤æµè§ˆå™¨æ•°æ®å°†éœ€è¦é‡æ–°é…å¯¹ã€‚
 
-## 目前可以做什么
+## ç›®å‰å¯ä»¥åšä»€ä¹ˆ
 
-- 通过 Gateway 网关 WS 与模型聊天（`chat.history`、`chat.send`、`chat.abort`、`chat.inject`）
-- 在聊天中流式传输工具调用 + 实时工具输出卡片（智能体事件）
-- 渠道：WhatsApp/Telegram/Discord/Slack + 插件渠道（Mattermost 等）状态 + QR 登录 + 每渠道配置（`channels.status`、`web.login.*`、`config.patch`）
-- 实例：在线列表 + 刷新（`system-presence`）
-- 会话：列表 + 每会话思考/详细覆盖（`sessions.list`、`sessions.patch`）
-- 定时任务：列出/添加/运行/启用/禁用 + 运行历史（`cron.*`）
-- Skills：状态、启用/禁用、安装、API 密钥更新（`skills.*`）
-- 节点：列表 + 能力（`node.list`）
-- 执行批准：编辑 Gateway 网关或节点允许列表 + `exec host=gateway/node` 的询问策略（`exec.approvals.*`）
-- 配置：查看/编辑 `~/.OpenKrab/OpenKrab.json`（`config.get`、`config.set`）
-- 配置：应用 + 带验证的重启（`config.apply`）并唤醒上次活动的会话
-- 配置写入包含基础哈希保护，以防止覆盖并发编辑
-- 配置 schema + 表单渲染（`config.schema`，包括插件 + 渠道 schema）；原始 JSON 编辑器仍然可用
-- 调试：状态/健康/模型快照 + 事件日志 + 手动 RPC 调用（`status`、`health`、`models.list`）
-- 日志：Gateway 网关文件日志的实时尾部跟踪，带过滤/导出（`logs.tail`）
-- 更新：运行包/git 更新 + 重启（`update.run`）并显示重启报告
+- é€šè¿‡ Gateway ç½‘å…³ WS ä¸Žæ¨¡åž‹èŠå¤©ï¼ˆ`chat.history`ã€`chat.send`ã€`chat.abort`ã€`chat.inject`ï¼‰
+- åœ¨èŠå¤©ä¸­æµå¼ä¼ è¾“å·¥å…·è°ƒç”¨ + å®žæ—¶å·¥å…·è¾“å‡ºå¡ç‰‡ï¼ˆæ™ºèƒ½ä½“äº‹ä»¶ï¼‰
+- æ¸ é“ï¼šWhatsApp/Telegram/Discord/Slack + æ’ä»¶æ¸ é“ï¼ˆMattermost ç­‰ï¼‰çŠ¶æ€ + QR ç™»å½• + æ¯æ¸ é“é…ç½®ï¼ˆ`channels.status`ã€`web.login.*`ã€`config.patch`ï¼‰
+- å®žä¾‹ï¼šåœ¨çº¿åˆ—è¡¨ + åˆ·æ–°ï¼ˆ`system-presence`ï¼‰
+- ä¼šè¯ï¼šåˆ—è¡¨ + æ¯ä¼šè¯æ€è€ƒ/è¯¦ç»†è¦†ç›–ï¼ˆ`sessions.list`ã€`sessions.patch`ï¼‰
+- å®šæ—¶ä»»åŠ¡ï¼šåˆ—å‡º/æ·»åŠ /è¿è¡Œ/å¯ç”¨/ç¦ç”¨ + è¿è¡ŒåŽ†å²ï¼ˆ`cron.*`ï¼‰
+- Skillsï¼šçŠ¶æ€ã€å¯ç”¨/ç¦ç”¨ã€å®‰è£…ã€API å¯†é’¥æ›´æ–°ï¼ˆ`skills.*`ï¼‰
+- èŠ‚ç‚¹ï¼šåˆ—è¡¨ + èƒ½åŠ›ï¼ˆ`node.list`ï¼‰
+- æ‰§è¡Œæ‰¹å‡†ï¼šç¼–è¾‘ Gateway ç½‘å…³æˆ–èŠ‚ç‚¹å…è®¸åˆ—è¡¨ + `exec host=gateway/node` çš„è¯¢é—®ç­–ç•¥ï¼ˆ`exec.approvals.*`ï¼‰
+- é…ç½®ï¼šæŸ¥çœ‹/ç¼–è¾‘ `~/.OpenKrab/OpenKrab.json`ï¼ˆ`config.get`ã€`config.set`ï¼‰
+- é…ç½®ï¼šåº”ç”¨ + å¸¦éªŒè¯çš„é‡å¯ï¼ˆ`config.apply`ï¼‰å¹¶å”¤é†’ä¸Šæ¬¡æ´»åŠ¨çš„ä¼šè¯
+- é…ç½®å†™å…¥åŒ…å«åŸºç¡€å“ˆå¸Œä¿æŠ¤ï¼Œä»¥é˜²æ­¢è¦†ç›–å¹¶å‘ç¼–è¾‘
+- é…ç½® schema + è¡¨å•æ¸²æŸ“ï¼ˆ`config.schema`ï¼ŒåŒ…æ‹¬æ’ä»¶ + æ¸ é“ schemaï¼‰ï¼›åŽŸå§‹ JSON ç¼–è¾‘å™¨ä»ç„¶å¯ç”¨
+- è°ƒè¯•ï¼šçŠ¶æ€/å¥åº·/æ¨¡åž‹å¿«ç…§ + äº‹ä»¶æ—¥å¿— + æ‰‹åŠ¨ RPC è°ƒç”¨ï¼ˆ`status`ã€`health`ã€`models.list`ï¼‰
+- æ—¥å¿—ï¼šGateway ç½‘å…³æ–‡ä»¶æ—¥å¿—çš„å®žæ—¶å°¾éƒ¨è·Ÿè¸ªï¼Œå¸¦è¿‡æ»¤/å¯¼å‡ºï¼ˆ`logs.tail`ï¼‰
+- æ›´æ–°ï¼šè¿è¡ŒåŒ…/git æ›´æ–° + é‡å¯ï¼ˆ`update.run`ï¼‰å¹¶æ˜¾ç¤ºé‡å¯æŠ¥å‘Š
 
-## 聊天行为
+## èŠå¤©è¡Œä¸º
 
-- `chat.send` 是**非阻塞的**：它立即以 `{ runId, status: "started" }` 确认，响应通过 `chat` 事件流式传输。
-- 使用相同的 `idempotencyKey` 重新发送在运行时返回 `{ status: "in_flight" }`，完成后返回 `{ status: "ok" }`。
-- `chat.inject` 将助手备注附加到会话转录，并为仅 UI 更新广播 `chat` 事件（无智能体运行，无渠道投递）。
-- 停止：
-  - 点击**停止**（调用 `chat.abort`）
-  - 输入 `/stop`（或 `stop|esc|abort|wait|exit|interrupt`）以带外中止
-  - `chat.abort` 支持 `{ sessionKey }`（无 `runId`）以中止该会话的所有活动运行
+- `chat.send` æ˜¯**éžé˜»å¡žçš„**ï¼šå®ƒç«‹å³ä»¥ `{ runId, status: "started" }` ç¡®è®¤ï¼Œå“åº”é€šè¿‡ `chat` äº‹ä»¶æµå¼ä¼ è¾“ã€‚
+- ä½¿ç”¨ç›¸åŒçš„ `idempotencyKey` é‡æ–°å‘é€åœ¨è¿è¡Œæ—¶è¿”å›ž `{ status: "in_flight" }`ï¼Œå®ŒæˆåŽè¿”å›ž `{ status: "ok" }`ã€‚
+- `chat.inject` å°†åŠ©æ‰‹å¤‡æ³¨é™„åŠ åˆ°ä¼šè¯è½¬å½•ï¼Œå¹¶ä¸ºä»… UI æ›´æ–°å¹¿æ’­ `chat` äº‹ä»¶ï¼ˆæ— æ™ºèƒ½ä½“è¿è¡Œï¼Œæ— æ¸ é“æŠ•é€’ï¼‰ã€‚
+- åœæ­¢ï¼š
+  - ç‚¹å‡»**åœæ­¢**ï¼ˆè°ƒç”¨ `chat.abort`ï¼‰
+  - è¾“å…¥ `/stop`ï¼ˆæˆ– `stop|esc|abort|wait|exit|interrupt`ï¼‰ä»¥å¸¦å¤–ä¸­æ­¢
+  - `chat.abort` æ”¯æŒ `{ sessionKey }`ï¼ˆæ—  `runId`ï¼‰ä»¥ä¸­æ­¢è¯¥ä¼šè¯çš„æ‰€æœ‰æ´»åŠ¨è¿è¡Œ
 
-## Tailnet 访问（推荐）
+## Tailnet è®¿é—®ï¼ˆæŽ¨èï¼‰
 
-### 集成 Tailscale Serve（首选）
+### é›†æˆ Tailscale Serveï¼ˆé¦–é€‰ï¼‰
 
-保持 Gateway 网关在 loopback 上，让 Tailscale Serve 用 HTTPS 代理它：
+ä¿æŒ Gateway ç½‘å…³åœ¨ loopback ä¸Šï¼Œè®© Tailscale Serve ç”¨ HTTPS ä»£ç†å®ƒï¼š
 
 ```bash
 OpenKrab gateway --tailscale serve
 ```
 
-打开：
+æ‰“å¼€ï¼š
 
-- `https://<magicdns>/`（或你配置的 `gateway.controlUi.basePath`）
+- `https://<magicdns>/`ï¼ˆæˆ–ä½ é…ç½®çš„ `gateway.controlUi.basePath`ï¼‰
 
-默认情况下，当 `gateway.auth.allowTailscale` 为 `true` 时，Serve 请求可以通过 Tailscale 身份头（`tailscale-user-login`）进行认证。OpenKrab 通过使用 `tailscale whois` 解析 `x-forwarded-for` 地址并与头匹配来验证身份，并且只在请求通过 Tailscale 的 `x-forwarded-*` 头到达 loopback 时接受这些。如果你想即使对于 Serve 流量也要求 token/密码，请设置 `gateway.auth.allowTailscale: false`（或强制 `gateway.auth.mode: "password"`）。
+é»˜è®¤æƒ…å†µä¸‹ï¼Œå½“ `gateway.auth.allowTailscale` ä¸º `true` æ—¶ï¼ŒServe è¯·æ±‚å¯ä»¥é€šè¿‡ Tailscale èº«ä»½å¤´ï¼ˆ`tailscale-user-login`ï¼‰è¿›è¡Œè®¤è¯ã€‚OpenKrab é€šè¿‡ä½¿ç”¨ `tailscale whois` è§£æž `x-forwarded-for` åœ°å€å¹¶ä¸Žå¤´åŒ¹é…æ¥éªŒè¯èº«ä»½ï¼Œå¹¶ä¸”åªåœ¨è¯·æ±‚é€šè¿‡ Tailscale çš„ `x-forwarded-*` å¤´åˆ°è¾¾ loopback æ—¶æŽ¥å—è¿™äº›ã€‚å¦‚æžœä½ æƒ³å³ä½¿å¯¹äºŽ Serve æµé‡ä¹Ÿè¦æ±‚ token/å¯†ç ï¼Œè¯·è®¾ç½® `gateway.auth.allowTailscale: false`ï¼ˆæˆ–å¼ºåˆ¶ `gateway.auth.mode: "password"`ï¼‰ã€‚
 
-### 绑定到 tailnet + token
+### ç»‘å®šåˆ° tailnet + token
 
 ```bash
 OpenKrab gateway --bind tailnet --token "$(openssl rand -hex 32)"
 ```
 
-然后打开：
+ç„¶åŽæ‰“å¼€ï¼š
 
-- `http://<tailscale-ip>:18789/`（或你配置的 `gateway.controlUi.basePath`）
+- `http://<tailscale-ip>:18789/`ï¼ˆæˆ–ä½ é…ç½®çš„ `gateway.controlUi.basePath`ï¼‰
 
-将 token 粘贴到 UI 设置中（作为 `connect.params.auth.token` 发送）。
+å°† token ç²˜è´´åˆ° UI è®¾ç½®ä¸­ï¼ˆä½œä¸º `connect.params.auth.token` å‘é€ï¼‰ã€‚
 
-## 不安全的 HTTP
+## ä¸å®‰å…¨çš„ HTTP
 
-如果你通过普通 HTTP 打开仪表板（`http://<lan-ip>` 或 `http://<tailscale-ip>`），浏览器在**非安全上下文**中运行并阻止 WebCrypto。默认情况下，OpenKrab **阻止**没有设备身份的控制 UI 连接。
+å¦‚æžœä½ é€šè¿‡æ™®é€š HTTP æ‰“å¼€ä»ªè¡¨æ¿ï¼ˆ`http://<lan-ip>` æˆ– `http://<tailscale-ip>`ï¼‰ï¼Œæµè§ˆå™¨åœ¨**éžå®‰å…¨ä¸Šä¸‹æ–‡**ä¸­è¿è¡Œå¹¶é˜»æ­¢ WebCryptoã€‚é»˜è®¤æƒ…å†µä¸‹ï¼ŒOpenKrab **é˜»æ­¢**æ²¡æœ‰è®¾å¤‡èº«ä»½çš„æŽ§åˆ¶ UI è¿žæŽ¥ã€‚
 
-**推荐修复：** 使用 HTTPS（Tailscale Serve）或在本地打开 UI：
+**æŽ¨èä¿®å¤ï¼š** ä½¿ç”¨ HTTPSï¼ˆTailscale Serveï¼‰æˆ–åœ¨æœ¬åœ°æ‰“å¼€ UIï¼š
 
-- `https://<magicdns>/`（Serve）
-- `http://127.0.0.1:18789/`（在 Gateway 网关主机上）
+- `https://<magicdns>/`ï¼ˆServeï¼‰
+- `http://127.0.0.1:18789/`ï¼ˆåœ¨ Gateway ç½‘å…³ä¸»æœºä¸Šï¼‰
 
-**降级示例（仅通过 HTTP 使用 token）：**
+**é™çº§ç¤ºä¾‹ï¼ˆä»…é€šè¿‡ HTTP ä½¿ç”¨ tokenï¼‰ï¼š**
 
 ```json5
 {
@@ -139,54 +139,55 @@ OpenKrab gateway --bind tailnet --token "$(openssl rand -hex 32)"
 }
 ```
 
-这会为控制 UI 禁用设备身份 + 配对（即使在 HTTPS 上）。仅在你信任网络时使用。
+è¿™ä¼šä¸ºæŽ§åˆ¶ UI ç¦ç”¨è®¾å¤‡èº«ä»½ + é…å¯¹ï¼ˆå³ä½¿åœ¨ HTTPS ä¸Šï¼‰ã€‚ä»…åœ¨ä½ ä¿¡ä»»ç½‘ç»œæ—¶ä½¿ç”¨ã€‚
 
-参见 [Tailscale](/gateway/tailscale) 了解 HTTPS 设置指南。
+å‚è§ [Tailscale](/gateway/tailscale) äº†è§£ HTTPS è®¾ç½®æŒ‡å—ã€‚
 
-## 构建 UI
+## æž„å»º UI
 
-Gateway 网关从 `dist/control-ui` 提供静态文件。使用以下命令构建：
-
-```bash
-pnpm ui:build # 首次运行时自动安装 UI 依赖
-```
-
-可选的绝对基础路径（当你想要固定的资源 URL 时）：
+Gateway ç½‘å…³ä»Ž `dist/control-ui` æä¾›é™æ€æ–‡ä»¶ã€‚ä½¿ç”¨ä»¥ä¸‹å‘½ä»¤æž„å»ºï¼š
 
 ```bash
-OpenKrab_CONTROL_UI_BASE_PATH=/OpenKrab/ pnpm ui:build
+pnpm ui:build # é¦–æ¬¡è¿è¡Œæ—¶è‡ªåŠ¨å®‰è£… UI ä¾èµ–
 ```
 
-用于本地开发（单独的开发服务器）：
+å¯é€‰çš„ç»å¯¹åŸºç¡€è·¯å¾„ï¼ˆå½“ä½ æƒ³è¦å›ºå®šçš„èµ„æº URL æ—¶ï¼‰ï¼š
 
 ```bash
-pnpm ui:dev # 首次运行时自动安装 UI 依赖
+OPENKRAB_CONTROL_UI_BASE_PATH=/OpenKrab/ pnpm ui:build
 ```
 
-然后将 UI 指向你的 Gateway 网关 WS URL（例如 `ws://127.0.0.1:18789`）。
+ç”¨äºŽæœ¬åœ°å¼€å‘ï¼ˆå•ç‹¬çš„å¼€å‘æœåŠ¡å™¨ï¼‰ï¼š
 
-## 调试/测试：开发服务器 + 远程 Gateway 网关
+```bash
+pnpm ui:dev # é¦–æ¬¡è¿è¡Œæ—¶è‡ªåŠ¨å®‰è£… UI ä¾èµ–
+```
 
-控制 UI 是静态文件；WebSocket 目标是可配置的，可以与 HTTP 源不同。当你想要在本地使用 Vite 开发服务器但 Gateway 网关在其他地方运行时，这很方便。
+ç„¶åŽå°† UI æŒ‡å‘ä½ çš„ Gateway ç½‘å…³ WS URLï¼ˆä¾‹å¦‚ `ws://127.0.0.1:18789`ï¼‰ã€‚
 
-1. 启动 UI 开发服务器：`pnpm ui:dev`
-2. 打开类似以下的 URL：
+## è°ƒè¯•/æµ‹è¯•ï¼šå¼€å‘æœåŠ¡å™¨ + è¿œç¨‹ Gateway ç½‘å…³
+
+æŽ§åˆ¶ UI æ˜¯é™æ€æ–‡ä»¶ï¼›WebSocket ç›®æ ‡æ˜¯å¯é…ç½®çš„ï¼Œå¯ä»¥ä¸Ž HTTP æºä¸åŒã€‚å½“ä½ æƒ³è¦åœ¨æœ¬åœ°ä½¿ç”¨ Vite å¼€å‘æœåŠ¡å™¨ä½† Gateway ç½‘å…³åœ¨å…¶ä»–åœ°æ–¹è¿è¡Œæ—¶ï¼Œè¿™å¾ˆæ–¹ä¾¿ã€‚
+
+1. å¯åŠ¨ UI å¼€å‘æœåŠ¡å™¨ï¼š`pnpm ui:dev`
+2. æ‰“å¼€ç±»ä¼¼ä»¥ä¸‹çš„ URLï¼š
 
 ```text
 http://localhost:5173/?gatewayUrl=ws://<gateway-host>:18789
 ```
 
-可选的一次性认证（如需要）：
+å¯é€‰çš„ä¸€æ¬¡æ€§è®¤è¯ï¼ˆå¦‚éœ€è¦ï¼‰ï¼š
 
 ```text
 http://localhost:5173/?gatewayUrl=wss://<gateway-host>:18789&token=<gateway-token>
 ```
 
-注意：
+æ³¨æ„ï¼š
 
-- `gatewayUrl` 在加载后存储在 localStorage 中并从 URL 中移除。
-- `token` 存储在 localStorage 中；`password` 仅保留在内存中。
-- 当 Gateway 网关在 TLS 后面时（Tailscale Serve、HTTPS 代理等），使用 `wss://`。
+- `gatewayUrl` åœ¨åŠ è½½åŽå­˜å‚¨åœ¨ localStorage ä¸­å¹¶ä»Ž URL ä¸­ç§»é™¤ã€‚
+- `token` å­˜å‚¨åœ¨ localStorage ä¸­ï¼›`password` ä»…ä¿ç•™åœ¨å†…å­˜ä¸­ã€‚
+- å½“ Gateway ç½‘å…³åœ¨ TLS åŽé¢æ—¶ï¼ˆTailscale Serveã€HTTPS ä»£ç†ç­‰ï¼‰ï¼Œä½¿ç”¨ `wss://`ã€‚
 
-远程访问设置详情：[远程访问](/gateway/remote)。
+è¿œç¨‹è®¿é—®è®¾ç½®è¯¦æƒ…ï¼š[è¿œç¨‹è®¿é—®](/gateway/remote)ã€‚
+
 

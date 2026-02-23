@@ -1,4 +1,4 @@
-//! Ported from `openclaw/src/sessions/session-label.ts`
+//! Ported from `OpenKrab/src/sessions/session-label.ts`
 
 pub const SESSION_LABEL_MAX_LENGTH: usize = 64;
 
@@ -41,3 +41,4 @@ mod tests {
         assert!(parse_session_label(&long_label).is_err());
     }
 }
+

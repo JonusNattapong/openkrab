@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Poll sending via gateway + CLI"
 read_when:
   - Adding or modifying poll support
@@ -17,20 +17,15 @@ title: "Polls"
 ## CLI
 
 ```bash
-# WhatsApp
-openkrab message poll --target +15555550123 \
-  --poll-question "Lunch today?" --poll-option "Yes" --poll-option "No" --poll-option "Maybe"
-openkrab message poll --target 123456789@g.us \
+# WhatsApp\nOpenKrab message poll --target +15555550123 \
+  --poll-question "Lunch today?" --poll-option "Yes" --poll-option "No" --poll-option "Maybe"\nOpenKrab message poll --target 123456789@g.us \
   --poll-question "Meeting time?" --poll-option "10am" --poll-option "2pm" --poll-option "4pm" --poll-multi
 
-# Discord
-openkrab message poll --channel discord --target channel:123456789 \
-  --poll-question "Snack?" --poll-option "Pizza" --poll-option "Sushi"
-openkrab message poll --channel discord --target channel:123456789 \
+# Discord\nOpenKrab message poll --channel discord --target channel:123456789 \
+  --poll-question "Snack?" --poll-option "Pizza" --poll-option "Sushi"\nOpenKrab message poll --channel discord --target channel:123456789 \
   --poll-question "Plan?" --poll-option "A" --poll-option "B" --poll-duration-hours 48
 
-# MS Teams
-openkrab message poll --channel msteams --target conversation:19:abc@thread.tacv2 \
+# MS Teams\nOpenKrab message poll --channel msteams --target conversation:19:abc@thread.tacv2 \
   --poll-question "Lunch?" --poll-option "Pizza" --poll-option "Sushi"
 ```
 
@@ -64,6 +59,7 @@ Params:
 
 Use the `message` tool with `poll` action (`to`, `pollQuestion`, `pollOption`, optional `pollMulti`, `pollDurationHours`, `channel`).
 
-Note: Discord has no “pick exactly N” mode; `pollMulti` maps to multi-select.
+Note: Discord has no â€œpick exactly Nâ€ mode; `pollMulti` maps to multi-select.
 Teams polls are rendered as Adaptive Cards and require the gateway to stay online
 to record votes in `~/.openkrab/msteams-polls.json`.
+

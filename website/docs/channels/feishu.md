@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Feishu bot overview, features, and configuration"
 read_when:
   - You want to connect a Feishu/Lark bot
@@ -8,7 +8,7 @@ title: Feishu
 
 # Feishu bot
 
-Feishu (Lark) is a team chat platform used by companies for messaging and collaboration. This plugin connects openkrab to a Feishu/Lark bot using the platform’s WebSocket event subscription so messages can be received without exposing a public webhook URL.
+Feishu (Lark) is a team chat platform used by companies for messaging and collaboration. This plugin connects OpenKrab to a Feishu/Lark bot using the platformâ€™s WebSocket event subscription so messages can be received without exposing a public webhook URL.
 
 ---
 
@@ -16,14 +16,12 @@ Feishu (Lark) is a team chat platform used by companies for messaging and collab
 
 Install the Feishu plugin:
 
-```bash
-openkrab plugins install @openkrab/feishu
+```bash\nOpenKrab plugins install @openkrab/feishu
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/feishu
+```bash\nOpenKrab plugins install ./extensions/feishu
 ```
 
 ---
@@ -34,10 +32,9 @@ There are two ways to add the Feishu channel:
 
 ### Method 1: onboarding wizard (recommended)
 
-If you just installed openkrab, run the wizard:
+If you just installed OpenKrab, run the wizard:
 
-```bash
-openkrab onboard
+```bash\nOpenKrab onboard
 ```
 
 The wizard guides you through:
@@ -46,7 +43,7 @@ The wizard guides you through:
 2. Configuring app credentials in openkrab
 3. Starting the gateway
 
-✅ **After configuration**, check gateway status:
+âœ… **After configuration**, check gateway status:
 
 - `openkrab gateway status`
 - `openkrab logs --follow`
@@ -55,13 +52,12 @@ The wizard guides you through:
 
 If you already completed initial install, add the channel via CLI:
 
-```bash
-openkrab channels add
+```bash\nOpenKrab channels add
 ```
 
 Choose **Feishu**, then enter the App ID and App Secret.
 
-✅ **After configuration**, manage the gateway:
+âœ… **After configuration**, manage the gateway:
 
 - `openkrab gateway status`
 - `openkrab gateway restart`
@@ -92,7 +88,7 @@ From **Credentials & Basic Info**, copy:
 - **App ID** (format: `cli_xxx`)
 - **App Secret**
 
-❗ **Important:** keep the App Secret private.
+â— **Important:** keep the App Secret private.
 
 ![Get credentials](../images/feishu-step3-credentials.png)
 
@@ -139,7 +135,7 @@ In **App Capability** > **Bot**:
 
 ### 6. Configure event subscription
 
-⚠️ **Important:** before setting event subscription, make sure:
+âš ï¸ **Important:** before setting event subscription, make sure:
 
 1. You already ran `openkrab channels add` for Feishu
 2. The gateway is running (`openkrab gateway status`)
@@ -149,7 +145,7 @@ In **Event Subscription**:
 1. Choose **Use long connection to receive events** (WebSocket)
 2. Add the event: `im.message.receive_v1`
 
-⚠️ If the gateway is not running, the long-connection setup may fail to save.
+âš ï¸ If the gateway is not running, the long-connection setup may fail to save.
 
 ![Configure event subscription](../images/feishu-step6-event-subscription.png)
 
@@ -165,8 +161,7 @@ In **Event Subscription**:
 
 ### Configure with the wizard (recommended)
 
-```bash
-openkrab channels add
+```bash\nOpenKrab channels add
 ```
 
 Choose **Feishu** and paste your App ID + App Secret.
@@ -228,8 +223,7 @@ If your tenant is on Lark (international), set the domain to `lark` (or a full d
 
 ### 1. Start the gateway
 
-```bash
-openkrab gateway
+```bash\nOpenKrab gateway
 ```
 
 ### 2. Send a test message
@@ -240,8 +234,7 @@ In Feishu, find your bot and send a message.
 
 By default, the bot replies with a pairing code. Approve it:
 
-```bash
-openkrab pairing approve feishu <CODE>
+```bash\nOpenKrab pairing approve feishu <CODE>
 ```
 
 After approval, you can chat normally.
@@ -265,8 +258,8 @@ After approval, you can chat normally.
 - **Approve pairing**:
 
   ```bash
-  openkrab pairing list feishu
-  openkrab pairing approve feishu <CODE>
+  OpenKrab pairing list feishu
+  OpenKrab pairing approve feishu <CODE>
   ```
 
 - **Allowlist mode**: set `channels.feishu.allowFrom` with allowed Open IDs
@@ -358,8 +351,7 @@ User IDs look like `ou_xxx`.
 
 Check pairing requests for user Open IDs:
 
-```bash
-openkrab pairing list feishu
+```bash\nOpenKrab pairing list feishu
 ```
 
 ---
@@ -476,14 +468,14 @@ Use `bindings` to route Feishu DMs or groups to different agents.
     list: [
       { id: "main" },
       {
-        id: "clawd-fan",
-        workspace: "/home/user/clawd-fan",
-        agentDir: "/home/user/.openkrab/agents/clawd-fan/agent",
+        id: "Krabd-fan",
+        workspace: "/home/user/Krabd-fan",
+        agentDir: "/home/user/.openkrab/agents/Krabd-fan/agent",
       },
       {
-        id: "clawd-xi",
-        workspace: "/home/user/clawd-xi",
-        agentDir: "/home/user/.openkrab/agents/clawd-xi/agent",
+        id: "Krabd-xi",
+        workspace: "/home/user/Krabd-xi",
+        agentDir: "/home/user/.openkrab/agents/Krabd-xi/agent",
       },
     ],
   },
@@ -496,14 +488,14 @@ Use `bindings` to route Feishu DMs or groups to different agents.
       },
     },
     {
-      agentId: "clawd-fan",
+      agentId: "Krabd-fan",
       match: {
         channel: "feishu",
         peer: { kind: "direct", id: "ou_yyy" },
       },
     },
     {
-      agentId: "clawd-xi",
+      agentId: "Krabd-xi",
       match: {
         channel: "feishu",
         peer: { kind: "group", id: "oc_zzz" },
@@ -569,18 +561,20 @@ Key options:
 
 ### Receive
 
-- ✅ Text
-- ✅ Rich text (post)
-- ✅ Images
-- ✅ Files
-- ✅ Audio
-- ✅ Video
-- ✅ Stickers
+- âœ… Text
+- âœ… Rich text (post)
+- âœ… Images
+- âœ… Files
+- âœ… Audio
+- âœ… Video
+- âœ… Stickers
 
 ### Send
 
-- ✅ Text
-- ✅ Images
-- ✅ Files
-- ✅ Audio
-- ⚠️ Rich text (partial support)
+- âœ… Text
+- âœ… Images
+- âœ… Files
+- âœ… Audio
+- âš ï¸ Rich text (partial support)
+
+

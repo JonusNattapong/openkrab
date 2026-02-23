@@ -1,4 +1,4 @@
-//! TUI - Terminal User Interface for krabkrab
+//! TUI - Terminal User Interface for openkrab
 //! Provides interactive terminal experience with chat, sessions, and commands
 
 pub mod app;
@@ -29,3 +29,4 @@ pub fn run_tui(config: TuiConfig) -> anyhow::Result<()> {
     app.run()?;
     Ok(())
 }
+

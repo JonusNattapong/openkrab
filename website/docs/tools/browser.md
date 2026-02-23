@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Integrated browser control service + action commands"
 read_when:
   - Adding agent-controlled browser automation
@@ -40,7 +40,7 @@ OpenKrab browser --browser-profile OpenKrab open https://example.com
 OpenKrab browser --browser-profile OpenKrab snapshot
 ```
 
-If you get “Browser disabled”, enable it in config (see below) and restart the
+If you get â€œBrowser disabledâ€, enable it in config (see below) and restart the
 Gateway.
 
 ## Profiles: `OpenKrab` vs `chrome`
@@ -81,16 +81,16 @@ Notes:
 
 - The browser control service binds to loopback on a port derived from `gateway.port`
   (default: `18791`, which is gateway + 2). The relay uses the next port (`18792`).
-- If you override the Gateway port (`gateway.port` or `OpenKrab_GATEWAY_PORT`),
-  the derived browser ports shift to stay in the same “family”.
+- If you override the Gateway port (`gateway.port` or `OPENKRAB_GATEWAY_PORT`),
+  the derived browser ports shift to stay in the same â€œfamilyâ€.
 - `cdpUrl` defaults to the relay port when unset.
 - `remoteCdpTimeoutMs` applies to remote (non-loopback) CDP reachability checks.
 - `remoteCdpHandshakeTimeoutMs` applies to remote CDP WebSocket reachability checks.
-- `attachOnly: true` means “never launch a local browser; only attach if it is already running.”
+- `attachOnly: true` means â€œnever launch a local browser; only attach if it is already running.â€
 - `color` + per-profile `color` tint the browser UI so you can see which profile is active.
 - Default profile is `chrome` (extension relay). Use `defaultProfile: "OpenKrab"` for the managed browser.
-- Auto-detect order: system default browser if Chromium-based; otherwise Chrome → Brave → Edge → Chromium → Chrome Canary.
-- Local `OpenKrab` profiles auto-assign `cdpPort`/`cdpUrl` — set those only for remote CDP.
+- Auto-detect order: system default browser if Chromium-based; otherwise Chrome â†’ Brave â†’ Edge â†’ Chromium â†’ Chrome Canary.
+- Local `OpenKrab` profiles auto-assign `cdpPort`/`cdpUrl` â€” set those only for remote CDP.
 
 ## Use Brave (or another Chromium-based browser)
 
@@ -152,8 +152,8 @@ This is the default path for remote gateways.
 Notes:
 
 - The node host exposes its local browser control server via a **proxy command**.
-- Profiles come from the node’s own `browser.profiles` config (same as local).
-- Disable if you don’t want it:
+- Profiles come from the nodeâ€™s own `browser.profiles` config (same as local).
+- Disable if you donâ€™t want it:
   - On the node: `nodeHost.browserProxy.enabled=false`
   - On the gateway: `gateway.nodes.browser.mode="off"`
 
@@ -191,7 +191,7 @@ Notes:
 
 Key ideas:
 
-- Browser control is loopback-only; access flows through the Gateway’s auth or node pairing.
+- Browser control is loopback-only; access flows through the Gatewayâ€™s auth or node pairing.
 - If browser control is enabled and no auth is configured, OpenKrab auto-generates `gateway.auth.token` on startup and persists it to config.
 - Keep the Gateway and any node hosts on a private network (Tailscale); avoid public exposure.
 - Treat remote CDP URLs/tokens as secrets; prefer env vars or a secrets manager.
@@ -213,14 +213,14 @@ Defaults:
 
 - The `OpenKrab` profile is auto-created if missing.
 - The `chrome` profile is built-in for the Chrome extension relay (points at `http://127.0.0.1:18792` by default).
-- Local CDP ports allocate from **18800–18899** by default.
+- Local CDP ports allocate from **18800â€“18899** by default.
 - Deleting a profile moves its local data directory to Trash.
 
 All control endpoints accept `?profile=<name>`; the CLI uses `--browser-profile`.
 
 ## Chrome extension relay (use your existing Chrome)
 
-OpenKrab can also drive **your existing Chrome tabs** (no separate “OpenKrab” Chrome instance) via a local CDP relay + a Chrome extension.
+OpenKrab can also drive **your existing Chrome tabs** (no separate â€œOpenKrabâ€ Chrome instance) via a local CDP relay + a Chrome extension.
 
 Full guide: [Chrome extension](/tools/chrome-extension)
 
@@ -249,8 +249,8 @@ Chrome extension relay takeover requires host browser control, so either:
 OpenKrab browser extension install
 ```
 
-- Chrome → `chrome://extensions` → enable “Developer mode”
-- “Load unpacked” → select the directory printed by `OpenKrab browser extension path`
+- Chrome â†’ `chrome://extensions` â†’ enable â€œDeveloper modeâ€
+- â€œLoad unpackedâ€ â†’ select the directory printed by `OpenKrab browser extension path`
 - Pin the extension, then click it on the tab you want to control (badge shows `ON`).
 
 2. Use it:
@@ -277,7 +277,7 @@ Notes:
 
 - **Dedicated user data dir**: never touches your personal browser profile.
 - **Dedicated ports**: avoids `9222` to prevent collisions with dev workflows.
-- **Deterministic tab control**: target tabs by `targetId`, not “last tab”.
+- **Deterministic tab control**: target tabs by `targetId`, not â€œlast tabâ€.
 
 ## Browser selection
 
@@ -324,7 +324,7 @@ If gateway auth is configured, browser HTTP routes require auth too:
 ### Playwright requirement
 
 Some features (navigate/act/AI snapshot/role snapshot, element screenshots, PDF) require
-Playwright. If Playwright isn’t installed, those endpoints return a clear 501
+Playwright. If Playwright isnâ€™t installed, those endpoints return a clear 501
 error. ARIA snapshots and basic screenshots still work for OpenKrab-managed Chrome.
 For the Chrome extension relay driver, ARIA snapshots and screenshots require Playwright.
 
@@ -344,7 +344,7 @@ docker compose run --rm OpenKrab-cli \
 
 To persist browser downloads, set `PLAYWRIGHT_BROWSERS_PATH` (for example,
 `/home/node/.cache/ms-playwright`) and make sure `/home/node` is persisted via
-`OpenKrab_HOME_VOLUME` or a bind mount. See [Docker](/install/docker).
+`OPENKRAB_HOME_VOLUME` or a bind mount. See [Docker](/install/docker).
 
 ## How it works (internal)
 
@@ -464,12 +464,12 @@ Notes:
 
 ## Snapshots and refs
 
-OpenKrab supports two “snapshot” styles:
+OpenKrab supports two â€œsnapshotâ€ styles:
 
 - **AI snapshot (numeric refs)**: `OpenKrab browser snapshot` (default; `--format ai`)
   - Output: a text snapshot that includes numeric refs.
   - Actions: `OpenKrab browser click 12`, `OpenKrab browser type 23 "hello"`.
-  - Internally, the ref is resolved via Playwright’s `aria-ref`.
+  - Internally, the ref is resolved via Playwrightâ€™s `aria-ref`.
 
 - **Role snapshot (role refs like `e12`)**: `OpenKrab browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
   - Output: a role-based list/tree with `[ref=e12]` (and optional `[nth=1]`).
@@ -507,7 +507,7 @@ OpenKrab browser wait "#main" \
 
 ## Debug workflows
 
-When an action fails (e.g. “not visible”, “strict mode violation”, “covered”):
+When an action fails (e.g. â€œnot visibleâ€, â€œstrict mode violationâ€, â€œcoveredâ€):
 
 1. `OpenKrab browser snapshot --interactive`
 2. Use `click <ref>` / `type <ref>` (prefer role refs in interactive mode)
@@ -537,7 +537,7 @@ Role snapshots in JSON include `refs` plus a small `stats` block (lines/chars/re
 
 ## State and environment knobs
 
-These are useful for “make the site behave like X” workflows:
+These are useful for â€œmake the site behave like Xâ€ workflows:
 
 - Cookies: `cookies`, `cookies set`, `cookies clear`
 - Storage: `storage local|session get|set|clear`
@@ -570,7 +570,7 @@ For Linux-specific issues (especially snap Chromium), see
 
 The agent gets **one tool** for browser automation:
 
-- `browser` — status/start/stop/tabs/open/focus/close/snapshot/screenshot/navigate/act
+- `browser` â€” status/start/stop/tabs/open/focus/close/snapshot/screenshot/navigate/act
 
 How it maps:
 
@@ -585,4 +585,5 @@ How it maps:
   - If a browser-capable node is connected, the tool may auto-route to it unless you pin `target="host"` or `target="node"`.
 
 This keeps the agent deterministic and avoids brittle selectors.
+
 

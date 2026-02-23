@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab webhooks` (webhook helpers + Gmail Pub/Sub)"
 read_when:
   - You want to wire Gmail Pub/Sub events into openkrab
@@ -17,9 +17,8 @@ Related:
 
 ## Gmail
 
-```bash
-openkrab webhooks gmail setup --account you@example.com
-openkrab webhooks gmail run
+```bash\nOpenKrab webhooks gmail setup --account you@example.com\nOpenKrab webhooks gmail run
 ```
 
 See [Gmail Pub/Sub documentation](/automation/gmail-pubsub) for details.
+

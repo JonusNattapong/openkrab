@@ -1,6 +1,6 @@
-# Contributing to krabkrab (Rust)
+# Contributing to openkrab (Rust)
 
-Thank you for your interest in contributing to krabkrab! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to openkrab! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents
 
@@ -22,8 +22,8 @@ Be respectful and inclusive. We welcome contributions from everyone.
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/krabkrab.git
-   cd krabkrab
+   git clone https://github.com/YOUR_USERNAME/openkrab.git
+   cd openkrab
    ```
 3. Create a feature branch:
    ```bash
@@ -166,7 +166,7 @@ docs(readme): update installation instructions
 
 ## Porting Guidelines
 
-When porting from the TypeScript version (`../openclaw`):
+When porting from the TypeScript version (`../OpenKrab`):
 
 ### Before Porting
 
@@ -193,12 +193,12 @@ When porting from the TypeScript version (`../openclaw`):
 ### Example Port
 
 ```rust
-// TypeScript (openclaw/src/utils.ts)
+// TypeScript (OpenKrab/src/utils.ts)
 export function normalizeText(text: string): string {
   return text.trim().toLowerCase();
 }
 
-// Rust (krabkrab/src/utils.rs)
+// Rust (openkrab/src/utils.rs)
 /// Normalizes text by trimming and converting to lowercase.
 pub fn normalize_text(text: &str) -> String {
     text.trim().to_lowercase()
@@ -235,3 +235,5 @@ src/
 - Reference issues in commits and PRs
 
 Thank you for contributing! 🦀
+
+

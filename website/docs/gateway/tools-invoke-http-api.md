@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Invoke a single tool directly via the Gateway HTTP endpoint"
 read_when:
   - Calling tools without running a full agent turn
@@ -8,7 +8,7 @@ title: "Tools Invoke API"
 
 # Tools Invoke (HTTP)
 
-openkrab’s Gateway exposes a simple HTTP endpoint for invoking a single tool directly. It is always enabled, but gated by Gateway auth and tool policy.
+openkrabâ€™s Gateway exposes a simple HTTP endpoint for invoking a single tool directly. It is always enabled, but gated by Gateway auth and tool policy.
 
 - `POST /tools/invoke`
 - Same port as the Gateway (WS + HTTP multiplex): `http://<gateway-host>:<port>/tools/invoke`
@@ -23,8 +23,8 @@ Uses the Gateway auth configuration. Send a bearer token:
 
 Notes:
 
-- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `openkrab_GATEWAY_TOKEN`).
-- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `openkrab_GATEWAY_PASSWORD`).
+- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `OPENKRAB_GATEWAY_TOKEN`).
+- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `OPENKRAB_GATEWAY_PASSWORD`).
 - If `gateway.auth.rateLimit` is configured and too many auth failures occur, the endpoint returns `429` with `Retry-After`.
 
 ## Request body
@@ -88,13 +88,13 @@ To help group policies resolve context, you can optionally set:
 
 ## Responses
 
-- `200` → `{ ok: true, result }`
-- `400` → `{ ok: false, error: { type, message } }` (invalid request or tool input error)
-- `401` → unauthorized
-- `429` → auth rate-limited (`Retry-After` set)
-- `404` → tool not available (not found or not allowlisted)
-- `405` → method not allowed
-- `500` → `{ ok: false, error: { type, message } }` (unexpected tool execution error; sanitized message)
+- `200` â†’ `{ ok: true, result }`
+- `400` â†’ `{ ok: false, error: { type, message } }` (invalid request or tool input error)
+- `401` â†’ unauthorized
+- `429` â†’ auth rate-limited (`Retry-After` set)
+- `404` â†’ tool not available (not found or not allowlisted)
+- `405` â†’ method not allowed
+- `500` â†’ `{ ok: false, error: { type, message } }` (unexpected tool execution error; sanitized message)
 
 ## Example
 
@@ -108,3 +108,4 @@ curl -sS http://127.0.0.1:18789/tools/invoke \
     "args": {}
   }'
 ```
+

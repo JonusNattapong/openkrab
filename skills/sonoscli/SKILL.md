@@ -4,7 +4,7 @@ description: Control Sonos speakers (discover/status/play/volume/group).
 homepage: https://sonoscli.sh
 metadata:
   {
-    "openclaw":
+    "OpenKrab":
       {
         "emoji": "🔊",
         "requires": { "bins": ["sonos"] },
@@ -44,3 +44,4 @@ Notes
 
 - If SSDP fails, specify `--ip <speaker-ip>`.
 - Spotify Web API search is optional and requires `SPOTIFY_CLIENT_ID/SECRET`.
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Discord bot support status, capabilities, and configuration"
 read_when:
   - Working on Discord channel features
@@ -23,13 +23,13 @@ Status: ready for DMs and guild channels via the official Discord gateway.
 
 ## Quick setup
 
-You will need to create a new application with a bot, add the bot to your server, and pair it to openkrab. We recommend adding your bot to your own private server. If you don't have one yet, [create one first](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (choose **Create My Own > For me and my friends**).
+You will need to create a new application with a bot, add the bot to your server, and pair it to OpenKrab. We recommend adding your bot to your own private server. If you don't have one yet, [create one first](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (choose **Create My Own > For me and my friends**).
 
 <Steps>
   <Step title="Create a Discord application and bot">
     Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application**. Name it something like "openkrab".
 
-    Click **Bot** on the sidebar. Set the **Username** to whatever you call your openkrab agent.
+    Click **Bot** on the sidebar. Set the **Username** to whatever you call your OpenKrab agent.
 
   </Step>
 
@@ -46,7 +46,7 @@ You will need to create a new application with a bot, add the bot to your server
     Scroll back up on the **Bot** page and click **Reset Token**.
 
     <Note>
-    Despite the name, this generates your first token — nothing is being "reset."
+    Despite the name, this generates your first token â€” nothing is being "reset."
     </Note>
 
     Copy the token and save it somewhere. This is your **Bot Token** and you will need it shortly.
@@ -77,39 +77,36 @@ You will need to create a new application with a bot, add the bot to your server
   <Step title="Enable Developer Mode and collect your IDs">
     Back in the Discord app, you need to enable Developer Mode so you can copy internal IDs.
 
-    1. Click **User Settings** (gear icon next to your avatar) → **Advanced** → toggle on **Developer Mode**
-    2. Right-click your **server icon** in the sidebar → **Copy Server ID**
-    3. Right-click your **own avatar** → **Copy User ID**
+    1. Click **User Settings** (gear icon next to your avatar) â†’ **Advanced** â†’ toggle on **Developer Mode**
+    2. Right-click your **server icon** in the sidebar â†’ **Copy Server ID**
+    3. Right-click your **own avatar** â†’ **Copy User ID**
 
-    Save your **Server ID** and **User ID** alongside your Bot Token — you'll send all three to openkrab in the next step.
+    Save your **Server ID** and **User ID** alongside your Bot Token â€” you'll send all three to OpenKrab in the next step.
 
   </Step>
 
   <Step title="Allow DMs from server members">
-    For pairing to work, Discord needs to allow your bot to DM you. Right-click your **server icon** → **Privacy Settings** → toggle on **Direct Messages**.
+    For pairing to work, Discord needs to allow your bot to DM you. Right-click your **server icon** â†’ **Privacy Settings** â†’ toggle on **Direct Messages**.
 
-    This lets server members (including bots) send you DMs. Keep this enabled if you want to use Discord DMs with openkrab. If you only plan to use guild channels, you can disable DMs after pairing.
+    This lets server members (including bots) send you DMs. Keep this enabled if you want to use Discord DMs with OpenKrab. If you only plan to use guild channels, you can disable DMs after pairing.
 
   </Step>
 
   <Step title="Step 0: Set your bot token securely (do not send it in chat)">
-    Your Discord bot token is a secret (like a password). Set it on the machine running openkrab before messaging your agent.
+    Your Discord bot token is a secret (like a password). Set it on the machine running OpenKrab before messaging your agent.
 
-```bash
-openkrab config set channels.discord.token '"YOUR_BOT_TOKEN"' --json
-openkrab config set channels.discord.enabled true --json
-openkrab gateway
+```bash\nOpenKrab config set channels.discord.token '"YOUR_BOT_TOKEN"' --json\nOpenKrab config set channels.discord.enabled true --json\nOpenKrab gateway
 ```
 
-    If openkrab is already running as a background service, use `openkrab gateway restart` instead.
+    If OpenKrab is already running as a background service, use `openkrab gateway restart` instead.
 
   </Step>
 
-  <Step title="Configure openkrab and pair">
+  <Step title="Configure OpenKrab and pair">
 
     <Tabs>
       <Tab title="Ask your agent">
-        Chat with your openkrab agent on any existing channel (e.g. Telegram) and tell it. If Discord is your first channel, use the CLI / config tab instead.
+        Chat with your OpenKrab agent on any existing channel (e.g. Telegram) and tell it. If Discord is your first channel, use the CLI / config tab instead.
 
         > "I already set my Discord bot token in config. Please finish Discord setup with User ID `<user_id>` and Server ID `<server_id>`."
       </Tab>
@@ -149,9 +146,7 @@ DISCORD_BOT_TOKEN=...
       </Tab>
       <Tab title="CLI">
 
-```bash
-openkrab pairing list discord
-openkrab pairing approve discord <CODE>
+```bash\nOpenKrab pairing list discord\nOpenKrab pairing approve discord <CODE>
 ```
 
       </Tab>
@@ -247,7 +242,7 @@ Once DMs are working, you can set up your Discord server as a full workspace whe
   </Step>
 </Steps>
 
-Now create some channels on your Discord server and start chatting. Your agent can see the channel name, and each channel gets its own isolated session — so you can set up `#coding`, `#home`, `#research`, or whatever fits your workflow.
+Now create some channels on your Discord server and start chatting. Your agent can see the channel name, and each channel gets its own isolated session â€” so you can set up `#coding`, `#home`, `#research`, or whatever fits your workflow.
 
 ## Runtime model
 
@@ -259,8 +254,7 @@ Now create some channels on your Discord server and start chatting. Your agent c
 - Native slash commands run in isolated command sessions (`agent:<agentId>:discord:slash:<userId>`), while still carrying `CommandTargetSessionKey` to the routed conversation session.
 
 ## Interactive components
-
-openkrab supports Discord components v2 containers for agent messages. Use the message tool with a `components` payload. Interaction results are routed back to the agent as normal inbound messages and follow the existing Discord `replyToMode` settings.
+\nOpenKrab supports Discord components v2 containers for agent messages. Use the message tool with a `components` payload. Interaction results are routed back to the agent as normal inbound messages and follow the existing Discord `replyToMode` settings.
 
 Supported blocks:
 
@@ -282,7 +276,7 @@ Modal forms:
 
 - Add `components.modal` with up to 5 fields
 - Field types: `text`, `checkbox`, `radio`, `select`, `role-select`, `user-select`
-- openkrab adds a trigger button automatically
+- OpenKrab adds a trigger button automatically
 
 Example:
 
@@ -494,7 +488,7 @@ Use `bindings[].match.roles` to route Discord guild members to different agents 
     - channel ID
     - user ID
 
-    Prefer numeric IDs in openkrab config for reliable audits and probes.
+    Prefer numeric IDs in OpenKrab config for reliable audits and probes.
 
   </Accordion>
 </AccordionGroup>
@@ -505,7 +499,7 @@ Use `bindings[].match.roles` to route Discord guild members to different agents 
 - Per-channel override: `channels.discord.commands.native`.
 - `commands.native=false` explicitly clears previously registered Discord native commands.
 - Native command auth uses the same Discord allowlists/policies as normal message handling.
-- Commands may still be visible in Discord UI for users who are not authorized; execution still enforces openkrab auth and returns "not authorized".
+- Commands may still be visible in Discord UI for users who are not authorized; execution still enforces OpenKrab auth and returns "not authorized".
 
 See [Slash commands](/tools/slash-commands) for command catalog and behavior.
 
@@ -565,14 +559,14 @@ See [Slash commands](/tools/slash-commands) for command catalog and behavior.
   </Accordion>
 
   <Accordion title="Ack reactions">
-    `ackReaction` sends an acknowledgement emoji while openkrab is processing an inbound message.
+    `ackReaction` sends an acknowledgement emoji while OpenKrab is processing an inbound message.
 
     Resolution order:
 
     - `channels.discord.accounts.<accountId>.ackReaction`
     - `channels.discord.ackReaction`
     - `messages.ackReaction`
-    - agent identity emoji fallback (`agents.list[].identity.emoji`, else "👀")
+    - agent identity emoji fallback (`agents.list[].identity.emoji`, else "ðŸ‘€")
 
     Notes:
 
@@ -719,7 +713,7 @@ See [Slash commands](/tools/slash-commands) for command catalog and behavior.
     - `channels.discord.execApprovals.target` (`dm` | `channel` | `both`, default: `dm`)
     - `agentFilter`, `sessionFilter`, `cleanupAfterResolve`
 
-    When `target` is `channel` or `both`, the approval prompt is visible in the channel. Only configured approvers can use the buttons; other users receive an ephemeral denial. Approval prompts include the command text, so only enable channel delivery in trusted channels. If the channel ID cannot be derived from the session key, openkrab falls back to DM delivery.
+    When `target` is `channel` or `both`, the approval prompt is visible in the channel. Only configured approvers can use the buttons; other users receive an ephemeral denial. Approval prompts include the command text, so only enable channel delivery in trusted channels. If the channel ID cannot be derived from the session key, OpenKrab falls back to DM delivery.
 
     If approvals fail with unknown approval IDs, verify approver list and feature enablement.
 
@@ -751,8 +745,7 @@ Default gate behavior:
 | presence                                                                                                                                                                 | disabled |
 
 ## Components v2 UI
-
-openkrab uses Discord components v2 for exec approvals and cross-context markers. Discord message actions can also accept `components` for custom UI (advanced; requires Carbon component instances), while legacy `embeds` remain available but are not recommended.
+\nOpenKrab uses Discord components v2 for exec approvals and cross-context markers. Discord message actions can also accept `components` for custom UI (advanced; requires Carbon component instances), while legacy `embeds` remain available but are not recommended.
 
 - `channels.discord.ui.components.accentColor` sets the accent color used by Discord component containers (hex).
 - Set per account with `channels.discord.accounts.<id>.ui.components.accentColor`.
@@ -776,13 +769,13 @@ Example:
 
 ## Voice messages
 
-Discord voice messages show a waveform preview and require OGG/Opus audio plus metadata. openkrab generates the waveform automatically, but it needs `ffmpeg` and `ffprobe` available on the gateway host to inspect and convert audio files.
+Discord voice messages show a waveform preview and require OGG/Opus audio plus metadata. OpenKrab generates the waveform automatically, but it needs `ffmpeg` and `ffprobe` available on the gateway host to inspect and convert audio files.
 
 Requirements and constraints:
 
 - Provide a **local file path** (URLs are rejected).
 - Omit text content (Discord does not allow text + voice message in the same payload).
-- Any audio format is accepted; openkrab converts to OGG/Opus when needed.
+- Any audio format is accepted; OpenKrab converts to OGG/Opus when needed.
 
 Example:
 
@@ -810,10 +803,7 @@ message(action="send", channel="discord", target="channel:123", path="/path/to/a
 
     Useful checks:
 
-```bash
-openkrab doctor
-openkrab channels status --probe
-openkrab logs --follow
+```bash\nOpenKrab doctor\nOpenKrab channels status --probe\nOpenKrab logs --follow
 ```
 
   </Accordion>
@@ -882,3 +872,4 @@ High-signal Discord fields:
 - [Multi-agent routing](/concepts/multi-agent)
 - [Troubleshooting](/channels/troubleshooting)
 - [Slash commands](/tools/slash-commands)
+

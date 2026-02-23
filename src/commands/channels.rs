@@ -1,7 +1,7 @@
-//! Channels command - Manage connected chat channels and accounts
+﻿//! Channels command - Manage connected chat channels and accounts
 
 use crate::config_io;
-use crate::openkrab_config::{ChannelConfig, DiscordAccountConfig, TelegramAccountConfig};
+use crate::OPENKRAB_CONFIG::{ChannelConfig, DiscordAccountConfig, TelegramAccountConfig};
 
 pub fn channels_list_command() -> String {
     let mut output = String::from("Configured Channels:\n");
@@ -18,7 +18,7 @@ pub fn channels_list_command() -> String {
         if let Some(telegram) = channels.telegram {
             for (id, acc) in telegram.accounts {
                 found_any = true;
-                let status_icon = if acc.enabled { "✓" } else { "✗" };
+                let status_icon = if acc.enabled { "âœ“" } else { "âœ—" };
                 output.push_str(&format!(
                     "{} Telegram ({})\n   Status: {}\n",
                     status_icon,
@@ -30,7 +30,7 @@ pub fn channels_list_command() -> String {
         if let Some(discord) = channels.discord {
             for (id, acc) in discord.accounts {
                 found_any = true;
-                let status_icon = if acc.enabled { "✓" } else { "✗" };
+                let status_icon = if acc.enabled { "âœ“" } else { "âœ—" };
                 output.push_str(&format!(
                     "{} Discord ({})\n   Status: {}\n",
                     status_icon,
@@ -41,7 +41,7 @@ pub fn channels_list_command() -> String {
         }
         for (id, acc) in channels.slack {
             found_any = true;
-            let status_icon = if acc.enabled { "✓" } else { "✗" };
+            let status_icon = if acc.enabled { "âœ“" } else { "âœ—" };
             output.push_str(&format!(
                 "{} Slack ({})\n   Status: {}\n",
                 status_icon,
@@ -51,7 +51,7 @@ pub fn channels_list_command() -> String {
         }
         for (id, acc) in channels.whatsapp {
             found_any = true;
-            let status_icon = if acc.enabled { "✓" } else { "✗" };
+            let status_icon = if acc.enabled { "âœ“" } else { "âœ—" };
             output.push_str(&format!(
                 "{} WhatsApp ({})\n   Status: {}\n",
                 status_icon,
@@ -75,7 +75,7 @@ pub fn channels_status_command() -> String {
 pub fn channels_add_command(channel: &str, token: Option<&str>) -> String {
     let mut config = match config_io::load_config() {
         Ok(cfg) => cfg,
-        Err(_) => crate::openkrab_config::OpenKrabConfig::default(),
+        Err(_) => crate::OPENKRAB_CONFIG::OpenKrabConfig::default(),
     };
 
     let mut channels_cfg = config.channels.take().unwrap_or_default();
@@ -172,3 +172,4 @@ pub fn channels_logs_command(channel: Option<&str>, lines: Option<usize>) -> Str
         n, channel
     )
 }
+

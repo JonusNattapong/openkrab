@@ -1,5 +1,5 @@
 //! streaming — Block and tool streaming for agent responses.
-//! Ported from `openclaw/src/agents/pi-embedded-subscribe.ts` concepts.
+//! Ported from `OpenKrab/src/agents/pi-embedded-subscribe.ts` concepts.
 //!
 //! Provides infrastructure for streaming LLM responses piece-by-piece
 //! instead of waiting for the entire completion.
@@ -509,3 +509,4 @@ mod tests {
         assert_eq!(acc.reasoning(), "thinking...");
     }
 }
+

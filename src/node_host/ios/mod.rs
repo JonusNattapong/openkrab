@@ -107,7 +107,7 @@ pub mod swift {
         r#"import AVFoundation
 import UIKit
 
-class KrabKrabCameraHandler: NSObject {
+class openkrabCameraHandler: NSObject {
 
     private func compressionQuality(for quality: String) -> CGFloat {
         switch quality {
@@ -142,7 +142,7 @@ class KrabKrabCameraHandler: NSObject {
         let image = renderer.image { ctx in
             UIColor.black.setFill()
             ctx.fill(CGRect(origin: .zero, size: size))
-            let text = "KrabKrab Camera (\(camera))"
+            let text = "openkrab Camera (\(camera))"
             let attrs: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: 36, weight: .medium),
                 .foregroundColor: UIColor.white
@@ -165,8 +165,8 @@ enum CameraError: Error {
 }
 
 // MARK: - JavaScript Bridge
-@objc(KrabKrabCameraBridge)
-class KrabKrabCameraBridge: NSObject {
+@objc(openkrabCameraBridge)
+class openkrabCameraBridge: NSObject {
     
     @objc
     func capturePhoto(
@@ -176,7 +176,7 @@ class KrabKrabCameraBridge: NSObject {
         flash: Bool,
         completion: @escaping (String) -> Void
     ) {
-        let handler = KrabKrabCameraHandler()
+        let handler = openkrabCameraHandler()
         handler.capturePhoto(camera: camera, quality: quality, flash: flash) { result in
             switch result {
             case .success(let data):
@@ -215,7 +215,7 @@ class KrabKrabCameraBridge: NSObject {
         r#"import ReplayKit
 import UIKit
 
-class KrabKrabScreenRecordHandler: NSObject {
+class openkrabScreenRecordHandler: NSObject {
     
     private let recorder = RPRecorderFactory.shared()
     private var isRecording = false
@@ -279,8 +279,8 @@ enum ScreenRecordError: Error {
 }
 
 // MARK: - JavaScript Bridge
-@objc(KrabKrabScreenRecordBridge)
-class KrabKrabScreenRecordBridge: NSObject {
+@objc(openkrabScreenRecordBridge)
+class openkrabScreenRecordBridge: NSObject {
     
     @objc
     func startRecording(
@@ -290,7 +290,7 @@ class KrabKrabScreenRecordBridge: NSObject {
         durationSecs: UInt,
         completion: @escaping (String) -> Void
     ) {
-        let handler = KrabKrabScreenRecordHandler()
+        let handler = openkrabScreenRecordHandler()
         handler.startRecording(audio: audio, quality: quality, duration: durationSecs) { result in
             switch result {
             case .success(let recordingId):
@@ -328,7 +328,7 @@ class KrabKrabScreenRecordBridge: NSObject {
     pub fn location_handler_swift() -> String {
         r#"import CoreLocation
 
-class KrabKrabLocationHandler: NSObject, CLLocationManagerDelegate {
+class openkrabLocationHandler: NSObject, CLLocationManagerDelegate {
     
     private var locationManager: CLLocationManager?
     private var locationCompletion: ((Result<CLLocation, Error>) -> Void)?
@@ -396,8 +396,8 @@ enum LocationError: Error {
 }
 
 // MARK: - JavaScript Bridge
-@objc(KrabKrabLocationBridge)
-class KrabKrabLocationBridge: NSObject {
+@objc(openkrabLocationBridge)
+class openkrabLocationBridge: NSObject {
     
     @objc
     func getLocation(
@@ -406,7 +406,7 @@ class KrabKrabLocationBridge: NSObject {
         timeoutMs: UInt,
         completion: @escaping (String) -> Void
     ) {
-        let handler = KrabKrabLocationHandler()
+        let handler = openkrabLocationHandler()
         handler.getLocation(accuracy: accuracy, timeout: timeoutMs) { result in
             switch result {
             case .success(let location):
@@ -447,7 +447,7 @@ class KrabKrabLocationBridge: NSObject {
         r#"import UserNotifications
 import UIKit
 
-class KrabKrabNotificationHandler: NSObject, UNUserNotificationCenterDelegate {
+class openkrabNotificationHandler: NSObject, UNUserNotificationCenterDelegate {
     
     /// Send a local notification
     /// - Parameters:
@@ -513,8 +513,8 @@ enum NotificationError: Error {
 }
 
 // MARK: - JavaScript Bridge
-@objc(KrabKrabNotificationBridge)
-class KrabKrabNotificationBridge: NSObject {
+@objc(openkrabNotificationBridge)
+class openkrabNotificationBridge: NSObject {
     
     @objc
     func sendNotification(
@@ -525,7 +525,7 @@ class KrabKrabNotificationBridge: NSObject {
         badge: NSNumber?,
         completion: @escaping (String) -> Void
     ) {
-        let handler = KrabKrabNotificationHandler()
+        let handler = openkrabNotificationHandler()
         let badgeValue = badge?.uintValue
         
         handler.sendNotification(
@@ -576,3 +576,4 @@ pub fn generate_all_swift() -> String {
         swift::notification_handler_swift()
     )
 }
+

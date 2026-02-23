@@ -1,8 +1,8 @@
----
+﻿---
 read_when: You want per-agent sandboxing or per-agent tool allow/deny policies in a multi-agent gateway.
 status: active
-summary: 按智能体的沙箱 + 工具限制、优先级和示例
-title: 多智能体沙箱与工具
+summary: æŒ‰æ™ºèƒ½ä½“çš„æ²™ç®± + å·¥å…·é™åˆ¶ã€ä¼˜å…ˆçº§å’Œç¤ºä¾‹
+title: å¤šæ™ºèƒ½ä½“æ²™ç®±ä¸Žå·¥å…·
 x-i18n:
   generated_at: "2026-02-03T07:50:39Z"
   model: claude-opus-4-5
@@ -12,40 +12,40 @@ x-i18n:
   workflow: 15
 ---
 
-# 多智能体沙箱与工具配置
+# å¤šæ™ºèƒ½ä½“æ²™ç®±ä¸Žå·¥å…·é…ç½®
 
-## 概述
+## æ¦‚è¿°
 
-多智能体设置中的每个智能体现在可以拥有自己的：
+å¤šæ™ºèƒ½ä½“è®¾ç½®ä¸­çš„æ¯ä¸ªæ™ºèƒ½ä½“çŽ°åœ¨å¯ä»¥æ‹¥æœ‰è‡ªå·±çš„ï¼š
 
-- **沙箱配置**（`agents.list[].sandbox` 覆盖 `agents.defaults.sandbox`）
-- **工具限制**（`tools.allow` / `tools.deny`，以及 `agents.list[].tools`）
+- **æ²™ç®±é…ç½®**ï¼ˆ`agents.list[].sandbox` è¦†ç›– `agents.defaults.sandbox`ï¼‰
+- **å·¥å…·é™åˆ¶**ï¼ˆ`tools.allow` / `tools.deny`ï¼Œä»¥åŠ `agents.list[].tools`ï¼‰
 
-这允许你运行具有不同安全配置文件的多个智能体：
+è¿™å…è®¸ä½ è¿è¡Œå…·æœ‰ä¸åŒå®‰å…¨é…ç½®æ–‡ä»¶çš„å¤šä¸ªæ™ºèƒ½ä½“ï¼š
 
-- 具有完全访问权限的个人助手
-- 具有受限工具的家庭/工作智能体
-- 在沙箱中运行的面向公众的智能体
+- å…·æœ‰å®Œå…¨è®¿é—®æƒé™çš„ä¸ªäººåŠ©æ‰‹
+- å…·æœ‰å—é™å·¥å…·çš„å®¶åº­/å·¥ä½œæ™ºèƒ½ä½“
+- åœ¨æ²™ç®±ä¸­è¿è¡Œçš„é¢å‘å…¬ä¼—çš„æ™ºèƒ½ä½“
 
-`setupCommand` 属于 `sandbox.docker` 下（全局或按智能体），在容器创建时运行一次。
+`setupCommand` å±žäºŽ `sandbox.docker` ä¸‹ï¼ˆå…¨å±€æˆ–æŒ‰æ™ºèƒ½ä½“ï¼‰ï¼Œåœ¨å®¹å™¨åˆ›å»ºæ—¶è¿è¡Œä¸€æ¬¡ã€‚
 
-认证是按智能体的：每个智能体从其自己的 `agentDir` 认证存储读取：
+è®¤è¯æ˜¯æŒ‰æ™ºèƒ½ä½“çš„ï¼šæ¯ä¸ªæ™ºèƒ½ä½“ä»Žå…¶è‡ªå·±çš„ `agentDir` è®¤è¯å­˜å‚¨è¯»å–ï¼š
 
 ```
 ~/.OpenKrab/agents/<agentId>/agent/auth-profiles.json
 ```
 
-凭证**不会**在智能体之间共享。切勿在智能体之间重用 `agentDir`。
-如果你想共享凭证，请将 `auth-profiles.json` 复制到其他智能体的 `agentDir` 中。
+å‡­è¯**ä¸ä¼š**åœ¨æ™ºèƒ½ä½“ä¹‹é—´å…±äº«ã€‚åˆ‡å‹¿åœ¨æ™ºèƒ½ä½“ä¹‹é—´é‡ç”¨ `agentDir`ã€‚
+å¦‚æžœä½ æƒ³å…±äº«å‡­è¯ï¼Œè¯·å°† `auth-profiles.json` å¤åˆ¶åˆ°å…¶ä»–æ™ºèƒ½ä½“çš„ `agentDir` ä¸­ã€‚
 
-有关沙箱隔离在运行时的行为，请参见[沙箱隔离](/gateway/sandboxing)。
-有关调试"为什么这被阻止了？"，请参见[沙箱 vs 工具策略 vs 提权](/gateway/sandbox-vs-tool-policy-vs-elevated) 和 `OpenKrab sandbox explain`。
+æœ‰å…³æ²™ç®±éš”ç¦»åœ¨è¿è¡Œæ—¶çš„è¡Œä¸ºï¼Œè¯·å‚è§[æ²™ç®±éš”ç¦»](/gateway/sandboxing)ã€‚
+æœ‰å…³è°ƒè¯•"ä¸ºä»€ä¹ˆè¿™è¢«é˜»æ­¢äº†ï¼Ÿ"ï¼Œè¯·å‚è§[æ²™ç®± vs å·¥å…·ç­–ç•¥ vs ææƒ](/gateway/sandbox-vs-tool-policy-vs-elevated) å’Œ `OpenKrab sandbox explain`ã€‚
 
 ---
 
-## 配置示例
+## é…ç½®ç¤ºä¾‹
 
-### 示例 1：个人 + 受限家庭智能体
+### ç¤ºä¾‹ 1ï¼šä¸ªäºº + å—é™å®¶åº­æ™ºèƒ½ä½“
 
 ```json
 {
@@ -89,14 +89,14 @@ x-i18n:
 }
 ```
 
-**结果：**
+**ç»“æžœï¼š**
 
-- `main` 智能体：在主机上运行，完全工具访问
-- `family` 智能体：在 Docker 中运行（每个智能体一个容器），仅有 `read` 工具
+- `main` æ™ºèƒ½ä½“ï¼šåœ¨ä¸»æœºä¸Šè¿è¡Œï¼Œå®Œå…¨å·¥å…·è®¿é—®
+- `family` æ™ºèƒ½ä½“ï¼šåœ¨ Docker ä¸­è¿è¡Œï¼ˆæ¯ä¸ªæ™ºèƒ½ä½“ä¸€ä¸ªå®¹å™¨ï¼‰ï¼Œä»…æœ‰ `read` å·¥å…·
 
 ---
 
-### 示例 2：具有共享沙箱的工作智能体
+### ç¤ºä¾‹ 2ï¼šå…·æœ‰å…±äº«æ²™ç®±çš„å·¥ä½œæ™ºèƒ½ä½“
 
 ```json
 {
@@ -127,7 +127,7 @@ x-i18n:
 
 ---
 
-### 示例 2b：全局编码配置文件 + 仅消息智能体
+### ç¤ºä¾‹ 2bï¼šå…¨å±€ç¼–ç é…ç½®æ–‡ä»¶ + ä»…æ¶ˆæ¯æ™ºèƒ½ä½“
 
 ```json
 {
@@ -143,21 +143,21 @@ x-i18n:
 }
 ```
 
-**结果：**
+**ç»“æžœï¼š**
 
-- 默认智能体获得编码工具
-- `support` 智能体仅用于消息（+ Slack 工具）
+- é»˜è®¤æ™ºèƒ½ä½“èŽ·å¾—ç¼–ç å·¥å…·
+- `support` æ™ºèƒ½ä½“ä»…ç”¨äºŽæ¶ˆæ¯ï¼ˆ+ Slack å·¥å…·ï¼‰
 
 ---
 
-### 示例 3：每个智能体不同的沙箱模式
+### ç¤ºä¾‹ 3ï¼šæ¯ä¸ªæ™ºèƒ½ä½“ä¸åŒçš„æ²™ç®±æ¨¡å¼
 
 ```json
 {
   "agents": {
     "defaults": {
       "sandbox": {
-        "mode": "non-main", // 全局默认
+        "mode": "non-main", // å…¨å±€é»˜è®¤
         "scope": "session"
       }
     },
@@ -166,14 +166,14 @@ x-i18n:
         "id": "main",
         "workspace": "~/.OpenKrab/workspace",
         "sandbox": {
-          "mode": "off" // 覆盖：main 永不沙箱隔离
+          "mode": "off" // è¦†ç›–ï¼šmain æ°¸ä¸æ²™ç®±éš”ç¦»
         }
       },
       {
         "id": "public",
         "workspace": "~/.OpenKrab/workspace-public",
         "sandbox": {
-          "mode": "all", // 覆盖：public 始终沙箱隔离
+          "mode": "all", // è¦†ç›–ï¼špublic å§‹ç»ˆæ²™ç®±éš”ç¦»
           "scope": "agent"
         },
         "tools": {
@@ -188,13 +188,13 @@ x-i18n:
 
 ---
 
-## 配置优先级
+## é…ç½®ä¼˜å…ˆçº§
 
-当全局（`agents.defaults.*`）和智能体特定（`agents.list[].*`）配置同时存在时：
+å½“å…¨å±€ï¼ˆ`agents.defaults.*`ï¼‰å’Œæ™ºèƒ½ä½“ç‰¹å®šï¼ˆ`agents.list[].*`ï¼‰é…ç½®åŒæ—¶å­˜åœ¨æ—¶ï¼š
 
-### 沙箱配置
+### æ²™ç®±é…ç½®
 
-智能体特定设置覆盖全局：
+æ™ºèƒ½ä½“ç‰¹å®šè®¾ç½®è¦†ç›–å…¨å±€ï¼š
 
 ```
 agents.list[].sandbox.mode > agents.defaults.sandbox.mode
@@ -206,58 +206,58 @@ agents.list[].sandbox.browser.* > agents.defaults.sandbox.browser.*
 agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 ```
 
-**注意事项：**
+**æ³¨æ„äº‹é¡¹ï¼š**
 
-- `agents.list[].sandbox.{docker,browser,prune}.*` 为该智能体覆盖 `agents.defaults.sandbox.{docker,browser,prune}.*`（当沙箱 scope 解析为 `"shared"` 时忽略）。
+- `agents.list[].sandbox.{docker,browser,prune}.*` ä¸ºè¯¥æ™ºèƒ½ä½“è¦†ç›– `agents.defaults.sandbox.{docker,browser,prune}.*`ï¼ˆå½“æ²™ç®± scope è§£æžä¸º `"shared"` æ—¶å¿½ç•¥ï¼‰ã€‚
 
-### 工具限制
+### å·¥å…·é™åˆ¶
 
-过滤顺序是：
+è¿‡æ»¤é¡ºåºæ˜¯ï¼š
 
-1. **工具配置文件**（`tools.profile` 或 `agents.list[].tools.profile`）
-2. **提供商工具配置文件**（`tools.byProvider[provider].profile` 或 `agents.list[].tools.byProvider[provider].profile`）
-3. **全局工具策略**（`tools.allow` / `tools.deny`）
-4. **提供商工具策略**（`tools.byProvider[provider].allow/deny`）
-5. **智能体特定工具策略**（`agents.list[].tools.allow/deny`）
-6. **智能体提供商策略**（`agents.list[].tools.byProvider[provider].allow/deny`）
-7. **沙箱工具策略**（`tools.sandbox.tools` 或 `agents.list[].tools.sandbox.tools`）
-8. **子智能体工具策略**（`tools.subagents.tools`，如适用）
+1. **å·¥å…·é…ç½®æ–‡ä»¶**ï¼ˆ`tools.profile` æˆ– `agents.list[].tools.profile`ï¼‰
+2. **æä¾›å•†å·¥å…·é…ç½®æ–‡ä»¶**ï¼ˆ`tools.byProvider[provider].profile` æˆ– `agents.list[].tools.byProvider[provider].profile`ï¼‰
+3. **å…¨å±€å·¥å…·ç­–ç•¥**ï¼ˆ`tools.allow` / `tools.deny`ï¼‰
+4. **æä¾›å•†å·¥å…·ç­–ç•¥**ï¼ˆ`tools.byProvider[provider].allow/deny`ï¼‰
+5. **æ™ºèƒ½ä½“ç‰¹å®šå·¥å…·ç­–ç•¥**ï¼ˆ`agents.list[].tools.allow/deny`ï¼‰
+6. **æ™ºèƒ½ä½“æä¾›å•†ç­–ç•¥**ï¼ˆ`agents.list[].tools.byProvider[provider].allow/deny`ï¼‰
+7. **æ²™ç®±å·¥å…·ç­–ç•¥**ï¼ˆ`tools.sandbox.tools` æˆ– `agents.list[].tools.sandbox.tools`ï¼‰
+8. **å­æ™ºèƒ½ä½“å·¥å…·ç­–ç•¥**ï¼ˆ`tools.subagents.tools`ï¼Œå¦‚é€‚ç”¨ï¼‰
 
-每个级别可以进一步限制工具，但不能恢复之前级别拒绝的工具。
-如果设置了 `agents.list[].tools.sandbox.tools`，它将替换该智能体的 `tools.sandbox.tools`。
-如果设置了 `agents.list[].tools.profile`，它将覆盖该智能体的 `tools.profile`。
-提供商工具键接受 `provider`（例如 `google-antigravity`）或 `provider/model`（例如 `openai/gpt-5.2`）。
+æ¯ä¸ªçº§åˆ«å¯ä»¥è¿›ä¸€æ­¥é™åˆ¶å·¥å…·ï¼Œä½†ä¸èƒ½æ¢å¤ä¹‹å‰çº§åˆ«æ‹’ç»çš„å·¥å…·ã€‚
+å¦‚æžœè®¾ç½®äº† `agents.list[].tools.sandbox.tools`ï¼Œå®ƒå°†æ›¿æ¢è¯¥æ™ºèƒ½ä½“çš„ `tools.sandbox.tools`ã€‚
+å¦‚æžœè®¾ç½®äº† `agents.list[].tools.profile`ï¼Œå®ƒå°†è¦†ç›–è¯¥æ™ºèƒ½ä½“çš„ `tools.profile`ã€‚
+æä¾›å•†å·¥å…·é”®æŽ¥å— `provider`ï¼ˆä¾‹å¦‚ `google-antigravity`ï¼‰æˆ– `provider/model`ï¼ˆä¾‹å¦‚ `openai/gpt-5.2`ï¼‰ã€‚
 
-### 工具组（简写）
+### å·¥å…·ç»„ï¼ˆç®€å†™ï¼‰
 
-工具策略（全局、智能体、沙箱）支持 `group:*` 条目，可扩展为多个具体工具：
+å·¥å…·ç­–ç•¥ï¼ˆå…¨å±€ã€æ™ºèƒ½ä½“ã€æ²™ç®±ï¼‰æ”¯æŒ `group:*` æ¡ç›®ï¼Œå¯æ‰©å±•ä¸ºå¤šä¸ªå…·ä½“å·¥å…·ï¼š
 
-- `group:runtime`：`exec`、`bash`、`process`
-- `group:fs`：`read`、`write`、`edit`、`apply_patch`
-- `group:sessions`：`sessions_list`、`sessions_history`、`sessions_send`、`sessions_spawn`、`session_status`
-- `group:memory`：`memory_search`、`memory_get`
-- `group:ui`：`browser`、`canvas`
-- `group:automation`：`cron`、`gateway`
-- `group:messaging`：`message`
-- `group:nodes`：`nodes`
-- `group:OpenKrab`：所有内置 OpenKrab 工具（不包括提供商插件）
+- `group:runtime`ï¼š`exec`ã€`bash`ã€`process`
+- `group:fs`ï¼š`read`ã€`write`ã€`edit`ã€`apply_patch`
+- `group:sessions`ï¼š`sessions_list`ã€`sessions_history`ã€`sessions_send`ã€`sessions_spawn`ã€`session_status`
+- `group:memory`ï¼š`memory_search`ã€`memory_get`
+- `group:ui`ï¼š`browser`ã€`canvas`
+- `group:automation`ï¼š`cron`ã€`gateway`
+- `group:messaging`ï¼š`message`
+- `group:nodes`ï¼š`nodes`
+- `group:OpenKrab`ï¼šæ‰€æœ‰å†…ç½® OpenKrab å·¥å…·ï¼ˆä¸åŒ…æ‹¬æä¾›å•†æ’ä»¶ï¼‰
 
-### 提权模式
+### ææƒæ¨¡å¼
 
-`tools.elevated` 是全局基线（基于发送者的允许列表）。`agents.list[].tools.elevated` 可以为特定智能体进一步限制提权（两者都必须允许）。
+`tools.elevated` æ˜¯å…¨å±€åŸºçº¿ï¼ˆåŸºäºŽå‘é€è€…çš„å…è®¸åˆ—è¡¨ï¼‰ã€‚`agents.list[].tools.elevated` å¯ä»¥ä¸ºç‰¹å®šæ™ºèƒ½ä½“è¿›ä¸€æ­¥é™åˆ¶ææƒï¼ˆä¸¤è€…éƒ½å¿…é¡»å…è®¸ï¼‰ã€‚
 
-缓解模式：
+ç¼“è§£æ¨¡å¼ï¼š
 
-- 为不受信任的智能体拒绝 `exec`（`agents.list[].tools.deny: ["exec"]`）
-- 避免将发送者加入允许列表后路由到受限智能体
-- 如果你只想要沙箱隔离执行，全局禁用提权（`tools.elevated.enabled: false`）
-- 为敏感配置文件按智能体禁用提权（`agents.list[].tools.elevated.enabled: false`）
+- ä¸ºä¸å—ä¿¡ä»»çš„æ™ºèƒ½ä½“æ‹’ç» `exec`ï¼ˆ`agents.list[].tools.deny: ["exec"]`ï¼‰
+- é¿å…å°†å‘é€è€…åŠ å…¥å…è®¸åˆ—è¡¨åŽè·¯ç”±åˆ°å—é™æ™ºèƒ½ä½“
+- å¦‚æžœä½ åªæƒ³è¦æ²™ç®±éš”ç¦»æ‰§è¡Œï¼Œå…¨å±€ç¦ç”¨ææƒï¼ˆ`tools.elevated.enabled: false`ï¼‰
+- ä¸ºæ•æ„Ÿé…ç½®æ–‡ä»¶æŒ‰æ™ºèƒ½ä½“ç¦ç”¨ææƒï¼ˆ`agents.list[].tools.elevated.enabled: false`ï¼‰
 
 ---
 
-## 从单智能体迁移
+## ä»Žå•æ™ºèƒ½ä½“è¿ç§»
 
-**之前（单智能体）：**
+**ä¹‹å‰ï¼ˆå•æ™ºèƒ½ä½“ï¼‰ï¼š**
 
 ```json
 {
@@ -280,7 +280,7 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 }
 ```
 
-**之后（具有不同配置文件的多智能体）：**
+**ä¹‹åŽï¼ˆå…·æœ‰ä¸åŒé…ç½®æ–‡ä»¶çš„å¤šæ™ºèƒ½ä½“ï¼‰ï¼š**
 
 ```json
 {
@@ -297,13 +297,13 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 }
 ```
 
-旧版 `agent.*` 配置由 `OpenKrab doctor` 迁移；今后请优先使用 `agents.defaults` + `agents.list`。
+æ—§ç‰ˆ `agent.*` é…ç½®ç”± `OpenKrab doctor` è¿ç§»ï¼›ä»ŠåŽè¯·ä¼˜å…ˆä½¿ç”¨ `agents.defaults` + `agents.list`ã€‚
 
 ---
 
-## 工具限制示例
+## å·¥å…·é™åˆ¶ç¤ºä¾‹
 
-### 只读智能体
+### åªè¯»æ™ºèƒ½ä½“
 
 ```json
 {
@@ -314,7 +314,7 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 }
 ```
 
-### 安全执行智能体（无文件修改）
+### å®‰å…¨æ‰§è¡Œæ™ºèƒ½ä½“ï¼ˆæ— æ–‡ä»¶ä¿®æ”¹ï¼‰
 
 ```json
 {
@@ -325,7 +325,7 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 }
 ```
 
-### 仅通信智能体
+### ä»…é€šä¿¡æ™ºèƒ½ä½“
 
 ```json
 {
@@ -338,65 +338,66 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 
 ---
 
-## 常见陷阱："non-main"
+## å¸¸è§é™·é˜±ï¼š"non-main"
 
-`agents.defaults.sandbox.mode: "non-main"` 基于 `session.mainKey`（默认 `"main"`），
-而不是智能体 id。群组/渠道会话始终获得自己的键，因此它们
-被视为非 main 并将被沙箱隔离。如果你希望智能体永不
-沙箱隔离，请设置 `agents.list[].sandbox.mode: "off"`。
+`agents.defaults.sandbox.mode: "non-main"` åŸºäºŽ `session.mainKey`ï¼ˆé»˜è®¤ `"main"`ï¼‰ï¼Œ
+è€Œä¸æ˜¯æ™ºèƒ½ä½“ idã€‚ç¾¤ç»„/æ¸ é“ä¼šè¯å§‹ç»ˆèŽ·å¾—è‡ªå·±çš„é”®ï¼Œå› æ­¤å®ƒä»¬
+è¢«è§†ä¸ºéž main å¹¶å°†è¢«æ²™ç®±éš”ç¦»ã€‚å¦‚æžœä½ å¸Œæœ›æ™ºèƒ½ä½“æ°¸ä¸
+æ²™ç®±éš”ç¦»ï¼Œè¯·è®¾ç½® `agents.list[].sandbox.mode: "off"`ã€‚
 
 ---
 
-## 测试
+## æµ‹è¯•
 
-配置多智能体沙箱和工具后：
+é…ç½®å¤šæ™ºèƒ½ä½“æ²™ç®±å’Œå·¥å…·åŽï¼š
 
-1. **检查智能体解析：**
+1. **æ£€æŸ¥æ™ºèƒ½ä½“è§£æžï¼š**
 
    ```exec
    OpenKrab agents list --bindings
    ```
 
-2. **验证沙箱容器：**
+2. **éªŒè¯æ²™ç®±å®¹å™¨ï¼š**
 
    ```exec
    docker ps --filter "name=OpenKrab-sbx-"
    ```
 
-3. **测试工具限制：**
-   - 发送需要受限工具的消息
-   - 验证智能体无法使用被拒绝的工具
+3. **æµ‹è¯•å·¥å…·é™åˆ¶ï¼š**
+   - å‘é€éœ€è¦å—é™å·¥å…·çš„æ¶ˆæ¯
+   - éªŒè¯æ™ºèƒ½ä½“æ— æ³•ä½¿ç”¨è¢«æ‹’ç»çš„å·¥å…·
 
-4. **监控日志：**
+4. **ç›‘æŽ§æ—¥å¿—ï¼š**
    ```exec
-   tail -f "${OpenKrab_STATE_DIR:-$HOME/.OpenKrab}/logs/gateway.log" | grep -E "routing|sandbox|tools"
+   tail -f "${OPENKRAB_STATE_DIR:-$HOME/.OpenKrab}/logs/gateway.log" | grep -E "routing|sandbox|tools"
    ```
 
 ---
 
-## 故障排除
+## æ•…éšœæŽ’é™¤
 
-### 尽管设置了 `mode: "all"` 但智能体未被沙箱隔离
+### å°½ç®¡è®¾ç½®äº† `mode: "all"` ä½†æ™ºèƒ½ä½“æœªè¢«æ²™ç®±éš”ç¦»
 
-- 检查是否有全局 `agents.defaults.sandbox.mode` 覆盖它
-- 智能体特定配置优先，因此设置 `agents.list[].sandbox.mode: "all"`
+- æ£€æŸ¥æ˜¯å¦æœ‰å…¨å±€ `agents.defaults.sandbox.mode` è¦†ç›–å®ƒ
+- æ™ºèƒ½ä½“ç‰¹å®šé…ç½®ä¼˜å…ˆï¼Œå› æ­¤è®¾ç½® `agents.list[].sandbox.mode: "all"`
 
-### 尽管有拒绝列表但工具仍然可用
+### å°½ç®¡æœ‰æ‹’ç»åˆ—è¡¨ä½†å·¥å…·ä»ç„¶å¯ç”¨
 
-- 检查工具过滤顺序：全局 → 智能体 → 沙箱 → 子智能体
-- 每个级别只能进一步限制，不能恢复
-- 通过日志验证：`[tools] filtering tools for agent:${agentId}`
+- æ£€æŸ¥å·¥å…·è¿‡æ»¤é¡ºåºï¼šå…¨å±€ â†’ æ™ºèƒ½ä½“ â†’ æ²™ç®± â†’ å­æ™ºèƒ½ä½“
+- æ¯ä¸ªçº§åˆ«åªèƒ½è¿›ä¸€æ­¥é™åˆ¶ï¼Œä¸èƒ½æ¢å¤
+- é€šè¿‡æ—¥å¿—éªŒè¯ï¼š`[tools] filtering tools for agent:${agentId}`
 
-### 容器未按智能体隔离
+### å®¹å™¨æœªæŒ‰æ™ºèƒ½ä½“éš”ç¦»
 
-- 在智能体特定沙箱配置中设置 `scope: "agent"`
-- 默认是 `"session"`，每个会话创建一个容器
+- åœ¨æ™ºèƒ½ä½“ç‰¹å®šæ²™ç®±é…ç½®ä¸­è®¾ç½® `scope: "agent"`
+- é»˜è®¤æ˜¯ `"session"`ï¼Œæ¯ä¸ªä¼šè¯åˆ›å»ºä¸€ä¸ªå®¹å™¨
 
 ---
 
-## 另请参阅
+## å¦è¯·å‚é˜…
 
-- [多智能体路由](/concepts/multi-agent)
-- [沙箱配置](/gateway/configuration#agentsdefaults-sandbox)
-- [会话管理](/concepts/session)
+- [å¤šæ™ºèƒ½ä½“è·¯ç”±](/concepts/multi-agent)
+- [æ²™ç®±é…ç½®](/gateway/configuration#agentsdefaults-sandbox)
+- [ä¼šè¯ç®¡ç†](/concepts/session)
+
 

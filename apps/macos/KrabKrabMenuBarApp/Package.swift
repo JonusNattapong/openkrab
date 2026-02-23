@@ -2,20 +2,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "KrabKrabMenuBarApp",
+    name: "openkrabMenuBarApp",
     platforms: [
         .macOS(.v13)
     ],
     products: [
         .executable(
-            name: "KrabKrabMenuBarApp",
-            targets: ["KrabKrabMenuBarApp"]
+            name: "openkrabMenuBarApp",
+            targets: ["openkrabMenuBarApp"]
         )
     ],
     targets: [
         .executableTarget(
-            name: "KrabKrabMenuBarApp",
+            name: "openkrabMenuBarApp",
             path: "Sources"
         )
     ]
 )
+

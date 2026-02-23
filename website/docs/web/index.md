@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Gateway web surfaces: Dashboard, bind modes, and security"
 read_when:
   - You want to access the Gateway over a browser
@@ -38,8 +38,7 @@ mode = "serve"
 
 Then start the gateway:
 
-```bash
-krabkrab gateway
+```bash\nOpenKrab gateway
 ```
 
 Open:
@@ -79,8 +78,7 @@ password = "your-secure-password"
 
 Open the dashboard:
 
-```bash
-krabkrab dashboard
+```bash\nOpenKrab dashboard
 ```
 
 Or manually visit `http://127.0.0.1:18789/`
@@ -95,3 +93,5 @@ The WebChat interface allows browser-based messaging:
 - Upload media
 
 See [WebChat](/web/webchat) for details.
+
+

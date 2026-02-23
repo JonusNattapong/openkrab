@@ -1,4 +1,4 @@
-use krabkrab::channels::logging::*;
+use openkrab::channels::logging::*;
 use serde_json::json;
 
 #[test]
@@ -42,3 +42,4 @@ fn test_log_typing_failure_and_ack() {
     };
     log_ack_failure(&params2);
 }
+

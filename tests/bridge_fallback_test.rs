@@ -1,4 +1,4 @@
-use krabkrab::commands::bridge_command;
+use openkrab::commands::bridge_command;
 
 #[test]
 fn bridge_layer_override_js_is_rejected() {
@@ -13,3 +13,4 @@ fn bridge_auto_mode_without_fallback_returns_error() {
         bridge_command("canvas_host", Some("unsupported_action"), Some("{}"), None).unwrap_err();
     assert!(err.to_string().contains("unsupported"));
 }
+

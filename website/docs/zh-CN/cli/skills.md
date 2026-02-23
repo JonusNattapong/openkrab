@@ -21,7 +21,7 @@ x-i18n:
 
 - Skills 系统：[Skills](/tools/skills)
 - Skills 配置：[Skills 配置](/tools/skills-config)
-- ClawHub 安装：[ClawHub](/tools/clawhub)
+- KrabHub 安装：[KrabHub](/tools/KrabHub)
 
 ## 命令
 
@@ -31,4 +31,5 @@ OpenKrab skills list --eligible
 OpenKrab skills info <name>
 OpenKrab skills check
 ```
+
 

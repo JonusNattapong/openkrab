@@ -1,5 +1,5 @@
 //! transcript_events — Session transcript update events.
-//! Ported from `openclaw/src/sessions/transcript-events.ts`.
+//! Ported from `OpenKrab/src/sessions/transcript-events.ts`.
 //!
 //! Provides a pub/sub mechanism for notifying listeners when session
 //! transcripts are updated.
@@ -227,3 +227,4 @@ mod tests {
         );
     }
 }
+

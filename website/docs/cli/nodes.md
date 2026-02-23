@@ -1,7 +1,7 @@
----
+﻿---
 summary: "CLI reference for `openkrab nodes` (list/status/approve/invoke, camera/canvas/screen)"
 read_when:
-  - You’re managing paired nodes (cameras, screen, canvas)
+  - Youâ€™re managing paired nodes (cameras, screen, canvas)
   - You need to approve requests or invoke node commands
 title: "nodes"
 ---
@@ -22,15 +22,7 @@ Common options:
 
 ## Common commands
 
-```bash
-openkrab nodes list
-openkrab nodes list --connected
-openkrab nodes list --last-connected 24h
-openkrab nodes pending
-openkrab nodes approve <requestId>
-openkrab nodes status
-openkrab nodes status --connected
-openkrab nodes status --last-connected 24h
+```bash\nOpenKrab nodes list\nOpenKrab nodes list --connected\nOpenKrab nodes list --last-connected 24h\nOpenKrab nodes pending\nOpenKrab nodes approve <requestId>\nOpenKrab nodes status\nOpenKrab nodes status --connected\nOpenKrab nodes status --last-connected 24h
 ```
 
 `nodes list` prints pending/paired tables. Paired rows include the most recent connect age (Last Connect).
@@ -39,11 +31,7 @@ filter to nodes that connected within a duration (e.g. `24h`, `7d`).
 
 ## Invoke / run
 
-```bash
-openkrab nodes invoke --node <id|name|ip> --command <command> --params <json>
-openkrab nodes run --node <id|name|ip> <command...>
-openkrab nodes run --raw "git status"
-openkrab nodes run --agent main --node <id|name|ip> --raw "git status"
+```bash\nOpenKrab nodes invoke --node <id|name|ip> --command <command> --params <json>\nOpenKrab nodes run --node <id|name|ip> <command...>\nOpenKrab nodes run --raw "git status"\nOpenKrab nodes run --agent main --node <id|name|ip> --raw "git status"
 ```
 
 Invoke flags:
@@ -54,7 +42,7 @@ Invoke flags:
 
 ### Exec-style defaults
 
-`nodes run` mirrors the model’s exec behavior (defaults + approvals):
+`nodes run` mirrors the modelâ€™s exec behavior (defaults + approvals):
 
 - Reads `tools.exec.*` (plus `agents.list[].tools.exec.*` overrides).
 - Uses exec approvals (`exec.approval.request`) before invoking `system.run`.
@@ -71,3 +59,4 @@ Flags:
 - `--raw <command>`: run a shell string (`/bin/sh -lc` or `cmd.exe /c`).
 - `--agent <id>`: agent-scoped approvals/allowlists (defaults to configured agent).
 - `--ask <off|on-miss|always>`, `--security <deny|allowlist|full>`: overrides.
+

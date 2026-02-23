@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 你想让 OpenKrab 在云 VPS 上 24/7 运行（而不是你的笔记本电脑）
-  - 你想在自己的 VPS 上运行生产级、永久在线的 Gateway 网关
-  - 你想完全控制持久化、二进制文件和重启行为
-  - 你在 Hetzner 或类似提供商上用 Docker 运行 OpenKrab
-summary: 在廉价的 Hetzner VPS（Docker）上 24/7 运行 OpenKrab Gateway 网关，带持久状态和内置二进制文件
+  - ä½ æƒ³è®© OpenKrab åœ¨äº‘ VPS ä¸Š 24/7 è¿è¡Œï¼ˆè€Œä¸æ˜¯ä½ çš„ç¬”è®°æœ¬ç”µè„‘ï¼‰
+  - ä½ æƒ³åœ¨è‡ªå·±çš„ VPS ä¸Šè¿è¡Œç”Ÿäº§çº§ã€æ°¸ä¹…åœ¨çº¿çš„ Gateway ç½‘å…³
+  - ä½ æƒ³å®Œå…¨æŽ§åˆ¶æŒä¹…åŒ–ã€äºŒè¿›åˆ¶æ–‡ä»¶å’Œé‡å¯è¡Œä¸º
+  - ä½ åœ¨ Hetzner æˆ–ç±»ä¼¼æä¾›å•†ä¸Šç”¨ Docker è¿è¡Œ OpenKrab
+summary: åœ¨å»‰ä»·çš„ Hetzner VPSï¼ˆDockerï¼‰ä¸Š 24/7 è¿è¡Œ OpenKrab Gateway ç½‘å…³ï¼Œå¸¦æŒä¹…çŠ¶æ€å’Œå†…ç½®äºŒè¿›åˆ¶æ–‡ä»¶
 title: Hetzner
 x-i18n:
   generated_at: "2026-02-03T07:52:17Z"
@@ -15,78 +15,78 @@ x-i18n:
   workflow: 15
 ---
 
-# 在 Hetzner 上运行 OpenKrab（Docker，生产 VPS 指南）
+# åœ¨ Hetzner ä¸Šè¿è¡Œ OpenKrabï¼ˆDockerï¼Œç”Ÿäº§ VPS æŒ‡å—ï¼‰
 
-## 目标
+## ç›®æ ‡
 
-使用 Docker 在 Hetzner VPS 上运行持久的 OpenKrab Gateway 网关，带持久状态、内置二进制文件和安全的重启行为。
+ä½¿ç”¨ Docker åœ¨ Hetzner VPS ä¸Šè¿è¡ŒæŒä¹…çš„ OpenKrab Gateway ç½‘å…³ï¼Œå¸¦æŒä¹…çŠ¶æ€ã€å†…ç½®äºŒè¿›åˆ¶æ–‡ä»¶å’Œå®‰å…¨çš„é‡å¯è¡Œä¸ºã€‚
 
-如果你想要"约 $5 实现 OpenKrab 24/7"，这是最简单可靠的设置。
-Hetzner 定价会变化；选择最小的 Debian/Ubuntu VPS，如果遇到 OOM 再扩容。
+å¦‚æžœä½ æƒ³è¦"çº¦ $5 å®žçŽ° OpenKrab 24/7"ï¼Œè¿™æ˜¯æœ€ç®€å•å¯é çš„è®¾ç½®ã€‚
+Hetzner å®šä»·ä¼šå˜åŒ–ï¼›é€‰æ‹©æœ€å°çš„ Debian/Ubuntu VPSï¼Œå¦‚æžœé‡åˆ° OOM å†æ‰©å®¹ã€‚
 
-## 我们在做什么（简单说明）？
+## æˆ‘ä»¬åœ¨åšä»€ä¹ˆï¼ˆç®€å•è¯´æ˜Žï¼‰ï¼Ÿ
 
-- 租用一台小型 Linux 服务器（Hetzner VPS）
-- 安装 Docker（隔离的应用运行时）
-- 在 Docker 中启动 OpenKrab Gateway 网关
-- 在主机上持久化 `~/.OpenKrab` + `~/.OpenKrab/workspace`（重启/重建后保留）
-- 通过 SSH 隧道从你的笔记本电脑访问控制 UI
+- ç§Ÿç”¨ä¸€å°å°åž‹ Linux æœåŠ¡å™¨ï¼ˆHetzner VPSï¼‰
+- å®‰è£… Dockerï¼ˆéš”ç¦»çš„åº”ç”¨è¿è¡Œæ—¶ï¼‰
+- åœ¨ Docker ä¸­å¯åŠ¨ OpenKrab Gateway ç½‘å…³
+- åœ¨ä¸»æœºä¸ŠæŒä¹…åŒ– `~/.OpenKrab` + `~/.OpenKrab/workspace`ï¼ˆé‡å¯/é‡å»ºåŽä¿ç•™ï¼‰
+- é€šè¿‡ SSH éš§é“ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘è®¿é—®æŽ§åˆ¶ UI
 
-Gateway 网关可以通过以下方式访问：
+Gateway ç½‘å…³å¯ä»¥é€šè¿‡ä»¥ä¸‹æ–¹å¼è®¿é—®ï¼š
 
-- 从你的笔记本电脑进行 SSH 端口转发
-- 如果你自己管理防火墙和令牌，可以直接暴露端口
+- ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘è¿›è¡Œ SSH ç«¯å£è½¬å‘
+- å¦‚æžœä½ è‡ªå·±ç®¡ç†é˜²ç«å¢™å’Œä»¤ç‰Œï¼Œå¯ä»¥ç›´æŽ¥æš´éœ²ç«¯å£
 
-本指南假设在 Hetzner 上使用 Ubuntu 或 Debian。
-如果你使用其他 Linux VPS，请相应地映射软件包。
-通用 Docker 流程请参见 [Docker](/install/docker)。
+æœ¬æŒ‡å—å‡è®¾åœ¨ Hetzner ä¸Šä½¿ç”¨ Ubuntu æˆ– Debianã€‚
+å¦‚æžœä½ ä½¿ç”¨å…¶ä»– Linux VPSï¼Œè¯·ç›¸åº”åœ°æ˜ å°„è½¯ä»¶åŒ…ã€‚
+é€šç”¨ Docker æµç¨‹è¯·å‚è§ [Docker](/install/docker)ã€‚
 
 ---
 
-## 快速路径（有经验的运维人员）
+## å¿«é€Ÿè·¯å¾„ï¼ˆæœ‰ç»éªŒçš„è¿ç»´äººå‘˜ï¼‰
 
-1. 配置 Hetzner VPS
-2. 安装 Docker
-3. 克隆 OpenKrab 仓库
-4. 创建持久化主机目录
-5. 配置 `.env` 和 `docker-compose.yml`
-6. 将所需二进制文件烘焙到镜像中
+1. é…ç½® Hetzner VPS
+2. å®‰è£… Docker
+3. å…‹éš† OpenKrab ä»“åº“
+4. åˆ›å»ºæŒä¹…åŒ–ä¸»æœºç›®å½•
+5. é…ç½® `.env` å’Œ `docker-compose.yml`
+6. å°†æ‰€éœ€äºŒè¿›åˆ¶æ–‡ä»¶çƒ˜ç„™åˆ°é•œåƒä¸­
 7. `docker compose up -d`
-8. 验证持久化和 Gateway 网关访问
+8. éªŒè¯æŒä¹…åŒ–å’Œ Gateway ç½‘å…³è®¿é—®
 
 ---
 
-## 你需要什么
+## ä½ éœ€è¦ä»€ä¹ˆ
 
-- 具有 root 访问权限的 Hetzner VPS
-- 从你的笔记本电脑进行 SSH 访问
-- 基本熟悉 SSH + 复制/粘贴
-- 约 20 分钟
-- Docker 和 Docker Compose
-- 模型认证凭证
-- 可选的提供商凭证
-  - WhatsApp 二维码
-  - Telegram 机器人令牌
+- å…·æœ‰ root è®¿é—®æƒé™çš„ Hetzner VPS
+- ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘è¿›è¡Œ SSH è®¿é—®
+- åŸºæœ¬ç†Ÿæ‚‰ SSH + å¤åˆ¶/ç²˜è´´
+- çº¦ 20 åˆ†é’Ÿ
+- Docker å’Œ Docker Compose
+- æ¨¡åž‹è®¤è¯å‡­è¯
+- å¯é€‰çš„æä¾›å•†å‡­è¯
+  - WhatsApp äºŒç»´ç 
+  - Telegram æœºå™¨äººä»¤ç‰Œ
   - Gmail OAuth
 
 ---
 
-## 1) 配置 VPS
+## 1) é…ç½® VPS
 
-在 Hetzner 中创建一个 Ubuntu 或 Debian VPS。
+åœ¨ Hetzner ä¸­åˆ›å»ºä¸€ä¸ª Ubuntu æˆ– Debian VPSã€‚
 
-以 root 身份连接：
+ä»¥ root èº«ä»½è¿žæŽ¥ï¼š
 
 ```bash
 ssh root@YOUR_VPS_IP
 ```
 
-本指南假设 VPS 是有状态的。
-不要将其视为一次性基础设施。
+æœ¬æŒ‡å—å‡è®¾ VPS æ˜¯æœ‰çŠ¶æ€çš„ã€‚
+ä¸è¦å°†å…¶è§†ä¸ºä¸€æ¬¡æ€§åŸºç¡€è®¾æ–½ã€‚
 
 ---
 
-## 2) 安装 Docker（在 VPS 上）
+## 2) å®‰è£… Dockerï¼ˆåœ¨ VPS ä¸Šï¼‰
 
 ```bash
 apt-get update
@@ -94,7 +94,7 @@ apt-get install -y git curl ca-certificates
 curl -fsSL https://get.docker.com | sh
 ```
 
-验证：
+éªŒè¯ï¼š
 
 ```bash
 docker --version
@@ -103,68 +103,68 @@ docker compose version
 
 ---
 
-## 3) 克隆 OpenKrab 仓库
+## 3) å…‹éš† OpenKrab ä»“åº“
 
 ```bash
 git clone https://github.com/OpenKrab/OpenKrab.git
 cd OpenKrab
 ```
 
-本指南假设你将构建自定义镜像以保证二进制文件持久化。
+æœ¬æŒ‡å—å‡è®¾ä½ å°†æž„å»ºè‡ªå®šä¹‰é•œåƒä»¥ä¿è¯äºŒè¿›åˆ¶æ–‡ä»¶æŒä¹…åŒ–ã€‚
 
 ---
 
-## 4) 创建持久化主机目录
+## 4) åˆ›å»ºæŒä¹…åŒ–ä¸»æœºç›®å½•
 
-Docker 容器是临时的。
-所有长期状态必须存储在主机上。
+Docker å®¹å™¨æ˜¯ä¸´æ—¶çš„ã€‚
+æ‰€æœ‰é•¿æœŸçŠ¶æ€å¿…é¡»å­˜å‚¨åœ¨ä¸»æœºä¸Šã€‚
 
 ```bash
 mkdir -p /root/.OpenKrab
 mkdir -p /root/.OpenKrab/workspace
 
-# 将所有权设置为容器用户（uid 1000）：
+# å°†æ‰€æœ‰æƒè®¾ç½®ä¸ºå®¹å™¨ç”¨æˆ·ï¼ˆuid 1000ï¼‰ï¼š
 chown -R 1000:1000 /root/.OpenKrab
 chown -R 1000:1000 /root/.OpenKrab/workspace
 ```
 
 ---
 
-## 5) 配置环境变量
+## 5) é…ç½®çŽ¯å¢ƒå˜é‡
 
-在仓库根目录创建 `.env`。
+åœ¨ä»“åº“æ ¹ç›®å½•åˆ›å»º `.env`ã€‚
 
 ```bash
-OpenKrab_IMAGE=OpenKrab:latest
-OpenKrab_GATEWAY_TOKEN=change-me-now
-OpenKrab_GATEWAY_BIND=lan
-OpenKrab_GATEWAY_PORT=18789
+OPENKRAB_IMAGE=OpenKrab:latest
+OPENKRAB_GATEWAY_TOKEN=change-me-now
+OPENKRAB_GATEWAY_BIND=lan
+OPENKRAB_GATEWAY_PORT=18789
 
-OpenKrab_CONFIG_DIR=/root/.OpenKrab
-OpenKrab_WORKSPACE_DIR=/root/.OpenKrab/workspace
+OPENKRAB_CONFIG_DIR=/root/.OpenKrab
+OPENKRAB_WORKSPACE_DIR=/root/.OpenKrab/workspace
 
 GOG_KEYRING_PASSWORD=change-me-now
 XDG_CONFIG_HOME=/home/node/.OpenKrab
 ```
 
-生成强密钥：
+ç”Ÿæˆå¼ºå¯†é’¥ï¼š
 
 ```bash
 openssl rand -hex 32
 ```
 
-**不要提交此文件。**
+**ä¸è¦æäº¤æ­¤æ–‡ä»¶ã€‚**
 
 ---
 
-## 6) Docker Compose 配置
+## 6) Docker Compose é…ç½®
 
-创建或更新 `docker-compose.yml`。
+åˆ›å»ºæˆ–æ›´æ–° `docker-compose.yml`ã€‚
 
 ```yaml
 services:
   OpenKrab-gateway:
-    image: ${OpenKrab_IMAGE}
+    image: ${OPENKRAB_IMAGE}
     build: .
     restart: unless-stopped
     env_file:
@@ -173,22 +173,22 @@ services:
       - HOME=/home/node
       - NODE_ENV=production
       - TERM=xterm-256color
-      - OpenKrab_GATEWAY_BIND=${OpenKrab_GATEWAY_BIND}
-      - OpenKrab_GATEWAY_PORT=${OpenKrab_GATEWAY_PORT}
-      - OpenKrab_GATEWAY_TOKEN=${OpenKrab_GATEWAY_TOKEN}
+      - OPENKRAB_GATEWAY_BIND=${OPENKRAB_GATEWAY_BIND}
+      - OPENKRAB_GATEWAY_PORT=${OPENKRAB_GATEWAY_PORT}
+      - OPENKRAB_GATEWAY_TOKEN=${OPENKRAB_GATEWAY_TOKEN}
       - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD}
       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
       - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     volumes:
-      - ${OpenKrab_CONFIG_DIR}:/home/node/.OpenKrab
-      - ${OpenKrab_WORKSPACE_DIR}:/home/node/.OpenKrab/workspace
+      - ${OPENKRAB_CONFIG_DIR}:/home/node/.OpenKrab
+      - ${OPENKRAB_WORKSPACE_DIR}:/home/node/.OpenKrab/workspace
     ports:
-      # 推荐：在 VPS 上保持 Gateway 网关仅限 loopback；通过 SSH 隧道访问。
-      # 要公开暴露，移除 `127.0.0.1:` 前缀并相应配置防火墙。
-      - "127.0.0.1:${OpenKrab_GATEWAY_PORT}:18789"
+      # æŽ¨èï¼šåœ¨ VPS ä¸Šä¿æŒ Gateway ç½‘å…³ä»…é™ loopbackï¼›é€šè¿‡ SSH éš§é“è®¿é—®ã€‚
+      # è¦å…¬å¼€æš´éœ²ï¼Œç§»é™¤ `127.0.0.1:` å‰ç¼€å¹¶ç›¸åº”é…ç½®é˜²ç«å¢™ã€‚
+      - "127.0.0.1:${OPENKRAB_GATEWAY_PORT}:18789"
 
-      # 可选：仅当你对此 VPS 运行 iOS/Android 节点并需要 Canvas 主机时。
-      # 如果你公开暴露此端口，请阅读 /gateway/security 并相应配置防火墙。
+      # å¯é€‰ï¼šä»…å½“ä½ å¯¹æ­¤ VPS è¿è¡Œ iOS/Android èŠ‚ç‚¹å¹¶éœ€è¦ Canvas ä¸»æœºæ—¶ã€‚
+      # å¦‚æžœä½ å…¬å¼€æš´éœ²æ­¤ç«¯å£ï¼Œè¯·é˜…è¯» /gateway/security å¹¶ç›¸åº”é…ç½®é˜²ç«å¢™ã€‚
       # - "18793:18793"
     command:
       [
@@ -196,56 +196,56 @@ services:
         "dist/index.js",
         "gateway",
         "--bind",
-        "${OpenKrab_GATEWAY_BIND}",
+        "${OPENKRAB_GATEWAY_BIND}",
         "--port",
-        "${OpenKrab_GATEWAY_PORT}",
+        "${OPENKRAB_GATEWAY_PORT}",
       ]
 ```
 
 ---
 
-## 7) 将所需二进制文件烘焙到镜像中（关键）
+## 7) å°†æ‰€éœ€äºŒè¿›åˆ¶æ–‡ä»¶çƒ˜ç„™åˆ°é•œåƒä¸­ï¼ˆå…³é”®ï¼‰
 
-在运行中的容器内安装二进制文件是一个陷阱。
-任何在运行时安装的东西都会在重启时丢失。
+åœ¨è¿è¡Œä¸­çš„å®¹å™¨å†…å®‰è£…äºŒè¿›åˆ¶æ–‡ä»¶æ˜¯ä¸€ä¸ªé™·é˜±ã€‚
+ä»»ä½•åœ¨è¿è¡Œæ—¶å®‰è£…çš„ä¸œè¥¿éƒ½ä¼šåœ¨é‡å¯æ—¶ä¸¢å¤±ã€‚
 
-所有 skills 所需的外部二进制文件必须在镜像构建时安装。
+æ‰€æœ‰ skills æ‰€éœ€çš„å¤–éƒ¨äºŒè¿›åˆ¶æ–‡ä»¶å¿…é¡»åœ¨é•œåƒæž„å»ºæ—¶å®‰è£…ã€‚
 
-以下示例仅展示三个常见二进制文件：
+ä»¥ä¸‹ç¤ºä¾‹ä»…å±•ç¤ºä¸‰ä¸ªå¸¸è§äºŒè¿›åˆ¶æ–‡ä»¶ï¼š
 
-- `gog` 用于 Gmail 访问
-- `goplaces` 用于 Google Places
-- `wacli` 用于 WhatsApp
+- `gog` ç”¨äºŽ Gmail è®¿é—®
+- `goplaces` ç”¨äºŽ Google Places
+- `wacli` ç”¨äºŽ WhatsApp
 
-这些是示例，不是完整列表。
-你可以使用相同的模式安装任意数量的二进制文件。
+è¿™äº›æ˜¯ç¤ºä¾‹ï¼Œä¸æ˜¯å®Œæ•´åˆ—è¡¨ã€‚
+ä½ å¯ä»¥ä½¿ç”¨ç›¸åŒçš„æ¨¡å¼å®‰è£…ä»»æ„æ•°é‡çš„äºŒè¿›åˆ¶æ–‡ä»¶ã€‚
 
-如果你以后添加依赖额外二进制文件的新 skills，你必须：
+å¦‚æžœä½ ä»¥åŽæ·»åŠ ä¾èµ–é¢å¤–äºŒè¿›åˆ¶æ–‡ä»¶çš„æ–° skillsï¼Œä½ å¿…é¡»ï¼š
 
-1. 更新 Dockerfile
-2. 重新构建镜像
-3. 重启容器
+1. æ›´æ–° Dockerfile
+2. é‡æ–°æž„å»ºé•œåƒ
+3. é‡å¯å®¹å™¨
 
-**示例 Dockerfile**
+**ç¤ºä¾‹ Dockerfile**
 
 ```dockerfile
 FROM node:22-bookworm
 
 RUN apt-get update && apt-get install -y socat && rm -rf /var/lib/apt/lists/*
 
-# 示例二进制文件 1：Gmail CLI
+# ç¤ºä¾‹äºŒè¿›åˆ¶æ–‡ä»¶ 1ï¼šGmail CLI
 RUN curl -L https://github.com/steipete/gog/releases/latest/download/gog_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/gog
 
-# 示例二进制文件 2：Google Places CLI
+# ç¤ºä¾‹äºŒè¿›åˆ¶æ–‡ä»¶ 2ï¼šGoogle Places CLI
 RUN curl -L https://github.com/steipete/goplaces/releases/latest/download/goplaces_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/goplaces
 
-# 示例二进制文件 3：WhatsApp CLI
+# ç¤ºä¾‹äºŒè¿›åˆ¶æ–‡ä»¶ 3ï¼šWhatsApp CLI
 RUN curl -L https://github.com/steipete/wacli/releases/latest/download/wacli_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/wacli
 
-# 使用相同模式在下方添加更多二进制文件
+# ä½¿ç”¨ç›¸åŒæ¨¡å¼åœ¨ä¸‹æ–¹æ·»åŠ æ›´å¤šäºŒè¿›åˆ¶æ–‡ä»¶
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
@@ -267,14 +267,14 @@ CMD ["node","dist/index.js"]
 
 ---
 
-## 8) 构建并启动
+## 8) æž„å»ºå¹¶å¯åŠ¨
 
 ```bash
 docker compose build
 docker compose up -d OpenKrab-gateway
 ```
 
-验证二进制文件：
+éªŒè¯äºŒè¿›åˆ¶æ–‡ä»¶ï¼š
 
 ```bash
 docker compose exec OpenKrab-gateway which gog
@@ -282,7 +282,7 @@ docker compose exec OpenKrab-gateway which goplaces
 docker compose exec OpenKrab-gateway which wacli
 ```
 
-预期输出：
+é¢„æœŸè¾“å‡ºï¼š
 
 ```
 /usr/local/bin/gog
@@ -292,47 +292,48 @@ docker compose exec OpenKrab-gateway which wacli
 
 ---
 
-## 9) 验证 Gateway 网关
+## 9) éªŒè¯ Gateway ç½‘å…³
 
 ```bash
 docker compose logs -f OpenKrab-gateway
 ```
 
-成功：
+æˆåŠŸï¼š
 
 ```
 [gateway] listening on ws://0.0.0.0:18789
 ```
 
-从你的笔记本电脑：
+ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘ï¼š
 
 ```bash
 ssh -N -L 18789:127.0.0.1:18789 root@YOUR_VPS_IP
 ```
 
-打开：
+æ‰“å¼€ï¼š
 
 `http://127.0.0.1:18789/`
 
-粘贴你的 Gateway 网关令牌。
+ç²˜è´´ä½ çš„ Gateway ç½‘å…³ä»¤ç‰Œã€‚
 
 ---
 
-## 持久化位置（事实来源）
+## æŒä¹…åŒ–ä½ç½®ï¼ˆäº‹å®žæ¥æºï¼‰
 
-OpenKrab 在 Docker 中运行，但 Docker 不是事实来源。
-所有长期状态必须在重启、重建和重启后保留。
+OpenKrab åœ¨ Docker ä¸­è¿è¡Œï¼Œä½† Docker ä¸æ˜¯äº‹å®žæ¥æºã€‚
+æ‰€æœ‰é•¿æœŸçŠ¶æ€å¿…é¡»åœ¨é‡å¯ã€é‡å»ºå’Œé‡å¯åŽä¿ç•™ã€‚
 
-| 组件             | 位置                              | 持久化机制    | 说明                        |
+| ç»„ä»¶             | ä½ç½®                              | æŒä¹…åŒ–æœºåˆ¶    | è¯´æ˜Ž                        |
 | ---------------- | --------------------------------- | ------------- | --------------------------- |
-| Gateway 网关配置 | `/home/node/.OpenKrab/`           | 主机卷挂载    | 包括 `OpenKrab.json`、令牌  |
-| 模型认证配置文件 | `/home/node/.OpenKrab/`           | 主机卷挂载    | OAuth 令牌、API 密钥        |
-| Skill 配置       | `/home/node/.OpenKrab/skills/`    | 主机卷挂载    | Skill 级别状态              |
-| 智能体工作区     | `/home/node/.OpenKrab/workspace/` | 主机卷挂载    | 代码和智能体产物            |
-| WhatsApp 会话    | `/home/node/.OpenKrab/`           | 主机卷挂载    | 保留二维码登录              |
-| Gmail 密钥环     | `/home/node/.OpenKrab/`           | 主机卷 + 密码 | 需要 `GOG_KEYRING_PASSWORD` |
-| 外部二进制文件   | `/usr/local/bin/`                 | Docker 镜像   | 必须在构建时烘焙            |
-| Node 运行时      | 容器文件系统                      | Docker 镜像   | 每次镜像构建时重建          |
-| 操作系统包       | 容器文件系统                      | Docker 镜像   | 不要在运行时安装            |
-| Docker 容器      | 临时的                            | 可重启        | 可以安全销毁                |
+| Gateway ç½‘å…³é…ç½® | `/home/node/.OpenKrab/`           | ä¸»æœºå·æŒ‚è½½    | åŒ…æ‹¬ `OpenKrab.json`ã€ä»¤ç‰Œ  |
+| æ¨¡åž‹è®¤è¯é…ç½®æ–‡ä»¶ | `/home/node/.OpenKrab/`           | ä¸»æœºå·æŒ‚è½½    | OAuth ä»¤ç‰Œã€API å¯†é’¥        |
+| Skill é…ç½®       | `/home/node/.OpenKrab/skills/`    | ä¸»æœºå·æŒ‚è½½    | Skill çº§åˆ«çŠ¶æ€              |
+| æ™ºèƒ½ä½“å·¥ä½œåŒº     | `/home/node/.OpenKrab/workspace/` | ä¸»æœºå·æŒ‚è½½    | ä»£ç å’Œæ™ºèƒ½ä½“äº§ç‰©            |
+| WhatsApp ä¼šè¯    | `/home/node/.OpenKrab/`           | ä¸»æœºå·æŒ‚è½½    | ä¿ç•™äºŒç»´ç ç™»å½•              |
+| Gmail å¯†é’¥çŽ¯     | `/home/node/.OpenKrab/`           | ä¸»æœºå· + å¯†ç  | éœ€è¦ `GOG_KEYRING_PASSWORD` |
+| å¤–éƒ¨äºŒè¿›åˆ¶æ–‡ä»¶   | `/usr/local/bin/`                 | Docker é•œåƒ   | å¿…é¡»åœ¨æž„å»ºæ—¶çƒ˜ç„™            |
+| Node è¿è¡Œæ—¶      | å®¹å™¨æ–‡ä»¶ç³»ç»Ÿ                      | Docker é•œåƒ   | æ¯æ¬¡é•œåƒæž„å»ºæ—¶é‡å»º          |
+| æ“ä½œç³»ç»ŸåŒ…       | å®¹å™¨æ–‡ä»¶ç³»ç»Ÿ                      | Docker é•œåƒ   | ä¸è¦åœ¨è¿è¡Œæ—¶å®‰è£…            |
+| Docker å®¹å™¨      | ä¸´æ—¶çš„                            | å¯é‡å¯        | å¯ä»¥å®‰å…¨é”€æ¯                |
+
 

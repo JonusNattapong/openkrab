@@ -131,7 +131,7 @@ pub async fn refresh_qwen_credentials(
         if status.as_u16() == 400 {
             bail!(
                 "Qwen OAuth refresh token expired or invalid. \
-                 Re-authenticate with `krabkrab models auth login --provider qwen-portal`."
+                 Re-authenticate with `openkrab models auth login --provider qwen-portal`."
             );
         }
         bail!("Qwen OAuth refresh failed: {}", text.trim());
@@ -229,3 +229,4 @@ mod tests {
         assert!(!future.is_expired());
     }
 }
+

@@ -1,4 +1,4 @@
-//! uninstall — Uninstall krabkrab command.
+//! uninstall — Uninstall openkrab command.
 //! Ported from `openkrab/src/commands/uninstall.ts` (Phase 6).
 
 use std::path::PathBuf;
@@ -12,10 +12,10 @@ pub struct UninstallOptions {
 
 /// Run uninstall command.
 pub fn uninstall_command(opts: UninstallOptions) -> String {
-    let mut lines = vec!["🦀 krabkrab Uninstall".to_string(), String::new()];
+    let mut lines = vec!["🦀 openkrab Uninstall".to_string(), String::new()];
 
     if !opts.force {
-        lines.push("⚠️  This will remove krabkrab from your system.".to_string());
+        lines.push("⚠️  This will remove openkrab from your system.".to_string());
         lines.push("Use --force to confirm uninstallation.".to_string());
         lines.push(String::new());
         lines.push("The following will be removed:".to_string());
@@ -25,9 +25,9 @@ pub fn uninstall_command(opts: UninstallOptions) -> String {
 
     // Binary
     let binary_paths = vec![
-        "/usr/local/bin/krabkrab",
-        "/usr/bin/krabkrab",
-        "C:\\Program Files\\krabkrab\\krabkrab.exe",
+        "/usr/local/bin/openkrab",
+        "/usr/bin/openkrab",
+        "C:\\Program Files\\openkrab\\openkrab.exe",
     ];
 
     for path in &binary_paths {
@@ -45,7 +45,7 @@ pub fn uninstall_command(opts: UninstallOptions) -> String {
     }
 
     // Config
-    let config_dir = dirs::config_dir().map(|d| d.join("krabkrab"));
+    let config_dir = dirs::config_dir().map(|d| d.join("openkrab"));
 
     if let Some(ref dir) = config_dir {
         if opts.purge && opts.force {
@@ -59,7 +59,7 @@ pub fn uninstall_command(opts: UninstallOptions) -> String {
     }
 
     // Data
-    let data_dir = dirs::data_dir().map(|d| d.join("krabkrab"));
+    let data_dir = dirs::data_dir().map(|d| d.join("openkrab"));
 
     if let Some(ref dir) = data_dir {
         if opts.purge && opts.force {
@@ -75,17 +75,18 @@ pub fn uninstall_command(opts: UninstallOptions) -> String {
     if opts.force {
         lines.push(String::new());
         if removed.is_empty() {
-            lines.push("No krabkrab installation found to remove.".to_string());
+            lines.push("No openkrab installation found to remove.".to_string());
         } else {
             lines.push("Removed:".to_string());
             for item in removed {
                 lines.push(format!("  ✓ {}", item));
             }
             lines.push(String::new());
-            lines.push("krabkrab has been uninstalled.".to_string());
+            lines.push("openkrab has been uninstalled.".to_string());
             lines.push("Sorry to see you go! 🦀".to_string());
         }
     }
 
     lines.join("\n")
 }
+

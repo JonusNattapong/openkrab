@@ -1,4 +1,4 @@
-use krabkrab::channels::channel_config::*;
+use openkrab::channels::channel_config::*;
 use std::collections::HashMap;
 
 #[test]
@@ -45,3 +45,4 @@ fn nested_allowlist() {
     )));
     assert!(resolve_nested_allowlist_decision((true, true, true, true)));
 }
+

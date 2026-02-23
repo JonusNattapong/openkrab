@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab browser` (profiles, tabs, actions, extension relay)"
 read_when:
   - You use `openkrab browser` and want examples for common tasks
@@ -9,7 +9,7 @@ title: "browser"
 
 # `openkrab browser`
 
-Manage openkrab’s browser control server and run browser actions (tabs, snapshots, screenshots, navigation, clicks, typing).
+Manage openkrabâ€™s browser control server and run browser actions (tabs, snapshots, screenshots, navigation, clicks, typing).
 
 Related:
 
@@ -26,11 +26,7 @@ Related:
 
 ## Quick start (local)
 
-```bash
-openkrab browser --browser-profile chrome tabs
-openkrab browser --browser-profile openkrab start
-openkrab browser --browser-profile openkrab open https://example.com
-openkrab browser --browser-profile openkrab snapshot
+```bash\nOpenKrab browser --browser-profile chrome tabs\nOpenKrab browser --browser-profile OpenKrab start\nOpenKrab browser --browser-profile OpenKrab open https://example.com\nOpenKrab browser --browser-profile OpenKrab snapshot
 ```
 
 ## Profiles
@@ -40,47 +36,34 @@ Profiles are named browser routing configs. In practice:
 - `openkrab`: launches/attaches to a dedicated openkrab-managed Chrome instance (isolated user data dir).
 - `chrome`: controls your existing Chrome tab(s) via the Chrome extension relay.
 
-```bash
-openkrab browser profiles
-openkrab browser create-profile --name work --color "#FF5A36"
-openkrab browser delete-profile --name work
+```bash\nOpenKrab browser profiles\nOpenKrab browser create-profile --name work --color "#FF5A36"\nOpenKrab browser delete-profile --name work
 ```
 
 Use a specific profile:
 
-```bash
-openkrab browser --browser-profile work tabs
+```bash\nOpenKrab browser --browser-profile work tabs
 ```
 
 ## Tabs
 
-```bash
-openkrab browser tabs
-openkrab browser open https://docs.openkrab.ai
-openkrab browser focus <targetId>
-openkrab browser close <targetId>
+```bash\nOpenKrab browser tabs\nOpenKrab browser open https://docs.openkrab.ai\nOpenKrab browser focus <targetId>\nOpenKrab browser close <targetId>
 ```
 
 ## Snapshot / screenshot / actions
 
 Snapshot:
 
-```bash
-openkrab browser snapshot
+```bash\nOpenKrab browser snapshot
 ```
 
 Screenshot:
 
-```bash
-openkrab browser screenshot
+```bash\nOpenKrab browser screenshot
 ```
 
 Navigate/click/type (ref-based UI automation):
 
-```bash
-openkrab browser navigate https://example.com
-openkrab browser click <ref>
-openkrab browser type <ref> "hello"
+```bash\nOpenKrab browser navigate https://example.com\nOpenKrab browser click <ref>\nOpenKrab browser type <ref> "hello"
 ```
 
 ## Chrome extension relay (attach via toolbar button)
@@ -89,12 +72,10 @@ This mode lets the agent control an existing Chrome tab that you attach manually
 
 Install the unpacked extension to a stable path:
 
-```bash
-openkrab browser extension install
-openkrab browser extension path
+```bash\nOpenKrab browser extension install\nOpenKrab browser extension path
 ```
 
-Then Chrome → `chrome://extensions` → enable “Developer mode” → “Load unpacked” → select the printed folder.
+Then Chrome â†’ `chrome://extensions` â†’ enable â€œDeveloper modeâ€ â†’ â€œLoad unpackedâ€ â†’ select the printed folder.
 
 Full guide: [Chrome extension](/tools/chrome-extension)
 
@@ -105,3 +86,4 @@ If the Gateway runs on a different machine than the browser, run a **node host**
 Use `gateway.nodes.browser.mode` to control auto-routing and `gateway.nodes.browser.node` to pin a specific node if multiple are connected.
 
 Security + remote setup: [Browser tool](/tools/browser), [Remote access](/gateway/remote), [Tailscale](/gateway/tailscale), [Security](/gateway/security)
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Fast channel level troubleshooting with per channel failure signatures and fixes"
 read_when:
   - Channel transport says connected but replies fail
@@ -14,12 +14,7 @@ Use this page when a channel connects but behavior is wrong.
 
 Run these in order first:
 
-```bash
-openkrab status
-openkrab gateway status
-openkrab logs --follow
-openkrab doctor
-openkrab channels status --probe
+```bash\nOpenKrab status\nOpenKrab gateway status\nOpenKrab logs --follow\nOpenKrab doctor\nOpenKrab channels status --probe
 ```
 
 Healthy baseline:
@@ -115,3 +110,4 @@ Full troubleshooting: [/channels/signal#troubleshooting](/channels/signal#troubl
 | Encrypted rooms fail                | Verify crypto module and encryption settings | Enable encryption support and rejoin/sync room. |
 
 Full troubleshooting: [/channels/matrix#troubleshooting](/channels/matrix#troubleshooting)
+

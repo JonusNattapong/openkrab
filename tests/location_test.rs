@@ -1,4 +1,4 @@
-use krabkrab::channels::location::*;
+use openkrab::channels::location::*;
 
 #[test]
 fn test_format_location_text_live() {
@@ -33,3 +33,4 @@ fn test_to_location_context() {
     assert_eq!(ctx.LocationLat, 1.0);
     assert_eq!(ctx.LocationLon, 2.0);
 }
+

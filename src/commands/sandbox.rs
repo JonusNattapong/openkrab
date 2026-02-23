@@ -40,7 +40,7 @@ pub fn sandbox_list_command(cfg: &AppConfig) -> String {
             "ps",
             "-a",
             "--filter",
-            "label=krabkrab.sandbox=true",
+            "label=openkrab.sandbox=true",
             "--format",
             "{{.ID}}|{{.Names}}|{{.Image}}|{{.Status}}",
         ])
@@ -102,7 +102,7 @@ pub fn sandbox_build_command(browser: bool, common: bool) -> String {
         .args([
             "build",
             "-t",
-            "krabkrab/sandbox:latest",
+            "openkrab/sandbox:latest",
             "-f",
             "Dockerfile.sandbox",
             ".",
@@ -116,7 +116,7 @@ pub fn sandbox_build_command(browser: bool, common: bool) -> String {
             .args([
                 "build",
                 "-t",
-                "krabkrab/sandbox-browser:latest",
+                "openkrab/sandbox-browser:latest",
                 "-f",
                 "Dockerfile.sandbox.browser",
                 ".",
@@ -131,7 +131,7 @@ pub fn sandbox_build_command(browser: bool, common: bool) -> String {
             .args([
                 "build",
                 "-t",
-                "krabkrab/sandbox-common:latest",
+                "openkrab/sandbox-common:latest",
                 "-f",
                 "Dockerfile.sandbox.common",
                 ".",
@@ -154,7 +154,7 @@ pub fn sandbox_recreate_command(cfg: &AppConfig, force: bool) -> String {
 
     if force {
         let output = Command::new("docker")
-            .args(["ps", "-qa", "--filter", "label=krabkrab.sandbox=true"])
+            .args(["ps", "-qa", "--filter", "label=openkrab.sandbox=true"])
             .output()
             .expect("Failed to execute docker ps");
 
@@ -188,12 +188,12 @@ pub fn sandbox_recreate_command(cfg: &AppConfig, force: bool) -> String {
         .unwrap_or_default();
 
     let targets = vec![
-        ("krabkrab-sandbox-default", resolve_sandbox_image(cfg)),
+        ("openkrab-sandbox-default", resolve_sandbox_image(cfg)),
         (
-            "krabkrab-sandbox-browser",
+            "openkrab-sandbox-browser",
             resolve_sandbox_browser_image(cfg),
         ),
-        ("krabkrab-sandbox-common", resolve_sandbox_common_image(cfg)),
+        ("openkrab-sandbox-common", resolve_sandbox_common_image(cfg)),
     ];
 
     for (name, image) in targets {
@@ -244,7 +244,7 @@ fn ensure_sandbox_container(
         "--name".to_string(),
         name.to_string(),
         "--label".to_string(),
-        "krabkrab.sandbox=true".to_string(),
+        "openkrab.sandbox=true".to_string(),
     ];
 
     if let Some(net) = network.filter(|s| !s.trim().is_empty()) {
@@ -407,3 +407,4 @@ mod tests {
         assert_eq!(format_simple_sandbox_status(false), "down");
     }
 }
+

@@ -1,4 +1,4 @@
-//! Ported from `openclaw/src/sessions/input-provenance.ts`
+//! Ported from `OpenKrab/src/sessions/input-provenance.ts`
 
 use serde::{Deserialize, Serialize};
 
@@ -55,3 +55,4 @@ impl InputProvenance {
 pub fn has_inter_session_user_provenance(provenance: Option<&InputProvenance>) -> bool {
     provenance.map(|p| p.is_inter_session()).unwrap_or(false)
 }
+

@@ -1,4 +1,4 @@
-use krabkrab::channels::conversation_label::*;
+use openkrab::channels::conversation_label::*;
 
 #[test]
 fn test_resolve_conversation_label_explicit() {
@@ -25,3 +25,4 @@ fn test_resolve_conversation_label_append_id() {
     let res = resolve_conversation_label(&ctx).unwrap();
     assert!(res.contains("id:123456"));
 }
+

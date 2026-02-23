@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Complete reference for CLI onboarding flow, auth/model setup, outputs, and internals"
 read_when:
   - You need detailed behavior for OpenKrab onboard
@@ -204,7 +204,7 @@ Credential and profile paths:
 
 <Note>
 Headless and server tip: complete OAuth on a machine with a browser, then copy
-`~/.OpenKrab/credentials/oauth.json` (or `$OpenKrab_STATE_DIR/credentials/oauth.json`)
+`~/.OpenKrab/credentials/oauth.json` (or `$OPENKRAB_STATE_DIR/credentials/oauth.json`)
 to the gateway host.
 </Note>
 
@@ -257,4 +257,5 @@ Signal setup behavior:
 - Onboarding hub: [Onboarding Wizard (CLI)](/start/wizard)
 - Automation and scripts: [CLI Automation](/start/wizard-cli-automation)
 - Command reference: [`OpenKrab onboard`](/cli/onboard)
+
 

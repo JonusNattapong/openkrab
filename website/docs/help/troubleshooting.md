@@ -1,7 +1,7 @@
----
+﻿---
 summary: "Symptom first troubleshooting hub for openkrab"
 read_when:
-  - openkrab is not working and you need the fastest path to a fix
+  - OpenKrab is not working and you need the fastest path to a fix
   - You want a triage flow before diving into deep runbooks
 title: "Troubleshooting"
 ---
@@ -14,25 +14,18 @@ If you only have 2 minutes, use this page as a triage front door.
 
 Run this exact ladder in order:
 
-```bash
-openkrab status
-openkrab status --all
-openkrab gateway probe
-openkrab gateway status
-openkrab doctor
-openkrab channels status --probe
-openkrab logs --follow
+```bash\nOpenKrab status\nOpenKrab status --all\nOpenKrab gateway probe\nOpenKrab gateway status\nOpenKrab doctor\nOpenKrab channels status --probe\nOpenKrab logs --follow
 ```
 
 Good output in one line:
 
-- `openkrab status` → shows configured channels and no obvious auth errors.
-- `openkrab status --all` → full report is present and shareable.
-- `openkrab gateway probe` → expected gateway target is reachable.
-- `openkrab gateway status` → `Runtime: running` and `RPC probe: ok`.
-- `openkrab doctor` → no blocking config/service errors.
-- `openkrab channels status --probe` → channels report `connected` or `ready`.
-- `openkrab logs --follow` → steady activity, no repeating fatal errors.
+- `openkrab status` â†’ shows configured channels and no obvious auth errors.
+- `openkrab status --all` â†’ full report is present and shareable.
+- `openkrab gateway probe` â†’ expected gateway target is reachable.
+- `openkrab gateway status` â†’ `Runtime: running` and `RPC probe: ok`.
+- `openkrab doctor` â†’ no blocking config/service errors.
+- `openkrab channels status --probe` â†’ channels report `connected` or `ready`.
+- `openkrab logs --follow` â†’ steady activity, no repeating fatal errors.
 
 ## Decision tree
 
@@ -59,11 +52,11 @@ flowchart TD
 <AccordionGroup>
   <Accordion title="No replies">
     ```bash
-    openkrab status
-    openkrab gateway status
-    openkrab channels status --probe
-    openkrab pairing list <channel>
-    openkrab logs --follow
+    OpenKrab status
+    OpenKrab gateway status
+    OpenKrab channels status --probe
+    OpenKrab pairing list <channel>
+    OpenKrab logs --follow
     ```
 
     Good output looks like:
@@ -75,9 +68,9 @@ flowchart TD
 
     Common log signatures:
 
-    - `drop guild message (mention required` → mention gating blocked the message in Discord.
-    - `pairing request` → sender is unapproved and waiting for DM pairing approval.
-    - `blocked` / `allowlist` in channel logs → sender, room, or group is filtered.
+    - `drop guild message (mention required` â†’ mention gating blocked the message in Discord.
+    - `pairing request` â†’ sender is unapproved and waiting for DM pairing approval.
+    - `blocked` / `allowlist` in channel logs â†’ sender, room, or group is filtered.
 
     Deep pages:
 
@@ -89,11 +82,11 @@ flowchart TD
 
   <Accordion title="Dashboard or Control UI will not connect">
     ```bash
-    openkrab status
-    openkrab gateway status
-    openkrab logs --follow
-    openkrab doctor
-    openkrab channels status --probe
+    OpenKrab status
+    OpenKrab gateway status
+    OpenKrab logs --follow
+    OpenKrab doctor
+    OpenKrab channels status --probe
     ```
 
     Good output looks like:
@@ -104,9 +97,9 @@ flowchart TD
 
     Common log signatures:
 
-    - `device identity required` → HTTP/non-secure context cannot complete device auth.
-    - `unauthorized` / reconnect loop → wrong token/password or auth mode mismatch.
-    - `gateway connect failed:` → UI is targeting the wrong URL/port or unreachable gateway.
+    - `device identity required` â†’ HTTP/non-secure context cannot complete device auth.
+    - `unauthorized` / reconnect loop â†’ wrong token/password or auth mode mismatch.
+    - `gateway connect failed:` â†’ UI is targeting the wrong URL/port or unreachable gateway.
 
     Deep pages:
 
@@ -118,11 +111,11 @@ flowchart TD
 
   <Accordion title="Gateway will not start or service installed but not running">
     ```bash
-    openkrab status
-    openkrab gateway status
-    openkrab logs --follow
-    openkrab doctor
-    openkrab channels status --probe
+    OpenKrab status
+    OpenKrab gateway status
+    OpenKrab logs --follow
+    OpenKrab doctor
+    OpenKrab channels status --probe
     ```
 
     Good output looks like:
@@ -133,9 +126,9 @@ flowchart TD
 
     Common log signatures:
 
-    - `Gateway start blocked: set gateway.mode=local` → gateway mode is unset/remote.
-    - `refusing to bind gateway ... without auth` → non-loopback bind without token/password.
-    - `another gateway instance is already listening` or `EADDRINUSE` → port already taken.
+    - `Gateway start blocked: set gateway.mode=local` â†’ gateway mode is unset/remote.
+    - `refusing to bind gateway ... without auth` â†’ non-loopback bind without token/password.
+    - `another gateway instance is already listening` or `EADDRINUSE` â†’ port already taken.
 
     Deep pages:
 
@@ -147,11 +140,11 @@ flowchart TD
 
   <Accordion title="Channel connects but messages do not flow">
     ```bash
-    openkrab status
-    openkrab gateway status
-    openkrab logs --follow
-    openkrab doctor
-    openkrab channels status --probe
+    OpenKrab status
+    OpenKrab gateway status
+    OpenKrab logs --follow
+    OpenKrab doctor
+    OpenKrab channels status --probe
     ```
 
     Good output looks like:
@@ -162,9 +155,9 @@ flowchart TD
 
     Common log signatures:
 
-    - `mention required` → group mention gating blocked processing.
-    - `pairing` / `pending` → DM sender is not approved yet.
-    - `not_in_channel`, `missing_scope`, `Forbidden`, `401/403` → channel permission token issue.
+    - `mention required` â†’ group mention gating blocked processing.
+    - `pairing` / `pending` â†’ DM sender is not approved yet.
+    - `not_in_channel`, `missing_scope`, `Forbidden`, `401/403` â†’ channel permission token issue.
 
     Deep pages:
 
@@ -175,12 +168,12 @@ flowchart TD
 
   <Accordion title="Cron or heartbeat did not fire or did not deliver">
     ```bash
-    openkrab status
-    openkrab gateway status
-    openkrab cron status
-    openkrab cron list
-    openkrab cron runs --id <jobId> --limit 20
-    openkrab logs --follow
+    OpenKrab status
+    OpenKrab gateway status
+    OpenKrab cron status
+    OpenKrab cron list
+    OpenKrab cron runs --id <jobId> --limit 20
+    OpenKrab logs --follow
     ```
 
     Good output looks like:
@@ -191,10 +184,10 @@ flowchart TD
 
     Common log signatures:
 
-    - `cron: scheduler disabled; jobs will not run automatically` → cron is disabled.
-    - `heartbeat skipped` with `reason=quiet-hours` → outside configured active hours.
-    - `requests-in-flight` → main lane busy; heartbeat wake was deferred.
-    - `unknown accountId` → heartbeat delivery target account does not exist.
+    - `cron: scheduler disabled; jobs will not run automatically` â†’ cron is disabled.
+    - `heartbeat skipped` with `reason=quiet-hours` â†’ outside configured active hours.
+    - `requests-in-flight` â†’ main lane busy; heartbeat wake was deferred.
+    - `unknown accountId` â†’ heartbeat delivery target account does not exist.
 
     Deep pages:
 
@@ -206,11 +199,11 @@ flowchart TD
 
   <Accordion title="Node is paired but tool fails camera canvas screen exec">
     ```bash
-    openkrab status
-    openkrab gateway status
-    openkrab nodes status
-    openkrab nodes describe --node <idOrNameOrIp>
-    openkrab logs --follow
+    OpenKrab status
+    OpenKrab gateway status
+    OpenKrab nodes status
+    OpenKrab nodes describe --node <idOrNameOrIp>
+    OpenKrab logs --follow
     ```
 
     Good output looks like:
@@ -221,10 +214,10 @@ flowchart TD
 
     Common log signatures:
 
-    - `NODE_BACKGROUND_UNAVAILABLE` → bring node app to foreground.
-    - `*_PERMISSION_REQUIRED` → OS permission was denied/missing.
-    - `SYSTEM_RUN_DENIED: approval required` → exec approval is pending.
-    - `SYSTEM_RUN_DENIED: allowlist miss` → command not on exec allowlist.
+    - `NODE_BACKGROUND_UNAVAILABLE` â†’ bring node app to foreground.
+    - `*_PERMISSION_REQUIRED` â†’ OS permission was denied/missing.
+    - `SYSTEM_RUN_DENIED: approval required` â†’ exec approval is pending.
+    - `SYSTEM_RUN_DENIED: allowlist miss` â†’ command not on exec allowlist.
 
     Deep pages:
 
@@ -236,11 +229,11 @@ flowchart TD
 
   <Accordion title="Browser tool fails">
     ```bash
-    openkrab status
-    openkrab gateway status
-    openkrab browser status
-    openkrab logs --follow
-    openkrab doctor
+    OpenKrab status
+    OpenKrab gateway status
+    OpenKrab browser status
+    OpenKrab logs --follow
+    OpenKrab doctor
     ```
 
     Good output looks like:
@@ -250,10 +243,10 @@ flowchart TD
 
     Common log signatures:
 
-    - `Failed to start Chrome CDP on port` → local browser launch failed.
-    - `browser.executablePath not found` → configured binary path is wrong.
-    - `Chrome extension relay is running, but no tab is connected` → extension not attached.
-    - `Browser attachOnly is enabled ... not reachable` → attach-only profile has no live CDP target.
+    - `Failed to start Chrome CDP on port` â†’ local browser launch failed.
+    - `browser.executablePath not found` â†’ configured binary path is wrong.
+    - `Chrome extension relay is running, but no tab is connected` â†’ extension not attached.
+    - `Browser attachOnly is enabled ... not reachable` â†’ attach-only profile has no live CDP target.
 
     Deep pages:
 
@@ -263,3 +256,4 @@ flowchart TD
 
   </Accordion>
 </AccordionGroup>
+

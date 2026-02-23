@@ -1,42 +1,42 @@
----
+﻿---
 summary: "Context: what the model sees, how it is built, and how to inspect it"
 read_when:
-  - You want to understand what “context” means in openkrab
-  - You are debugging why the model “knows” something (or forgot it)
+  - You want to understand what â€œcontextâ€ means in openkrab
+  - You are debugging why the model â€œknowsâ€ something (or forgot it)
   - You want to reduce context overhead (/context, /status, /compact)
 title: "Context"
 ---
 
 # Context
 
-“Context” is **everything openkrab sends to the model for a run**. It is bounded by the model’s **context window** (token limit).
+â€œContextâ€ is **everything OpenKrab sends to the model for a run**. It is bounded by the modelâ€™s **context window** (token limit).
 
 Beginner mental model:
 
 - **System prompt** (openkrab-built): rules, tools, skills list, time/runtime, and injected workspace files.
-- **Conversation history**: your messages + the assistant’s messages for this session.
+- **Conversation history**: your messages + the assistantâ€™s messages for this session.
 - **Tool calls/results + attachments**: command output, file reads, images/audio, etc.
 
-Context is _not the same thing_ as “memory”: memory can be stored on disk and reloaded later; context is what’s inside the model’s current window.
+Context is _not the same thing_ as â€œmemoryâ€: memory can be stored on disk and reloaded later; context is whatâ€™s inside the modelâ€™s current window.
 
 ## Quick start (inspect context)
 
-- `/status` → quick “how full is my window?” view + session settings.
-- `/context list` → what’s injected + rough sizes (per file + totals).
-- `/context detail` → deeper breakdown: per-file, per-tool schema sizes, per-skill entry sizes, and system prompt size.
-- `/usage tokens` → append per-reply usage footer to normal replies.
-- `/compact` → summarize older history into a compact entry to free window space.
+- `/status` â†’ quick â€œhow full is my window?â€ view + session settings.
+- `/context list` â†’ whatâ€™s injected + rough sizes (per file + totals).
+- `/context detail` â†’ deeper breakdown: per-file, per-tool schema sizes, per-skill entry sizes, and system prompt size.
+- `/usage tokens` â†’ append per-reply usage footer to normal replies.
+- `/compact` â†’ summarize older history into a compact entry to free window space.
 
 See also: [Slash commands](/tools/slash-commands), [Token use & costs](/reference/token-use), [Compaction](/concepts/compaction).
 
 ## Example output
 
-Values vary by model, provider, tool policy, and what’s in your workspace.
+Values vary by model, provider, tool policy, and whatâ€™s in your workspace.
 
 ### `/context list`
 
 ```
-🧠 Context breakdown
+ðŸ§  Context breakdown
 Workspace: <workspaceDir>
 Bootstrap max/file: 20,000 chars
 Sandbox: mode=non-main sandboxed=false
@@ -52,7 +52,7 @@ Injected workspace files:
 - BOOTSTRAP.md: OK | raw 0 chars (~0 tok) | injected 0 chars (~0 tok)
 
 Skills list (system prompt text): 2,184 chars (~546 tok) (12 skills)
-Tools: read, edit, write, exec, process, browser, message, sessions_send, …
+Tools: read, edit, write, exec, process, browser, message, sessions_send, â€¦
 Tool list (system prompt text): 1,032 chars (~258 tok)
 Tool schemas (JSON): 31,988 chars (~7,997 tok) (counts toward context; not shown as text)
 Tools: (same as above)
@@ -63,17 +63,17 @@ Session tokens (cached): 14,250 total / ctx=32,000
 ### `/context detail`
 
 ```
-🧠 Context breakdown (detailed)
-…
+ðŸ§  Context breakdown (detailed)
+â€¦
 Top skills (prompt entry size):
 - frontend-design: 412 chars (~103 tok)
 - oracle: 401 chars (~101 tok)
-… (+10 more skills)
+â€¦ (+10 more skills)
 
 Top tools (schema size):
 - browser: 9,812 chars (~2,453 tok)
 - exec: 6,240 chars (~1,560 tok)
-… (+N more tools)
+â€¦ (+N more tools)
 ```
 
 ## What counts toward the context window
@@ -85,9 +85,9 @@ Everything the model receives counts, including:
 - Tool calls + tool results.
 - Attachments/transcripts (images/audio/files).
 - Compaction summaries and pruning artifacts.
-- Provider “wrappers” or hidden headers (not visible, still counted).
+- Provider â€œwrappersâ€ or hidden headers (not visible, still counted).
 
-## How openkrab builds the system prompt
+## How OpenKrab builds the system prompt
 
 The system prompt is **openkrab-owned** and rebuilt each run. It includes:
 
@@ -102,7 +102,7 @@ Full breakdown: [System Prompt](/concepts/system-prompt).
 
 ## Injected workspace files (Project Context)
 
-By default, openkrab injects a fixed set of workspace files (if present):
+By default, OpenKrab injects a fixed set of workspace files (if present):
 
 - `AGENTS.md`
 - `SOUL.md`
@@ -112,24 +112,24 @@ By default, openkrab injects a fixed set of workspace files (if present):
 - `HEARTBEAT.md`
 - `BOOTSTRAP.md` (first-run only)
 
-Large files are truncated per-file using `agents.defaults.bootstrapMaxChars` (default `20000` chars). openkrab also enforces a total bootstrap injection cap across files with `agents.defaults.bootstrapTotalMaxChars` (default `150000` chars). `/context` shows **raw vs injected** sizes and whether truncation happened.
+Large files are truncated per-file using `agents.defaults.bootstrapMaxChars` (default `20000` chars). OpenKrab also enforces a total bootstrap injection cap across files with `agents.defaults.bootstrapTotalMaxChars` (default `150000` chars). `/context` shows **raw vs injected** sizes and whether truncation happened.
 
-## Skills: what’s injected vs loaded on-demand
+## Skills: whatâ€™s injected vs loaded on-demand
 
 The system prompt includes a compact **skills list** (name + description + location). This list has real overhead.
 
-Skill instructions are _not_ included by default. The model is expected to `read` the skill’s `SKILL.md` **only when needed**.
+Skill instructions are _not_ included by default. The model is expected to `read` the skillâ€™s `SKILL.md` **only when needed**.
 
 ## Tools: there are two costs
 
 Tools affect context in two ways:
 
-1. **Tool list text** in the system prompt (what you see as “Tooling”).
-2. **Tool schemas** (JSON). These are sent to the model so it can call tools. They count toward context even though you don’t see them as plain text.
+1. **Tool list text** in the system prompt (what you see as â€œToolingâ€).
+2. **Tool schemas** (JSON). These are sent to the model so it can call tools. They count toward context even though you donâ€™t see them as plain text.
 
 `/context detail` breaks down the biggest tool schemas so you can see what dominates.
 
-## Commands, directives, and “inline shortcuts”
+## Commands, directives, and â€œinline shortcutsâ€
 
 Slash commands are handled by the Gateway. There are a few different behaviors:
 
@@ -137,7 +137,7 @@ Slash commands are handled by the Gateway. There are a few different behaviors:
 - **Directives**: `/think`, `/verbose`, `/reasoning`, `/elevated`, `/model`, `/queue` are stripped before the model sees the message.
   - Directive-only messages persist session settings.
   - Inline directives in a normal message act as per-message hints.
-- **Inline shortcuts** (allowlisted senders only): certain `/...` tokens inside a normal message can run immediately (example: “hey /status”), and are stripped before the model sees the remaining text.
+- **Inline shortcuts** (allowlisted senders only): certain `/...` tokens inside a normal message can run immediately (example: â€œhey /statusâ€), and are stripped before the model sees the remaining text.
 
 Details: [Slash commands](/tools/slash-commands).
 
@@ -156,6 +156,7 @@ Docs: [Session](/concepts/session), [Compaction](/concepts/compaction), [Session
 `/context` prefers the latest **run-built** system prompt report when available:
 
 - `System prompt (run)` = captured from the last embedded (tool-capable) run and persisted in the session store.
-- `System prompt (estimate)` = computed on the fly when no run report exists (or when running via a CLI backend that doesn’t generate the report).
+- `System prompt (estimate)` = computed on the fly when no run report exists (or when running via a CLI backend that doesnâ€™t generate the report).
 
 Either way, it reports sizes and top contributors; it does **not** dump the full system prompt or tool schemas.
+

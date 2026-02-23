@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Troubleshoot cron and heartbeat scheduling and delivery"
 read_when:
   - Cron did not run
@@ -13,29 +13,17 @@ Use this page for scheduler and delivery issues (`cron` + `heartbeat`).
 
 ## Command ladder
 
-```bash
-openkrab status
-openkrab gateway status
-openkrab logs --follow
-openkrab doctor
-openkrab channels status --probe
+```bash\nOpenKrab status\nOpenKrab gateway status\nOpenKrab logs --follow\nOpenKrab doctor\nOpenKrab channels status --probe
 ```
 
 Then run automation checks:
 
-```bash
-openkrab cron status
-openkrab cron list
-openkrab system heartbeat last
+```bash\nOpenKrab cron status\nOpenKrab cron list\nOpenKrab system heartbeat last
 ```
 
 ## Cron not firing
 
-```bash
-openkrab cron status
-openkrab cron list
-openkrab cron runs --id <jobId> --limit 20
-openkrab logs --follow
+```bash\nOpenKrab cron status\nOpenKrab cron list\nOpenKrab cron runs --id <jobId> --limit 20\nOpenKrab logs --follow
 ```
 
 Good output looks like:
@@ -46,17 +34,13 @@ Good output looks like:
 
 Common signatures:
 
-- `cron: scheduler disabled; jobs will not run automatically` → cron disabled in config/env.
-- `cron: timer tick failed` → scheduler tick crashed; inspect surrounding stack/log context.
-- `reason: not-due` in run output → manual run called without `--force` and job not due yet.
+- `cron: scheduler disabled; jobs will not run automatically` â†’ cron disabled in config/env.
+- `cron: timer tick failed` â†’ scheduler tick crashed; inspect surrounding stack/log context.
+- `reason: not-due` in run output â†’ manual run called without `--force` and job not due yet.
 
 ## Cron fired but no delivery
 
-```bash
-openkrab cron runs --id <jobId> --limit 20
-openkrab cron list
-openkrab channels status --probe
-openkrab logs --follow
+```bash\nOpenKrab cron runs --id <jobId> --limit 20\nOpenKrab cron list\nOpenKrab channels status --probe\nOpenKrab logs --follow
 ```
 
 Good output looks like:
@@ -67,17 +51,13 @@ Good output looks like:
 
 Common signatures:
 
-- Run succeeded but delivery mode is `none` → no external message is expected.
-- Delivery target missing/invalid (`channel`/`to`) → run may succeed internally but skip outbound.
-- Channel auth errors (`unauthorized`, `missing_scope`, `Forbidden`) → delivery blocked by channel credentials/permissions.
+- Run succeeded but delivery mode is `none` â†’ no external message is expected.
+- Delivery target missing/invalid (`channel`/`to`) â†’ run may succeed internally but skip outbound.
+- Channel auth errors (`unauthorized`, `missing_scope`, `Forbidden`) â†’ delivery blocked by channel credentials/permissions.
 
 ## Heartbeat suppressed or skipped
 
-```bash
-openkrab system heartbeat last
-openkrab logs --follow
-openkrab config get agents.defaults.heartbeat
-openkrab channels status --probe
+```bash\nOpenKrab system heartbeat last\nOpenKrab logs --follow\nOpenKrab config get agents.defaults.heartbeat\nOpenKrab channels status --probe
 ```
 
 Good output looks like:
@@ -87,19 +67,14 @@ Good output looks like:
 
 Common signatures:
 
-- `heartbeat skipped` with `reason=quiet-hours` → outside `activeHours`.
-- `requests-in-flight` → main lane busy; heartbeat deferred.
-- `empty-heartbeat-file` → interval heartbeat skipped because `HEARTBEAT.md` has no actionable content and no tagged cron event is queued.
-- `alerts-disabled` → visibility settings suppress outbound heartbeat messages.
+- `heartbeat skipped` with `reason=quiet-hours` â†’ outside `activeHours`.
+- `requests-in-flight` â†’ main lane busy; heartbeat deferred.
+- `empty-heartbeat-file` â†’ interval heartbeat skipped because `HEARTBEAT.md` has no actionable content and no tagged cron event is queued.
+- `alerts-disabled` â†’ visibility settings suppress outbound heartbeat messages.
 
 ## Timezone and activeHours gotchas
 
-```bash
-openkrab config get agents.defaults.heartbeat.activeHours
-openkrab config get agents.defaults.heartbeat.activeHours.timezone
-openkrab config get agents.defaults.userTimezone || echo "agents.defaults.userTimezone not set"
-openkrab cron list
-openkrab logs --follow
+```bash\nOpenKrab config get agents.defaults.heartbeat.activeHours\nOpenKrab config get agents.defaults.heartbeat.activeHours.timezone\nOpenKrab config get agents.defaults.userTimezone || echo "agents.defaults.userTimezone not set"\nOpenKrab cron list\nOpenKrab logs --follow
 ```
 
 Quick rules:
@@ -120,3 +95,4 @@ Related:
 - [/gateway/heartbeat](/gateway/heartbeat)
 - [/automation/cron-vs-heartbeat](/automation/cron-vs-heartbeat)
 - [/concepts/timezone](/concepts/timezone)
+

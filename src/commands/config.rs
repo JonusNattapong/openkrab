@@ -74,7 +74,7 @@ pub struct GatewayConfig {
 
 fn get_config_path() -> PathBuf {
     let home = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    home.join("krabkrab").join("krabkrab.toml")
+    home.join("openkrab").join("openkrab.toml")
 }
 
 pub fn config_show_command() -> String {
@@ -82,7 +82,7 @@ pub fn config_show_command() -> String {
 
     if !config_path.exists() {
         return r#"# No config file found. Create one at:
-# ~/.config/krabkrab/krabkrab.toml
+# ~/.config/openkrab/openkrab.toml
 #
 # Example configuration:
 # 
@@ -216,3 +216,4 @@ base_url = "http://localhost:11434"
         )
     }
 }
+

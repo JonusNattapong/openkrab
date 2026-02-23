@@ -1,5 +1,5 @@
 //! session_tools — Agent-accessible session management tools.
-//! Ported from `openclaw/src/agents/tools/sessions-*.ts`.
+//! Ported from `OpenKrab/src/agents/tools/sessions-*.ts`.
 //!
 //! Provides tools for agents to spawn, send to, list, and view history of sessions.
 
@@ -459,3 +459,4 @@ mod tests {
         assert_eq!(session.model_override, None);
     }
 }
+

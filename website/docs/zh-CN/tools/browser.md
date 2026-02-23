@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 添加智能体控制的浏览器自动化
-  - 调试 OpenKrab 干扰你自己 Chrome 的问题
-  - 在 macOS 应用中实现浏览器设置和生命周期管理
-summary: 集成浏览器控制服务 + 操作命令
-title: 浏览器（OpenKrab 托管）
+  - æ·»åŠ æ™ºèƒ½ä½“æŽ§åˆ¶çš„æµè§ˆå™¨è‡ªåŠ¨åŒ–
+  - è°ƒè¯• OpenKrab å¹²æ‰°ä½ è‡ªå·± Chrome çš„é—®é¢˜
+  - åœ¨ macOS åº”ç”¨ä¸­å®žçŽ°æµè§ˆå™¨è®¾ç½®å’Œç”Ÿå‘½å‘¨æœŸç®¡ç†
+summary: é›†æˆæµè§ˆå™¨æŽ§åˆ¶æœåŠ¡ + æ“ä½œå‘½ä»¤
+title: æµè§ˆå™¨ï¼ˆOpenKrab æ‰˜ç®¡ï¼‰
 x-i18n:
   generated_at: "2026-02-03T09:26:06Z"
   model: claude-opus-4-5
@@ -14,28 +14,28 @@ x-i18n:
   workflow: 15
 ---
 
-# 浏览器（OpenKrab 托管）
+# æµè§ˆå™¨ï¼ˆOpenKrab æ‰˜ç®¡ï¼‰
 
-OpenKrab 可以运行一个由智能体控制的**专用 Chrome/Brave/Edge/Chromium 配置文件**。
-它与你的个人浏览器隔离，通过 Gateway 网关内部的小型本地控制服务进行管理（仅限 loopback）。
+OpenKrab å¯ä»¥è¿è¡Œä¸€ä¸ªç”±æ™ºèƒ½ä½“æŽ§åˆ¶çš„**ä¸“ç”¨ Chrome/Brave/Edge/Chromium é…ç½®æ–‡ä»¶**ã€‚
+å®ƒä¸Žä½ çš„ä¸ªäººæµè§ˆå™¨éš”ç¦»ï¼Œé€šè¿‡ Gateway ç½‘å…³å†…éƒ¨çš„å°åž‹æœ¬åœ°æŽ§åˆ¶æœåŠ¡è¿›è¡Œç®¡ç†ï¼ˆä»…é™ loopbackï¼‰ã€‚
 
-新手视角：
+æ–°æ‰‹è§†è§’ï¼š
 
-- 把它想象成一个**独立的、仅供智能体使用的浏览器**。
-- `OpenKrab` 配置文件**不会**触及你的个人浏览器配置文件。
-- 智能体可以在安全的通道中**打开标签页、读取页面、点击和输入**。
-- 默认的 `chrome` 配置文件通过扩展中继使用**系统默认的 Chromium 浏览器**；切换到 `OpenKrab` 可使用隔离的托管浏览器。
+- æŠŠå®ƒæƒ³è±¡æˆä¸€ä¸ª**ç‹¬ç«‹çš„ã€ä»…ä¾›æ™ºèƒ½ä½“ä½¿ç”¨çš„æµè§ˆå™¨**ã€‚
+- `OpenKrab` é…ç½®æ–‡ä»¶**ä¸ä¼š**è§¦åŠä½ çš„ä¸ªäººæµè§ˆå™¨é…ç½®æ–‡ä»¶ã€‚
+- æ™ºèƒ½ä½“å¯ä»¥åœ¨å®‰å…¨çš„é€šé“ä¸­**æ‰“å¼€æ ‡ç­¾é¡µã€è¯»å–é¡µé¢ã€ç‚¹å‡»å’Œè¾“å…¥**ã€‚
+- é»˜è®¤çš„ `chrome` é…ç½®æ–‡ä»¶é€šè¿‡æ‰©å±•ä¸­ç»§ä½¿ç”¨**ç³»ç»Ÿé»˜è®¤çš„ Chromium æµè§ˆå™¨**ï¼›åˆ‡æ¢åˆ° `OpenKrab` å¯ä½¿ç”¨éš”ç¦»çš„æ‰˜ç®¡æµè§ˆå™¨ã€‚
 
-## 功能概览
+## åŠŸèƒ½æ¦‚è§ˆ
 
-- 一个名为 **OpenKrab** 的独立浏览器配置文件（默认橙色主题）。
-- 确定性标签页控制（列出/打开/聚焦/关闭）。
-- 智能体操作（点击/输入/拖动/选择）、快照、截图、PDF。
-- 可选的多配置文件支持（`OpenKrab`、`work`、`remote` 等）。
+- ä¸€ä¸ªåä¸º **OpenKrab** çš„ç‹¬ç«‹æµè§ˆå™¨é…ç½®æ–‡ä»¶ï¼ˆé»˜è®¤æ©™è‰²ä¸»é¢˜ï¼‰ã€‚
+- ç¡®å®šæ€§æ ‡ç­¾é¡µæŽ§åˆ¶ï¼ˆåˆ—å‡º/æ‰“å¼€/èšç„¦/å…³é—­ï¼‰ã€‚
+- æ™ºèƒ½ä½“æ“ä½œï¼ˆç‚¹å‡»/è¾“å…¥/æ‹–åŠ¨/é€‰æ‹©ï¼‰ã€å¿«ç…§ã€æˆªå›¾ã€PDFã€‚
+- å¯é€‰çš„å¤šé…ç½®æ–‡ä»¶æ”¯æŒï¼ˆ`OpenKrab`ã€`work`ã€`remote` ç­‰ï¼‰ã€‚
 
-此浏览器**不是**你的日常浏览器。它是一个安全、隔离的界面，用于智能体自动化和验证。
+æ­¤æµè§ˆå™¨**ä¸æ˜¯**ä½ çš„æ—¥å¸¸æµè§ˆå™¨ã€‚å®ƒæ˜¯ä¸€ä¸ªå®‰å…¨ã€éš”ç¦»çš„ç•Œé¢ï¼Œç”¨äºŽæ™ºèƒ½ä½“è‡ªåŠ¨åŒ–å’ŒéªŒè¯ã€‚
 
-## 快速开始
+## å¿«é€Ÿå¼€å§‹
 
 ```bash
 OpenKrab browser --browser-profile OpenKrab status
@@ -44,18 +44,18 @@ OpenKrab browser --browser-profile OpenKrab open https://example.com
 OpenKrab browser --browser-profile OpenKrab snapshot
 ```
 
-如果出现"Browser disabled"，请在配置中启用它（见下文）并重启 Gateway 网关。
+å¦‚æžœå‡ºçŽ°"Browser disabled"ï¼Œè¯·åœ¨é…ç½®ä¸­å¯ç”¨å®ƒï¼ˆè§ä¸‹æ–‡ï¼‰å¹¶é‡å¯ Gateway ç½‘å…³ã€‚
 
-## 配置文件：`OpenKrab` 与 `chrome`
+## é…ç½®æ–‡ä»¶ï¼š`OpenKrab` ä¸Ž `chrome`
 
-- `OpenKrab`：托管的隔离浏览器（无需扩展）。
-- `chrome`：到你**系统浏览器**的扩展中继（需要将 OpenKrab 扩展附加到标签页）。
+- `OpenKrab`ï¼šæ‰˜ç®¡çš„éš”ç¦»æµè§ˆå™¨ï¼ˆæ— éœ€æ‰©å±•ï¼‰ã€‚
+- `chrome`ï¼šåˆ°ä½ **ç³»ç»Ÿæµè§ˆå™¨**çš„æ‰©å±•ä¸­ç»§ï¼ˆéœ€è¦å°† OpenKrab æ‰©å±•é™„åŠ åˆ°æ ‡ç­¾é¡µï¼‰ã€‚
 
-如果你希望默认使用托管模式，请设置 `browser.defaultProfile: "OpenKrab"`。
+å¦‚æžœä½ å¸Œæœ›é»˜è®¤ä½¿ç”¨æ‰˜ç®¡æ¨¡å¼ï¼Œè¯·è®¾ç½® `browser.defaultProfile: "OpenKrab"`ã€‚
 
-## 配置
+## é…ç½®
 
-浏览器设置位于 `~/.OpenKrab/OpenKrab.json`。
+æµè§ˆå™¨è®¾ç½®ä½äºŽ `~/.OpenKrab/OpenKrab.json`ã€‚
 
 ```json5
 {
@@ -79,24 +79,24 @@ OpenKrab browser --browser-profile OpenKrab snapshot
 }
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 浏览器控制服务绑定到 loopback 上的端口，该端口从 `gateway.port` 派生（默认：`18791`，即 gateway + 2）。中继使用下一个端口（`18792`）。
-- 如果你覆盖了 Gateway 网关端口（`gateway.port` 或 `OpenKrab_GATEWAY_PORT`），派生的浏览器端口会相应调整以保持在同一"系列"中。
-- 未设置时，`cdpUrl` 默认为中继端口。
-- `remoteCdpTimeoutMs` 适用于远程（非 loopback）CDP 可达性检查。
-- `remoteCdpHandshakeTimeoutMs` 适用于远程 CDP WebSocket 可达性检查。
-- `attachOnly: true` 表示"永不启动本地浏览器；仅在浏览器已运行时附加"。
-- `color` + 每个配置文件的 `color` 为浏览器 UI 着色，以便你能看到哪个配置文件处于活动状态。
-- 默认配置文件是 `chrome`（扩展中继）。使用 `defaultProfile: "OpenKrab"` 来使用托管浏览器。
-- 自动检测顺序：如果系统默认浏览器是基于 Chromium 的则使用它；否则 Chrome → Brave → Edge → Chromium → Chrome Canary。
-- 本地 `OpenKrab` 配置文件会自动分配 `cdpPort`/`cdpUrl` — 仅为远程 CDP 设置这些。
+- æµè§ˆå™¨æŽ§åˆ¶æœåŠ¡ç»‘å®šåˆ° loopback ä¸Šçš„ç«¯å£ï¼Œè¯¥ç«¯å£ä»Ž `gateway.port` æ´¾ç”Ÿï¼ˆé»˜è®¤ï¼š`18791`ï¼Œå³ gateway + 2ï¼‰ã€‚ä¸­ç»§ä½¿ç”¨ä¸‹ä¸€ä¸ªç«¯å£ï¼ˆ`18792`ï¼‰ã€‚
+- å¦‚æžœä½ è¦†ç›–äº† Gateway ç½‘å…³ç«¯å£ï¼ˆ`gateway.port` æˆ– `OPENKRAB_GATEWAY_PORT`ï¼‰ï¼Œæ´¾ç”Ÿçš„æµè§ˆå™¨ç«¯å£ä¼šç›¸åº”è°ƒæ•´ä»¥ä¿æŒåœ¨åŒä¸€"ç³»åˆ—"ä¸­ã€‚
+- æœªè®¾ç½®æ—¶ï¼Œ`cdpUrl` é»˜è®¤ä¸ºä¸­ç»§ç«¯å£ã€‚
+- `remoteCdpTimeoutMs` é€‚ç”¨äºŽè¿œç¨‹ï¼ˆéž loopbackï¼‰CDP å¯è¾¾æ€§æ£€æŸ¥ã€‚
+- `remoteCdpHandshakeTimeoutMs` é€‚ç”¨äºŽè¿œç¨‹ CDP WebSocket å¯è¾¾æ€§æ£€æŸ¥ã€‚
+- `attachOnly: true` è¡¨ç¤º"æ°¸ä¸å¯åŠ¨æœ¬åœ°æµè§ˆå™¨ï¼›ä»…åœ¨æµè§ˆå™¨å·²è¿è¡Œæ—¶é™„åŠ "ã€‚
+- `color` + æ¯ä¸ªé…ç½®æ–‡ä»¶çš„ `color` ä¸ºæµè§ˆå™¨ UI ç€è‰²ï¼Œä»¥ä¾¿ä½ èƒ½çœ‹åˆ°å“ªä¸ªé…ç½®æ–‡ä»¶å¤„äºŽæ´»åŠ¨çŠ¶æ€ã€‚
+- é»˜è®¤é…ç½®æ–‡ä»¶æ˜¯ `chrome`ï¼ˆæ‰©å±•ä¸­ç»§ï¼‰ã€‚ä½¿ç”¨ `defaultProfile: "OpenKrab"` æ¥ä½¿ç”¨æ‰˜ç®¡æµè§ˆå™¨ã€‚
+- è‡ªåŠ¨æ£€æµ‹é¡ºåºï¼šå¦‚æžœç³»ç»Ÿé»˜è®¤æµè§ˆå™¨æ˜¯åŸºäºŽ Chromium çš„åˆ™ä½¿ç”¨å®ƒï¼›å¦åˆ™ Chrome â†’ Brave â†’ Edge â†’ Chromium â†’ Chrome Canaryã€‚
+- æœ¬åœ° `OpenKrab` é…ç½®æ–‡ä»¶ä¼šè‡ªåŠ¨åˆ†é… `cdpPort`/`cdpUrl` â€” ä»…ä¸ºè¿œç¨‹ CDP è®¾ç½®è¿™äº›ã€‚
 
-## 使用 Brave（或其他基于 Chromium 的浏览器）
+## ä½¿ç”¨ Braveï¼ˆæˆ–å…¶ä»–åŸºäºŽ Chromium çš„æµè§ˆå™¨ï¼‰
 
-如果你的**系统默认**浏览器是基于 Chromium 的（Chrome/Brave/Edge 等），OpenKrab 会自动使用它。设置 `browser.executablePath` 可覆盖自动检测：
+å¦‚æžœä½ çš„**ç³»ç»Ÿé»˜è®¤**æµè§ˆå™¨æ˜¯åŸºäºŽ Chromium çš„ï¼ˆChrome/Brave/Edge ç­‰ï¼‰ï¼ŒOpenKrab ä¼šè‡ªåŠ¨ä½¿ç”¨å®ƒã€‚è®¾ç½® `browser.executablePath` å¯è¦†ç›–è‡ªåŠ¨æ£€æµ‹ï¼š
 
-CLI 示例：
+CLI ç¤ºä¾‹ï¼š
 
 ```bash
 OpenKrab config set browser.executablePath "/usr/bin/google-chrome"
@@ -125,36 +125,36 @@ OpenKrab config set browser.executablePath "/usr/bin/google-chrome"
 }
 ```
 
-## 本地控制与远程控制
+## æœ¬åœ°æŽ§åˆ¶ä¸Žè¿œç¨‹æŽ§åˆ¶
 
-- **本地控制（默认）：** Gateway 网关启动 loopback 控制服务，可以启动本地浏览器。
-- **远程控制（节点主机）：** 在有浏览器的机器上运行节点主机；Gateway 网关将浏览器操作代理到该节点。
-- **远程 CDP：** 设置 `browser.profiles.<name>.cdpUrl`（或 `browser.cdpUrl`）以附加到远程的基于 Chromium 的浏览器。在这种情况下，OpenKrab 不会启动本地浏览器。
+- **æœ¬åœ°æŽ§åˆ¶ï¼ˆé»˜è®¤ï¼‰ï¼š** Gateway ç½‘å…³å¯åŠ¨ loopback æŽ§åˆ¶æœåŠ¡ï¼Œå¯ä»¥å¯åŠ¨æœ¬åœ°æµè§ˆå™¨ã€‚
+- **è¿œç¨‹æŽ§åˆ¶ï¼ˆèŠ‚ç‚¹ä¸»æœºï¼‰ï¼š** åœ¨æœ‰æµè§ˆå™¨çš„æœºå™¨ä¸Šè¿è¡ŒèŠ‚ç‚¹ä¸»æœºï¼›Gateway ç½‘å…³å°†æµè§ˆå™¨æ“ä½œä»£ç†åˆ°è¯¥èŠ‚ç‚¹ã€‚
+- **è¿œç¨‹ CDPï¼š** è®¾ç½® `browser.profiles.<name>.cdpUrl`ï¼ˆæˆ– `browser.cdpUrl`ï¼‰ä»¥é™„åŠ åˆ°è¿œç¨‹çš„åŸºäºŽ Chromium çš„æµè§ˆå™¨ã€‚åœ¨è¿™ç§æƒ…å†µä¸‹ï¼ŒOpenKrab ä¸ä¼šå¯åŠ¨æœ¬åœ°æµè§ˆå™¨ã€‚
 
-远程 CDP URL 可以包含认证信息：
+è¿œç¨‹ CDP URL å¯ä»¥åŒ…å«è®¤è¯ä¿¡æ¯ï¼š
 
-- 查询令牌（例如 `https://provider.example?token=<token>`）
-- HTTP Basic 认证（例如 `https://user:pass@provider.example`）
+- æŸ¥è¯¢ä»¤ç‰Œï¼ˆä¾‹å¦‚ `https://provider.example?token=<token>`ï¼‰
+- HTTP Basic è®¤è¯ï¼ˆä¾‹å¦‚ `https://user:pass@provider.example`ï¼‰
 
-OpenKrab 在调用 `/json/*` 端点和连接 CDP WebSocket 时会保留认证信息。建议使用环境变量或密钥管理器存储令牌，而不是将其提交到配置文件中。
+OpenKrab åœ¨è°ƒç”¨ `/json/*` ç«¯ç‚¹å’Œè¿žæŽ¥ CDP WebSocket æ—¶ä¼šä¿ç•™è®¤è¯ä¿¡æ¯ã€‚å»ºè®®ä½¿ç”¨çŽ¯å¢ƒå˜é‡æˆ–å¯†é’¥ç®¡ç†å™¨å­˜å‚¨ä»¤ç‰Œï¼Œè€Œä¸æ˜¯å°†å…¶æäº¤åˆ°é…ç½®æ–‡ä»¶ä¸­ã€‚
 
-## 节点浏览器代理（零配置默认）
+## èŠ‚ç‚¹æµè§ˆå™¨ä»£ç†ï¼ˆé›¶é…ç½®é»˜è®¤ï¼‰
 
-如果你在有浏览器的机器上运行**节点主机**，OpenKrab 可以自动将浏览器工具调用路由到该节点，无需任何额外的浏览器配置。这是远程 Gateway 网关的默认路径。
+å¦‚æžœä½ åœ¨æœ‰æµè§ˆå™¨çš„æœºå™¨ä¸Šè¿è¡Œ**èŠ‚ç‚¹ä¸»æœº**ï¼ŒOpenKrab å¯ä»¥è‡ªåŠ¨å°†æµè§ˆå™¨å·¥å…·è°ƒç”¨è·¯ç”±åˆ°è¯¥èŠ‚ç‚¹ï¼Œæ— éœ€ä»»ä½•é¢å¤–çš„æµè§ˆå™¨é…ç½®ã€‚è¿™æ˜¯è¿œç¨‹ Gateway ç½‘å…³çš„é»˜è®¤è·¯å¾„ã€‚
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 节点主机通过**代理命令**暴露其本地浏览器控制服务器。
-- 配置文件来自节点自己的 `browser.profiles` 配置（与本地相同）。
-- 如果不需要可以禁用：
-  - 在节点上：`nodeHost.browserProxy.enabled=false`
-  - 在 Gateway 网关上：`gateway.nodes.browser.mode="off"`
+- èŠ‚ç‚¹ä¸»æœºé€šè¿‡**ä»£ç†å‘½ä»¤**æš´éœ²å…¶æœ¬åœ°æµè§ˆå™¨æŽ§åˆ¶æœåŠ¡å™¨ã€‚
+- é…ç½®æ–‡ä»¶æ¥è‡ªèŠ‚ç‚¹è‡ªå·±çš„ `browser.profiles` é…ç½®ï¼ˆä¸Žæœ¬åœ°ç›¸åŒï¼‰ã€‚
+- å¦‚æžœä¸éœ€è¦å¯ä»¥ç¦ç”¨ï¼š
+  - åœ¨èŠ‚ç‚¹ä¸Šï¼š`nodeHost.browserProxy.enabled=false`
+  - åœ¨ Gateway ç½‘å…³ä¸Šï¼š`gateway.nodes.browser.mode="off"`
 
-## Browserless（托管远程 CDP）
+## Browserlessï¼ˆæ‰˜ç®¡è¿œç¨‹ CDPï¼‰
 
-[Browserless](https://browserless.io) 是一个托管的 Chromium 服务，通过 HTTPS 暴露 CDP 端点。你可以将 OpenKrab 浏览器配置文件指向 Browserless 区域端点，并使用你的 API 密钥进行认证。
+[Browserless](https://browserless.io) æ˜¯ä¸€ä¸ªæ‰˜ç®¡çš„ Chromium æœåŠ¡ï¼Œé€šè¿‡ HTTPS æš´éœ² CDP ç«¯ç‚¹ã€‚ä½ å¯ä»¥å°† OpenKrab æµè§ˆå™¨é…ç½®æ–‡ä»¶æŒ‡å‘ Browserless åŒºåŸŸç«¯ç‚¹ï¼Œå¹¶ä½¿ç”¨ä½ çš„ API å¯†é’¥è¿›è¡Œè®¤è¯ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```json5
 {
@@ -173,82 +173,82 @@ OpenKrab 在调用 `/json/*` 端点和连接 CDP WebSocket 时会保留认证信
 }
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 将 `<BROWSERLESS_API_KEY>` 替换为你真实的 Browserless 令牌。
-- 选择与你的 Browserless 账户匹配的区域端点（请参阅其文档）。
+- å°† `<BROWSERLESS_API_KEY>` æ›¿æ¢ä¸ºä½ çœŸå®žçš„ Browserless ä»¤ç‰Œã€‚
+- é€‰æ‹©ä¸Žä½ çš„ Browserless è´¦æˆ·åŒ¹é…çš„åŒºåŸŸç«¯ç‚¹ï¼ˆè¯·å‚é˜…å…¶æ–‡æ¡£ï¼‰ã€‚
 
-## 安全性
+## å®‰å…¨æ€§
 
-核心理念：
+æ ¸å¿ƒç†å¿µï¼š
 
-- 浏览器控制仅限 loopback；访问通过 Gateway 网关的认证或节点配对进行。
-- 将 Gateway 网关和任何节点主机保持在私有网络上（Tailscale）；避免公开暴露。
-- 将远程 CDP URL/令牌视为机密；优先使用环境变量或密钥管理器。
+- æµè§ˆå™¨æŽ§åˆ¶ä»…é™ loopbackï¼›è®¿é—®é€šè¿‡ Gateway ç½‘å…³çš„è®¤è¯æˆ–èŠ‚ç‚¹é…å¯¹è¿›è¡Œã€‚
+- å°† Gateway ç½‘å…³å’Œä»»ä½•èŠ‚ç‚¹ä¸»æœºä¿æŒåœ¨ç§æœ‰ç½‘ç»œä¸Šï¼ˆTailscaleï¼‰ï¼›é¿å…å…¬å¼€æš´éœ²ã€‚
+- å°†è¿œç¨‹ CDP URL/ä»¤ç‰Œè§†ä¸ºæœºå¯†ï¼›ä¼˜å…ˆä½¿ç”¨çŽ¯å¢ƒå˜é‡æˆ–å¯†é’¥ç®¡ç†å™¨ã€‚
 
-远程 CDP 提示：
+è¿œç¨‹ CDP æç¤ºï¼š
 
-- 尽可能使用 HTTPS 端点和短期令牌。
-- 避免在配置文件中直接嵌入长期令牌。
+- å°½å¯èƒ½ä½¿ç”¨ HTTPS ç«¯ç‚¹å’ŒçŸ­æœŸä»¤ç‰Œã€‚
+- é¿å…åœ¨é…ç½®æ–‡ä»¶ä¸­ç›´æŽ¥åµŒå…¥é•¿æœŸä»¤ç‰Œã€‚
 
-## 配置文件（多浏览器）
+## é…ç½®æ–‡ä»¶ï¼ˆå¤šæµè§ˆå™¨ï¼‰
 
-OpenKrab 支持多个命名配置文件（路由配置）。配置文件可以是：
+OpenKrab æ”¯æŒå¤šä¸ªå‘½åé…ç½®æ–‡ä»¶ï¼ˆè·¯ç”±é…ç½®ï¼‰ã€‚é…ç½®æ–‡ä»¶å¯ä»¥æ˜¯ï¼š
 
-- **OpenKrab 托管**：具有独立用户数据目录和 CDP 端口的专用基于 Chromium 的浏览器实例
-- **远程**：显式 CDP URL（在其他地方运行的基于 Chromium 的浏览器）
-- **扩展中继**：通过本地中继 + Chrome 扩展访问你现有的 Chrome 标签页
+- **OpenKrab æ‰˜ç®¡**ï¼šå…·æœ‰ç‹¬ç«‹ç”¨æˆ·æ•°æ®ç›®å½•å’Œ CDP ç«¯å£çš„ä¸“ç”¨åŸºäºŽ Chromium çš„æµè§ˆå™¨å®žä¾‹
+- **è¿œç¨‹**ï¼šæ˜¾å¼ CDP URLï¼ˆåœ¨å…¶ä»–åœ°æ–¹è¿è¡Œçš„åŸºäºŽ Chromium çš„æµè§ˆå™¨ï¼‰
+- **æ‰©å±•ä¸­ç»§**ï¼šé€šè¿‡æœ¬åœ°ä¸­ç»§ + Chrome æ‰©å±•è®¿é—®ä½ çŽ°æœ‰çš„ Chrome æ ‡ç­¾é¡µ
 
-默认值：
+é»˜è®¤å€¼ï¼š
 
-- 如果缺少 `OpenKrab` 配置文件，会自动创建。
-- `chrome` 配置文件是内置的，用于 Chrome 扩展中继（默认指向 `http://127.0.0.1:18792`）。
-- 本地 CDP 端口默认从 **18800–18899** 分配。
-- 删除配置文件会将其本地数据目录移至回收站。
+- å¦‚æžœç¼ºå°‘ `OpenKrab` é…ç½®æ–‡ä»¶ï¼Œä¼šè‡ªåŠ¨åˆ›å»ºã€‚
+- `chrome` é…ç½®æ–‡ä»¶æ˜¯å†…ç½®çš„ï¼Œç”¨äºŽ Chrome æ‰©å±•ä¸­ç»§ï¼ˆé»˜è®¤æŒ‡å‘ `http://127.0.0.1:18792`ï¼‰ã€‚
+- æœ¬åœ° CDP ç«¯å£é»˜è®¤ä»Ž **18800â€“18899** åˆ†é…ã€‚
+- åˆ é™¤é…ç½®æ–‡ä»¶ä¼šå°†å…¶æœ¬åœ°æ•°æ®ç›®å½•ç§»è‡³å›žæ”¶ç«™ã€‚
 
-所有控制端点接受 `?profile=<name>`；CLI 使用 `--browser-profile`。
+æ‰€æœ‰æŽ§åˆ¶ç«¯ç‚¹æŽ¥å— `?profile=<name>`ï¼›CLI ä½¿ç”¨ `--browser-profile`ã€‚
 
-## Chrome 扩展中继（使用你现有的 Chrome）
+## Chrome æ‰©å±•ä¸­ç»§ï¼ˆä½¿ç”¨ä½ çŽ°æœ‰çš„ Chromeï¼‰
 
-OpenKrab 还可以通过本地 CDP 中继 + Chrome 扩展驱动**你现有的 Chrome 标签页**（无需单独的"OpenKrab"Chrome 实例）。
+OpenKrab è¿˜å¯ä»¥é€šè¿‡æœ¬åœ° CDP ä¸­ç»§ + Chrome æ‰©å±•é©±åŠ¨**ä½ çŽ°æœ‰çš„ Chrome æ ‡ç­¾é¡µ**ï¼ˆæ— éœ€å•ç‹¬çš„"OpenKrab"Chrome å®žä¾‹ï¼‰ã€‚
 
-完整指南：[Chrome 扩展](/tools/chrome-extension)
+å®Œæ•´æŒ‡å—ï¼š[Chrome æ‰©å±•](/tools/chrome-extension)
 
-流程：
+æµç¨‹ï¼š
 
-- Gateway 网关在本地运行（同一台机器）或节点主机在浏览器所在机器上运行。
-- 本地**中继服务器**在 loopback 的 `cdpUrl` 上监听（默认：`http://127.0.0.1:18792`）。
-- 你点击标签页上的 **OpenKrab Browser Relay** 扩展图标来附加（它不会自动附加）。
-- 智能体通过选择正确的配置文件，使用普通的 `browser` 工具控制该标签页。
+- Gateway ç½‘å…³åœ¨æœ¬åœ°è¿è¡Œï¼ˆåŒä¸€å°æœºå™¨ï¼‰æˆ–èŠ‚ç‚¹ä¸»æœºåœ¨æµè§ˆå™¨æ‰€åœ¨æœºå™¨ä¸Šè¿è¡Œã€‚
+- æœ¬åœ°**ä¸­ç»§æœåŠ¡å™¨**åœ¨ loopback çš„ `cdpUrl` ä¸Šç›‘å¬ï¼ˆé»˜è®¤ï¼š`http://127.0.0.1:18792`ï¼‰ã€‚
+- ä½ ç‚¹å‡»æ ‡ç­¾é¡µä¸Šçš„ **OpenKrab Browser Relay** æ‰©å±•å›¾æ ‡æ¥é™„åŠ ï¼ˆå®ƒä¸ä¼šè‡ªåŠ¨é™„åŠ ï¼‰ã€‚
+- æ™ºèƒ½ä½“é€šè¿‡é€‰æ‹©æ­£ç¡®çš„é…ç½®æ–‡ä»¶ï¼Œä½¿ç”¨æ™®é€šçš„ `browser` å·¥å…·æŽ§åˆ¶è¯¥æ ‡ç­¾é¡µã€‚
 
-如果 Gateway 网关在其他地方运行，请在浏览器所在机器上运行节点主机，以便 Gateway 网关可以代理浏览器操作。
+å¦‚æžœ Gateway ç½‘å…³åœ¨å…¶ä»–åœ°æ–¹è¿è¡Œï¼Œè¯·åœ¨æµè§ˆå™¨æ‰€åœ¨æœºå™¨ä¸Šè¿è¡ŒèŠ‚ç‚¹ä¸»æœºï¼Œä»¥ä¾¿ Gateway ç½‘å…³å¯ä»¥ä»£ç†æµè§ˆå™¨æ“ä½œã€‚
 
-### 沙箱会话
+### æ²™ç®±ä¼šè¯
 
-如果智能体会话是沙箱隔离的，`browser` 工具可能默认为 `target="sandbox"`（沙箱浏览器）。
-Chrome 扩展中继接管需要主机浏览器控制，因此要么：
+å¦‚æžœæ™ºèƒ½ä½“ä¼šè¯æ˜¯æ²™ç®±éš”ç¦»çš„ï¼Œ`browser` å·¥å…·å¯èƒ½é»˜è®¤ä¸º `target="sandbox"`ï¼ˆæ²™ç®±æµè§ˆå™¨ï¼‰ã€‚
+Chrome æ‰©å±•ä¸­ç»§æŽ¥ç®¡éœ€è¦ä¸»æœºæµè§ˆå™¨æŽ§åˆ¶ï¼Œå› æ­¤è¦ä¹ˆï¼š
 
-- 在非沙箱模式下运行会话，或者
-- 设置 `agents.defaults.sandbox.browser.allowHostControl: true` 并在调用工具时使用 `target="host"`。
+- åœ¨éžæ²™ç®±æ¨¡å¼ä¸‹è¿è¡Œä¼šè¯ï¼Œæˆ–è€…
+- è®¾ç½® `agents.defaults.sandbox.browser.allowHostControl: true` å¹¶åœ¨è°ƒç”¨å·¥å…·æ—¶ä½¿ç”¨ `target="host"`ã€‚
 
-### 设置
+### è®¾ç½®
 
-1. 加载扩展（开发/未打包）：
+1. åŠ è½½æ‰©å±•ï¼ˆå¼€å‘/æœªæ‰“åŒ…ï¼‰ï¼š
 
 ```bash
 OpenKrab browser extension install
 ```
 
-- Chrome → `chrome://extensions` → 启用"开发者模式"
-- "加载已解压的扩展程序" → 选择 `OpenKrab browser extension path` 打印的目录
-- 固定扩展，然后在你想要控制的标签页上点击它（徽章显示 `ON`）。
+- Chrome â†’ `chrome://extensions` â†’ å¯ç”¨"å¼€å‘è€…æ¨¡å¼"
+- "åŠ è½½å·²è§£åŽ‹çš„æ‰©å±•ç¨‹åº" â†’ é€‰æ‹© `OpenKrab browser extension path` æ‰“å°çš„ç›®å½•
+- å›ºå®šæ‰©å±•ï¼Œç„¶åŽåœ¨ä½ æƒ³è¦æŽ§åˆ¶çš„æ ‡ç­¾é¡µä¸Šç‚¹å‡»å®ƒï¼ˆå¾½ç« æ˜¾ç¤º `ON`ï¼‰ã€‚
 
-2. 使用它：
+2. ä½¿ç”¨å®ƒï¼š
 
-- CLI：`OpenKrab browser --browser-profile chrome tabs`
-- 智能体工具：`browser` 配合 `profile="chrome"`
+- CLIï¼š`OpenKrab browser --browser-profile chrome tabs`
+- æ™ºèƒ½ä½“å·¥å…·ï¼š`browser` é…åˆ `profile="chrome"`
 
-可选：如果你想要不同的名称或中继端口，创建你自己的配置文件：
+å¯é€‰ï¼šå¦‚æžœä½ æƒ³è¦ä¸åŒçš„åç§°æˆ–ä¸­ç»§ç«¯å£ï¼Œåˆ›å»ºä½ è‡ªå·±çš„é…ç½®æ–‡ä»¶ï¼š
 
 ```bash
 OpenKrab browser create-profile \
@@ -258,20 +258,20 @@ OpenKrab browser create-profile \
   --color "#00AA00"
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 此模式依赖 Playwright-on-CDP 进行大多数操作（截图/快照/操作）。
-- 再次点击扩展图标可分离。
+- æ­¤æ¨¡å¼ä¾èµ– Playwright-on-CDP è¿›è¡Œå¤§å¤šæ•°æ“ä½œï¼ˆæˆªå›¾/å¿«ç…§/æ“ä½œï¼‰ã€‚
+- å†æ¬¡ç‚¹å‡»æ‰©å±•å›¾æ ‡å¯åˆ†ç¦»ã€‚
 
-## 隔离保证
+## éš”ç¦»ä¿è¯
 
-- **专用用户数据目录**：永不触及你的个人浏览器配置文件。
-- **专用端口**：避免使用 `9222` 以防止与开发工作流冲突。
-- **确定性标签页控制**：通过 `targetId` 定位标签页，而非"最后一个标签页"。
+- **ä¸“ç”¨ç”¨æˆ·æ•°æ®ç›®å½•**ï¼šæ°¸ä¸è§¦åŠä½ çš„ä¸ªäººæµè§ˆå™¨é…ç½®æ–‡ä»¶ã€‚
+- **ä¸“ç”¨ç«¯å£**ï¼šé¿å…ä½¿ç”¨ `9222` ä»¥é˜²æ­¢ä¸Žå¼€å‘å·¥ä½œæµå†²çªã€‚
+- **ç¡®å®šæ€§æ ‡ç­¾é¡µæŽ§åˆ¶**ï¼šé€šè¿‡ `targetId` å®šä½æ ‡ç­¾é¡µï¼Œè€Œéž"æœ€åŽä¸€ä¸ªæ ‡ç­¾é¡µ"ã€‚
 
-## 浏览器选择
+## æµè§ˆå™¨é€‰æ‹©
 
-本地启动时，OpenKrab 选择第一个可用的：
+æœ¬åœ°å¯åŠ¨æ—¶ï¼ŒOpenKrab é€‰æ‹©ç¬¬ä¸€ä¸ªå¯ç”¨çš„ï¼š
 
 1. Chrome
 2. Brave
@@ -279,67 +279,67 @@ OpenKrab browser create-profile \
 4. Chromium
 5. Chrome Canary
 
-你可以使用 `browser.executablePath` 覆盖。
+ä½ å¯ä»¥ä½¿ç”¨ `browser.executablePath` è¦†ç›–ã€‚
 
-平台：
+å¹³å°ï¼š
 
-- macOS：检查 `/Applications` 和 `~/Applications`。
-- Linux：查找 `google-chrome`、`brave`、`microsoft-edge`、`chromium` 等。
-- Windows：检查常见安装位置。
+- macOSï¼šæ£€æŸ¥ `/Applications` å’Œ `~/Applications`ã€‚
+- Linuxï¼šæŸ¥æ‰¾ `google-chrome`ã€`brave`ã€`microsoft-edge`ã€`chromium` ç­‰ã€‚
+- Windowsï¼šæ£€æŸ¥å¸¸è§å®‰è£…ä½ç½®ã€‚
 
-## 控制 API（可选）
+## æŽ§åˆ¶ APIï¼ˆå¯é€‰ï¼‰
 
-仅用于本地集成，Gateway 网关暴露一个小型的 loopback HTTP API：
+ä»…ç”¨äºŽæœ¬åœ°é›†æˆï¼ŒGateway ç½‘å…³æš´éœ²ä¸€ä¸ªå°åž‹çš„ loopback HTTP APIï¼š
 
-- 状态/启动/停止：`GET /`、`POST /start`、`POST /stop`
-- 标签页：`GET /tabs`、`POST /tabs/open`、`POST /tabs/focus`、`DELETE /tabs/:targetId`
-- 快照/截图：`GET /snapshot`、`POST /screenshot`
-- 操作：`POST /navigate`、`POST /act`
-- 钩子：`POST /hooks/file-chooser`、`POST /hooks/dialog`
-- 下载：`POST /download`、`POST /wait/download`
-- 调试：`GET /console`、`POST /pdf`
-- 调试：`GET /errors`、`GET /requests`、`POST /trace/start`、`POST /trace/stop`、`POST /highlight`
-- 网络：`POST /response/body`
-- 状态：`GET /cookies`、`POST /cookies/set`、`POST /cookies/clear`
-- 状态：`GET /storage/:kind`、`POST /storage/:kind/set`、`POST /storage/:kind/clear`
-- 设置：`POST /set/offline`、`POST /set/headers`、`POST /set/credentials`、`POST /set/geolocation`、`POST /set/media`、`POST /set/timezone`、`POST /set/locale`、`POST /set/device`
+- çŠ¶æ€/å¯åŠ¨/åœæ­¢ï¼š`GET /`ã€`POST /start`ã€`POST /stop`
+- æ ‡ç­¾é¡µï¼š`GET /tabs`ã€`POST /tabs/open`ã€`POST /tabs/focus`ã€`DELETE /tabs/:targetId`
+- å¿«ç…§/æˆªå›¾ï¼š`GET /snapshot`ã€`POST /screenshot`
+- æ“ä½œï¼š`POST /navigate`ã€`POST /act`
+- é’©å­ï¼š`POST /hooks/file-chooser`ã€`POST /hooks/dialog`
+- ä¸‹è½½ï¼š`POST /download`ã€`POST /wait/download`
+- è°ƒè¯•ï¼š`GET /console`ã€`POST /pdf`
+- è°ƒè¯•ï¼š`GET /errors`ã€`GET /requests`ã€`POST /trace/start`ã€`POST /trace/stop`ã€`POST /highlight`
+- ç½‘ç»œï¼š`POST /response/body`
+- çŠ¶æ€ï¼š`GET /cookies`ã€`POST /cookies/set`ã€`POST /cookies/clear`
+- çŠ¶æ€ï¼š`GET /storage/:kind`ã€`POST /storage/:kind/set`ã€`POST /storage/:kind/clear`
+- è®¾ç½®ï¼š`POST /set/offline`ã€`POST /set/headers`ã€`POST /set/credentials`ã€`POST /set/geolocation`ã€`POST /set/media`ã€`POST /set/timezone`ã€`POST /set/locale`ã€`POST /set/device`
 
-所有端点接受 `?profile=<name>`。
+æ‰€æœ‰ç«¯ç‚¹æŽ¥å— `?profile=<name>`ã€‚
 
-### Playwright 要求
+### Playwright è¦æ±‚
 
-某些功能（navigate/act/AI 快照/角色快照、元素截图、PDF）需要 Playwright。如果未安装 Playwright，这些端点会返回明确的 501 错误。ARIA 快照和基本截图对于 OpenKrab 托管的 Chrome 仍然有效。对于 Chrome 扩展中继驱动程序，ARIA 快照和截图需要 Playwright。
+æŸäº›åŠŸèƒ½ï¼ˆnavigate/act/AI å¿«ç…§/è§’è‰²å¿«ç…§ã€å…ƒç´ æˆªå›¾ã€PDFï¼‰éœ€è¦ Playwrightã€‚å¦‚æžœæœªå®‰è£… Playwrightï¼Œè¿™äº›ç«¯ç‚¹ä¼šè¿”å›žæ˜Žç¡®çš„ 501 é”™è¯¯ã€‚ARIA å¿«ç…§å’ŒåŸºæœ¬æˆªå›¾å¯¹äºŽ OpenKrab æ‰˜ç®¡çš„ Chrome ä»ç„¶æœ‰æ•ˆã€‚å¯¹äºŽ Chrome æ‰©å±•ä¸­ç»§é©±åŠ¨ç¨‹åºï¼ŒARIA å¿«ç…§å’Œæˆªå›¾éœ€è¦ Playwrightã€‚
 
-如果你看到 `Playwright is not available in this gateway build`，请安装完整的 Playwright 包（不是 `playwright-core`）并重启 Gateway 网关，或者重新安装带浏览器支持的 OpenKrab。
+å¦‚æžœä½ çœ‹åˆ° `Playwright is not available in this gateway build`ï¼Œè¯·å®‰è£…å®Œæ•´çš„ Playwright åŒ…ï¼ˆä¸æ˜¯ `playwright-core`ï¼‰å¹¶é‡å¯ Gateway ç½‘å…³ï¼Œæˆ–è€…é‡æ–°å®‰è£…å¸¦æµè§ˆå™¨æ”¯æŒçš„ OpenKrabã€‚
 
-#### Docker Playwright 安装
+#### Docker Playwright å®‰è£…
 
-如果你的 Gateway 网关在 Docker 中运行，避免使用 `npx playwright`（npm 覆盖冲突）。改用捆绑的 CLI：
+å¦‚æžœä½ çš„ Gateway ç½‘å…³åœ¨ Docker ä¸­è¿è¡Œï¼Œé¿å…ä½¿ç”¨ `npx playwright`ï¼ˆnpm è¦†ç›–å†²çªï¼‰ã€‚æ”¹ç”¨æ†ç»‘çš„ CLIï¼š
 
 ```bash
 docker compose run --rm OpenKrab-cli \
   node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
-要持久化浏览器下载，设置 `PLAYWRIGHT_BROWSERS_PATH`（例如 `/home/node/.cache/ms-playwright`）并确保 `/home/node` 通过 `OpenKrab_HOME_VOLUME` 或绑定挂载持久化。参见 [Docker](/install/docker)。
+è¦æŒä¹…åŒ–æµè§ˆå™¨ä¸‹è½½ï¼Œè®¾ç½® `PLAYWRIGHT_BROWSERS_PATH`ï¼ˆä¾‹å¦‚ `/home/node/.cache/ms-playwright`ï¼‰å¹¶ç¡®ä¿ `/home/node` é€šè¿‡ `OPENKRAB_HOME_VOLUME` æˆ–ç»‘å®šæŒ‚è½½æŒä¹…åŒ–ã€‚å‚è§ [Docker](/install/docker)ã€‚
 
-## 工作原理（内部）
+## å·¥ä½œåŽŸç†ï¼ˆå†…éƒ¨ï¼‰
 
-高层流程：
+é«˜å±‚æµç¨‹ï¼š
 
-- 一个小型**控制服务器**接受 HTTP 请求。
-- 它通过 **CDP** 连接到基于 Chromium 的浏览器（Chrome/Brave/Edge/Chromium）。
-- 对于高级操作（点击/输入/快照/PDF），它在 CDP 之上使用 **Playwright**。
-- 当缺少 Playwright 时，仅非 Playwright 操作可用。
+- ä¸€ä¸ªå°åž‹**æŽ§åˆ¶æœåŠ¡å™¨**æŽ¥å— HTTP è¯·æ±‚ã€‚
+- å®ƒé€šè¿‡ **CDP** è¿žæŽ¥åˆ°åŸºäºŽ Chromium çš„æµè§ˆå™¨ï¼ˆChrome/Brave/Edge/Chromiumï¼‰ã€‚
+- å¯¹äºŽé«˜çº§æ“ä½œï¼ˆç‚¹å‡»/è¾“å…¥/å¿«ç…§/PDFï¼‰ï¼Œå®ƒåœ¨ CDP ä¹‹ä¸Šä½¿ç”¨ **Playwright**ã€‚
+- å½“ç¼ºå°‘ Playwright æ—¶ï¼Œä»…éž Playwright æ“ä½œå¯ç”¨ã€‚
 
-这种设计使智能体保持在稳定、确定性的接口上，同时让你可以切换本地/远程浏览器和配置文件。
+è¿™ç§è®¾è®¡ä½¿æ™ºèƒ½ä½“ä¿æŒåœ¨ç¨³å®šã€ç¡®å®šæ€§çš„æŽ¥å£ä¸Šï¼ŒåŒæ—¶è®©ä½ å¯ä»¥åˆ‡æ¢æœ¬åœ°/è¿œç¨‹æµè§ˆå™¨å’Œé…ç½®æ–‡ä»¶ã€‚
 
-## CLI 快速参考
+## CLI å¿«é€Ÿå‚è€ƒ
 
-所有命令接受 `--browser-profile <name>` 以定位特定配置文件。
-所有命令也接受 `--json` 以获得机器可读的输出（稳定的负载）。
+æ‰€æœ‰å‘½ä»¤æŽ¥å— `--browser-profile <name>` ä»¥å®šä½ç‰¹å®šé…ç½®æ–‡ä»¶ã€‚
+æ‰€æœ‰å‘½ä»¤ä¹ŸæŽ¥å— `--json` ä»¥èŽ·å¾—æœºå™¨å¯è¯»çš„è¾“å‡ºï¼ˆç¨³å®šçš„è´Ÿè½½ï¼‰ã€‚
 
-基础操作：
+åŸºç¡€æ“ä½œï¼š
 
 - `OpenKrab browser status`
 - `OpenKrab browser start`
@@ -353,7 +353,7 @@ docker compose run --rm OpenKrab-cli \
 - `OpenKrab browser focus abcd1234`
 - `OpenKrab browser close abcd1234`
 
-检查：
+æ£€æŸ¥ï¼š
 
 - `OpenKrab browser screenshot`
 - `OpenKrab browser screenshot --full-page`
@@ -372,7 +372,7 @@ docker compose run --rm OpenKrab-cli \
 - `OpenKrab browser pdf`
 - `OpenKrab browser responsebody "**/api" --max-chars 5000`
 
-操作：
+æ“ä½œï¼š
 
 - `OpenKrab browser navigate https://example.com`
 - `OpenKrab browser resize 1280 720`
@@ -396,7 +396,7 @@ docker compose run --rm OpenKrab-cli \
 - `OpenKrab browser trace start`
 - `OpenKrab browser trace stop`
 
-状态：
+çŠ¶æ€ï¼š
 
 - `OpenKrab browser cookies`
 - `OpenKrab browser cookies set session abc123 --url "https://example.com"`
@@ -415,56 +415,56 @@ docker compose run --rm OpenKrab-cli \
 - `OpenKrab browser set locale en-US`
 - `OpenKrab browser set device "iPhone 14"`
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `upload` 和 `dialog` 是**预备**调用；在触发选择器/对话框的点击/按键之前运行它们。
-- `upload` 也可以通过 `--input-ref` 或 `--element` 直接设置文件输入。
-- `snapshot`：
-  - `--format ai`（安装 Playwright 时的默认值）：返回带有数字 ref 的 AI 快照（`aria-ref="<n>"`）。
-  - `--format aria`：返回无障碍树（无 ref；仅供检查）。
-  - `--efficient`（或 `--mode efficient`）：紧凑角色快照预设（interactive + compact + depth + 较低的 maxChars）。
-  - 配置默认值（仅限工具/CLI）：设置 `browser.snapshotDefaults.mode: "efficient"` 以在调用者未传递模式时使用高效快照（参见 [Gateway 网关配置](/gateway/configuration#browser-OpenKrab-managed-browser)）。
-  - 角色快照选项（`--interactive`、`--compact`、`--depth`、`--selector`）强制使用带有 `ref=e12` 等 ref 的基于角色的快照。
-  - `--frame "<iframe selector>"` 将角色快照范围限定到 iframe（与 `e12` 等角色 ref 配合使用）。
-  - `--interactive` 输出一个扁平的、易于选择的交互元素列表（最适合驱动操作）。
-  - `--labels` 添加一个带有叠加 ref 标签的视口截图（打印 `MEDIA:<path>`）。
-- `click`/`type` 等需要来自 `snapshot` 的 `ref`（数字 `12` 或角色 ref `e12`）。
-  操作故意不支持 CSS 选择器。
+- `upload` å’Œ `dialog` æ˜¯**é¢„å¤‡**è°ƒç”¨ï¼›åœ¨è§¦å‘é€‰æ‹©å™¨/å¯¹è¯æ¡†çš„ç‚¹å‡»/æŒ‰é”®ä¹‹å‰è¿è¡Œå®ƒä»¬ã€‚
+- `upload` ä¹Ÿå¯ä»¥é€šè¿‡ `--input-ref` æˆ– `--element` ç›´æŽ¥è®¾ç½®æ–‡ä»¶è¾“å…¥ã€‚
+- `snapshot`ï¼š
+  - `--format ai`ï¼ˆå®‰è£… Playwright æ—¶çš„é»˜è®¤å€¼ï¼‰ï¼šè¿”å›žå¸¦æœ‰æ•°å­— ref çš„ AI å¿«ç…§ï¼ˆ`aria-ref="<n>"`ï¼‰ã€‚
+  - `--format aria`ï¼šè¿”å›žæ— éšœç¢æ ‘ï¼ˆæ—  refï¼›ä»…ä¾›æ£€æŸ¥ï¼‰ã€‚
+  - `--efficient`ï¼ˆæˆ– `--mode efficient`ï¼‰ï¼šç´§å‡‘è§’è‰²å¿«ç…§é¢„è®¾ï¼ˆinteractive + compact + depth + è¾ƒä½Žçš„ maxCharsï¼‰ã€‚
+  - é…ç½®é»˜è®¤å€¼ï¼ˆä»…é™å·¥å…·/CLIï¼‰ï¼šè®¾ç½® `browser.snapshotDefaults.mode: "efficient"` ä»¥åœ¨è°ƒç”¨è€…æœªä¼ é€’æ¨¡å¼æ—¶ä½¿ç”¨é«˜æ•ˆå¿«ç…§ï¼ˆå‚è§ [Gateway ç½‘å…³é…ç½®](/gateway/configuration#browser-OpenKrab-managed-browser)ï¼‰ã€‚
+  - è§’è‰²å¿«ç…§é€‰é¡¹ï¼ˆ`--interactive`ã€`--compact`ã€`--depth`ã€`--selector`ï¼‰å¼ºåˆ¶ä½¿ç”¨å¸¦æœ‰ `ref=e12` ç­‰ ref çš„åŸºäºŽè§’è‰²çš„å¿«ç…§ã€‚
+  - `--frame "<iframe selector>"` å°†è§’è‰²å¿«ç…§èŒƒå›´é™å®šåˆ° iframeï¼ˆä¸Ž `e12` ç­‰è§’è‰² ref é…åˆä½¿ç”¨ï¼‰ã€‚
+  - `--interactive` è¾“å‡ºä¸€ä¸ªæ‰å¹³çš„ã€æ˜“äºŽé€‰æ‹©çš„äº¤äº’å…ƒç´ åˆ—è¡¨ï¼ˆæœ€é€‚åˆé©±åŠ¨æ“ä½œï¼‰ã€‚
+  - `--labels` æ·»åŠ ä¸€ä¸ªå¸¦æœ‰å åŠ  ref æ ‡ç­¾çš„è§†å£æˆªå›¾ï¼ˆæ‰“å° `MEDIA:<path>`ï¼‰ã€‚
+- `click`/`type` ç­‰éœ€è¦æ¥è‡ª `snapshot` çš„ `ref`ï¼ˆæ•°å­— `12` æˆ–è§’è‰² ref `e12`ï¼‰ã€‚
+  æ“ä½œæ•…æ„ä¸æ”¯æŒ CSS é€‰æ‹©å™¨ã€‚
 
-## 快照和 ref
+## å¿«ç…§å’Œ ref
 
-OpenKrab 支持两种"快照"风格：
+OpenKrab æ”¯æŒä¸¤ç§"å¿«ç…§"é£Žæ ¼ï¼š
 
-- **AI 快照（数字 ref）**：`OpenKrab browser snapshot`（默认；`--format ai`）
-  - 输出：包含数字 ref 的文本快照。
-  - 操作：`OpenKrab browser click 12`、`OpenKrab browser type 23 "hello"`。
-  - 内部通过 Playwright 的 `aria-ref` 解析 ref。
+- **AI å¿«ç…§ï¼ˆæ•°å­— refï¼‰**ï¼š`OpenKrab browser snapshot`ï¼ˆé»˜è®¤ï¼›`--format ai`ï¼‰
+  - è¾“å‡ºï¼šåŒ…å«æ•°å­— ref çš„æ–‡æœ¬å¿«ç…§ã€‚
+  - æ“ä½œï¼š`OpenKrab browser click 12`ã€`OpenKrab browser type 23 "hello"`ã€‚
+  - å†…éƒ¨é€šè¿‡ Playwright çš„ `aria-ref` è§£æž refã€‚
 
-- **角色快照（角色 ref 如 `e12`）**：`OpenKrab browser snapshot --interactive`（或 `--compact`、`--depth`、`--selector`、`--frame`）
-  - 输出：带有 `[ref=e12]`（和可选的 `[nth=1]`）的基于角色的列表/树。
-  - 操作：`OpenKrab browser click e12`、`OpenKrab browser highlight e12`。
-  - 内部通过 `getByRole(...)`（加上重复项的 `nth()`）解析 ref。
-  - 添加 `--labels` 可包含带有叠加 `e12` 标签的视口截图。
+- **è§’è‰²å¿«ç…§ï¼ˆè§’è‰² ref å¦‚ `e12`ï¼‰**ï¼š`OpenKrab browser snapshot --interactive`ï¼ˆæˆ– `--compact`ã€`--depth`ã€`--selector`ã€`--frame`ï¼‰
+  - è¾“å‡ºï¼šå¸¦æœ‰ `[ref=e12]`ï¼ˆå’Œå¯é€‰çš„ `[nth=1]`ï¼‰çš„åŸºäºŽè§’è‰²çš„åˆ—è¡¨/æ ‘ã€‚
+  - æ“ä½œï¼š`OpenKrab browser click e12`ã€`OpenKrab browser highlight e12`ã€‚
+  - å†…éƒ¨é€šè¿‡ `getByRole(...)`ï¼ˆåŠ ä¸Šé‡å¤é¡¹çš„ `nth()`ï¼‰è§£æž refã€‚
+  - æ·»åŠ  `--labels` å¯åŒ…å«å¸¦æœ‰å åŠ  `e12` æ ‡ç­¾çš„è§†å£æˆªå›¾ã€‚
 
-ref 行为：
+ref è¡Œä¸ºï¼š
 
-- ref 在**导航之间不稳定**；如果出错，重新运行 `snapshot` 并使用新的 ref。
-- 如果角色快照是使用 `--frame` 拍摄的，角色 ref 将限定在该 iframe 内，直到下一次角色快照。
+- ref åœ¨**å¯¼èˆªä¹‹é—´ä¸ç¨³å®š**ï¼›å¦‚æžœå‡ºé”™ï¼Œé‡æ–°è¿è¡Œ `snapshot` å¹¶ä½¿ç”¨æ–°çš„ refã€‚
+- å¦‚æžœè§’è‰²å¿«ç…§æ˜¯ä½¿ç”¨ `--frame` æ‹æ‘„çš„ï¼Œè§’è‰² ref å°†é™å®šåœ¨è¯¥ iframe å†…ï¼Œç›´åˆ°ä¸‹ä¸€æ¬¡è§’è‰²å¿«ç…§ã€‚
 
-## 等待增强功能
+## ç­‰å¾…å¢žå¼ºåŠŸèƒ½
 
-你可以等待的不仅仅是时间/文本：
+ä½ å¯ä»¥ç­‰å¾…çš„ä¸ä»…ä»…æ˜¯æ—¶é—´/æ–‡æœ¬ï¼š
 
-- 等待 URL（Playwright 支持通配符）：
+- ç­‰å¾… URLï¼ˆPlaywright æ”¯æŒé€šé…ç¬¦ï¼‰ï¼š
   - `OpenKrab browser wait --url "**/dash"`
-- 等待加载状态：
+- ç­‰å¾…åŠ è½½çŠ¶æ€ï¼š
   - `OpenKrab browser wait --load networkidle`
-- 等待 JS 断言：
+- ç­‰å¾… JS æ–­è¨€ï¼š
   - `OpenKrab browser wait --fn "window.ready===true"`
-- 等待选择器变得可见：
+- ç­‰å¾…é€‰æ‹©å™¨å˜å¾—å¯è§ï¼š
   - `OpenKrab browser wait "#main"`
 
-这些可以组合使用：
+è¿™äº›å¯ä»¥ç»„åˆä½¿ç”¨ï¼š
 
 ```bash
 OpenKrab browser wait "#main" \
@@ -474,26 +474,26 @@ OpenKrab browser wait "#main" \
   --timeout-ms 15000
 ```
 
-## 调试工作流
+## è°ƒè¯•å·¥ä½œæµ
 
-当操作失败时（例如"not visible"、"strict mode violation"、"covered"）：
+å½“æ“ä½œå¤±è´¥æ—¶ï¼ˆä¾‹å¦‚"not visible"ã€"strict mode violation"ã€"covered"ï¼‰ï¼š
 
 1. `OpenKrab browser snapshot --interactive`
-2. 使用 `click <ref>` / `type <ref>`（在交互模式下优先使用角色 ref）
-3. 如果仍然失败：`OpenKrab browser highlight <ref>` 查看 Playwright 定位的目标
-4. 如果页面行为异常：
+2. ä½¿ç”¨ `click <ref>` / `type <ref>`ï¼ˆåœ¨äº¤äº’æ¨¡å¼ä¸‹ä¼˜å…ˆä½¿ç”¨è§’è‰² refï¼‰
+3. å¦‚æžœä»ç„¶å¤±è´¥ï¼š`OpenKrab browser highlight <ref>` æŸ¥çœ‹ Playwright å®šä½çš„ç›®æ ‡
+4. å¦‚æžœé¡µé¢è¡Œä¸ºå¼‚å¸¸ï¼š
    - `OpenKrab browser errors --clear`
    - `OpenKrab browser requests --filter api --clear`
-5. 深度调试：录制 trace：
+5. æ·±åº¦è°ƒè¯•ï¼šå½•åˆ¶ traceï¼š
    - `OpenKrab browser trace start`
-   - 重现问题
-   - `OpenKrab browser trace stop`（打印 `TRACE:<path>`）
+   - é‡çŽ°é—®é¢˜
+   - `OpenKrab browser trace stop`ï¼ˆæ‰“å° `TRACE:<path>`ï¼‰
 
-## JSON 输出
+## JSON è¾“å‡º
 
-`--json` 用于脚本和结构化工具。
+`--json` ç”¨äºŽè„šæœ¬å’Œç»“æž„åŒ–å·¥å…·ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```bash
 OpenKrab browser status --json
@@ -502,53 +502,54 @@ OpenKrab browser requests --filter api --json
 OpenKrab browser cookies --json
 ```
 
-JSON 格式的角色快照包含 `refs` 加上一个小的 `stats` 块（lines/chars/refs/interactive），以便工具可以推断负载大小和密度。
+JSON æ ¼å¼çš„è§’è‰²å¿«ç…§åŒ…å« `refs` åŠ ä¸Šä¸€ä¸ªå°çš„ `stats` å—ï¼ˆlines/chars/refs/interactiveï¼‰ï¼Œä»¥ä¾¿å·¥å…·å¯ä»¥æŽ¨æ–­è´Ÿè½½å¤§å°å’Œå¯†åº¦ã€‚
 
-## 状态和环境开关
+## çŠ¶æ€å’ŒçŽ¯å¢ƒå¼€å…³
 
-这些对于"让网站表现得像 X"的工作流很有用：
+è¿™äº›å¯¹äºŽ"è®©ç½‘ç«™è¡¨çŽ°å¾—åƒ X"çš„å·¥ä½œæµå¾ˆæœ‰ç”¨ï¼š
 
-- Cookies：`cookies`、`cookies set`、`cookies clear`
-- 存储：`storage local|session get|set|clear`
-- 离线：`set offline on|off`
-- 请求头：`set headers --json '{"X-Debug":"1"}'`（或 `--clear`）
-- HTTP basic 认证：`set credentials user pass`（或 `--clear`）
-- 地理位置：`set geo <lat> <lon> --origin "https://example.com"`（或 `--clear`）
-- 媒体：`set media dark|light|no-preference|none`
-- 时区/语言环境：`set timezone ...`、`set locale ...`
-- 设备/视口：
-  - `set device "iPhone 14"`（Playwright 设备预设）
+- Cookiesï¼š`cookies`ã€`cookies set`ã€`cookies clear`
+- å­˜å‚¨ï¼š`storage local|session get|set|clear`
+- ç¦»çº¿ï¼š`set offline on|off`
+- è¯·æ±‚å¤´ï¼š`set headers --json '{"X-Debug":"1"}'`ï¼ˆæˆ– `--clear`ï¼‰
+- HTTP basic è®¤è¯ï¼š`set credentials user pass`ï¼ˆæˆ– `--clear`ï¼‰
+- åœ°ç†ä½ç½®ï¼š`set geo <lat> <lon> --origin "https://example.com"`ï¼ˆæˆ– `--clear`ï¼‰
+- åª’ä½“ï¼š`set media dark|light|no-preference|none`
+- æ—¶åŒº/è¯­è¨€çŽ¯å¢ƒï¼š`set timezone ...`ã€`set locale ...`
+- è®¾å¤‡/è§†å£ï¼š
+  - `set device "iPhone 14"`ï¼ˆPlaywright è®¾å¤‡é¢„è®¾ï¼‰
   - `set viewport 1280 720`
 
-## 安全与隐私
+## å®‰å…¨ä¸Žéšç§
 
-- OpenKrab 浏览器配置文件可能包含已登录的会话；请将其视为敏感信息。
-- `browser act kind=evaluate` / `OpenKrab browser evaluate` 和 `wait --fn` 在页面上下文中执行任意 JavaScript。提示注入可能会操纵它。如果不需要，请使用 `browser.evaluateEnabled=false` 禁用它。
-- 有关登录和反机器人注意事项（X/Twitter 等），请参阅 [浏览器登录 + X/Twitter 发帖](/tools/browser-login)。
-- 保持 Gateway 网关/节点主机私有（仅限 loopback 或 tailnet）。
-- 远程 CDP 端点功能强大；请通过隧道保护它们。
+- OpenKrab æµè§ˆå™¨é…ç½®æ–‡ä»¶å¯èƒ½åŒ…å«å·²ç™»å½•çš„ä¼šè¯ï¼›è¯·å°†å…¶è§†ä¸ºæ•æ„Ÿä¿¡æ¯ã€‚
+- `browser act kind=evaluate` / `OpenKrab browser evaluate` å’Œ `wait --fn` åœ¨é¡µé¢ä¸Šä¸‹æ–‡ä¸­æ‰§è¡Œä»»æ„ JavaScriptã€‚æç¤ºæ³¨å…¥å¯èƒ½ä¼šæ“çºµå®ƒã€‚å¦‚æžœä¸éœ€è¦ï¼Œè¯·ä½¿ç”¨ `browser.evaluateEnabled=false` ç¦ç”¨å®ƒã€‚
+- æœ‰å…³ç™»å½•å’Œåæœºå™¨äººæ³¨æ„äº‹é¡¹ï¼ˆX/Twitter ç­‰ï¼‰ï¼Œè¯·å‚é˜… [æµè§ˆå™¨ç™»å½• + X/Twitter å‘å¸–](/tools/browser-login)ã€‚
+- ä¿æŒ Gateway ç½‘å…³/èŠ‚ç‚¹ä¸»æœºç§æœ‰ï¼ˆä»…é™ loopback æˆ– tailnetï¼‰ã€‚
+- è¿œç¨‹ CDP ç«¯ç‚¹åŠŸèƒ½å¼ºå¤§ï¼›è¯·é€šè¿‡éš§é“ä¿æŠ¤å®ƒä»¬ã€‚
 
-## 故障排除
+## æ•…éšœæŽ’é™¤
 
-有关 Linux 特定问题（特别是 snap Chromium），请参阅[浏览器故障排除](/tools/browser-linux-troubleshooting)。
+æœ‰å…³ Linux ç‰¹å®šé—®é¢˜ï¼ˆç‰¹åˆ«æ˜¯ snap Chromiumï¼‰ï¼Œè¯·å‚é˜…[æµè§ˆå™¨æ•…éšœæŽ’é™¤](/tools/browser-linux-troubleshooting)ã€‚
 
-## 智能体工具 + 控制工作原理
+## æ™ºèƒ½ä½“å·¥å…· + æŽ§åˆ¶å·¥ä½œåŽŸç†
 
-智能体获得**一个工具**用于浏览器自动化：
+æ™ºèƒ½ä½“èŽ·å¾—**ä¸€ä¸ªå·¥å…·**ç”¨äºŽæµè§ˆå™¨è‡ªåŠ¨åŒ–ï¼š
 
-- `browser` — status/start/stop/tabs/open/focus/close/snapshot/screenshot/navigate/act
+- `browser` â€” status/start/stop/tabs/open/focus/close/snapshot/screenshot/navigate/act
 
-映射方式：
+æ˜ å°„æ–¹å¼ï¼š
 
-- `browser snapshot` 返回稳定的 UI 树（AI 或 ARIA）。
-- `browser act` 使用快照 `ref` ID 来点击/输入/拖动/选择。
-- `browser screenshot` 捕获像素（整页或元素）。
-- `browser` 接受：
-  - `profile` 来选择命名的浏览器配置文件（OpenKrab、chrome 或远程 CDP）。
-  - `target`（`sandbox` | `host` | `node`）来选择浏览器所在位置。
-  - 在沙箱会话中，`target: "host"` 需要 `agents.defaults.sandbox.browser.allowHostControl=true`。
-  - 如果省略 `target`：沙箱会话默认为 `sandbox`，非沙箱会话默认为 `host`。
-  - 如果连接了具有浏览器能力的节点，工具可能会自动路由到该节点，除非你指定 `target="host"` 或 `target="node"`。
+- `browser snapshot` è¿”å›žç¨³å®šçš„ UI æ ‘ï¼ˆAI æˆ– ARIAï¼‰ã€‚
+- `browser act` ä½¿ç”¨å¿«ç…§ `ref` ID æ¥ç‚¹å‡»/è¾“å…¥/æ‹–åŠ¨/é€‰æ‹©ã€‚
+- `browser screenshot` æ•èŽ·åƒç´ ï¼ˆæ•´é¡µæˆ–å…ƒç´ ï¼‰ã€‚
+- `browser` æŽ¥å—ï¼š
+  - `profile` æ¥é€‰æ‹©å‘½åçš„æµè§ˆå™¨é…ç½®æ–‡ä»¶ï¼ˆOpenKrabã€chrome æˆ–è¿œç¨‹ CDPï¼‰ã€‚
+  - `target`ï¼ˆ`sandbox` | `host` | `node`ï¼‰æ¥é€‰æ‹©æµè§ˆå™¨æ‰€åœ¨ä½ç½®ã€‚
+  - åœ¨æ²™ç®±ä¼šè¯ä¸­ï¼Œ`target: "host"` éœ€è¦ `agents.defaults.sandbox.browser.allowHostControl=true`ã€‚
+  - å¦‚æžœçœç•¥ `target`ï¼šæ²™ç®±ä¼šè¯é»˜è®¤ä¸º `sandbox`ï¼Œéžæ²™ç®±ä¼šè¯é»˜è®¤ä¸º `host`ã€‚
+  - å¦‚æžœè¿žæŽ¥äº†å…·æœ‰æµè§ˆå™¨èƒ½åŠ›çš„èŠ‚ç‚¹ï¼Œå·¥å…·å¯èƒ½ä¼šè‡ªåŠ¨è·¯ç”±åˆ°è¯¥èŠ‚ç‚¹ï¼Œé™¤éžä½ æŒ‡å®š `target="host"` æˆ– `target="node"`ã€‚
 
-这使智能体保持确定性并避免脆弱的选择器。
+è¿™ä½¿æ™ºèƒ½ä½“ä¿æŒç¡®å®šæ€§å¹¶é¿å…è„†å¼±çš„é€‰æ‹©å™¨ã€‚
+
 

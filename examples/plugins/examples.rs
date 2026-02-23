@@ -1,7 +1,7 @@
 //! Plugin system examples and usage demonstrations.
 
-use krabkrab::plugins::loader::{PluginLoader, PluginLoaderConfig, PluginManager};
-use krabkrab::plugins::{PluginKind, PluginManifest, PluginRegistry};
+use openkrab::plugins::loader::{PluginLoader, PluginLoaderConfig, PluginManager};
+use openkrab::plugins::{PluginKind, PluginManifest, PluginRegistry};
 use std::path::PathBuf;
 
 /// Example: Basic plugin discovery and loading.
@@ -40,7 +40,7 @@ pub fn example_custom_directories() {
     let config = PluginLoaderConfig {
         plugin_dirs: vec![
             PathBuf::from("./my-plugins"),
-            PathBuf::from("/usr/share/krabkrab/plugins"),
+            PathBuf::from("/usr/share/openkrab/plugins"),
         ],
         hot_reload: false,
         extensions: vec!["wasm".to_string(), "so".to_string()],
@@ -170,3 +170,4 @@ mod tests {
         assert_eq!(discovered[0].manifest.name, "example-test-plugin");
     }
 }
+

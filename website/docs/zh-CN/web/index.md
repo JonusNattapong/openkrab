@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 你想通过 Tailscale 访问 Gateway 网关
-  - 你想使用浏览器 Control UI 和配置编辑
-summary: Gateway 网关 Web 界面：Control UI、绑定模式和安全
+  - ä½ æƒ³é€šè¿‡ Tailscale è®¿é—® Gateway ç½‘å…³
+  - ä½ æƒ³ä½¿ç”¨æµè§ˆå™¨ Control UI å’Œé…ç½®ç¼–è¾‘
+summary: Gateway ç½‘å…³ Web ç•Œé¢ï¼šControl UIã€ç»‘å®šæ¨¡å¼å’Œå®‰å…¨
 title: Web
 x-i18n:
   generated_at: "2026-02-03T10:13:29Z"
@@ -13,39 +13,39 @@ x-i18n:
   workflow: 15
 ---
 
-# Web（Gateway 网关）
+# Webï¼ˆGateway ç½‘å…³ï¼‰
 
-Gateway 网关从与 Gateway 网关 WebSocket 相同的端口提供一个小型**浏览器 Control UI**（Vite + Lit）：
+Gateway ç½‘å…³ä»Žä¸Ž Gateway ç½‘å…³ WebSocket ç›¸åŒçš„ç«¯å£æä¾›ä¸€ä¸ªå°åž‹**æµè§ˆå™¨ Control UI**ï¼ˆVite + Litï¼‰ï¼š
 
-- 默认：`http://<host>:18789/`
-- 可选前缀：设置 `gateway.controlUi.basePath`（例如 `/OpenKrab`）
+- é»˜è®¤ï¼š`http://<host>:18789/`
+- å¯é€‰å‰ç¼€ï¼šè®¾ç½® `gateway.controlUi.basePath`ï¼ˆä¾‹å¦‚ `/OpenKrab`ï¼‰
 
-功能详见 [Control UI](/web/control-ui)。
-本页重点介绍绑定模式、安全和面向 Web 的界面。
+åŠŸèƒ½è¯¦è§ [Control UI](/web/control-ui)ã€‚
+æœ¬é¡µé‡ç‚¹ä»‹ç»ç»‘å®šæ¨¡å¼ã€å®‰å…¨å’Œé¢å‘ Web çš„ç•Œé¢ã€‚
 
 ## Webhooks
 
-当 `hooks.enabled=true` 时，Gateway 网关还在同一 HTTP 服务器上公开一个小型 webhook 端点。
-参见 [Gateway 网关配置](/gateway/configuration) → `hooks` 了解认证 + 载荷。
+å½“ `hooks.enabled=true` æ—¶ï¼ŒGateway ç½‘å…³è¿˜åœ¨åŒä¸€ HTTP æœåŠ¡å™¨ä¸Šå…¬å¼€ä¸€ä¸ªå°åž‹ webhook ç«¯ç‚¹ã€‚
+å‚è§ [Gateway ç½‘å…³é…ç½®](/gateway/configuration) â†’ `hooks` äº†è§£è®¤è¯ + è½½è·ã€‚
 
-## 配置（默认开启）
+## é…ç½®ï¼ˆé»˜è®¤å¼€å¯ï¼‰
 
-当资源存在时（`dist/control-ui`），Control UI **默认启用**。
-你可以通过配置控制它：
+å½“èµ„æºå­˜åœ¨æ—¶ï¼ˆ`dist/control-ui`ï¼‰ï¼ŒControl UI **é»˜è®¤å¯ç”¨**ã€‚
+ä½ å¯ä»¥é€šè¿‡é…ç½®æŽ§åˆ¶å®ƒï¼š
 
 ```json5
 {
   gateway: {
-    controlUi: { enabled: true, basePath: "/OpenKrab" }, // basePath 可选
+    controlUi: { enabled: true, basePath: "/OpenKrab" }, // basePath å¯é€‰
   },
 }
 ```
 
-## Tailscale 访问
+## Tailscale è®¿é—®
 
-### 集成 Serve（推荐）
+### é›†æˆ Serveï¼ˆæŽ¨èï¼‰
 
-保持 Gateway 网关在本地回环上，让 Tailscale Serve 代理它：
+ä¿æŒ Gateway ç½‘å…³åœ¨æœ¬åœ°å›žçŽ¯ä¸Šï¼Œè®© Tailscale Serve ä»£ç†å®ƒï¼š
 
 ```json5
 {
@@ -56,17 +56,17 @@ Gateway 网关从与 Gateway 网关 WebSocket 相同的端口提供一个小型*
 }
 ```
 
-然后启动 Gateway 网关：
+ç„¶åŽå¯åŠ¨ Gateway ç½‘å…³ï¼š
 
 ```bash
 OpenKrab gateway
 ```
 
-打开：
+æ‰“å¼€ï¼š
 
-- `https://<magicdns>/`（或你配置的 `gateway.controlUi.basePath`）
+- `https://<magicdns>/`ï¼ˆæˆ–ä½ é…ç½®çš„ `gateway.controlUi.basePath`ï¼‰
 
-### Tailnet 绑定 + 令牌
+### Tailnet ç»‘å®š + ä»¤ç‰Œ
 
 ```json5
 {
@@ -78,42 +78,43 @@ OpenKrab gateway
 }
 ```
 
-然后启动 Gateway 网关（非本地回环绑定需要令牌）：
+ç„¶åŽå¯åŠ¨ Gateway ç½‘å…³ï¼ˆéžæœ¬åœ°å›žçŽ¯ç»‘å®šéœ€è¦ä»¤ç‰Œï¼‰ï¼š
 
 ```bash
 OpenKrab gateway
 ```
 
-打开：
+æ‰“å¼€ï¼š
 
-- `http://<tailscale-ip>:18789/`（或你配置的 `gateway.controlUi.basePath`）
+- `http://<tailscale-ip>:18789/`ï¼ˆæˆ–ä½ é…ç½®çš„ `gateway.controlUi.basePath`ï¼‰
 
-### 公共互联网（Funnel）
+### å…¬å…±äº’è”ç½‘ï¼ˆFunnelï¼‰
 
 ```json5
 {
   gateway: {
     bind: "loopback",
     tailscale: { mode: "funnel" },
-    auth: { mode: "password" }, // 或 OpenKrab_GATEWAY_PASSWORD
+    auth: { mode: "password" }, // æˆ– OPENKRAB_GATEWAY_PASSWORD
   },
 }
 ```
 
-## 安全注意事项
+## å®‰å…¨æ³¨æ„äº‹é¡¹
 
-- Gateway 网关认证默认是必需的（令牌/密码或 Tailscale 身份头）。
-- 非本地回环绑定仍然**需要**共享令牌/密码（`gateway.auth` 或环境变量）。
-- 向导默认生成 Gateway 网关令牌（即使在本地回环上）。
-- UI 发送 `connect.params.auth.token` 或 `connect.params.auth.password`。
-- 使用 Serve 时，当 `gateway.auth.allowTailscale` 为 `true` 时，Tailscale 身份头可以满足认证（无需令牌/密码）。设置 `gateway.auth.allowTailscale: false` 以要求显式凭证。参见 [Tailscale](/gateway/tailscale) 和 [安全](/gateway/security)。
-- `gateway.tailscale.mode: "funnel"` 需要 `gateway.auth.mode: "password"`（共享密码）。
+- Gateway ç½‘å…³è®¤è¯é»˜è®¤æ˜¯å¿…éœ€çš„ï¼ˆä»¤ç‰Œ/å¯†ç æˆ– Tailscale èº«ä»½å¤´ï¼‰ã€‚
+- éžæœ¬åœ°å›žçŽ¯ç»‘å®šä»ç„¶**éœ€è¦**å…±äº«ä»¤ç‰Œ/å¯†ç ï¼ˆ`gateway.auth` æˆ–çŽ¯å¢ƒå˜é‡ï¼‰ã€‚
+- å‘å¯¼é»˜è®¤ç”Ÿæˆ Gateway ç½‘å…³ä»¤ç‰Œï¼ˆå³ä½¿åœ¨æœ¬åœ°å›žçŽ¯ä¸Šï¼‰ã€‚
+- UI å‘é€ `connect.params.auth.token` æˆ– `connect.params.auth.password`ã€‚
+- ä½¿ç”¨ Serve æ—¶ï¼Œå½“ `gateway.auth.allowTailscale` ä¸º `true` æ—¶ï¼ŒTailscale èº«ä»½å¤´å¯ä»¥æ»¡è¶³è®¤è¯ï¼ˆæ— éœ€ä»¤ç‰Œ/å¯†ç ï¼‰ã€‚è®¾ç½® `gateway.auth.allowTailscale: false` ä»¥è¦æ±‚æ˜¾å¼å‡­è¯ã€‚å‚è§ [Tailscale](/gateway/tailscale) å’Œ [å®‰å…¨](/gateway/security)ã€‚
+- `gateway.tailscale.mode: "funnel"` éœ€è¦ `gateway.auth.mode: "password"`ï¼ˆå…±äº«å¯†ç ï¼‰ã€‚
 
-## 构建 UI
+## æž„å»º UI
 
-Gateway 网关从 `dist/control-ui` 提供静态文件。使用以下命令构建：
+Gateway ç½‘å…³ä»Ž `dist/control-ui` æä¾›é™æ€æ–‡ä»¶ã€‚ä½¿ç”¨ä»¥ä¸‹å‘½ä»¤æž„å»ºï¼š
 
 ```bash
-pnpm ui:build # 首次运行时自动安装 UI 依赖
+pnpm ui:build # é¦–æ¬¡è¿è¡Œæ—¶è‡ªåŠ¨å®‰è£… UI ä¾èµ–
 ```
+
 

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Migration guide from OpenKrab (TypeScript) to OpenKrab (Rust)"
 read_when:
   - You are migrating from OpenKrab to OpenKrab
@@ -40,12 +40,12 @@ cd openkrab
 cargo build --release
 
 # Or download pre-built binary
-# Binary at: target/release/krabkrab
+# Binary at: target/release/openkrab
 ```
 
 ### 2. Configuration Format
 
-**OpenKrab:** JSON5 (`~/.clawdbot/OpenKrab.json`)
+**OpenKrab:** JSON5 (`~/.openkrab/OpenKrab.json`)
 ```json5
 {
   agents: {
@@ -62,7 +62,7 @@ cargo build --release
 }
 ```
 
-**OpenKrab:** TOML (`~/.config/krabkrab/config.toml`)
+**OpenKrab:** TOML (`~/.config/openkrab/config.toml`)
 ```toml
 [agents.defaults]
 provider = "anthropic"
@@ -77,34 +77,34 @@ bot_token = "123:abc"
 
 | OpenKrab | OpenKrab | Notes |
 |----------|----------|-------|
-| `OpenKrab` | `krabkrab` | New binary name |
-| `OpenKrab onboard` | `krabkrab setup` | Setup wizard |
-| `OpenKrab config get <path>` | `krabkrab config get <key>` | Dot notation |
-| `OpenKrab gateway --port 18789` | `krabkrab gateway --port 18789` | Similar |
-| `OpenKrab channels login` | `krabkrab channels add` | Different flow |
-| `OpenKrab doctor` | `krabkrab doctor` | Same |
-| `OpenKrab status` | `krabkrab status` | Same |
-| `OpenKrab message send` | `krabkrab message send` | Similar |
-| `OpenKrab memory index` | `krabkrab memory sync` | Different name |
+| `OpenKrab` | `openkrab` | New binary name |
+| `OpenKrab onboard` | `openkrab setup` | Setup wizard |
+| `OpenKrab config get <path>` | `openkrab config get <key>` | Dot notation |
+| `OpenKrab gateway --port 18789` | `openkrab gateway --port 18789` | Similar |
+| `OpenKrab channels login` | `openkrab channels add` | Different flow |
+| `OpenKrab doctor` | `openkrab doctor` | Same |
+| `OpenKrab status` | `openkrab status` | Same |
+| `OpenKrab message send` | `openkrab message send` | Similar |
+| `OpenKrab memory index` | `openkrab memory sync` | Different name |
 
 ### 4. Directory Structure
 
 | OpenKrab | OpenKrab |
 |----------|----------|
-| `~/.clawdbot/` | `~/.config/krabkrab/` |
-| `~/.clawdbot/OpenKrab.json` | `~/.config/krabkrab/config.toml` |
-| `~/.clawdbot/workspace/` | `~/.local/share/krabkrab/workspace/` |
-| `~/.clawdbot/sessions/` | `~/.local/share/krabkrab/sessions/` |
-| `~/.clawdbot/credentials/` | `~/.local/share/krabkrab/credentials/` |
+| `~/.openkrab/` | `~/.config/openkrab/` |
+| `~/.openkrab/OpenKrab.json` | `~/.config/openkrab/config.toml` |
+| `~/.openkrab/workspace/` | `~/.local/share/openkrab/workspace/` |
+| `~/.openkrab/sessions/` | `~/.local/share/openkrab/sessions/` |
+| `~/.openkrab/credentials/` | `~/.local/share/openkrab/credentials/` |
 
 ### 5. Environment Variables
 
 | OpenKrab | OpenKrab |
 |----------|----------|
-| `OpenKrab_HOME` | `KRABKRAB_CONFIG_DIR` |
-| `OpenKrab_STATE_DIR` | `KRABKRAB_DATA_DIR` |
-| `OpenKrab_CONFIG_PATH` | `KRABKRAB_CONFIG_FILE` |
-| `CLAWDBOT_PROFILE` | `KRABKRAB_PROFILE` |
+| `OPENKRAB_HOME` | `OPENKRAB_CONFIG_DIR` |
+| `OPENKRAB_STATE_DIR` | `OPENKRAB_DATA_DIR` |
+| `OPENKRAB_CONFIG_PATH` | `OPENKRAB_CONFIG_FILE` |
+| .OPENKRAB_PROFILE` | `OPENKRAB_PROFILE` |
 
 ### 6. Model Provider Configuration
 
@@ -136,7 +136,7 @@ model = "claude-3-5-sonnet-20241022"
 
 ```bash
 # On your old OpenKrab installation
-cp ~/.clawdbot/OpenKrab.json ~/OpenKrab-backup.json
+cp ~/.openkrab/OpenKrab.json ~/OpenKrab-backup.json
 ```
 
 ### Step 2: Install OpenKrab
@@ -145,15 +145,14 @@ cp ~/.clawdbot/OpenKrab.json ~/OpenKrab-backup.json
 git clone https://github.com/openkrab/openkrab.git
 cd openkrab
 cargo build --release
-sudo cp target/release/krabkrab /usr/local/bin/
+sudo cp target/release/openkrab /usr/local/bin/
 ```
 
 ### Step 3: Migrate Configuration
 
 OpenKrab includes a migration helper:
 
-```bash
-krabkrab migrate --from-OpenKrab ~/OpenKrab-backup.json
+```bash\nOpenKrab migrate --from-OpenKrab ~/OpenKrab-backup.json
 ```
 
 This will:
@@ -164,21 +163,17 @@ This will:
 
 ### Step 4: Verify Migration
 
-```bash
-krabkrab doctor          # Check configuration
-krabkrab config show     # View migrated config
-krabkrab status          # Check gateway status
+```bash\nOpenKrab doctor          # Check configuration\nOpenKrab config show     # View migrated config\nOpenKrab status          # Check gateway status
 ```
 
 ### Step 5: Start Gateway
 
-```bash
-krabkrab gateway --port 18789
+```bash\nOpenKrab gateway --port 18789
 ```
 
 ## Feature Comparison
 
-### ✅ Fully Ported (100% compatible)
+### âœ… Fully Ported (100% compatible)
 
 | Feature | Lines of Code | Notes |
 |---------|---------------|-------|
@@ -196,7 +191,7 @@ krabkrab gateway --port 18789
 
 **Total: ~56,276 lines of Rust** (vs ~27,139 lines of TypeScript)
 
-### ❌ Not Ported (Intentionally)
+### âŒ Not Ported (Intentionally)
 
 | Feature | Reason | Alternative |
 |---------|--------|-------------|
@@ -239,30 +234,29 @@ OpenKrab supports config hot reload like OpenKrab, but uses TOML instead of JSON
 
 ### 4. No Built-in Update
 
-OpenKrab doesn't have `krabkrab update` command yet. Update by:
+OpenKrab doesn't have `openkrab update` command yet. Update by:
 ```bash
 git pull
 cargo build --release
-sudo cp target/release/krabkrab /usr/local/bin/
+sudo cp target/release/openkrab /usr/local/bin/
 ```
 
 ## Troubleshooting Migration
 
 ### "Config validation failed"
 
-```bash
-krabkrab doctor --fix
+```bash\nOpenKrab doctor --fix
 ```
 
 ### "Channel not connecting"
 
 - Verify API tokens are correctly migrated
-- Check `krabkrab channels status`
-- Re-add channel if needed: `krabkrab channels add`
+- Check `openkrab channels status`
+- Re-add channel if needed: `openkrab channels add`
 
 ### "Memory not found"
 
-- Re-index memory: `krabkrab memory sync --path ~/old-workspace/memory/`
+- Re-index memory: `openkrab memory sync --path ~/old-workspace/memory/`
 
 ### "Plugins not loading"
 
@@ -288,11 +282,11 @@ OpenKrab is a **complete rewrite** in Rust:
 | **Extensions** | 37 | 30 ported |
 
 ### Performance Improvements
-- ✅ **5x faster** execution
-- ✅ **<100MB** memory usage (vs 200-500MB)
-- ✅ **<100ms** startup (vs 1-2 seconds)
-- ✅ **Single binary** deployment
-- ✅ **Memory safety** guarantees
+- âœ… **5x faster** execution
+- âœ… **<100MB** memory usage (vs 200-500MB)
+- âœ… **<100ms** startup (vs 1-2 seconds)
+- âœ… **Single binary** deployment
+- âœ… **Memory safety** guarantees
 
 ### Code Quality
 - Zero-cost abstractions
@@ -301,4 +295,8 @@ OpenKrab is a **complete rewrite** in Rust:
 - Cross-platform native binaries
 
 The migration is straightforward - config conversion from JSON5 to TOML is the main task.
+
+
+
+
 

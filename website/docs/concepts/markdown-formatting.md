@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Markdown formatting pipeline for outbound channels"
 read_when:
   - You are changing markdown formatting or chunking for outbound channels
@@ -8,8 +8,7 @@ title: "Markdown Formatting"
 ---
 
 # Markdown formatting
-
-openkrab formats outbound Markdown by converting it into a shared intermediate
+\nOpenKrab formats outbound Markdown by converting it into a shared intermediate
 representation (IR) before rendering channel-specific output. The IR keeps the
 source text intact while carrying style/link spans so chunking and rendering can
 stay consistent across channels.
@@ -41,14 +40,14 @@ stay consistent across channels.
 Input Markdown:
 
 ```markdown
-Hello **world** — see [docs](https://docs.openkrab.ai).
+Hello **world** â€” see [docs](https://docs.openkrab.ai).
 ```
 
 IR (schematic):
 
 ```json
 {
-  "text": "Hello world — see docs.",
+  "text": "Hello world â€” see docs.",
   "styles": [{ "start": 6, "end": 11, "style": "bold" }],
   "links": [{ "start": 19, "end": 23, "href": "https://docs.openkrab.ai" }]
 }
@@ -128,3 +127,4 @@ SPOILER style ranges. Other channels treat them as plain text.
 - Signal style ranges depend on UTF-16 offsets; do not use code point offsets.
 - Preserve trailing newlines for fenced code blocks so closing markers land on
   their own line.
+

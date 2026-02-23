@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 打包 OpenKrab.app
-  - 调试 macOS Gateway 网关 launchd 服务
-  - 为 macOS 安装 Gateway 网关 CLI
-summary: macOS 上的 Gateway 网关运行时（外部 launchd 服务）
-title: macOS 上的 Gateway 网关
+  - æ‰“åŒ… OpenKrab.app
+  - è°ƒè¯• macOS Gateway ç½‘å…³ launchd æœåŠ¡
+  - ä¸º macOS å®‰è£… Gateway ç½‘å…³ CLI
+summary: macOS ä¸Šçš„ Gateway ç½‘å…³è¿è¡Œæ—¶ï¼ˆå¤–éƒ¨ launchd æœåŠ¡ï¼‰
+title: macOS ä¸Šçš„ Gateway ç½‘å…³
 x-i18n:
   generated_at: "2026-02-03T07:52:30Z"
   model: claude-opus-4-5
@@ -14,63 +14,64 @@ x-i18n:
   workflow: 15
 ---
 
-# macOS 上的 Gateway 网关（外部 launchd）
+# macOS ä¸Šçš„ Gateway ç½‘å…³ï¼ˆå¤–éƒ¨ launchdï¼‰
 
-OpenKrab.app 不再捆绑 Node/Bun 或 Gateway 网关运行时。macOS 应用期望有一个**外部**的 `OpenKrab` CLI 安装，不会将 Gateway 网关作为子进程启动，而是管理一个每用户的 launchd 服务来保持 Gateway 网关运行（或者如果已有本地 Gateway 网关正在运行，则连接到现有的）。
+OpenKrab.app ä¸å†æ†ç»‘ Node/Bun æˆ– Gateway ç½‘å…³è¿è¡Œæ—¶ã€‚macOS åº”ç”¨æœŸæœ›æœ‰ä¸€ä¸ª**å¤–éƒ¨**çš„ `OpenKrab` CLI å®‰è£…ï¼Œä¸ä¼šå°† Gateway ç½‘å…³ä½œä¸ºå­è¿›ç¨‹å¯åŠ¨ï¼Œè€Œæ˜¯ç®¡ç†ä¸€ä¸ªæ¯ç”¨æˆ·çš„ launchd æœåŠ¡æ¥ä¿æŒ Gateway ç½‘å…³è¿è¡Œï¼ˆæˆ–è€…å¦‚æžœå·²æœ‰æœ¬åœ° Gateway ç½‘å…³æ­£åœ¨è¿è¡Œï¼Œåˆ™è¿žæŽ¥åˆ°çŽ°æœ‰çš„ï¼‰ã€‚
 
-## 安装 CLI（本地模式必需）
+## å®‰è£… CLIï¼ˆæœ¬åœ°æ¨¡å¼å¿…éœ€ï¼‰
 
-你需要在 Mac 上安装 Node 22+，然后全局安装 `OpenKrab`：
+ä½ éœ€è¦åœ¨ Mac ä¸Šå®‰è£… Node 22+ï¼Œç„¶åŽå…¨å±€å®‰è£… `OpenKrab`ï¼š
 
 ```bash
 npm install -g OpenKrab@<version>
 ```
 
-macOS 应用的**安装 CLI**按钮通过 npm/pnpm 运行相同的流程（不推荐使用 bun 作为 Gateway 网关运行时）。
+macOS åº”ç”¨çš„**å®‰è£… CLI**æŒ‰é’®é€šè¿‡ npm/pnpm è¿è¡Œç›¸åŒçš„æµç¨‹ï¼ˆä¸æŽ¨èä½¿ç”¨ bun ä½œä¸º Gateway ç½‘å…³è¿è¡Œæ—¶ï¼‰ã€‚
 
-## Launchd（Gateway 网关作为 LaunchAgent）
+## Launchdï¼ˆGateway ç½‘å…³ä½œä¸º LaunchAgentï¼‰
 
-标签：
+æ ‡ç­¾ï¼š
 
-- `bot.molt.gateway`（或 `bot.molt.<profile>`；旧版 `com.OpenKrab.*` 可能仍然存在）
+- `bot.molt.gateway`ï¼ˆæˆ– `bot.molt.<profile>`ï¼›æ—§ç‰ˆ `com.OpenKrab.*` å¯èƒ½ä»ç„¶å­˜åœ¨ï¼‰
 
-Plist 位置（每用户）：
+Plist ä½ç½®ï¼ˆæ¯ç”¨æˆ·ï¼‰ï¼š
 
 - `~/Library/LaunchAgents/bot.molt.gateway.plist`
-  （或 `~/Library/LaunchAgents/bot.molt.<profile>.plist`）
+  ï¼ˆæˆ– `~/Library/LaunchAgents/bot.molt.<profile>.plist`ï¼‰
 
-管理者：
+ç®¡ç†è€…ï¼š
 
-- macOS 应用在本地模式下拥有 LaunchAgent 的安装/更新权限。
-- CLI 也可以安装它：`OpenKrab gateway install`。
+- macOS åº”ç”¨åœ¨æœ¬åœ°æ¨¡å¼ä¸‹æ‹¥æœ‰ LaunchAgent çš„å®‰è£…/æ›´æ–°æƒé™ã€‚
+- CLI ä¹Ÿå¯ä»¥å®‰è£…å®ƒï¼š`OpenKrab gateway install`ã€‚
 
-行为：
+è¡Œä¸ºï¼š
 
-- "OpenKrab Active"启用/禁用 LaunchAgent。
-- 应用退出**不会**停止 Gateway 网关（launchd 保持其存活）。
-- 如果 Gateway 网关已经在配置的端口上运行，应用会连接到它而不是启动新的。
+- "OpenKrab Active"å¯ç”¨/ç¦ç”¨ LaunchAgentã€‚
+- åº”ç”¨é€€å‡º**ä¸ä¼š**åœæ­¢ Gateway ç½‘å…³ï¼ˆlaunchd ä¿æŒå…¶å­˜æ´»ï¼‰ã€‚
+- å¦‚æžœ Gateway ç½‘å…³å·²ç»åœ¨é…ç½®çš„ç«¯å£ä¸Šè¿è¡Œï¼Œåº”ç”¨ä¼šè¿žæŽ¥åˆ°å®ƒè€Œä¸æ˜¯å¯åŠ¨æ–°çš„ã€‚
 
-日志：
+æ—¥å¿—ï¼š
 
-- launchd stdout/err：`/tmp/OpenKrab/OpenKrab-gateway.log`
+- launchd stdout/errï¼š`/tmp/OpenKrab/OpenKrab-gateway.log`
 
-## 版本兼容性
+## ç‰ˆæœ¬å…¼å®¹æ€§
 
-macOS 应用会检查 Gateway 网关版本与其自身版本是否匹配。如果不兼容，请更新全局 CLI 以匹配应用版本。
+macOS åº”ç”¨ä¼šæ£€æŸ¥ Gateway ç½‘å…³ç‰ˆæœ¬ä¸Žå…¶è‡ªèº«ç‰ˆæœ¬æ˜¯å¦åŒ¹é…ã€‚å¦‚æžœä¸å…¼å®¹ï¼Œè¯·æ›´æ–°å…¨å±€ CLI ä»¥åŒ¹é…åº”ç”¨ç‰ˆæœ¬ã€‚
 
-## 冒烟测试
+## å†’çƒŸæµ‹è¯•
 
 ```bash
 OpenKrab --version
 
-OpenKrab_SKIP_CHANNELS=1 \
-OpenKrab_SKIP_CANVAS_HOST=1 \
+OPENKRAB_SKIP_CHANNELS=1 \
+OPENKRAB_SKIP_CANVAS_HOST=1 \
 OpenKrab gateway --port 18999 --bind loopback
 ```
 
-然后：
+ç„¶åŽï¼š
 
 ```bash
 OpenKrab gateway call health --url ws://127.0.0.1:18999 --timeout 3000
 ```
+
 

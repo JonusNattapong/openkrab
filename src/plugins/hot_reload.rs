@@ -333,7 +333,7 @@ impl HotReloadManager {
         // Check if it's a manifest file
         if file_name == "plugin.json"
             || file_name == "manifest.json"
-            || file_name == "krabkrab.json"
+            || file_name == "openkrab.json"
         {
             let plugin_name = path
                 .parent()
@@ -502,3 +502,4 @@ mod tests {
         assert!(summary.has_activity());
     }
 }
+

@@ -1,4 +1,4 @@
-//! Ported from `openclaw/src/sessions/level-overrides.ts`
+//! Ported from `OpenKrab/src/sessions/level-overrides.ts`
 
 use super::{Session, VerbosityLevel};
 
@@ -74,3 +74,4 @@ mod tests {
         assert_eq!(session.verbosity, VerbosityLevel::Normal);
     }
 }
+

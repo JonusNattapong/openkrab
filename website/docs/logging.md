@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Logging overview: file logs, console output, CLI tailing, and the Control UI"
 read_when:
   - You need a beginner-friendly overview of logging
@@ -68,7 +68,7 @@ OpenKrab doctor
 
 ### Control UI (web)
 
-The Control UI’s **Logs** tab tails the same file using `logs.tail`.
+The Control UIâ€™s **Logs** tab tails the same file using `logs.tail`.
 See [/web/control-ui](/web/control-ui) for how to open it.
 
 ### Channel-only logs
@@ -210,7 +210,7 @@ Flags are case-insensitive and support wildcards (e.g. `telegram.*` or `*`).
 Env override (one-off):
 
 ```
-OpenKrab_DIAGNOSTICS=telegram.http,telegram.payload
+OPENKRAB_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 Notes:
@@ -324,7 +324,7 @@ Queues + sessions:
 
 ### Sampling + flushing
 
-- Trace sampling: `diagnostics.otel.sampleRate` (0.0–1.0, root spans only).
+- Trace sampling: `diagnostics.otel.sampleRate` (0.0â€“1.0, root spans only).
 - Metric export interval: `diagnostics.otel.flushIntervalMs` (min 1000ms).
 
 ### Protocol notes
@@ -348,4 +348,5 @@ Queues + sessions:
 - **Logs empty?** Check that the Gateway is running and writing to the file path
   in `logging.file`.
 - **Need more detail?** Set `logging.level` to `debug` or `trace` and retry.
+
 

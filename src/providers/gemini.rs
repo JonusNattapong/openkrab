@@ -1,5 +1,5 @@
 //! Gemini (Google) provider — chat completion + text embeddings.
-//! Mirrors openclaw's google-shared provider behaviour.
+//! Mirrors OpenKrab's google-shared provider behaviour.
 
 use super::LlmProvider;
 use anyhow::Result;
@@ -171,3 +171,4 @@ mod tests {
         assert_eq!(p.name(), "gemini");
     }
 }
+

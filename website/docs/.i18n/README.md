@@ -1,11 +1,11 @@
-# openkrab docs i18n assets
+﻿# OpenKrab docs i18n assets
 
 This folder stores **generated** and **config** files for documentation translations.
 
 ## Files
 
-- `glossary.<lang>.json` — preferred term mappings (used in prompt guidance).
-- `<lang>.tm.jsonl` — translation memory (cache) keyed by workflow + model + text hash.
+- `glossary.<lang>.json` â€” preferred term mappings (used in prompt guidance).
+- `<lang>.tm.jsonl` â€” translation memory (cache) keyed by workflow + model + text hash.
 
 ## Glossary format
 
@@ -14,7 +14,7 @@ This folder stores **generated** and **config** files for documentation translat
 ```json
 {
   "source": "troubleshooting",
-  "target": "故障排除",
+  "target": "æ•…éšœæŽ’é™¤",
   "ignore_case": true,
   "whole_word": false
 }
@@ -29,3 +29,4 @@ Fields:
 
 - Glossary entries are passed to the model as **prompt guidance** (no deterministic rewrites).
 - The translation memory is updated by `scripts/docs-i18n`.
+

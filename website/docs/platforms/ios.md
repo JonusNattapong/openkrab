@@ -1,4 +1,4 @@
----
+﻿---
 summary: "iOS node app: connect to the Gateway, pairing, canvas, and troubleshooting"
 read_when:
   - Pairing or reconnecting the iOS node
@@ -69,12 +69,12 @@ In Settings, enable **Manual Host** and enter the gateway host + port (default `
 The iOS node renders a WKWebView canvas. Use `node.invoke` to drive it:
 
 ```bash
-OpenKrab nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18789/__OpenKrab__/canvas/"}'
+OpenKrab nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18789/__OPENKRAB__/canvas/"}'
 ```
 
 Notes:
 
-- The Gateway canvas host serves `/__OpenKrab__/canvas/` and `/__OpenKrab__/a2ui/`.
+- The Gateway canvas host serves `/__OPENKRAB__/canvas/` and `/__OPENKRAB__/a2ui/`.
 - It is served from the Gateway HTTP server (same port as `gateway.port`, default `18789`).
 - The iOS node auto-navigates to A2UI on connect when a canvas host URL is advertised.
 - Return to the built-in scaffold with `canvas.navigate` and `{"url":""}`.
@@ -106,4 +106,5 @@ OpenKrab nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"ma
 - [Pairing](/gateway/pairing)
 - [Discovery](/gateway/discovery)
 - [Bonjour](/gateway/bonjour)
+
 

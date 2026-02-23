@@ -139,8 +139,9 @@ pub fn repair_tool_use_result_pairing(messages: &[ChatMessage]) -> ToolUseRepair
 }
 
 pub fn strip_tool_result_details(messages: &[ChatMessage]) -> Vec<ChatMessage> {
-    // In OpenClaw, this strips the 'details' field from toolResult messages.
+    // In OpenKrab, this strips the 'details' field from toolResult messages.
     // In OpenKrab, ChatMessage::Tool doesn't have a 'details' field currently,
     // but we can prepare it for future parity if we add it.
     messages.to_vec()
 }
+

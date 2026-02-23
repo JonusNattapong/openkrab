@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 调查运行时问题或故障
-summary: OpenKrab 常见故障的快速故障排除指南
-title: 故障排除
+  - è°ƒæŸ¥è¿è¡Œæ—¶é—®é¢˜æˆ–æ•…éšœ
+summary: OpenKrab å¸¸è§æ•…éšœçš„å¿«é€Ÿæ•…éšœæŽ’é™¤æŒ‡å—
+title: æ•…éšœæŽ’é™¤
 x-i18n:
   generated_at: "2026-02-03T10:09:42Z"
   model: claude-opus-4-5
@@ -12,365 +12,365 @@ x-i18n:
   workflow: 15
 ---
 
-# 故障排除 🔧
+# æ•…éšœæŽ’é™¤ ðŸ”§
 
-当 OpenKrab 出现异常时，以下是解决方法。
+å½“ OpenKrab å‡ºçŽ°å¼‚å¸¸æ—¶ï¼Œä»¥ä¸‹æ˜¯è§£å†³æ–¹æ³•ã€‚
 
-如果你只想快速分类问题，请先查看常见问题的[最初的六十秒](/help/faq#first-60-seconds-if-somethings-broken)。本页深入介绍运行时故障和诊断。
+å¦‚æžœä½ åªæƒ³å¿«é€Ÿåˆ†ç±»é—®é¢˜ï¼Œè¯·å…ˆæŸ¥çœ‹å¸¸è§é—®é¢˜çš„[æœ€åˆçš„å…­åç§’](/help/faq#first-60-seconds-if-somethings-broken)ã€‚æœ¬é¡µæ·±å…¥ä»‹ç»è¿è¡Œæ—¶æ•…éšœå’Œè¯Šæ–­ã€‚
 
-特定提供商的快捷方式：[/channels/troubleshooting](/channels/troubleshooting)
+ç‰¹å®šæä¾›å•†çš„å¿«æ·æ–¹å¼ï¼š[/channels/troubleshooting](/channels/troubleshooting)
 
-## 状态与诊断
+## çŠ¶æ€ä¸Žè¯Šæ–­
 
-快速分类命令（按顺序）：
+å¿«é€Ÿåˆ†ç±»å‘½ä»¤ï¼ˆæŒ‰é¡ºåºï¼‰ï¼š
 
-| 命令                               | 它告诉你什么                                                                          | 何时使用                              |
+| å‘½ä»¤                               | å®ƒå‘Šè¯‰ä½ ä»€ä¹ˆ                                                                          | ä½•æ—¶ä½¿ç”¨                              |
 | ---------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------- |
-| `OpenKrab status`                  | 本地摘要：操作系统 + 更新、Gateway 网关可达性/模式、服务、智能体/会话、提供商配置状态 | 首次检查，快速概览                    |
-| `OpenKrab status --all`            | 完整本地诊断（只读、可粘贴、相对安全）包括日志尾部                                    | 当你需要分享调试报告时                |
-| `OpenKrab status --deep`           | 运行 Gateway 网关健康检查（包括提供商探测；需要可达的 Gateway 网关）                  | 当"已配置"不意味着"正常工作"时        |
-| `OpenKrab gateway probe`           | Gateway 网关发现 + 可达性（本地 + 远程目标）                                          | 当你怀疑正在探测错误的 Gateway 网关时 |
-| `OpenKrab channels status --probe` | 向运行中的 Gateway 网关查询渠道状态（并可选探测）                                     | 当 Gateway 网关可达但渠道异常时       |
-| `OpenKrab gateway status`          | 监管程序状态（launchd/systemd/schtasks）、运行时 PID/退出、最后的 Gateway 网关错误    | 当服务"看起来已加载"但没有运行时      |
-| `OpenKrab logs --follow`           | 实时日志（运行时问题的最佳信号）                                                      | 当你需要实际的故障原因时              |
+| `OpenKrab status`                  | æœ¬åœ°æ‘˜è¦ï¼šæ“ä½œç³»ç»Ÿ + æ›´æ–°ã€Gateway ç½‘å…³å¯è¾¾æ€§/æ¨¡å¼ã€æœåŠ¡ã€æ™ºèƒ½ä½“/ä¼šè¯ã€æä¾›å•†é…ç½®çŠ¶æ€ | é¦–æ¬¡æ£€æŸ¥ï¼Œå¿«é€Ÿæ¦‚è§ˆ                    |
+| `OpenKrab status --all`            | å®Œæ•´æœ¬åœ°è¯Šæ–­ï¼ˆåªè¯»ã€å¯ç²˜è´´ã€ç›¸å¯¹å®‰å…¨ï¼‰åŒ…æ‹¬æ—¥å¿—å°¾éƒ¨                                    | å½“ä½ éœ€è¦åˆ†äº«è°ƒè¯•æŠ¥å‘Šæ—¶                |
+| `OpenKrab status --deep`           | è¿è¡Œ Gateway ç½‘å…³å¥åº·æ£€æŸ¥ï¼ˆåŒ…æ‹¬æä¾›å•†æŽ¢æµ‹ï¼›éœ€è¦å¯è¾¾çš„ Gateway ç½‘å…³ï¼‰                  | å½“"å·²é…ç½®"ä¸æ„å‘³ç€"æ­£å¸¸å·¥ä½œ"æ—¶        |
+| `OpenKrab gateway probe`           | Gateway ç½‘å…³å‘çŽ° + å¯è¾¾æ€§ï¼ˆæœ¬åœ° + è¿œç¨‹ç›®æ ‡ï¼‰                                          | å½“ä½ æ€€ç–‘æ­£åœ¨æŽ¢æµ‹é”™è¯¯çš„ Gateway ç½‘å…³æ—¶ |
+| `OpenKrab channels status --probe` | å‘è¿è¡Œä¸­çš„ Gateway ç½‘å…³æŸ¥è¯¢æ¸ é“çŠ¶æ€ï¼ˆå¹¶å¯é€‰æŽ¢æµ‹ï¼‰                                     | å½“ Gateway ç½‘å…³å¯è¾¾ä½†æ¸ é“å¼‚å¸¸æ—¶       |
+| `OpenKrab gateway status`          | ç›‘ç®¡ç¨‹åºçŠ¶æ€ï¼ˆlaunchd/systemd/schtasksï¼‰ã€è¿è¡Œæ—¶ PID/é€€å‡ºã€æœ€åŽçš„ Gateway ç½‘å…³é”™è¯¯    | å½“æœåŠ¡"çœ‹èµ·æ¥å·²åŠ è½½"ä½†æ²¡æœ‰è¿è¡Œæ—¶      |
+| `OpenKrab logs --follow`           | å®žæ—¶æ—¥å¿—ï¼ˆè¿è¡Œæ—¶é—®é¢˜çš„æœ€ä½³ä¿¡å·ï¼‰                                                      | å½“ä½ éœ€è¦å®žé™…çš„æ•…éšœåŽŸå› æ—¶              |
 
-**分享输出：** 优先使用 `OpenKrab status --all`（它会隐藏令牌）。如果你粘贴 `OpenKrab status`，考虑先设置 `OpenKrab_SHOW_SECRETS=0`（令牌预览）。
+**åˆ†äº«è¾“å‡ºï¼š** ä¼˜å…ˆä½¿ç”¨ `OpenKrab status --all`ï¼ˆå®ƒä¼šéšè—ä»¤ç‰Œï¼‰ã€‚å¦‚æžœä½ ç²˜è´´ `OpenKrab status`ï¼Œè€ƒè™‘å…ˆè®¾ç½® `OPENKRAB_SHOW_SECRETS=0`ï¼ˆä»¤ç‰Œé¢„è§ˆï¼‰ã€‚
 
-另请参阅：[健康检查](/gateway/health) 和 [日志](/logging)。
+å¦è¯·å‚é˜…ï¼š[å¥åº·æ£€æŸ¥](/gateway/health) å’Œ [æ—¥å¿—](/logging)ã€‚
 
-## 常见问题
+## å¸¸è§é—®é¢˜
 
 ### No API key found for provider "anthropic"
 
-这意味着**智能体的认证存储为空**或缺少 Anthropic 凭证。
-认证是**每个智能体独立的**，所以新智能体不会继承主智能体的密钥。
+è¿™æ„å‘³ç€**æ™ºèƒ½ä½“çš„è®¤è¯å­˜å‚¨ä¸ºç©º**æˆ–ç¼ºå°‘ Anthropic å‡­è¯ã€‚
+è®¤è¯æ˜¯**æ¯ä¸ªæ™ºèƒ½ä½“ç‹¬ç«‹çš„**ï¼Œæ‰€ä»¥æ–°æ™ºèƒ½ä½“ä¸ä¼šç»§æ‰¿ä¸»æ™ºèƒ½ä½“çš„å¯†é’¥ã€‚
 
-修复选项：
+ä¿®å¤é€‰é¡¹ï¼š
 
-- 重新运行新手引导并为该智能体选择 **Anthropic**。
-- 或在 **Gateway 网关主机**上粘贴 setup-token：
+- é‡æ–°è¿è¡Œæ–°æ‰‹å¼•å¯¼å¹¶ä¸ºè¯¥æ™ºèƒ½ä½“é€‰æ‹© **Anthropic**ã€‚
+- æˆ–åœ¨ **Gateway ç½‘å…³ä¸»æœº**ä¸Šç²˜è´´ setup-tokenï¼š
   ```bash
   OpenKrab models auth setup-token --provider anthropic
   ```
-- 或将 `auth-profiles.json` 从主智能体目录复制到新智能体目录。
+- æˆ–å°† `auth-profiles.json` ä»Žä¸»æ™ºèƒ½ä½“ç›®å½•å¤åˆ¶åˆ°æ–°æ™ºèƒ½ä½“ç›®å½•ã€‚
 
-验证：
+éªŒè¯ï¼š
 
 ```bash
 OpenKrab models status
 ```
 
-### OAuth token refresh failed（Anthropic Claude 订阅）
+### OAuth token refresh failedï¼ˆAnthropic Claude è®¢é˜…ï¼‰
 
-这意味着存储的 Anthropic OAuth 令牌已过期且刷新失败。
-如果你使用 Claude 订阅（无 API 密钥），最可靠的修复方法是
-切换到 **Claude Code setup-token** 并在 **Gateway 网关主机**上粘贴。
+è¿™æ„å‘³ç€å­˜å‚¨çš„ Anthropic OAuth ä»¤ç‰Œå·²è¿‡æœŸä¸”åˆ·æ–°å¤±è´¥ã€‚
+å¦‚æžœä½ ä½¿ç”¨ Claude è®¢é˜…ï¼ˆæ—  API å¯†é’¥ï¼‰ï¼Œæœ€å¯é çš„ä¿®å¤æ–¹æ³•æ˜¯
+åˆ‡æ¢åˆ° **Claude Code setup-token** å¹¶åœ¨ **Gateway ç½‘å…³ä¸»æœº**ä¸Šç²˜è´´ã€‚
 
-**推荐（setup-token）：**
+**æŽ¨èï¼ˆsetup-tokenï¼‰ï¼š**
 
 ```bash
-# 在 Gateway 网关主机上运行（粘贴 setup-token）
+# åœ¨ Gateway ç½‘å…³ä¸»æœºä¸Šè¿è¡Œï¼ˆç²˜è´´ setup-tokenï¼‰
 OpenKrab models auth setup-token --provider anthropic
 OpenKrab models status
 ```
 
-如果你在其他地方生成了令牌：
+å¦‚æžœä½ åœ¨å…¶ä»–åœ°æ–¹ç”Ÿæˆäº†ä»¤ç‰Œï¼š
 
 ```bash
 OpenKrab models auth paste-token --provider anthropic
 OpenKrab models status
 ```
 
-更多详情：[Anthropic](/providers/anthropic) 和 [OAuth](/concepts/oauth)。
+æ›´å¤šè¯¦æƒ…ï¼š[Anthropic](/providers/anthropic) å’Œ [OAuth](/concepts/oauth)ã€‚
 
-### Control UI 在 HTTP 上失败（"device identity required" / "connect failed"）
+### Control UI åœ¨ HTTP ä¸Šå¤±è´¥ï¼ˆ"device identity required" / "connect failed"ï¼‰
 
-如果你通过纯 HTTP 打开仪表板（例如 `http://<lan-ip>:18789/` 或
-`http://<tailscale-ip>:18789/`），浏览器运行在**非安全上下文**中，
-会阻止 WebCrypto，因此无法生成设备身份。
+å¦‚æžœä½ é€šè¿‡çº¯ HTTP æ‰“å¼€ä»ªè¡¨æ¿ï¼ˆä¾‹å¦‚ `http://<lan-ip>:18789/` æˆ–
+`http://<tailscale-ip>:18789/`ï¼‰ï¼Œæµè§ˆå™¨è¿è¡Œåœ¨**éžå®‰å…¨ä¸Šä¸‹æ–‡**ä¸­ï¼Œ
+ä¼šé˜»æ­¢ WebCryptoï¼Œå› æ­¤æ— æ³•ç”Ÿæˆè®¾å¤‡èº«ä»½ã€‚
 
-**修复：**
+**ä¿®å¤ï¼š**
 
-- 优先通过 [Tailscale Serve](/gateway/tailscale) 使用 HTTPS。
-- 或在 Gateway 网关主机上本地打开：`http://127.0.0.1:18789/`。
-- 如果必须使用 HTTP，启用 `gateway.controlUi.allowInsecureAuth: true` 并
-  使用 Gateway 网关令牌（仅令牌；无设备身份/配对）。参见
-  [Control UI](/web/control-ui#insecure-http)。
+- ä¼˜å…ˆé€šè¿‡ [Tailscale Serve](/gateway/tailscale) ä½¿ç”¨ HTTPSã€‚
+- æˆ–åœ¨ Gateway ç½‘å…³ä¸»æœºä¸Šæœ¬åœ°æ‰“å¼€ï¼š`http://127.0.0.1:18789/`ã€‚
+- å¦‚æžœå¿…é¡»ä½¿ç”¨ HTTPï¼Œå¯ç”¨ `gateway.controlUi.allowInsecureAuth: true` å¹¶
+  ä½¿ç”¨ Gateway ç½‘å…³ä»¤ç‰Œï¼ˆä»…ä»¤ç‰Œï¼›æ— è®¾å¤‡èº«ä»½/é…å¯¹ï¼‰ã€‚å‚è§
+  [Control UI](/web/control-ui#insecure-http)ã€‚
 
 ### CI Secrets Scan Failed
 
-这意味着 `detect-secrets` 发现了尚未在基线中的新候选项。
-按照 [密钥扫描](/gateway/security#secret-scanning-detect-secrets) 操作。
+è¿™æ„å‘³ç€ `detect-secrets` å‘çŽ°äº†å°šæœªåœ¨åŸºçº¿ä¸­çš„æ–°å€™é€‰é¡¹ã€‚
+æŒ‰ç…§ [å¯†é’¥æ‰«æ](/gateway/security#secret-scanning-detect-secrets) æ“ä½œã€‚
 
-### 服务已安装但没有运行
+### æœåŠ¡å·²å®‰è£…ä½†æ²¡æœ‰è¿è¡Œ
 
-如果 Gateway 网关服务已安装但进程立即退出，服务
-可能显示"已加载"但实际没有运行。
+å¦‚æžœ Gateway ç½‘å…³æœåŠ¡å·²å®‰è£…ä½†è¿›ç¨‹ç«‹å³é€€å‡ºï¼ŒæœåŠ¡
+å¯èƒ½æ˜¾ç¤º"å·²åŠ è½½"ä½†å®žé™…æ²¡æœ‰è¿è¡Œã€‚
 
-**检查：**
+**æ£€æŸ¥ï¼š**
 
 ```bash
 OpenKrab gateway status
 OpenKrab doctor
 ```
 
-Doctor/service 将显示运行时状态（PID/最后退出）和日志提示。
+Doctor/service å°†æ˜¾ç¤ºè¿è¡Œæ—¶çŠ¶æ€ï¼ˆPID/æœ€åŽé€€å‡ºï¼‰å’Œæ—¥å¿—æç¤ºã€‚
 
-**日志：**
+**æ—¥å¿—ï¼š**
 
-- 优先：`OpenKrab logs --follow`
-- 文件日志（始终）：`/tmp/OpenKrab/OpenKrab-YYYY-MM-DD.log`（或你配置的 `logging.file`）
-- macOS LaunchAgent（如果已安装）：`$OpenKrab_STATE_DIR/logs/gateway.log` 和 `gateway.err.log`
-- Linux systemd（如果已安装）：`journalctl --user -u OpenKrab-gateway[-<profile>].service -n 200 --no-pager`
-- Windows：`schtasks /Query /TN "OpenKrab Gateway (<profile>)" /V /FO LIST`
+- ä¼˜å…ˆï¼š`OpenKrab logs --follow`
+- æ–‡ä»¶æ—¥å¿—ï¼ˆå§‹ç»ˆï¼‰ï¼š`/tmp/OpenKrab/OpenKrab-YYYY-MM-DD.log`ï¼ˆæˆ–ä½ é…ç½®çš„ `logging.file`ï¼‰
+- macOS LaunchAgentï¼ˆå¦‚æžœå·²å®‰è£…ï¼‰ï¼š`$OPENKRAB_STATE_DIR/logs/gateway.log` å’Œ `gateway.err.log`
+- Linux systemdï¼ˆå¦‚æžœå·²å®‰è£…ï¼‰ï¼š`journalctl --user -u OpenKrab-gateway[-<profile>].service -n 200 --no-pager`
+- Windowsï¼š`schtasks /Query /TN "OpenKrab Gateway (<profile>)" /V /FO LIST`
 
-**启用更多日志：**
+**å¯ç”¨æ›´å¤šæ—¥å¿—ï¼š**
 
-- 提高文件日志详细程度（持久化 JSONL）：
+- æé«˜æ–‡ä»¶æ—¥å¿—è¯¦ç»†ç¨‹åº¦ï¼ˆæŒä¹…åŒ– JSONLï¼‰ï¼š
   ```json
   { "logging": { "level": "debug" } }
   ```
-- 提高控制台详细程度（仅 TTY 输出）：
+- æé«˜æŽ§åˆ¶å°è¯¦ç»†ç¨‹åº¦ï¼ˆä»… TTY è¾“å‡ºï¼‰ï¼š
   ```json
   { "logging": { "consoleLevel": "debug", "consoleStyle": "pretty" } }
   ```
-- 快速提示：`--verbose` 仅影响**控制台**输出。文件日志仍由 `logging.level` 控制。
+- å¿«é€Ÿæç¤ºï¼š`--verbose` ä»…å½±å“**æŽ§åˆ¶å°**è¾“å‡ºã€‚æ–‡ä»¶æ—¥å¿—ä»ç”± `logging.level` æŽ§åˆ¶ã€‚
 
-参见 [/logging](/logging) 了解格式、配置和访问的完整概述。
+å‚è§ [/logging](/logging) äº†è§£æ ¼å¼ã€é…ç½®å’Œè®¿é—®çš„å®Œæ•´æ¦‚è¿°ã€‚
 
 ### "Gateway start blocked: set gateway.mode=local"
 
-这意味着配置存在但 `gateway.mode` 未设置（或不是 `local`），所以
-Gateway 网关拒绝启动。
+è¿™æ„å‘³ç€é…ç½®å­˜åœ¨ä½† `gateway.mode` æœªè®¾ç½®ï¼ˆæˆ–ä¸æ˜¯ `local`ï¼‰ï¼Œæ‰€ä»¥
+Gateway ç½‘å…³æ‹’ç»å¯åŠ¨ã€‚
 
-**修复（推荐）：**
+**ä¿®å¤ï¼ˆæŽ¨èï¼‰ï¼š**
 
-- 运行向导并将 Gateway 网关运行模式设置为 **Local**：
+- è¿è¡Œå‘å¯¼å¹¶å°† Gateway ç½‘å…³è¿è¡Œæ¨¡å¼è®¾ç½®ä¸º **Local**ï¼š
   ```bash
   OpenKrab configure
   ```
-- 或直接设置：
+- æˆ–ç›´æŽ¥è®¾ç½®ï¼š
   ```bash
   OpenKrab config set gateway.mode local
   ```
 
-**如果你打算运行远程 Gateway 网关：**
+**å¦‚æžœä½ æ‰“ç®—è¿è¡Œè¿œç¨‹ Gateway ç½‘å…³ï¼š**
 
-- 设置远程 URL 并保持 `gateway.mode=remote`：
+- è®¾ç½®è¿œç¨‹ URL å¹¶ä¿æŒ `gateway.mode=remote`ï¼š
   ```bash
   OpenKrab config set gateway.mode remote
   OpenKrab config set gateway.remote.url "wss://gateway.example.com"
   ```
 
-**仅临时/开发使用：** 传递 `--allow-unconfigured` 以在没有
-`gateway.mode=local` 的情况下启动 Gateway 网关。
+**ä»…ä¸´æ—¶/å¼€å‘ä½¿ç”¨ï¼š** ä¼ é€’ `--allow-unconfigured` ä»¥åœ¨æ²¡æœ‰
+`gateway.mode=local` çš„æƒ…å†µä¸‹å¯åŠ¨ Gateway ç½‘å…³ã€‚
 
-**还没有配置文件？** 运行 `OpenKrab setup` 创建初始配置，然后重新运行
-Gateway 网关。
+**è¿˜æ²¡æœ‰é…ç½®æ–‡ä»¶ï¼Ÿ** è¿è¡Œ `OpenKrab setup` åˆ›å»ºåˆå§‹é…ç½®ï¼Œç„¶åŽé‡æ–°è¿è¡Œ
+Gateway ç½‘å…³ã€‚
 
-### 服务环境（PATH + 运行时）
+### æœåŠ¡çŽ¯å¢ƒï¼ˆPATH + è¿è¡Œæ—¶ï¼‰
 
-Gateway 网关服务使用**最小 PATH** 运行以避免 shell/管理器的干扰：
+Gateway ç½‘å…³æœåŠ¡ä½¿ç”¨**æœ€å° PATH** è¿è¡Œä»¥é¿å… shell/ç®¡ç†å™¨çš„å¹²æ‰°ï¼š
 
-- macOS：`/opt/homebrew/bin`、`/usr/local/bin`、`/usr/bin`、`/bin`
-- Linux：`/usr/local/bin`、`/usr/bin`、`/bin`
+- macOSï¼š`/opt/homebrew/bin`ã€`/usr/local/bin`ã€`/usr/bin`ã€`/bin`
+- Linuxï¼š`/usr/local/bin`ã€`/usr/bin`ã€`/bin`
 
-这有意排除版本管理器（nvm/fnm/volta/asdf）和包
-管理器（pnpm/npm），因为服务不加载你的 shell 初始化。运行时
-变量如 `DISPLAY` 应该放在 `~/.OpenKrab/.env` 中（由 Gateway 网关早期加载）。
-在 `host=gateway` 上的 Exec 运行会将你的登录 shell `PATH` 合并到 exec 环境中，
-所以缺少的工具通常意味着你的 shell 初始化没有导出它们（或设置
-`tools.exec.pathPrepend`）。参见 [/tools/exec](/tools/exec)。
+è¿™æœ‰æ„æŽ’é™¤ç‰ˆæœ¬ç®¡ç†å™¨ï¼ˆnvm/fnm/volta/asdfï¼‰å’ŒåŒ…
+ç®¡ç†å™¨ï¼ˆpnpm/npmï¼‰ï¼Œå› ä¸ºæœåŠ¡ä¸åŠ è½½ä½ çš„ shell åˆå§‹åŒ–ã€‚è¿è¡Œæ—¶
+å˜é‡å¦‚ `DISPLAY` åº”è¯¥æ”¾åœ¨ `~/.OpenKrab/.env` ä¸­ï¼ˆç”± Gateway ç½‘å…³æ—©æœŸåŠ è½½ï¼‰ã€‚
+åœ¨ `host=gateway` ä¸Šçš„ Exec è¿è¡Œä¼šå°†ä½ çš„ç™»å½• shell `PATH` åˆå¹¶åˆ° exec çŽ¯å¢ƒä¸­ï¼Œ
+æ‰€ä»¥ç¼ºå°‘çš„å·¥å…·é€šå¸¸æ„å‘³ç€ä½ çš„ shell åˆå§‹åŒ–æ²¡æœ‰å¯¼å‡ºå®ƒä»¬ï¼ˆæˆ–è®¾ç½®
+`tools.exec.pathPrepend`ï¼‰ã€‚å‚è§ [/tools/exec](/tools/exec)ã€‚
 
-WhatsApp + Telegram 渠道需要 **Node**；不支持 Bun。如果你的
-服务是用 Bun 或版本管理的 Node 路径安装的，运行 `OpenKrab doctor`
-迁移到系统 Node 安装。
+WhatsApp + Telegram æ¸ é“éœ€è¦ **Node**ï¼›ä¸æ”¯æŒ Bunã€‚å¦‚æžœä½ çš„
+æœåŠ¡æ˜¯ç”¨ Bun æˆ–ç‰ˆæœ¬ç®¡ç†çš„ Node è·¯å¾„å®‰è£…çš„ï¼Œè¿è¡Œ `OpenKrab doctor`
+è¿ç§»åˆ°ç³»ç»Ÿ Node å®‰è£…ã€‚
 
-### 沙箱中 Skill 缺少 API 密钥
+### æ²™ç®±ä¸­ Skill ç¼ºå°‘ API å¯†é’¥
 
-**症状：** Skill 在主机上工作但在沙箱中因缺少 API 密钥而失败。
+**ç—‡çŠ¶ï¼š** Skill åœ¨ä¸»æœºä¸Šå·¥ä½œä½†åœ¨æ²™ç®±ä¸­å› ç¼ºå°‘ API å¯†é’¥è€Œå¤±è´¥ã€‚
 
-**原因：** 沙箱 exec 在 Docker 内运行，**不**继承主机 `process.env`。
+**åŽŸå› ï¼š** æ²™ç®± exec åœ¨ Docker å†…è¿è¡Œï¼Œ**ä¸**ç»§æ‰¿ä¸»æœº `process.env`ã€‚
 
-**修复：**
+**ä¿®å¤ï¼š**
 
-- 设置 `agents.defaults.sandbox.docker.env`（或每个智能体的 `agents.list[].sandbox.docker.env`）
-- 或将密钥烘焙到你的自定义沙箱镜像中
-- 然后运行 `OpenKrab sandbox recreate --agent <id>`（或 `--all`）
+- è®¾ç½® `agents.defaults.sandbox.docker.env`ï¼ˆæˆ–æ¯ä¸ªæ™ºèƒ½ä½“çš„ `agents.list[].sandbox.docker.env`ï¼‰
+- æˆ–å°†å¯†é’¥çƒ˜ç„™åˆ°ä½ çš„è‡ªå®šä¹‰æ²™ç®±é•œåƒä¸­
+- ç„¶åŽè¿è¡Œ `OpenKrab sandbox recreate --agent <id>`ï¼ˆæˆ– `--all`ï¼‰
 
-### 服务运行但端口未监听
+### æœåŠ¡è¿è¡Œä½†ç«¯å£æœªç›‘å¬
 
-如果服务报告**正在运行**但 Gateway 网关端口上没有监听，
-Gateway 网关可能拒绝绑定。
+å¦‚æžœæœåŠ¡æŠ¥å‘Š**æ­£åœ¨è¿è¡Œ**ä½† Gateway ç½‘å…³ç«¯å£ä¸Šæ²¡æœ‰ç›‘å¬ï¼Œ
+Gateway ç½‘å…³å¯èƒ½æ‹’ç»ç»‘å®šã€‚
 
-**这里"正在运行"的含义**
+**è¿™é‡Œ"æ­£åœ¨è¿è¡Œ"çš„å«ä¹‰**
 
-- `Runtime: running` 意味着你的监管程序（launchd/systemd/schtasks）认为进程存活。
-- `RPC probe` 意味着 CLI 实际上能够连接到 Gateway 网关 WebSocket 并调用 `status`。
-- 始终信任 `Probe target:` + `Config (service):` 作为"我们实际尝试了什么？"的信息行。
+- `Runtime: running` æ„å‘³ç€ä½ çš„ç›‘ç®¡ç¨‹åºï¼ˆlaunchd/systemd/schtasksï¼‰è®¤ä¸ºè¿›ç¨‹å­˜æ´»ã€‚
+- `RPC probe` æ„å‘³ç€ CLI å®žé™…ä¸Šèƒ½å¤Ÿè¿žæŽ¥åˆ° Gateway ç½‘å…³ WebSocket å¹¶è°ƒç”¨ `status`ã€‚
+- å§‹ç»ˆä¿¡ä»» `Probe target:` + `Config (service):` ä½œä¸º"æˆ‘ä»¬å®žé™…å°è¯•äº†ä»€ä¹ˆï¼Ÿ"çš„ä¿¡æ¯è¡Œã€‚
 
-**检查：**
+**æ£€æŸ¥ï¼š**
 
-- `gateway.mode` 必须为 `local` 才能运行 `OpenKrab gateway` 和服务。
-- 如果你设置了 `gateway.mode=remote`，**CLI 默认**使用远程 URL。服务可能仍在本地运行，但你的 CLI 可能在探测错误的位置。使用 `OpenKrab gateway status` 查看服务解析的端口 + 探测目标（或传递 `--url`）。
-- `OpenKrab gateway status` 和 `OpenKrab doctor` 在服务看起来正在运行但端口关闭时会显示日志中的**最后 Gateway 网关错误**。
-- 非本地回环绑定（`lan`/`tailnet`/`custom`，或本地回环不可用时的 `auto`）需要认证：
-  `gateway.auth.token`（或 `OpenKrab_GATEWAY_TOKEN`）。
-- `gateway.remote.token` 仅用于远程 CLI 调用；它**不**启用本地认证。
-- `gateway.token` 被忽略；使用 `gateway.auth.token`。
+- `gateway.mode` å¿…é¡»ä¸º `local` æ‰èƒ½è¿è¡Œ `OpenKrab gateway` å’ŒæœåŠ¡ã€‚
+- å¦‚æžœä½ è®¾ç½®äº† `gateway.mode=remote`ï¼Œ**CLI é»˜è®¤**ä½¿ç”¨è¿œç¨‹ URLã€‚æœåŠ¡å¯èƒ½ä»åœ¨æœ¬åœ°è¿è¡Œï¼Œä½†ä½ çš„ CLI å¯èƒ½åœ¨æŽ¢æµ‹é”™è¯¯çš„ä½ç½®ã€‚ä½¿ç”¨ `OpenKrab gateway status` æŸ¥çœ‹æœåŠ¡è§£æžçš„ç«¯å£ + æŽ¢æµ‹ç›®æ ‡ï¼ˆæˆ–ä¼ é€’ `--url`ï¼‰ã€‚
+- `OpenKrab gateway status` å’Œ `OpenKrab doctor` åœ¨æœåŠ¡çœ‹èµ·æ¥æ­£åœ¨è¿è¡Œä½†ç«¯å£å…³é—­æ—¶ä¼šæ˜¾ç¤ºæ—¥å¿—ä¸­çš„**æœ€åŽ Gateway ç½‘å…³é”™è¯¯**ã€‚
+- éžæœ¬åœ°å›žçŽ¯ç»‘å®šï¼ˆ`lan`/`tailnet`/`custom`ï¼Œæˆ–æœ¬åœ°å›žçŽ¯ä¸å¯ç”¨æ—¶çš„ `auto`ï¼‰éœ€è¦è®¤è¯ï¼š
+  `gateway.auth.token`ï¼ˆæˆ– `OPENKRAB_GATEWAY_TOKEN`ï¼‰ã€‚
+- `gateway.remote.token` ä»…ç”¨äºŽè¿œç¨‹ CLI è°ƒç”¨ï¼›å®ƒ**ä¸**å¯ç”¨æœ¬åœ°è®¤è¯ã€‚
+- `gateway.token` è¢«å¿½ç•¥ï¼›ä½¿ç”¨ `gateway.auth.token`ã€‚
 
-**如果 `OpenKrab gateway status` 显示配置不匹配**
+**å¦‚æžœ `OpenKrab gateway status` æ˜¾ç¤ºé…ç½®ä¸åŒ¹é…**
 
-- `Config (cli): ...` 和 `Config (service): ...` 通常应该匹配。
-- 如果不匹配，你几乎肯定是在编辑一个配置而服务运行的是另一个。
-- 修复：从你希望服务使用的相同 `--profile` / `OpenKrab_STATE_DIR` 重新运行 `OpenKrab gateway install --force`。
+- `Config (cli): ...` å’Œ `Config (service): ...` é€šå¸¸åº”è¯¥åŒ¹é…ã€‚
+- å¦‚æžœä¸åŒ¹é…ï¼Œä½ å‡ ä¹Žè‚¯å®šæ˜¯åœ¨ç¼–è¾‘ä¸€ä¸ªé…ç½®è€ŒæœåŠ¡è¿è¡Œçš„æ˜¯å¦ä¸€ä¸ªã€‚
+- ä¿®å¤ï¼šä»Žä½ å¸Œæœ›æœåŠ¡ä½¿ç”¨çš„ç›¸åŒ `--profile` / `OPENKRAB_STATE_DIR` é‡æ–°è¿è¡Œ `OpenKrab gateway install --force`ã€‚
 
-**如果 `OpenKrab gateway status` 报告服务配置问题**
+**å¦‚æžœ `OpenKrab gateway status` æŠ¥å‘ŠæœåŠ¡é…ç½®é—®é¢˜**
 
-- 监管程序配置（launchd/systemd/schtasks）缺少当前默认值。
-- 修复：运行 `OpenKrab doctor` 更新它（或 `OpenKrab gateway install --force` 完全重写）。
+- ç›‘ç®¡ç¨‹åºé…ç½®ï¼ˆlaunchd/systemd/schtasksï¼‰ç¼ºå°‘å½“å‰é»˜è®¤å€¼ã€‚
+- ä¿®å¤ï¼šè¿è¡Œ `OpenKrab doctor` æ›´æ–°å®ƒï¼ˆæˆ– `OpenKrab gateway install --force` å®Œå…¨é‡å†™ï¼‰ã€‚
 
-**如果 `Last gateway error:` 提到"refusing to bind … without auth"**
+**å¦‚æžœ `Last gateway error:` æåˆ°"refusing to bind â€¦ without auth"**
 
-- 你将 `gateway.bind` 设置为非本地回环模式（`lan`/`tailnet`/`custom`，或本地回环不可用时的 `auto`）但没有配置认证。
-- 修复：设置 `gateway.auth.mode` + `gateway.auth.token`（或导出 `OpenKrab_GATEWAY_TOKEN`）并重启服务。
+- ä½ å°† `gateway.bind` è®¾ç½®ä¸ºéžæœ¬åœ°å›žçŽ¯æ¨¡å¼ï¼ˆ`lan`/`tailnet`/`custom`ï¼Œæˆ–æœ¬åœ°å›žçŽ¯ä¸å¯ç”¨æ—¶çš„ `auto`ï¼‰ä½†æ²¡æœ‰é…ç½®è®¤è¯ã€‚
+- ä¿®å¤ï¼šè®¾ç½® `gateway.auth.mode` + `gateway.auth.token`ï¼ˆæˆ–å¯¼å‡º `OPENKRAB_GATEWAY_TOKEN`ï¼‰å¹¶é‡å¯æœåŠ¡ã€‚
 
-**如果 `OpenKrab gateway status` 显示 `bind=tailnet` 但未找到 tailnet 接口**
+**å¦‚æžœ `OpenKrab gateway status` æ˜¾ç¤º `bind=tailnet` ä½†æœªæ‰¾åˆ° tailnet æŽ¥å£**
 
-- Gateway 网关尝试绑定到 Tailscale IP（100.64.0.0/10）但在主机上未检测到。
-- 修复：在该机器上启动 Tailscale（或将 `gateway.bind` 改为 `loopback`/`lan`）。
+- Gateway ç½‘å…³å°è¯•ç»‘å®šåˆ° Tailscale IPï¼ˆ100.64.0.0/10ï¼‰ä½†åœ¨ä¸»æœºä¸Šæœªæ£€æµ‹åˆ°ã€‚
+- ä¿®å¤ï¼šåœ¨è¯¥æœºå™¨ä¸Šå¯åŠ¨ Tailscaleï¼ˆæˆ–å°† `gateway.bind` æ”¹ä¸º `loopback`/`lan`ï¼‰ã€‚
 
-**如果 `Probe note:` 说探测使用本地回环**
+**å¦‚æžœ `Probe note:` è¯´æŽ¢æµ‹ä½¿ç”¨æœ¬åœ°å›žçŽ¯**
 
-- 对于 `bind=lan` 这是预期的：Gateway 网关监听 `0.0.0.0`（所有接口），本地回环仍应本地连接。
-- 对于远程客户端，使用真实的 LAN IP（不是 `0.0.0.0`）加端口，并确保配置了认证。
+- å¯¹äºŽ `bind=lan` è¿™æ˜¯é¢„æœŸçš„ï¼šGateway ç½‘å…³ç›‘å¬ `0.0.0.0`ï¼ˆæ‰€æœ‰æŽ¥å£ï¼‰ï¼Œæœ¬åœ°å›žçŽ¯ä»åº”æœ¬åœ°è¿žæŽ¥ã€‚
+- å¯¹äºŽè¿œç¨‹å®¢æˆ·ç«¯ï¼Œä½¿ç”¨çœŸå®žçš„ LAN IPï¼ˆä¸æ˜¯ `0.0.0.0`ï¼‰åŠ ç«¯å£ï¼Œå¹¶ç¡®ä¿é…ç½®äº†è®¤è¯ã€‚
 
-### 地址已被使用（端口 18789）
+### åœ°å€å·²è¢«ä½¿ç”¨ï¼ˆç«¯å£ 18789ï¼‰
 
-这意味着某些东西已经在 Gateway 网关端口上监听。
+è¿™æ„å‘³ç€æŸäº›ä¸œè¥¿å·²ç»åœ¨ Gateway ç½‘å…³ç«¯å£ä¸Šç›‘å¬ã€‚
 
-**检查：**
+**æ£€æŸ¥ï¼š**
 
 ```bash
 OpenKrab gateway status
 ```
 
-它将显示监听器和可能的原因（Gateway 网关已在运行、SSH 隧道）。
-如果需要，停止服务或选择不同的端口。
+å®ƒå°†æ˜¾ç¤ºç›‘å¬å™¨å’Œå¯èƒ½çš„åŽŸå› ï¼ˆGateway ç½‘å…³å·²åœ¨è¿è¡Œã€SSH éš§é“ï¼‰ã€‚
+å¦‚æžœéœ€è¦ï¼Œåœæ­¢æœåŠ¡æˆ–é€‰æ‹©ä¸åŒçš„ç«¯å£ã€‚
 
-### 检测到额外的工作区文件夹
+### æ£€æµ‹åˆ°é¢å¤–çš„å·¥ä½œåŒºæ–‡ä»¶å¤¹
 
-如果你从旧版本升级，你的磁盘上可能仍有 `~/OpenKrab`。
-多个工作区目录可能导致令人困惑的认证或状态漂移，因为
-只有一个工作区是活动的。
+å¦‚æžœä½ ä»Žæ—§ç‰ˆæœ¬å‡çº§ï¼Œä½ çš„ç£ç›˜ä¸Šå¯èƒ½ä»æœ‰ `~/OpenKrab`ã€‚
+å¤šä¸ªå·¥ä½œåŒºç›®å½•å¯èƒ½å¯¼è‡´ä»¤äººå›°æƒ‘çš„è®¤è¯æˆ–çŠ¶æ€æ¼‚ç§»ï¼Œå› ä¸º
+åªæœ‰ä¸€ä¸ªå·¥ä½œåŒºæ˜¯æ´»åŠ¨çš„ã€‚
 
-**修复：** 保留单个活动工作区并归档/删除其余的。参见
-[智能体工作区](/concepts/agent-workspace#extra-workspace-folders)。
+**ä¿®å¤ï¼š** ä¿ç•™å•ä¸ªæ´»åŠ¨å·¥ä½œåŒºå¹¶å½’æ¡£/åˆ é™¤å…¶ä½™çš„ã€‚å‚è§
+[æ™ºèƒ½ä½“å·¥ä½œåŒº](/concepts/agent-workspace#extra-workspace-folders)ã€‚
 
-### 主聊天在沙箱工作区中运行
+### ä¸»èŠå¤©åœ¨æ²™ç®±å·¥ä½œåŒºä¸­è¿è¡Œ
 
-症状：`pwd` 或文件工具显示 `~/.OpenKrab/sandboxes/...` 即使你
-期望的是主机工作区。
+ç—‡çŠ¶ï¼š`pwd` æˆ–æ–‡ä»¶å·¥å…·æ˜¾ç¤º `~/.OpenKrab/sandboxes/...` å³ä½¿ä½ 
+æœŸæœ›çš„æ˜¯ä¸»æœºå·¥ä½œåŒºã€‚
 
-**原因：** `agents.defaults.sandbox.mode: "non-main"` 基于 `session.mainKey`（默认 `"main"`）判断。
-群组/渠道会话使用它们自己的键，所以它们被视为非主会话并
-获得沙箱工作区。
+**åŽŸå› ï¼š** `agents.defaults.sandbox.mode: "non-main"` åŸºäºŽ `session.mainKey`ï¼ˆé»˜è®¤ `"main"`ï¼‰åˆ¤æ–­ã€‚
+ç¾¤ç»„/æ¸ é“ä¼šè¯ä½¿ç”¨å®ƒä»¬è‡ªå·±çš„é”®ï¼Œæ‰€ä»¥å®ƒä»¬è¢«è§†ä¸ºéžä¸»ä¼šè¯å¹¶
+èŽ·å¾—æ²™ç®±å·¥ä½œåŒºã€‚
 
-**修复选项：**
+**ä¿®å¤é€‰é¡¹ï¼š**
 
-- 如果你想为智能体使用主机工作区：设置 `agents.list[].sandbox.mode: "off"`。
-- 如果你想在沙箱内访问主机工作区：为该智能体设置 `workspaceAccess: "rw"`。
+- å¦‚æžœä½ æƒ³ä¸ºæ™ºèƒ½ä½“ä½¿ç”¨ä¸»æœºå·¥ä½œåŒºï¼šè®¾ç½® `agents.list[].sandbox.mode: "off"`ã€‚
+- å¦‚æžœä½ æƒ³åœ¨æ²™ç®±å†…è®¿é—®ä¸»æœºå·¥ä½œåŒºï¼šä¸ºè¯¥æ™ºèƒ½ä½“è®¾ç½® `workspaceAccess: "rw"`ã€‚
 
 ### "Agent was aborted"
 
-智能体在响应中途被中断。
+æ™ºèƒ½ä½“åœ¨å“åº”ä¸­é€”è¢«ä¸­æ–­ã€‚
 
-**原因：**
+**åŽŸå› ï¼š**
 
-- 用户发送了 `stop`、`abort`、`esc`、`wait` 或 `exit`
-- 超时超限
-- 进程崩溃
+- ç”¨æˆ·å‘é€äº† `stop`ã€`abort`ã€`esc`ã€`wait` æˆ– `exit`
+- è¶…æ—¶è¶…é™
+- è¿›ç¨‹å´©æºƒ
 
-**修复：** 只需发送另一条消息。会话将继续。
+**ä¿®å¤ï¼š** åªéœ€å‘é€å¦ä¸€æ¡æ¶ˆæ¯ã€‚ä¼šè¯å°†ç»§ç»­ã€‚
 
 ### "Agent failed before reply: Unknown model: anthropic/claude-haiku-3-5"
 
-OpenKrab 有意拒绝**较旧/不安全的模型**（尤其是那些更容易受到提示词注入攻击的模型）。如果你看到此错误，该模型名称已不再支持。
+OpenKrab æœ‰æ„æ‹’ç»**è¾ƒæ—§/ä¸å®‰å…¨çš„æ¨¡åž‹**ï¼ˆå°¤å…¶æ˜¯é‚£äº›æ›´å®¹æ˜“å—åˆ°æç¤ºè¯æ³¨å…¥æ”»å‡»çš„æ¨¡åž‹ï¼‰ã€‚å¦‚æžœä½ çœ‹åˆ°æ­¤é”™è¯¯ï¼Œè¯¥æ¨¡åž‹åç§°å·²ä¸å†æ”¯æŒã€‚
 
-**修复：**
+**ä¿®å¤ï¼š**
 
-- 为提供商选择**最新**模型并更新你的配置或模型别名。
-- 如果你不确定哪些模型可用，运行 `OpenKrab models list` 或
-  `OpenKrab models scan` 并选择一个支持的模型。
-- 检查 Gateway 网关日志以获取详细的失败原因。
+- ä¸ºæä¾›å•†é€‰æ‹©**æœ€æ–°**æ¨¡åž‹å¹¶æ›´æ–°ä½ çš„é…ç½®æˆ–æ¨¡åž‹åˆ«åã€‚
+- å¦‚æžœä½ ä¸ç¡®å®šå“ªäº›æ¨¡åž‹å¯ç”¨ï¼Œè¿è¡Œ `OpenKrab models list` æˆ–
+  `OpenKrab models scan` å¹¶é€‰æ‹©ä¸€ä¸ªæ”¯æŒçš„æ¨¡åž‹ã€‚
+- æ£€æŸ¥ Gateway ç½‘å…³æ—¥å¿—ä»¥èŽ·å–è¯¦ç»†çš„å¤±è´¥åŽŸå› ã€‚
 
-另请参阅：[模型 CLI](/cli/models) 和 [模型提供商](/concepts/model-providers)。
+å¦è¯·å‚é˜…ï¼š[æ¨¡åž‹ CLI](/cli/models) å’Œ [æ¨¡åž‹æä¾›å•†](/concepts/model-providers)ã€‚
 
-### 消息未触发
+### æ¶ˆæ¯æœªè§¦å‘
 
-**检查 1：** 发送者是否在白名单中？
+**æ£€æŸ¥ 1ï¼š** å‘é€è€…æ˜¯å¦åœ¨ç™½åå•ä¸­ï¼Ÿ
 
 ```bash
 OpenKrab status
 ```
 
-在输出中查找 `AllowFrom: ...`。
+åœ¨è¾“å‡ºä¸­æŸ¥æ‰¾ `AllowFrom: ...`ã€‚
 
-**检查 2：** 对于群聊，是否需要提及？
+**æ£€æŸ¥ 2ï¼š** å¯¹äºŽç¾¤èŠï¼Œæ˜¯å¦éœ€è¦æåŠï¼Ÿ
 
 ```bash
-# 消息必须匹配 mentionPatterns 或显式提及；默认值在渠道 groups/guilds 中。
-# 多智能体：`agents.list[].groupChat.mentionPatterns` 覆盖全局模式。
+# æ¶ˆæ¯å¿…é¡»åŒ¹é… mentionPatterns æˆ–æ˜¾å¼æåŠï¼›é»˜è®¤å€¼åœ¨æ¸ é“ groups/guilds ä¸­ã€‚
+# å¤šæ™ºèƒ½ä½“ï¼š`agents.list[].groupChat.mentionPatterns` è¦†ç›–å…¨å±€æ¨¡å¼ã€‚
 grep -n "agents\\|groupChat\\|mentionPatterns\\|channels\\.whatsapp\\.groups\\|channels\\.telegram\\.groups\\|channels\\.imessage\\.groups\\|channels\\.discord\\.guilds" \
-  "${OpenKrab_CONFIG_PATH:-$HOME/.OpenKrab/OpenKrab.json}"
+  "${OPENKRAB_CONFIG_PATH:-$HOME/.OpenKrab/OpenKrab.json}"
 ```
 
-**检查 3：** 检查日志
+**æ£€æŸ¥ 3ï¼š** æ£€æŸ¥æ—¥å¿—
 
 ```bash
 OpenKrab logs --follow
-# 或者如果你想快速过滤：
+# æˆ–è€…å¦‚æžœä½ æƒ³å¿«é€Ÿè¿‡æ»¤ï¼š
 tail -f "$(ls -t /tmp/OpenKrab/OpenKrab-*.log | head -1)" | grep "blocked\\|skip\\|unauthorized"
 ```
 
-### 配对码未到达
+### é…å¯¹ç æœªåˆ°è¾¾
 
-如果 `dmPolicy` 是 `pairing`，未知发送者应该收到一个代码，他们的消息在批准前会被忽略。
+å¦‚æžœ `dmPolicy` æ˜¯ `pairing`ï¼ŒæœªçŸ¥å‘é€è€…åº”è¯¥æ”¶åˆ°ä¸€ä¸ªä»£ç ï¼Œä»–ä»¬çš„æ¶ˆæ¯åœ¨æ‰¹å‡†å‰ä¼šè¢«å¿½ç•¥ã€‚
 
-**检查 1：** 是否已有待处理的请求在等待？
+**æ£€æŸ¥ 1ï¼š** æ˜¯å¦å·²æœ‰å¾…å¤„ç†çš„è¯·æ±‚åœ¨ç­‰å¾…ï¼Ÿ
 
 ```bash
 OpenKrab pairing list <channel>
 ```
 
-待处理的私信配对请求默认每个渠道上限为 **3 个**。如果列表已满，新请求将不会生成代码，直到一个被批准或过期。
+å¾…å¤„ç†çš„ç§ä¿¡é…å¯¹è¯·æ±‚é»˜è®¤æ¯ä¸ªæ¸ é“ä¸Šé™ä¸º **3 ä¸ª**ã€‚å¦‚æžœåˆ—è¡¨å·²æ»¡ï¼Œæ–°è¯·æ±‚å°†ä¸ä¼šç”Ÿæˆä»£ç ï¼Œç›´åˆ°ä¸€ä¸ªè¢«æ‰¹å‡†æˆ–è¿‡æœŸã€‚
 
-**检查 2：** 请求是否已创建但未发送回复？
+**æ£€æŸ¥ 2ï¼š** è¯·æ±‚æ˜¯å¦å·²åˆ›å»ºä½†æœªå‘é€å›žå¤ï¼Ÿ
 
 ```bash
 OpenKrab logs --follow | grep "pairing request"
 ```
 
-**检查 3：** 确认该渠道的 `dmPolicy` 不是 `open`/`allowlist`。
+**æ£€æŸ¥ 3ï¼š** ç¡®è®¤è¯¥æ¸ é“çš„ `dmPolicy` ä¸æ˜¯ `open`/`allowlist`ã€‚
 
-### 图片 + 提及不工作
+### å›¾ç‰‡ + æåŠä¸å·¥ä½œ
 
-已知问题：当你发送只有提及的图片（没有其他文字）时，WhatsApp 有时不包含提及元数据。
+å·²çŸ¥é—®é¢˜ï¼šå½“ä½ å‘é€åªæœ‰æåŠçš„å›¾ç‰‡ï¼ˆæ²¡æœ‰å…¶ä»–æ–‡å­—ï¼‰æ—¶ï¼ŒWhatsApp æœ‰æ—¶ä¸åŒ…å«æåŠå…ƒæ•°æ®ã€‚
 
-**变通方法：** 在提及时添加一些文字：
+**å˜é€šæ–¹æ³•ï¼š** åœ¨æåŠæ—¶æ·»åŠ ä¸€äº›æ–‡å­—ï¼š
 
-- ❌ `@OpenKrab` + 图片
-- ✅ `@OpenKrab check this` + 图片
+- âŒ `@OpenKrab` + å›¾ç‰‡
+- âœ… `@OpenKrab check this` + å›¾ç‰‡
 
-### 会话未恢复
+### ä¼šè¯æœªæ¢å¤
 
-**检查 1：** 会话文件是否存在？
+**æ£€æŸ¥ 1ï¼š** ä¼šè¯æ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼Ÿ
 
 ```bash
 ls -la ~/.OpenKrab/agents/<agentId>/sessions/
 ```
 
-**检查 2：** 重置窗口是否太短？
+**æ£€æŸ¥ 2ï¼š** é‡ç½®çª—å£æ˜¯å¦å¤ªçŸ­ï¼Ÿ
 
 ```json
 {
@@ -378,118 +378,118 @@ ls -la ~/.OpenKrab/agents/<agentId>/sessions/
     "reset": {
       "mode": "daily",
       "atHour": 4,
-      "idleMinutes": 10080 // 7 天
+      "idleMinutes": 10080 // 7 å¤©
     }
   }
 }
 ```
 
-**检查 3：** 是否有人发送了 `/new`、`/reset` 或重置触发器？
+**æ£€æŸ¥ 3ï¼š** æ˜¯å¦æœ‰äººå‘é€äº† `/new`ã€`/reset` æˆ–é‡ç½®è§¦å‘å™¨ï¼Ÿ
 
-### 智能体超时
+### æ™ºèƒ½ä½“è¶…æ—¶
 
-默认超时是 30 分钟。对于长任务：
+é»˜è®¤è¶…æ—¶æ˜¯ 30 åˆ†é’Ÿã€‚å¯¹äºŽé•¿ä»»åŠ¡ï¼š
 
 ```json
 {
   "reply": {
-    "timeoutSeconds": 3600 // 1 小时
+    "timeoutSeconds": 3600 // 1 å°æ—¶
   }
 }
 ```
 
-或使用 `process` 工具在后台运行长命令。
+æˆ–ä½¿ç”¨ `process` å·¥å…·åœ¨åŽå°è¿è¡Œé•¿å‘½ä»¤ã€‚
 
-### WhatsApp 断开连接
+### WhatsApp æ–­å¼€è¿žæŽ¥
 
 ```bash
-# 检查本地状态（凭证、会话、排队事件）
+# æ£€æŸ¥æœ¬åœ°çŠ¶æ€ï¼ˆå‡­è¯ã€ä¼šè¯ã€æŽ’é˜Ÿäº‹ä»¶ï¼‰
 OpenKrab status
-# 探测运行中的 Gateway 网关 + 渠道（WA 连接 + Telegram + Discord API）
+# æŽ¢æµ‹è¿è¡Œä¸­çš„ Gateway ç½‘å…³ + æ¸ é“ï¼ˆWA è¿žæŽ¥ + Telegram + Discord APIï¼‰
 OpenKrab status --deep
 
-# 查看最近的连接事件
+# æŸ¥çœ‹æœ€è¿‘çš„è¿žæŽ¥äº‹ä»¶
 OpenKrab logs --limit 200 | grep "connection\\|disconnect\\|logout"
 ```
 
-**修复：** 通常在 Gateway 网关运行后会自动重连。如果卡住，重启 Gateway 网关进程（无论你如何监管它），或使用详细输出手动运行：
+**ä¿®å¤ï¼š** é€šå¸¸åœ¨ Gateway ç½‘å…³è¿è¡ŒåŽä¼šè‡ªåŠ¨é‡è¿žã€‚å¦‚æžœå¡ä½ï¼Œé‡å¯ Gateway ç½‘å…³è¿›ç¨‹ï¼ˆæ— è®ºä½ å¦‚ä½•ç›‘ç®¡å®ƒï¼‰ï¼Œæˆ–ä½¿ç”¨è¯¦ç»†è¾“å‡ºæ‰‹åŠ¨è¿è¡Œï¼š
 
 ```bash
 OpenKrab gateway --verbose
 ```
 
-如果你已登出/取消关联：
+å¦‚æžœä½ å·²ç™»å‡º/å–æ¶ˆå…³è”ï¼š
 
 ```bash
 OpenKrab channels logout
-trash "${OpenKrab_STATE_DIR:-$HOME/.OpenKrab}/credentials" # 如果 logout 无法完全清除所有内容
-OpenKrab channels login --verbose       # 重新扫描二维码
+trash "${OPENKRAB_STATE_DIR:-$HOME/.OpenKrab}/credentials" # å¦‚æžœ logout æ— æ³•å®Œå…¨æ¸…é™¤æ‰€æœ‰å†…å®¹
+OpenKrab channels login --verbose       # é‡æ–°æ‰«æäºŒç»´ç 
 ```
 
-### 媒体发送失败
+### åª’ä½“å‘é€å¤±è´¥
 
-**检查 1：** 文件路径是否有效？
+**æ£€æŸ¥ 1ï¼š** æ–‡ä»¶è·¯å¾„æ˜¯å¦æœ‰æ•ˆï¼Ÿ
 
 ```bash
 ls -la /path/to/your/image.jpg
 ```
 
-**检查 2：** 是否太大？
+**æ£€æŸ¥ 2ï¼š** æ˜¯å¦å¤ªå¤§ï¼Ÿ
 
-- 图片：最大 6MB
-- 音频/视频：最大 16MB
-- 文档：最大 100MB
+- å›¾ç‰‡ï¼šæœ€å¤§ 6MB
+- éŸ³é¢‘/è§†é¢‘ï¼šæœ€å¤§ 16MB
+- æ–‡æ¡£ï¼šæœ€å¤§ 100MB
 
-**检查 3：** 检查媒体日志
+**æ£€æŸ¥ 3ï¼š** æ£€æŸ¥åª’ä½“æ—¥å¿—
 
 ```bash
 grep "media\\|fetch\\|download" "$(ls -t /tmp/OpenKrab/OpenKrab-*.log | head -1)" | tail -20
 ```
 
-### 高内存使用
+### é«˜å†…å­˜ä½¿ç”¨
 
-OpenKrab 在内存中保留对话历史。
+OpenKrab åœ¨å†…å­˜ä¸­ä¿ç•™å¯¹è¯åŽ†å²ã€‚
 
-**修复：** 定期重启或设置会话限制：
+**ä¿®å¤ï¼š** å®šæœŸé‡å¯æˆ–è®¾ç½®ä¼šè¯é™åˆ¶ï¼š
 
 ```json
 {
   "session": {
-    "historyLimit": 100 // 保留的最大消息数
+    "historyLimit": 100 // ä¿ç•™çš„æœ€å¤§æ¶ˆæ¯æ•°
   }
 }
 ```
 
-## 常见故障排除
+## å¸¸è§æ•…éšœæŽ’é™¤
 
-### "Gateway won't start — configuration invalid"
+### "Gateway won't start â€” configuration invalid"
 
-当配置包含未知键、格式错误的值或无效类型时，OpenKrab 现在拒绝启动。
-这是为了安全而故意设计的。
+å½“é…ç½®åŒ…å«æœªçŸ¥é”®ã€æ ¼å¼é”™è¯¯çš„å€¼æˆ–æ— æ•ˆç±»åž‹æ—¶ï¼ŒOpenKrab çŽ°åœ¨æ‹’ç»å¯åŠ¨ã€‚
+è¿™æ˜¯ä¸ºäº†å®‰å…¨è€Œæ•…æ„è®¾è®¡çš„ã€‚
 
-用 Doctor 修复：
+ç”¨ Doctor ä¿®å¤ï¼š
 
 ```bash
 OpenKrab doctor
 OpenKrab doctor --fix
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `OpenKrab doctor` 报告每个无效条目。
-- `OpenKrab doctor --fix` 应用迁移/修复并重写配置。
-- 诊断命令如 `OpenKrab logs`、`OpenKrab health`、`OpenKrab status`、`OpenKrab gateway status` 和 `OpenKrab gateway probe` 即使配置无效也能运行。
+- `OpenKrab doctor` æŠ¥å‘Šæ¯ä¸ªæ— æ•ˆæ¡ç›®ã€‚
+- `OpenKrab doctor --fix` åº”ç”¨è¿ç§»/ä¿®å¤å¹¶é‡å†™é…ç½®ã€‚
+- è¯Šæ–­å‘½ä»¤å¦‚ `OpenKrab logs`ã€`OpenKrab health`ã€`OpenKrab status`ã€`OpenKrab gateway status` å’Œ `OpenKrab gateway probe` å³ä½¿é…ç½®æ— æ•ˆä¹Ÿèƒ½è¿è¡Œã€‚
 
-### "All models failed" — 我应该首先检查什么？
+### "All models failed" â€” æˆ‘åº”è¯¥é¦–å…ˆæ£€æŸ¥ä»€ä¹ˆï¼Ÿ
 
-- **凭证**存在于正在尝试的提供商（认证配置文件 + 环境变量）。
-- **模型路由**：确认 `agents.defaults.model.primary` 和回退是你可以访问的模型。
-- `/tmp/OpenKrab/…` 中的 **Gateway 网关日志**以获取确切的提供商错误。
-- **模型状态**：使用 `/model status`（聊天）或 `OpenKrab models status`（CLI）。
+- **å‡­è¯**å­˜åœ¨äºŽæ­£åœ¨å°è¯•çš„æä¾›å•†ï¼ˆè®¤è¯é…ç½®æ–‡ä»¶ + çŽ¯å¢ƒå˜é‡ï¼‰ã€‚
+- **æ¨¡åž‹è·¯ç”±**ï¼šç¡®è®¤ `agents.defaults.model.primary` å’Œå›žé€€æ˜¯ä½ å¯ä»¥è®¿é—®çš„æ¨¡åž‹ã€‚
+- `/tmp/OpenKrab/â€¦` ä¸­çš„ **Gateway ç½‘å…³æ—¥å¿—**ä»¥èŽ·å–ç¡®åˆ‡çš„æä¾›å•†é”™è¯¯ã€‚
+- **æ¨¡åž‹çŠ¶æ€**ï¼šä½¿ç”¨ `/model status`ï¼ˆèŠå¤©ï¼‰æˆ– `OpenKrab models status`ï¼ˆCLIï¼‰ã€‚
 
-### 我在我的个人 WhatsApp 号码上运行 — 为什么自聊天很奇怪？
+### æˆ‘åœ¨æˆ‘çš„ä¸ªäºº WhatsApp å·ç ä¸Šè¿è¡Œ â€” ä¸ºä»€ä¹ˆè‡ªèŠå¤©å¾ˆå¥‡æ€ªï¼Ÿ
 
-启用自聊天模式并将你自己的号码加入白名单：
+å¯ç”¨è‡ªèŠå¤©æ¨¡å¼å¹¶å°†ä½ è‡ªå·±çš„å·ç åŠ å…¥ç™½åå•ï¼š
 
 ```json5
 {
@@ -503,262 +503,262 @@ OpenKrab doctor --fix
 }
 ```
 
-参见 [WhatsApp 设置](/channels/whatsapp)。
+å‚è§ [WhatsApp è®¾ç½®](/channels/whatsapp)ã€‚
 
-### WhatsApp 将我登出。如何重新认证？
+### WhatsApp å°†æˆ‘ç™»å‡ºã€‚å¦‚ä½•é‡æ–°è®¤è¯ï¼Ÿ
 
-再次运行登录命令并扫描二维码：
+å†æ¬¡è¿è¡Œç™»å½•å‘½ä»¤å¹¶æ‰«æäºŒç»´ç ï¼š
 
 ```bash
 OpenKrab channels login
 ```
 
-### `main` 上的构建错误 — 标准修复路径是什么？
+### `main` ä¸Šçš„æž„å»ºé”™è¯¯ â€” æ ‡å‡†ä¿®å¤è·¯å¾„æ˜¯ä»€ä¹ˆï¼Ÿ
 
 1. `git pull origin main && pnpm install`
 2. `OpenKrab doctor`
-3. 检查 GitHub issues 或 Discord
-4. 临时变通方法：检出较旧的提交
+3. æ£€æŸ¥ GitHub issues æˆ– Discord
+4. ä¸´æ—¶å˜é€šæ–¹æ³•ï¼šæ£€å‡ºè¾ƒæ—§çš„æäº¤
 
-### npm install 失败（allow-build-scripts / 缺少 tar 或 yargs）。现在怎么办？
+### npm install å¤±è´¥ï¼ˆallow-build-scripts / ç¼ºå°‘ tar æˆ– yargsï¼‰ã€‚çŽ°åœ¨æ€Žä¹ˆåŠžï¼Ÿ
 
-如果你从源代码运行，使用仓库的包管理器：**pnpm**（首选）。
-仓库声明了 `packageManager: "pnpm@…"`。
+å¦‚æžœä½ ä»Žæºä»£ç è¿è¡Œï¼Œä½¿ç”¨ä»“åº“çš„åŒ…ç®¡ç†å™¨ï¼š**pnpm**ï¼ˆé¦–é€‰ï¼‰ã€‚
+ä»“åº“å£°æ˜Žäº† `packageManager: "pnpm@â€¦"`ã€‚
 
-典型恢复：
+å…¸åž‹æ¢å¤ï¼š
 
 ```bash
-git status   # 确保你在仓库根目录
+git status   # ç¡®ä¿ä½ åœ¨ä»“åº“æ ¹ç›®å½•
 pnpm install
 pnpm build
 OpenKrab doctor
 OpenKrab gateway restart
 ```
 
-原因：pnpm 是此仓库配置的包管理器。
+åŽŸå› ï¼špnpm æ˜¯æ­¤ä»“åº“é…ç½®çš„åŒ…ç®¡ç†å™¨ã€‚
 
-### 如何在 git 安装和 npm 安装之间切换？
+### å¦‚ä½•åœ¨ git å®‰è£…å’Œ npm å®‰è£…ä¹‹é—´åˆ‡æ¢ï¼Ÿ
 
-使用**网站安装程序**并通过标志选择安装方法。它
-原地升级并重写 Gateway 网关服务以指向新安装。
+ä½¿ç”¨**ç½‘ç«™å®‰è£…ç¨‹åº**å¹¶é€šè¿‡æ ‡å¿—é€‰æ‹©å®‰è£…æ–¹æ³•ã€‚å®ƒ
+åŽŸåœ°å‡çº§å¹¶é‡å†™ Gateway ç½‘å…³æœåŠ¡ä»¥æŒ‡å‘æ–°å®‰è£…ã€‚
 
-切换**到 git 安装**：
+åˆ‡æ¢**åˆ° git å®‰è£…**ï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --install-method git --no-onboard
 ```
 
-切换**到 npm 全局**：
+åˆ‡æ¢**åˆ° npm å…¨å±€**ï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- git 流程仅在仓库干净时才 rebase。先提交或 stash 更改。
-- 切换后，运行：
+- git æµç¨‹ä»…åœ¨ä»“åº“å¹²å‡€æ—¶æ‰ rebaseã€‚å…ˆæäº¤æˆ– stash æ›´æ”¹ã€‚
+- åˆ‡æ¢åŽï¼Œè¿è¡Œï¼š
   ```bash
   OpenKrab doctor
   OpenKrab gateway restart
   ```
 
-### Telegram 分块流式传输没有在工具调用之间分割文本。为什么？
+### Telegram åˆ†å—æµå¼ä¼ è¾“æ²¡æœ‰åœ¨å·¥å…·è°ƒç”¨ä¹‹é—´åˆ†å‰²æ–‡æœ¬ã€‚ä¸ºä»€ä¹ˆï¼Ÿ
 
-分块流式传输只发送**已完成的文本块**。你看到单条消息的常见原因：
+åˆ†å—æµå¼ä¼ è¾“åªå‘é€**å·²å®Œæˆçš„æ–‡æœ¬å—**ã€‚ä½ çœ‹åˆ°å•æ¡æ¶ˆæ¯çš„å¸¸è§åŽŸå› ï¼š
 
-- `agents.defaults.blockStreamingDefault` 仍然是 `"off"`。
-- `channels.telegram.blockStreaming` 设置为 `false`。
-- `channels.telegram.streamMode` 是 `partial` 或 `block` **且草稿流式传输处于活动状态**
-  （私聊 + 话题）。在这种情况下，草稿流式传输会禁用分块流式传输。
-- 你的 `minChars` / coalesce 设置太高，所以块被合并了。
-- 模型发出一个大的文本块（没有中间回复刷新点）。
+- `agents.defaults.blockStreamingDefault` ä»ç„¶æ˜¯ `"off"`ã€‚
+- `channels.telegram.blockStreaming` è®¾ç½®ä¸º `false`ã€‚
+- `channels.telegram.streamMode` æ˜¯ `partial` æˆ– `block` **ä¸”è‰ç¨¿æµå¼ä¼ è¾“å¤„äºŽæ´»åŠ¨çŠ¶æ€**
+  ï¼ˆç§èŠ + è¯é¢˜ï¼‰ã€‚åœ¨è¿™ç§æƒ…å†µä¸‹ï¼Œè‰ç¨¿æµå¼ä¼ è¾“ä¼šç¦ç”¨åˆ†å—æµå¼ä¼ è¾“ã€‚
+- ä½ çš„ `minChars` / coalesce è®¾ç½®å¤ªé«˜ï¼Œæ‰€ä»¥å—è¢«åˆå¹¶äº†ã€‚
+- æ¨¡åž‹å‘å‡ºä¸€ä¸ªå¤§çš„æ–‡æœ¬å—ï¼ˆæ²¡æœ‰ä¸­é—´å›žå¤åˆ·æ–°ç‚¹ï¼‰ã€‚
 
-修复清单：
+ä¿®å¤æ¸…å•ï¼š
 
-1. 将分块流式传输设置放在 `agents.defaults` 下，而不是根目录。
-2. 如果你想要真正的多消息分块回复，设置 `channels.telegram.streamMode: "off"`。
-3. 调试时使用较小的 chunk/coalesce 阈值。
+1. å°†åˆ†å—æµå¼ä¼ è¾“è®¾ç½®æ”¾åœ¨ `agents.defaults` ä¸‹ï¼Œè€Œä¸æ˜¯æ ¹ç›®å½•ã€‚
+2. å¦‚æžœä½ æƒ³è¦çœŸæ­£çš„å¤šæ¶ˆæ¯åˆ†å—å›žå¤ï¼Œè®¾ç½® `channels.telegram.streamMode: "off"`ã€‚
+3. è°ƒè¯•æ—¶ä½¿ç”¨è¾ƒå°çš„ chunk/coalesce é˜ˆå€¼ã€‚
 
-参见 [流式传输](/concepts/streaming)。
+å‚è§ [æµå¼ä¼ è¾“](/concepts/streaming)ã€‚
 
-### 即使设置了 `requireMention: false`，Discord 也不在我的服务器中回复。为什么？
+### å³ä½¿è®¾ç½®äº† `requireMention: false`ï¼ŒDiscord ä¹Ÿä¸åœ¨æˆ‘çš„æœåŠ¡å™¨ä¸­å›žå¤ã€‚ä¸ºä»€ä¹ˆï¼Ÿ
 
-`requireMention` 只控制渠道通过白名单**之后**的提及门控。
-默认情况下 `channels.discord.groupPolicy` 是 **allowlist**，所以必须显式启用 guild。
-如果你设置了 `channels.discord.guilds.<guildId>.channels`，只允许列出的频道；省略它以允许 guild 中的所有频道。
+`requireMention` åªæŽ§åˆ¶æ¸ é“é€šè¿‡ç™½åå•**ä¹‹åŽ**çš„æåŠé—¨æŽ§ã€‚
+é»˜è®¤æƒ…å†µä¸‹ `channels.discord.groupPolicy` æ˜¯ **allowlist**ï¼Œæ‰€ä»¥å¿…é¡»æ˜¾å¼å¯ç”¨ guildã€‚
+å¦‚æžœä½ è®¾ç½®äº† `channels.discord.guilds.<guildId>.channels`ï¼Œåªå…è®¸åˆ—å‡ºçš„é¢‘é“ï¼›çœç•¥å®ƒä»¥å…è®¸ guild ä¸­çš„æ‰€æœ‰é¢‘é“ã€‚
 
-修复清单：
+ä¿®å¤æ¸…å•ï¼š
 
-1. 设置 `channels.discord.groupPolicy: "open"` **或**添加 guild 白名单条目（并可选添加频道白名单）。
-2. 在 `channels.discord.guilds.<guildId>.channels` 中使用**数字频道 ID**。
-3. 将 `requireMention: false` 放在 `channels.discord.guilds` **下面**（全局或每个频道）。
-   顶级 `channels.discord.requireMention` 不是支持的键。
-4. 确保机器人有 **Message Content Intent** 和频道权限。
-5. 运行 `OpenKrab channels status --probe` 获取审计提示。
+1. è®¾ç½® `channels.discord.groupPolicy: "open"` **æˆ–**æ·»åŠ  guild ç™½åå•æ¡ç›®ï¼ˆå¹¶å¯é€‰æ·»åŠ é¢‘é“ç™½åå•ï¼‰ã€‚
+2. åœ¨ `channels.discord.guilds.<guildId>.channels` ä¸­ä½¿ç”¨**æ•°å­—é¢‘é“ ID**ã€‚
+3. å°† `requireMention: false` æ”¾åœ¨ `channels.discord.guilds` **ä¸‹é¢**ï¼ˆå…¨å±€æˆ–æ¯ä¸ªé¢‘é“ï¼‰ã€‚
+   é¡¶çº§ `channels.discord.requireMention` ä¸æ˜¯æ”¯æŒçš„é”®ã€‚
+4. ç¡®ä¿æœºå™¨äººæœ‰ **Message Content Intent** å’Œé¢‘é“æƒé™ã€‚
+5. è¿è¡Œ `OpenKrab channels status --probe` èŽ·å–å®¡è®¡æç¤ºã€‚
 
-文档：[Discord](/channels/discord)、[渠道故障排除](/channels/troubleshooting)。
+æ–‡æ¡£ï¼š[Discord](/channels/discord)ã€[æ¸ é“æ•…éšœæŽ’é™¤](/channels/troubleshooting)ã€‚
 
-### Cloud Code Assist API 错误：invalid tool schema（400）。现在怎么办？
+### Cloud Code Assist API é”™è¯¯ï¼šinvalid tool schemaï¼ˆ400ï¼‰ã€‚çŽ°åœ¨æ€Žä¹ˆåŠžï¼Ÿ
 
-这几乎总是**工具模式兼容性**问题。Cloud Code Assist
-端点接受 JSON Schema 的严格子集。OpenKrab 在当前 `main` 中清理/规范化工具
-模式，但修复尚未包含在最后一个版本中（截至
-2026 年 1 月 13 日）。
+è¿™å‡ ä¹Žæ€»æ˜¯**å·¥å…·æ¨¡å¼å…¼å®¹æ€§**é—®é¢˜ã€‚Cloud Code Assist
+ç«¯ç‚¹æŽ¥å— JSON Schema çš„ä¸¥æ ¼å­é›†ã€‚OpenKrab åœ¨å½“å‰ `main` ä¸­æ¸…ç†/è§„èŒƒåŒ–å·¥å…·
+æ¨¡å¼ï¼Œä½†ä¿®å¤å°šæœªåŒ…å«åœ¨æœ€åŽä¸€ä¸ªç‰ˆæœ¬ä¸­ï¼ˆæˆªè‡³
+2026 å¹´ 1 æœˆ 13 æ—¥ï¼‰ã€‚
 
-修复清单：
+ä¿®å¤æ¸…å•ï¼š
 
-1. **更新 OpenKrab**：
-   - 如果你可以从源代码运行，拉取 `main` 并重启 Gateway 网关。
-   - 否则，等待包含模式清理器的下一个版本。
-2. 避免不支持的关键字如 `anyOf/oneOf/allOf`、`patternProperties`、
-   `additionalProperties`、`minLength`、`maxLength`、`format` 等。
-3. 如果你定义自定义工具，保持顶级模式为 `type: "object"` 并使用
-   `properties` 和简单枚举。
+1. **æ›´æ–° OpenKrab**ï¼š
+   - å¦‚æžœä½ å¯ä»¥ä»Žæºä»£ç è¿è¡Œï¼Œæ‹‰å– `main` å¹¶é‡å¯ Gateway ç½‘å…³ã€‚
+   - å¦åˆ™ï¼Œç­‰å¾…åŒ…å«æ¨¡å¼æ¸…ç†å™¨çš„ä¸‹ä¸€ä¸ªç‰ˆæœ¬ã€‚
+2. é¿å…ä¸æ”¯æŒçš„å…³é”®å­—å¦‚ `anyOf/oneOf/allOf`ã€`patternProperties`ã€
+   `additionalProperties`ã€`minLength`ã€`maxLength`ã€`format` ç­‰ã€‚
+3. å¦‚æžœä½ å®šä¹‰è‡ªå®šä¹‰å·¥å…·ï¼Œä¿æŒé¡¶çº§æ¨¡å¼ä¸º `type: "object"` å¹¶ä½¿ç”¨
+   `properties` å’Œç®€å•æžšä¸¾ã€‚
 
-参见 [工具](/tools) 和 [TypeBox 模式](/concepts/typebox)。
+å‚è§ [å·¥å…·](/tools) å’Œ [TypeBox æ¨¡å¼](/concepts/typebox)ã€‚
 
-## macOS 特定问题
+## macOS ç‰¹å®šé—®é¢˜
 
-### 授予权限（语音/麦克风）时应用崩溃
+### æŽˆäºˆæƒé™ï¼ˆè¯­éŸ³/éº¦å…‹é£Žï¼‰æ—¶åº”ç”¨å´©æºƒ
 
-如果在你点击隐私提示的"允许"时应用消失或显示"Abort trap 6"：
+å¦‚æžœåœ¨ä½ ç‚¹å‡»éšç§æç¤ºçš„"å…è®¸"æ—¶åº”ç”¨æ¶ˆå¤±æˆ–æ˜¾ç¤º"Abort trap 6"ï¼š
 
-**修复 1：重置 TCC 缓存**
+**ä¿®å¤ 1ï¼šé‡ç½® TCC ç¼“å­˜**
 
 ```bash
 tccutil reset All bot.molt.mac.debug
 ```
 
-**修复 2：强制使用新的 Bundle ID**
-如果重置不起作用，在 [`scripts/package-mac-app.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/package-mac-app.sh) 中更改 `BUNDLE_ID`（例如，添加 `.test` 后缀）并重新构建。这会强制 macOS 将其视为新应用。
+**ä¿®å¤ 2ï¼šå¼ºåˆ¶ä½¿ç”¨æ–°çš„ Bundle ID**
+å¦‚æžœé‡ç½®ä¸èµ·ä½œç”¨ï¼Œåœ¨ [`scripts/package-mac-app.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/package-mac-app.sh) ä¸­æ›´æ”¹ `BUNDLE_ID`ï¼ˆä¾‹å¦‚ï¼Œæ·»åŠ  `.test` åŽç¼€ï¼‰å¹¶é‡æ–°æž„å»ºã€‚è¿™ä¼šå¼ºåˆ¶ macOS å°†å…¶è§†ä¸ºæ–°åº”ç”¨ã€‚
 
-### Gateway 网关卡在"Starting..."
+### Gateway ç½‘å…³å¡åœ¨"Starting..."
 
-应用连接到端口 `18789` 上的本地 Gateway 网关。如果一直卡住：
+åº”ç”¨è¿žæŽ¥åˆ°ç«¯å£ `18789` ä¸Šçš„æœ¬åœ° Gateway ç½‘å…³ã€‚å¦‚æžœä¸€ç›´å¡ä½ï¼š
 
-**修复 1：停止监管程序（首选）**
-如果 Gateway 网关由 launchd 监管，杀死 PID 只会重新生成它。先停止监管程序：
+**ä¿®å¤ 1ï¼šåœæ­¢ç›‘ç®¡ç¨‹åºï¼ˆé¦–é€‰ï¼‰**
+å¦‚æžœ Gateway ç½‘å…³ç”± launchd ç›‘ç®¡ï¼Œæ€æ­» PID åªä¼šé‡æ–°ç”Ÿæˆå®ƒã€‚å…ˆåœæ­¢ç›‘ç®¡ç¨‹åºï¼š
 
 ```bash
 OpenKrab gateway status
 OpenKrab gateway stop
-# 或：launchctl bootout gui/$UID/bot.molt.gateway（用 bot.molt.<profile> 替换；旧版 com.OpenKrab.* 仍然有效）
+# æˆ–ï¼šlaunchctl bootout gui/$UID/bot.molt.gatewayï¼ˆç”¨ bot.molt.<profile> æ›¿æ¢ï¼›æ—§ç‰ˆ com.OpenKrab.* ä»ç„¶æœ‰æ•ˆï¼‰
 ```
 
-**修复 2：端口被占用（查找监听器）**
+**ä¿®å¤ 2ï¼šç«¯å£è¢«å ç”¨ï¼ˆæŸ¥æ‰¾ç›‘å¬å™¨ï¼‰**
 
 ```bash
 lsof -nP -iTCP:18789 -sTCP:LISTEN
 ```
 
-如果是未被监管的进程，先尝试优雅停止，然后升级：
+å¦‚æžœæ˜¯æœªè¢«ç›‘ç®¡çš„è¿›ç¨‹ï¼Œå…ˆå°è¯•ä¼˜é›…åœæ­¢ï¼Œç„¶åŽå‡çº§ï¼š
 
 ```bash
 kill -TERM <PID>
 sleep 1
-kill -9 <PID> # 最后手段
+kill -9 <PID> # æœ€åŽæ‰‹æ®µ
 ```
 
-**修复 3：检查 CLI 安装**
-确保全局 `OpenKrab` CLI 已安装且与应用版本匹配：
+**ä¿®å¤ 3ï¼šæ£€æŸ¥ CLI å®‰è£…**
+ç¡®ä¿å…¨å±€ `OpenKrab` CLI å·²å®‰è£…ä¸”ä¸Žåº”ç”¨ç‰ˆæœ¬åŒ¹é…ï¼š
 
 ```bash
 OpenKrab --version
 npm install -g OpenKrab@<version>
 ```
 
-## 调试模式
+## è°ƒè¯•æ¨¡å¼
 
-获取详细日志：
+èŽ·å–è¯¦ç»†æ—¥å¿—ï¼š
 
 ```bash
-# 在配置中打开跟踪日志：
-#   ${OpenKrab_CONFIG_PATH:-$HOME/.OpenKrab/OpenKrab.json} -> { logging: { level: "trace" } }
+# åœ¨é…ç½®ä¸­æ‰“å¼€è·Ÿè¸ªæ—¥å¿—ï¼š
+#   ${OPENKRAB_CONFIG_PATH:-$HOME/.OpenKrab/OpenKrab.json} -> { logging: { level: "trace" } }
 #
-# 然后运行详细命令将调试输出镜像到标准输出：
+# ç„¶åŽè¿è¡Œè¯¦ç»†å‘½ä»¤å°†è°ƒè¯•è¾“å‡ºé•œåƒåˆ°æ ‡å‡†è¾“å‡ºï¼š
 OpenKrab gateway --verbose
 OpenKrab channels login --verbose
 ```
 
-## 日志位置
+## æ—¥å¿—ä½ç½®
 
-| 日志                             | 位置                                                                                                                                                                                                                                                                                                                      |
+| æ—¥å¿—                             | ä½ç½®                                                                                                                                                                                                                                                                                                                      |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Gateway 网关文件日志（结构化）   | `/tmp/OpenKrab/OpenKrab-YYYY-MM-DD.log`（或 `logging.file`）                                                                                                                                                                                                                                                              |
-| Gateway 网关服务日志（监管程序） | macOS：`$OpenKrab_STATE_DIR/logs/gateway.log` + `gateway.err.log`（默认：`~/.OpenKrab/logs/...`；配置文件使用 `~/.OpenKrab-<profile>/logs/...`）<br />Linux：`journalctl --user -u OpenKrab-gateway[-<profile>].service -n 200 --no-pager`<br />Windows：`schtasks /Query /TN "OpenKrab Gateway (<profile>)" /V /FO LIST` |
-| 会话文件                         | `$OpenKrab_STATE_DIR/agents/<agentId>/sessions/`                                                                                                                                                                                                                                                                          |
-| 媒体缓存                         | `$OpenKrab_STATE_DIR/media/`                                                                                                                                                                                                                                                                                              |
-| 凭证                             | `$OpenKrab_STATE_DIR/credentials/`                                                                                                                                                                                                                                                                                        |
+| Gateway ç½‘å…³æ–‡ä»¶æ—¥å¿—ï¼ˆç»“æž„åŒ–ï¼‰   | `/tmp/OpenKrab/OpenKrab-YYYY-MM-DD.log`ï¼ˆæˆ– `logging.file`ï¼‰                                                                                                                                                                                                                                                              |
+| Gateway ç½‘å…³æœåŠ¡æ—¥å¿—ï¼ˆç›‘ç®¡ç¨‹åºï¼‰ | macOSï¼š`$OPENKRAB_STATE_DIR/logs/gateway.log` + `gateway.err.log`ï¼ˆé»˜è®¤ï¼š`~/.OpenKrab/logs/...`ï¼›é…ç½®æ–‡ä»¶ä½¿ç”¨ `~/.OpenKrab-<profile>/logs/...`ï¼‰<br />Linuxï¼š`journalctl --user -u OpenKrab-gateway[-<profile>].service -n 200 --no-pager`<br />Windowsï¼š`schtasks /Query /TN "OpenKrab Gateway (<profile>)" /V /FO LIST` |
+| ä¼šè¯æ–‡ä»¶                         | `$OPENKRAB_STATE_DIR/agents/<agentId>/sessions/`                                                                                                                                                                                                                                                                          |
+| åª’ä½“ç¼“å­˜                         | `$OPENKRAB_STATE_DIR/media/`                                                                                                                                                                                                                                                                                              |
+| å‡­è¯                             | `$OPENKRAB_STATE_DIR/credentials/`                                                                                                                                                                                                                                                                                        |
 
-## 健康检查
+## å¥åº·æ£€æŸ¥
 
 ```bash
-# 监管程序 + 探测目标 + 配置路径
+# ç›‘ç®¡ç¨‹åº + æŽ¢æµ‹ç›®æ ‡ + é…ç½®è·¯å¾„
 OpenKrab gateway status
-# 包括系统级扫描（旧版/额外服务、端口监听器）
+# åŒ…æ‹¬ç³»ç»Ÿçº§æ‰«æï¼ˆæ—§ç‰ˆ/é¢å¤–æœåŠ¡ã€ç«¯å£ç›‘å¬å™¨ï¼‰
 OpenKrab gateway status --deep
 
-# Gateway 网关是否可达？
+# Gateway ç½‘å…³æ˜¯å¦å¯è¾¾ï¼Ÿ
 OpenKrab health --json
-# 如果失败，使用连接详情重新运行：
+# å¦‚æžœå¤±è´¥ï¼Œä½¿ç”¨è¿žæŽ¥è¯¦æƒ…é‡æ–°è¿è¡Œï¼š
 OpenKrab health --verbose
 
-# 默认端口上是否有东西在监听？
+# é»˜è®¤ç«¯å£ä¸Šæ˜¯å¦æœ‰ä¸œè¥¿åœ¨ç›‘å¬ï¼Ÿ
 lsof -nP -iTCP:18789 -sTCP:LISTEN
 
-# 最近活动（RPC 日志尾部）
+# æœ€è¿‘æ´»åŠ¨ï¼ˆRPC æ—¥å¿—å°¾éƒ¨ï¼‰
 OpenKrab logs --follow
-# 如果 RPC 宕机的备用方案
+# å¦‚æžœ RPC å®•æœºçš„å¤‡ç”¨æ–¹æ¡ˆ
 tail -20 /tmp/OpenKrab/OpenKrab-*.log
 ```
 
-## 重置所有内容
+## é‡ç½®æ‰€æœ‰å†…å®¹
 
-核选项：
+æ ¸é€‰é¡¹ï¼š
 
 ```bash
 OpenKrab gateway stop
-# 如果你安装了服务并想要干净安装：
+# å¦‚æžœä½ å®‰è£…äº†æœåŠ¡å¹¶æƒ³è¦å¹²å‡€å®‰è£…ï¼š
 # OpenKrab gateway uninstall
 
-trash "${OpenKrab_STATE_DIR:-$HOME/.OpenKrab}"
-OpenKrab channels login         # 重新配对 WhatsApp
-OpenKrab gateway restart           # 或：OpenKrab gateway
+trash "${OPENKRAB_STATE_DIR:-$HOME/.OpenKrab}"
+OpenKrab channels login         # é‡æ–°é…å¯¹ WhatsApp
+OpenKrab gateway restart           # æˆ–ï¼šOpenKrab gateway
 ```
 
-⚠️ 这会丢失所有会话并需要重新配对 WhatsApp。
+âš ï¸ è¿™ä¼šä¸¢å¤±æ‰€æœ‰ä¼šè¯å¹¶éœ€è¦é‡æ–°é…å¯¹ WhatsAppã€‚
 
-## 获取帮助
+## èŽ·å–å¸®åŠ©
 
-1. 首先检查日志：`/tmp/OpenKrab/`（默认：`OpenKrab-YYYY-MM-DD.log`，或你配置的 `logging.file`）
-2. 在 GitHub 上搜索现有问题
-3. 提交新问题时包含：
-   - OpenKrab 版本
-   - 相关日志片段
-   - 重现步骤
-   - 你的配置（隐藏密钥！）
+1. é¦–å…ˆæ£€æŸ¥æ—¥å¿—ï¼š`/tmp/OpenKrab/`ï¼ˆé»˜è®¤ï¼š`OpenKrab-YYYY-MM-DD.log`ï¼Œæˆ–ä½ é…ç½®çš„ `logging.file`ï¼‰
+2. åœ¨ GitHub ä¸Šæœç´¢çŽ°æœ‰é—®é¢˜
+3. æäº¤æ–°é—®é¢˜æ—¶åŒ…å«ï¼š
+   - OpenKrab ç‰ˆæœ¬
+   - ç›¸å…³æ—¥å¿—ç‰‡æ®µ
+   - é‡çŽ°æ­¥éª¤
+   - ä½ çš„é…ç½®ï¼ˆéšè—å¯†é’¥ï¼ï¼‰
 
 ---
 
-_"你试过关掉再开吗？"_ — 每个 IT 人员都这么说
+_"ä½ è¯•è¿‡å…³æŽ‰å†å¼€å—ï¼Ÿ"_ â€” æ¯ä¸ª IT äººå‘˜éƒ½è¿™ä¹ˆè¯´
 
-🦞🔧
+ðŸ¦žðŸ”§
 
-### 浏览器无法启动（Linux）
+### æµè§ˆå™¨æ— æ³•å¯åŠ¨ï¼ˆLinuxï¼‰
 
-如果你看到 `"Failed to start Chrome CDP on port 18800"`：
+å¦‚æžœä½ çœ‹åˆ° `"Failed to start Chrome CDP on port 18800"`ï¼š
 
-**最可能的原因：** Ubuntu 上的 Snap 打包的 Chromium。
+**æœ€å¯èƒ½çš„åŽŸå› ï¼š** Ubuntu ä¸Šçš„ Snap æ‰“åŒ…çš„ Chromiumã€‚
 
-**快速修复：** 改为安装 Google Chrome：
+**å¿«é€Ÿä¿®å¤ï¼š** æ”¹ä¸ºå®‰è£… Google Chromeï¼š
 
 ```bash
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 ```
 
-然后在配置中设置：
+ç„¶åŽåœ¨é…ç½®ä¸­è®¾ç½®ï¼š
 
 ```json
 {
@@ -768,5 +768,6 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 }
 ```
 
-**完整指南：** 参见 [browser-linux-troubleshooting](/tools/browser-linux-troubleshooting)
+**å®Œæ•´æŒ‡å—ï¼š** å‚è§ [browser-linux-troubleshooting](/tools/browser-linux-troubleshooting)
+
 

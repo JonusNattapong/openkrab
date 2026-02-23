@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab system` (system events, heartbeat, presence)"
 read_when:
   - You want to enqueue a system event without creating a cron job
@@ -14,11 +14,7 @@ and view presence.
 
 ## Common commands
 
-```bash
-openkrab system event --text "Check for urgent follow-ups" --mode now
-openkrab system heartbeat enable
-openkrab system heartbeat last
-openkrab system presence
+```bash\nOpenKrab system event --text "Check for urgent follow-ups" --mode now\nOpenKrab system heartbeat enable\nOpenKrab system heartbeat last\nOpenKrab system presence
 ```
 
 ## `system event`
@@ -58,3 +54,4 @@ Flags:
 
 - Requires a running Gateway reachable by your current config (local or remote).
 - System events are ephemeral and not persisted across restarts.
+

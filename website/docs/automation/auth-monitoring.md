@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Monitor OAuth expiry for model providers"
 read_when:
   - Setting up auth expiry monitoring or alerts
@@ -7,14 +7,12 @@ title: "Auth Monitoring"
 ---
 
 # Auth monitoring
-
-openkrab exposes OAuth expiry health via `openkrab models status`. Use that for
+\nOpenKrab exposes OAuth expiry health via `openkrab models status`. Use that for
 automation and alerting; scripts are optional extras for phone workflows.
 
 ## Preferred: CLI check (portable)
 
-```bash
-openkrab models status --check
+```bash\nOpenKrab models status --check
 ```
 
 Exit codes:
@@ -35,10 +33,11 @@ gateway host and are tuned for systemd + Termux.
   so keep `openkrab` on `PATH` for timers.
 - `scripts/auth-monitor.sh`: cron/systemd timer target; sends alerts (ntfy or phone).
 - `scripts/systemd/openkrab-auth-monitor.{service,timer}`: systemd user timer.
-- `scripts/claude-auth-status.sh`: Claude Code + openkrab auth checker (full/json/simple).
-- `scripts/mobile-reauth.sh`: guided re‑auth flow over SSH.
-- `scripts/termux-quick-auth.sh`: one‑tap widget status + open auth URL.
+- `scripts/claude-auth-status.sh`: Claude Code + OpenKrab auth checker (full/json/simple).
+- `scripts/mobile-reauth.sh`: guided reâ€‘auth flow over SSH.
+- `scripts/termux-quick-auth.sh`: oneâ€‘tap widget status + open auth URL.
 - `scripts/termux-auth-widget.sh`: full guided widget flow.
-- `scripts/termux-sync-widget.sh`: sync Claude Code creds → openkrab.
+- `scripts/termux-sync-widget.sh`: sync Claude Code creds â†’ OpenKrab.
 
-If you don’t need phone automation or systemd timers, skip these scripts.
+If you donâ€™t need phone automation or systemd timers, skip these scripts.
+

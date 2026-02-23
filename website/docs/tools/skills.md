@@ -47,22 +47,22 @@ You can gate them via `metadata.OpenKrab.requires.config` on the plugin’s conf
 entry. See [Plugins](/tools/plugin) for discovery/config and [Tools](/tools) for the
 tool surface those skills teach.
 
-## ClawHub (install + sync)
+## KrabHub (install + sync)
 
-ClawHub is the public skills registry for OpenKrab. Browse at
-[https://clawhub.com](https://clawhub.com). Use it to discover, install, update, and back up skills.
-Full guide: [ClawHub](/tools/clawhub).
+KrabHub is the public skills registry for OpenKrab. Browse at
+[https://KrabHub.com](https://KrabHub.com). Use it to discover, install, update, and back up skills.
+Full guide: [KrabHub](/tools/KrabHub).
 
 Common flows:
 
 - Install a skill into your workspace:
-  - `clawhub install <skill-slug>`
+  - `KrabHub install <skill-slug>`
 - Update all installed skills:
-  - `clawhub update --all`
+  - `KrabHub update --all`
 - Sync (scan + publish updates):
-  - `clawhub sync --all`
+  - `KrabHub sync --all`
 
-By default, `clawhub` installs into `./skills` under your current working
+By default, `KrabHub` installs into `./skills` under your current working
 directory (or falls back to the configured OpenKrab workspace). OpenKrab picks
 that up as `<workspace>/skills` on the next session.
 
@@ -295,7 +295,8 @@ See [Skills config](/tools/skills-config) for the full configuration schema.
 
 ## Looking for more skills?
 
-Browse [https://clawhub.com](https://clawhub.com).
+Browse [https://KrabHub.com](https://KrabHub.com).
 
 ---
+
 

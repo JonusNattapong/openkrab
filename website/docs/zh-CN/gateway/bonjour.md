@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 在 macOS/iOS 上调试 Bonjour 设备发现问题时
-  - 更改 mDNS 服务类型、TXT 记录或设备发现用户体验时
-summary: Bonjour/mDNS 设备发现 + 调试（Gateway 网关信标、客户端和常见故障模式）
-title: Bonjour 设备发现
+  - åœ¨ macOS/iOS ä¸Šè°ƒè¯• Bonjour è®¾å¤‡å‘çŽ°é—®é¢˜æ—¶
+  - æ›´æ”¹ mDNS æœåŠ¡ç±»åž‹ã€TXT è®°å½•æˆ–è®¾å¤‡å‘çŽ°ç”¨æˆ·ä½“éªŒæ—¶
+summary: Bonjour/mDNS è®¾å¤‡å‘çŽ° + è°ƒè¯•ï¼ˆGateway ç½‘å…³ä¿¡æ ‡ã€å®¢æˆ·ç«¯å’Œå¸¸è§æ•…éšœæ¨¡å¼ï¼‰
+title: Bonjour è®¾å¤‡å‘çŽ°
 x-i18n:
   generated_at: "2026-02-03T07:47:48Z"
   model: claude-opus-4-5
@@ -13,163 +13,164 @@ x-i18n:
   workflow: 15
 ---
 
-# Bonjour / mDNS 设备发现
+# Bonjour / mDNS è®¾å¤‡å‘çŽ°
 
-OpenKrab 使用 Bonjour（mDNS / DNS‑SD）作为**仅限局域网的便捷方式**来发现
-活跃的 Gateway 网关（WebSocket 端点）。这是尽力而为的，**不能**替代 SSH 或
-基于 Tailnet 的连接。
+OpenKrab ä½¿ç”¨ Bonjourï¼ˆmDNS / DNSâ€‘SDï¼‰ä½œä¸º**ä»…é™å±€åŸŸç½‘çš„ä¾¿æ·æ–¹å¼**æ¥å‘çŽ°
+æ´»è·ƒçš„ Gateway ç½‘å…³ï¼ˆWebSocket ç«¯ç‚¹ï¼‰ã€‚è¿™æ˜¯å°½åŠ›è€Œä¸ºçš„ï¼Œ**ä¸èƒ½**æ›¿ä»£ SSH æˆ–
+åŸºäºŽ Tailnet çš„è¿žæŽ¥ã€‚
 
-## 通过 Tailscale 的广域 Bonjour（单播 DNS‑SD）
+## é€šè¿‡ Tailscale çš„å¹¿åŸŸ Bonjourï¼ˆå•æ’­ DNSâ€‘SDï¼‰
 
-如果节点和 Gateway 网关在不同的网络上，多播 mDNS 无法跨越
-边界。你可以通过切换到基于 Tailscale 的**单播 DNS‑SD**
-（"广域 Bonjour"）来保持相同的设备发现用户体验。
+å¦‚æžœèŠ‚ç‚¹å’Œ Gateway ç½‘å…³åœ¨ä¸åŒçš„ç½‘ç»œä¸Šï¼Œå¤šæ’­ mDNS æ— æ³•è·¨è¶Š
+è¾¹ç•Œã€‚ä½ å¯ä»¥é€šè¿‡åˆ‡æ¢åˆ°åŸºäºŽ Tailscale çš„**å•æ’­ DNSâ€‘SD**
+ï¼ˆ"å¹¿åŸŸ Bonjour"ï¼‰æ¥ä¿æŒç›¸åŒçš„è®¾å¤‡å‘çŽ°ç”¨æˆ·ä½“éªŒã€‚
 
-概要步骤：
+æ¦‚è¦æ­¥éª¤ï¼š
 
-1. 在 Gateway 网关主机上运行 DNS 服务器（可通过 Tailnet 访问）。
-2. 在专用区域下发布 `_OpenKrab-gw._tcp` 的 DNS‑SD 记录
-   （示例：`OpenKrab.internal.`）。
-3. 配置 Tailscale **分割 DNS**，使你选择的域名通过该
-   DNS 服务器为客户端（包括 iOS）解析。
+1. åœ¨ Gateway ç½‘å…³ä¸»æœºä¸Šè¿è¡Œ DNS æœåŠ¡å™¨ï¼ˆå¯é€šè¿‡ Tailnet è®¿é—®ï¼‰ã€‚
+2. åœ¨ä¸“ç”¨åŒºåŸŸä¸‹å‘å¸ƒ `_OpenKrab-gw._tcp` çš„ DNSâ€‘SD è®°å½•
+   ï¼ˆç¤ºä¾‹ï¼š`OpenKrab.internal.`ï¼‰ã€‚
+3. é…ç½® Tailscale **åˆ†å‰² DNS**ï¼Œä½¿ä½ é€‰æ‹©çš„åŸŸåé€šè¿‡è¯¥
+   DNS æœåŠ¡å™¨ä¸ºå®¢æˆ·ç«¯ï¼ˆåŒ…æ‹¬ iOSï¼‰è§£æžã€‚
 
-OpenKrab 支持任何发现域名；`OpenKrab.internal.` 只是一个示例。
-iOS/Android 节点同时浏览 `local.` 和你配置的广域域名。
+OpenKrab æ”¯æŒä»»ä½•å‘çŽ°åŸŸåï¼›`OpenKrab.internal.` åªæ˜¯ä¸€ä¸ªç¤ºä¾‹ã€‚
+iOS/Android èŠ‚ç‚¹åŒæ—¶æµè§ˆ `local.` å’Œä½ é…ç½®çš„å¹¿åŸŸåŸŸåã€‚
 
-### Gateway 网关配置（推荐）
+### Gateway ç½‘å…³é…ç½®ï¼ˆæŽ¨èï¼‰
 
 ```json5
 {
-  gateway: { bind: "tailnet" }, // 仅 tailnet（推荐）
-  discovery: { wideArea: { enabled: true } }, // 启用广域 DNS-SD 发布
+  gateway: { bind: "tailnet" }, // ä»… tailnetï¼ˆæŽ¨èï¼‰
+  discovery: { wideArea: { enabled: true } }, // å¯ç”¨å¹¿åŸŸ DNS-SD å‘å¸ƒ
 }
 ```
 
-### 一次性 DNS 服务器设置（Gateway 网关主机）
+### ä¸€æ¬¡æ€§ DNS æœåŠ¡å™¨è®¾ç½®ï¼ˆGateway ç½‘å…³ä¸»æœºï¼‰
 
 ```bash
 OpenKrab dns setup --apply
 ```
 
-这会安装 CoreDNS 并配置它：
+è¿™ä¼šå®‰è£… CoreDNS å¹¶é…ç½®å®ƒï¼š
 
-- 仅在 Gateway 网关的 Tailscale 接口上监听 53 端口
-- 从 `~/.OpenKrab/dns/<domain>.db` 提供你选择的域名服务（示例：`OpenKrab.internal.`）
+- ä»…åœ¨ Gateway ç½‘å…³çš„ Tailscale æŽ¥å£ä¸Šç›‘å¬ 53 ç«¯å£
+- ä»Ž `~/.OpenKrab/dns/<domain>.db` æä¾›ä½ é€‰æ‹©çš„åŸŸåæœåŠ¡ï¼ˆç¤ºä¾‹ï¼š`OpenKrab.internal.`ï¼‰
 
-从 Tailnet 连接的机器上验证：
+ä»Ž Tailnet è¿žæŽ¥çš„æœºå™¨ä¸ŠéªŒè¯ï¼š
 
 ```bash
 dns-sd -B _OpenKrab-gw._tcp OpenKrab.internal.
 dig @<TAILNET_IPV4> -p 53 _OpenKrab-gw._tcp.OpenKrab.internal PTR +short
 ```
 
-### Tailscale DNS 设置
+### Tailscale DNS è®¾ç½®
 
-在 Tailscale 管理控制台中：
+åœ¨ Tailscale ç®¡ç†æŽ§åˆ¶å°ä¸­ï¼š
 
-- 添加指向 Gateway 网关 Tailnet IP 的名称服务器（UDP/TCP 53）。
-- 添加分割 DNS，使你的发现域名使用该名称服务器。
+- æ·»åŠ æŒ‡å‘ Gateway ç½‘å…³ Tailnet IP çš„åç§°æœåŠ¡å™¨ï¼ˆUDP/TCP 53ï¼‰ã€‚
+- æ·»åŠ åˆ†å‰² DNSï¼Œä½¿ä½ çš„å‘çŽ°åŸŸåä½¿ç”¨è¯¥åç§°æœåŠ¡å™¨ã€‚
 
-一旦客户端接受 Tailnet DNS，iOS 节点就可以在
-你的发现域名中浏览 `_OpenKrab-gw._tcp`，无需多播。
+ä¸€æ—¦å®¢æˆ·ç«¯æŽ¥å— Tailnet DNSï¼ŒiOS èŠ‚ç‚¹å°±å¯ä»¥åœ¨
+ä½ çš„å‘çŽ°åŸŸåä¸­æµè§ˆ `_OpenKrab-gw._tcp`ï¼Œæ— éœ€å¤šæ’­ã€‚
 
-### Gateway 网关监听器安全（推荐）
+### Gateway ç½‘å…³ç›‘å¬å™¨å®‰å…¨ï¼ˆæŽ¨èï¼‰
 
-Gateway 网关 WS 端口（默认 `18789`）默认绑定到 loopback。对于局域网/Tailnet
-访问，请明确绑定并保持认证启用。
+Gateway ç½‘å…³ WS ç«¯å£ï¼ˆé»˜è®¤ `18789`ï¼‰é»˜è®¤ç»‘å®šåˆ° loopbackã€‚å¯¹äºŽå±€åŸŸç½‘/Tailnet
+è®¿é—®ï¼Œè¯·æ˜Žç¡®ç»‘å®šå¹¶ä¿æŒè®¤è¯å¯ç”¨ã€‚
 
-对于仅 Tailnet 的设置：
+å¯¹äºŽä»… Tailnet çš„è®¾ç½®ï¼š
 
-- 在 `~/.OpenKrab/OpenKrab.json` 中设置 `gateway.bind: "tailnet"`。
-- 重启 Gateway 网关（或重启 macOS 菜单栏应用）。
+- åœ¨ `~/.OpenKrab/OpenKrab.json` ä¸­è®¾ç½® `gateway.bind: "tailnet"`ã€‚
+- é‡å¯ Gateway ç½‘å…³ï¼ˆæˆ–é‡å¯ macOS èœå•æ åº”ç”¨ï¼‰ã€‚
 
-## 什么在广播
+## ä»€ä¹ˆåœ¨å¹¿æ’­
 
-只有 Gateway 网关广播 `_OpenKrab-gw._tcp`。
+åªæœ‰ Gateway ç½‘å…³å¹¿æ’­ `_OpenKrab-gw._tcp`ã€‚
 
-## 服务类型
+## æœåŠ¡ç±»åž‹
 
-- `_OpenKrab-gw._tcp` — Gateway 网关传输信标（被 macOS/iOS/Android 节点使用）。
+- `_OpenKrab-gw._tcp` â€” Gateway ç½‘å…³ä¼ è¾“ä¿¡æ ‡ï¼ˆè¢« macOS/iOS/Android èŠ‚ç‚¹ä½¿ç”¨ï¼‰ã€‚
 
-## TXT 键（非机密提示）
+## TXT é”®ï¼ˆéžæœºå¯†æç¤ºï¼‰
 
-Gateway 网关广播小型非机密提示以方便 UI 流程：
+Gateway ç½‘å…³å¹¿æ’­å°åž‹éžæœºå¯†æç¤ºä»¥æ–¹ä¾¿ UI æµç¨‹ï¼š
 
 - `role=gateway`
-- `displayName=<友好名称>`
+- `displayName=<å‹å¥½åç§°>`
 - `lanHost=<hostname>.local`
-- `gatewayPort=<port>`（Gateway 网关 WS + HTTP）
-- `gatewayTls=1`（仅当 TLS 启用时）
-- `gatewayTlsSha256=<sha256>`（仅当 TLS 启用且指纹可用时）
-- `canvasPort=<port>`（仅当画布主机启用时；默认 `18793`）
-- `sshPort=<port>`（未覆盖时默认为 22）
+- `gatewayPort=<port>`ï¼ˆGateway ç½‘å…³ WS + HTTPï¼‰
+- `gatewayTls=1`ï¼ˆä»…å½“ TLS å¯ç”¨æ—¶ï¼‰
+- `gatewayTlsSha256=<sha256>`ï¼ˆä»…å½“ TLS å¯ç”¨ä¸”æŒ‡çº¹å¯ç”¨æ—¶ï¼‰
+- `canvasPort=<port>`ï¼ˆä»…å½“ç”»å¸ƒä¸»æœºå¯ç”¨æ—¶ï¼›é»˜è®¤ `18793`ï¼‰
+- `sshPort=<port>`ï¼ˆæœªè¦†ç›–æ—¶é»˜è®¤ä¸º 22ï¼‰
 - `transport=gateway`
-- `cliPath=<path>`（可选；可运行的 `OpenKrab` 入口点的绝对路径）
-- `tailnetDns=<magicdns>`（当 Tailnet 可用时的可选提示）
+- `cliPath=<path>`ï¼ˆå¯é€‰ï¼›å¯è¿è¡Œçš„ `OpenKrab` å…¥å£ç‚¹çš„ç»å¯¹è·¯å¾„ï¼‰
+- `tailnetDns=<magicdns>`ï¼ˆå½“ Tailnet å¯ç”¨æ—¶çš„å¯é€‰æç¤ºï¼‰
 
-## 在 macOS 上调试
+## åœ¨ macOS ä¸Šè°ƒè¯•
 
-有用的内置工具：
+æœ‰ç”¨çš„å†…ç½®å·¥å…·ï¼š
 
-- 浏览实例：
+- æµè§ˆå®žä¾‹ï¼š
   ```bash
   dns-sd -B _OpenKrab-gw._tcp local.
   ```
-- 解析单个实例（替换 `<instance>`）：
+- è§£æžå•ä¸ªå®žä¾‹ï¼ˆæ›¿æ¢ `<instance>`ï¼‰ï¼š
   ```bash
   dns-sd -L "<instance>" _OpenKrab-gw._tcp local.
   ```
 
-如果浏览有效但解析失败，你通常遇到的是局域网策略或
-mDNS 解析器问题。
+å¦‚æžœæµè§ˆæœ‰æ•ˆä½†è§£æžå¤±è´¥ï¼Œä½ é€šå¸¸é‡åˆ°çš„æ˜¯å±€åŸŸç½‘ç­–ç•¥æˆ–
+mDNS è§£æžå™¨é—®é¢˜ã€‚
 
-## 在 Gateway 网关日志中调试
+## åœ¨ Gateway ç½‘å…³æ—¥å¿—ä¸­è°ƒè¯•
 
-Gateway 网关会写入滚动日志文件（启动时打印为
-`gateway log file: ...`）。查找 `bonjour:` 行，特别是：
+Gateway ç½‘å…³ä¼šå†™å…¥æ»šåŠ¨æ—¥å¿—æ–‡ä»¶ï¼ˆå¯åŠ¨æ—¶æ‰“å°ä¸º
+`gateway log file: ...`ï¼‰ã€‚æŸ¥æ‰¾ `bonjour:` è¡Œï¼Œç‰¹åˆ«æ˜¯ï¼š
 
 - `bonjour: advertise failed ...`
 - `bonjour: ... name conflict resolved` / `hostname conflict resolved`
 - `bonjour: watchdog detected non-announced service ...`
 
-## 在 iOS 节点上调试
+## åœ¨ iOS èŠ‚ç‚¹ä¸Šè°ƒè¯•
 
-iOS 节点使用 `NWBrowser` 来发现 `_OpenKrab-gw._tcp`。
+iOS èŠ‚ç‚¹ä½¿ç”¨ `NWBrowser` æ¥å‘çŽ° `_OpenKrab-gw._tcp`ã€‚
 
-要捕获日志：
+è¦æ•èŽ·æ—¥å¿—ï¼š
 
-- 设置 → Gateway 网关 → 高级 → **Discovery Debug Logs**
-- 设置 → Gateway 网关 → 高级 → **Discovery Logs** → 复现 → **Copy**
+- è®¾ç½® â†’ Gateway ç½‘å…³ â†’ é«˜çº§ â†’ **Discovery Debug Logs**
+- è®¾ç½® â†’ Gateway ç½‘å…³ â†’ é«˜çº§ â†’ **Discovery Logs** â†’ å¤çŽ° â†’ **Copy**
 
-日志包括浏览器状态转换和结果集变化。
+æ—¥å¿—åŒ…æ‹¬æµè§ˆå™¨çŠ¶æ€è½¬æ¢å’Œç»“æžœé›†å˜åŒ–ã€‚
 
-## 常见故障模式
+## å¸¸è§æ•…éšœæ¨¡å¼
 
-- **Bonjour 不能跨网络**：使用 Tailnet 或 SSH。
-- **多播被阻止**：某些 Wi‑Fi 网络禁用 mDNS。
-- **休眠 / 接口变动**：macOS 可能暂时丢弃 mDNS 结果；重试。
-- **浏览有效但解析失败**：保持机器名称简单（避免表情符号或
-  标点符号），然后重启 Gateway 网关。服务实例名称源自
-  主机名，因此过于复杂的名称可能会混淆某些解析器。
+- **Bonjour ä¸èƒ½è·¨ç½‘ç»œ**ï¼šä½¿ç”¨ Tailnet æˆ– SSHã€‚
+- **å¤šæ’­è¢«é˜»æ­¢**ï¼šæŸäº› Wiâ€‘Fi ç½‘ç»œç¦ç”¨ mDNSã€‚
+- **ä¼‘çœ  / æŽ¥å£å˜åŠ¨**ï¼šmacOS å¯èƒ½æš‚æ—¶ä¸¢å¼ƒ mDNS ç»“æžœï¼›é‡è¯•ã€‚
+- **æµè§ˆæœ‰æ•ˆä½†è§£æžå¤±è´¥**ï¼šä¿æŒæœºå™¨åç§°ç®€å•ï¼ˆé¿å…è¡¨æƒ…ç¬¦å·æˆ–
+  æ ‡ç‚¹ç¬¦å·ï¼‰ï¼Œç„¶åŽé‡å¯ Gateway ç½‘å…³ã€‚æœåŠ¡å®žä¾‹åç§°æºè‡ª
+  ä¸»æœºåï¼Œå› æ­¤è¿‡äºŽå¤æ‚çš„åç§°å¯èƒ½ä¼šæ··æ·†æŸäº›è§£æžå™¨ã€‚
 
-## 转义的实例名称（`\032`）
+## è½¬ä¹‰çš„å®žä¾‹åç§°ï¼ˆ`\032`ï¼‰
 
-Bonjour/DNS‑SD 经常将服务实例名称中的字节转义为十进制 `\DDD`
-序列（例如空格变成 `\032`）。
+Bonjour/DNSâ€‘SD ç»å¸¸å°†æœåŠ¡å®žä¾‹åç§°ä¸­çš„å­—èŠ‚è½¬ä¹‰ä¸ºåè¿›åˆ¶ `\DDD`
+åºåˆ—ï¼ˆä¾‹å¦‚ç©ºæ ¼å˜æˆ `\032`ï¼‰ã€‚
 
-- 这在协议级别是正常的。
-- UI 应该解码以进行显示（iOS 使用 `BonjourEscapes.decode`）。
+- è¿™åœ¨åè®®çº§åˆ«æ˜¯æ­£å¸¸çš„ã€‚
+- UI åº”è¯¥è§£ç ä»¥è¿›è¡Œæ˜¾ç¤ºï¼ˆiOS ä½¿ç”¨ `BonjourEscapes.decode`ï¼‰ã€‚
 
-## 禁用 / 配置
+## ç¦ç”¨ / é…ç½®
 
-- `OpenKrab_DISABLE_BONJOUR=1` 禁用广播（旧版：`OpenKrab_DISABLE_BONJOUR`）。
-- `~/.OpenKrab/OpenKrab.json` 中的 `gateway.bind` 控制 Gateway 网关绑定模式。
-- `OpenKrab_SSH_PORT` 覆盖 TXT 中广播的 SSH 端口（旧版：`OpenKrab_SSH_PORT`）。
-- `OpenKrab_TAILNET_DNS` 在 TXT 中发布 MagicDNS 提示（旧版：`OpenKrab_TAILNET_DNS`）。
-- `OpenKrab_CLI_PATH` 覆盖广播的 CLI 路径（旧版：`OpenKrab_CLI_PATH`）。
+- `OPENKRAB_DISABLE_BONJOUR=1` ç¦ç”¨å¹¿æ’­ï¼ˆæ—§ç‰ˆï¼š`OPENKRAB_DISABLE_BONJOUR`ï¼‰ã€‚
+- `~/.OpenKrab/OpenKrab.json` ä¸­çš„ `gateway.bind` æŽ§åˆ¶ Gateway ç½‘å…³ç»‘å®šæ¨¡å¼ã€‚
+- `OPENKRAB_SSH_PORT` è¦†ç›– TXT ä¸­å¹¿æ’­çš„ SSH ç«¯å£ï¼ˆæ—§ç‰ˆï¼š`OPENKRAB_SSH_PORT`ï¼‰ã€‚
+- `OPENKRAB_TAILNET_DNS` åœ¨ TXT ä¸­å‘å¸ƒ MagicDNS æç¤ºï¼ˆæ—§ç‰ˆï¼š`OPENKRAB_TAILNET_DNS`ï¼‰ã€‚
+- `OPENKRAB_CLI_PATH` è¦†ç›–å¹¿æ’­çš„ CLI è·¯å¾„ï¼ˆæ—§ç‰ˆï¼š`OPENKRAB_CLI_PATH`ï¼‰ã€‚
 
-## 相关文档
+## ç›¸å…³æ–‡æ¡£
 
-- 设备发现策略和传输选择：[设备发现](/gateway/discovery)
-- 节点配对 + 批准：[Gateway 网关配对](/gateway/pairing)
+- è®¾å¤‡å‘çŽ°ç­–ç•¥å’Œä¼ è¾“é€‰æ‹©ï¼š[è®¾å¤‡å‘çŽ°](/gateway/discovery)
+- èŠ‚ç‚¹é…å¯¹ + æ‰¹å‡†ï¼š[Gateway ç½‘å…³é…å¯¹](/gateway/pairing)
+
 

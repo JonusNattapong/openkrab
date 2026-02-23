@@ -60,7 +60,7 @@ pub struct ChatChannelMeta {
 
 fn chat_meta_map() -> HashMap<&'static str, ChatChannelMeta> {
     let mut m = HashMap::new();
-    let website = "https://krabkrab.ai".to_string();
+    let website = "https://openkrab.ai".to_string();
 
     m.insert(
         "telegram",
@@ -229,3 +229,4 @@ where
         docs
     )
 }
+

@@ -188,7 +188,7 @@ impl TtsSpeaker {
 
         let bytes = response.bytes()?;
         let mut path = std::env::temp_dir();
-        path.push(format!("krabkrab-tts-{}.mp3", uuid::Uuid::new_v4()));
+        path.push(format!("openkrab-tts-{}.mp3", uuid::Uuid::new_v4()));
         std::fs::write(&path, &bytes)?;
 
         play_audio_file(&path)?;
@@ -322,3 +322,4 @@ mod tests {
         assert_eq!(s.voice.as_deref(), Some("Samantha"));
     }
 }
+

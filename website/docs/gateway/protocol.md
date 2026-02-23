@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Gateway WebSocket protocol: handshake, frames, versioning"
 read_when:
   - Implementing or updating gateway WS clients
@@ -21,22 +21,22 @@ handshake time.
 
 ## Handshake (connect)
 
-Gateway → Client (pre-connect challenge):
+Gateway â†’ Client (pre-connect challenge):
 
 ```json
 {
   "type": "event",
   "event": "connect.challenge",
-  "payload": { "nonce": "…", "ts": 1737264000000 }
+  "payload": { "nonce": "â€¦", "ts": 1737264000000 }
 }
 ```
 
-Client → Gateway:
+Client â†’ Gateway:
 
 ```json
 {
   "type": "req",
-  "id": "…",
+  "id": "â€¦",
   "method": "connect",
   "params": {
     "minProtocol": 3,
@@ -52,26 +52,26 @@ Client → Gateway:
     "caps": [],
     "commands": [],
     "permissions": {},
-    "auth": { "token": "…" },
+    "auth": { "token": "â€¦" },
     "locale": "en-US",
     "userAgent": "openkrab-cli/1.2.3",
     "device": {
       "id": "device_fingerprint",
-      "publicKey": "…",
-      "signature": "…",
+      "publicKey": "â€¦",
+      "signature": "â€¦",
       "signedAt": 1737264000000,
-      "nonce": "…"
+      "nonce": "â€¦"
     }
   }
 }
 ```
 
-Gateway → Client:
+Gateway â†’ Client:
 
 ```json
 {
   "type": "res",
-  "id": "…",
+  "id": "â€¦",
   "ok": true,
   "payload": { "type": "hello-ok", "protocol": 3, "policy": { "tickIntervalMs": 15000 } }
 }
@@ -82,7 +82,7 @@ When a device token is issued, `hello-ok` also includes:
 ```json
 {
   "auth": {
-    "deviceToken": "…",
+    "deviceToken": "â€¦",
     "role": "operator",
     "scopes": ["operator.read", "operator.write"]
   }
@@ -94,7 +94,7 @@ When a device token is issued, `hello-ok` also includes:
 ```json
 {
   "type": "req",
-  "id": "…",
+  "id": "â€¦",
   "method": "connect",
   "params": {
     "minProtocol": 3,
@@ -110,15 +110,15 @@ When a device token is issued, `hello-ok` also includes:
     "caps": ["camera", "canvas", "screen", "location", "voice"],
     "commands": ["camera.snap", "canvas.navigate", "screen.record", "location.get"],
     "permissions": { "camera.capture": true, "screen.record": false },
-    "auth": { "token": "…" },
+    "auth": { "token": "â€¦" },
     "locale": "en-US",
     "userAgent": "openkrab-ios/1.2.3",
     "device": {
       "id": "device_fingerprint",
-      "publicKey": "…",
-      "signature": "…",
+      "publicKey": "â€¦",
+      "signature": "â€¦",
       "signedAt": 1737264000000,
-      "nonce": "…"
+      "nonce": "â€¦"
     }
   }
 }
@@ -186,7 +186,7 @@ The Gateway treats these as **claims** and enforces server-side allowlists.
 
 ## Auth
 
-- If `openkrab_GATEWAY_TOKEN` (or `--token`) is set, `connect.params.auth.token`
+- If `OPENKRAB_GATEWAY_TOKEN` (or `--token`) is set, `connect.params.auth.token`
   must match or the socket is closed.
 - After pairing, the Gateway issues a **device token** scoped to the connection
   role + scopes. It is returned in `hello-ok.auth.deviceToken` and should be
@@ -201,8 +201,8 @@ The Gateway treats these as **claims** and enforces server-side allowlists.
 - Gateways issue tokens per device + role.
 - Pairing approvals are required for new device IDs unless local auto-approval
   is enabled.
-- **Local** connects include loopback and the gateway host’s own tailnet address
-  (so same‑host tailnet binds can still auto‑approve).
+- **Local** connects include loopback and the gateway hostâ€™s own tailnet address
+  (so sameâ€‘host tailnet binds can still autoâ€‘approve).
 - All WS clients must include `device` identity during `connect` (operator + node).
   Control UI can omit it **only** when `gateway.controlUi.allowInsecureAuth` is enabled
   (or `gateway.controlUi.dangerouslyDisableDeviceAuth` for break-glass use).
@@ -219,3 +219,4 @@ The Gateway treats these as **claims** and enforces server-side allowlists.
 This protocol exposes the **full gateway API** (status, channels, models, chat,
 agent, sessions, nodes, approvals, etc.). The exact surface is defined by the
 TypeBox schemas in `src/gateway/protocol/schema.ts`.
+

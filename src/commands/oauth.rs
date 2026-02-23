@@ -55,7 +55,7 @@ pub fn is_remote_environment() -> bool {
 
 fn get_token_path() -> PathBuf {
     let home = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    home.join("krabkrab").join("oauth_tokens.json")
+    home.join("openkrab").join("oauth_tokens.json")
 }
 
 fn load_tokens() -> Result<Option<OAuthTokens>> {
@@ -532,3 +532,4 @@ fn url_encode(s: &str) -> String {
         })
         .collect()
 }
+

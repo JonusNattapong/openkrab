@@ -1,5 +1,5 @@
----
-summary: "openkrab Gateway CLI (`openkrab gateway`) — run, query, and discover gateways"
+﻿---
+summary: "openkrab Gateway CLI (`openkrab gateway`) â€” run, query, and discover gateways"
 read_when:
   - Running the Gateway from the CLI (dev or servers)
   - Debugging Gateway auth, bind modes, and connectivity
@@ -9,9 +9,9 @@ title: "gateway"
 
 # Gateway CLI
 
-The Gateway is openkrab’s WebSocket server (channels, nodes, sessions, hooks).
+The Gateway is openkrabâ€™s WebSocket server (channels, nodes, sessions, hooks).
 
-Subcommands in this page live under `openkrab gateway …`.
+Subcommands in this page live under `openkrab gateway â€¦`.
 
 Related docs:
 
@@ -23,14 +23,12 @@ Related docs:
 
 Run a local Gateway process:
 
-```bash
-openkrab gateway
+```bash\nOpenKrab gateway
 ```
 
 Foreground alias:
 
-```bash
-openkrab gateway run
+```bash\nOpenKrab gateway run
 ```
 
 Notes:
@@ -38,15 +36,15 @@ Notes:
 - By default, the Gateway refuses to start unless `gateway.mode=local` is set in `~/.openkrab/openkrab.json`. Use `--allow-unconfigured` for ad-hoc/dev runs.
 - Binding beyond loopback without auth is blocked (safety guardrail).
 - `SIGUSR1` triggers an in-process restart when authorized (`commands.restart` is enabled by default; set `commands.restart: false` to block manual restart, while gateway tool/config apply/update remain allowed).
-- `SIGINT`/`SIGTERM` handlers stop the gateway process, but they don’t restore any custom terminal state. If you wrap the CLI with a TUI or raw-mode input, restore the terminal before exit.
+- `SIGINT`/`SIGTERM` handlers stop the gateway process, but they donâ€™t restore any custom terminal state. If you wrap the CLI with a TUI or raw-mode input, restore the terminal before exit.
 
 ### Options
 
 - `--port <port>`: WebSocket port (default comes from config/env; usually `18789`).
 - `--bind <loopback|lan|tailnet|auto|custom>`: listener bind mode.
 - `--auth <token|password>`: auth mode override.
-- `--token <token>`: token override (also sets `openkrab_GATEWAY_TOKEN` for the process).
-- `--password <password>`: password override (also sets `openkrab_GATEWAY_PASSWORD` for the process).
+- `--token <token>`: token override (also sets `OPENKRAB_GATEWAY_TOKEN` for the process).
+- `--password <password>`: password override (also sets `OPENKRAB_GATEWAY_PASSWORD` for the process).
 - `--tailscale <off|serve|funnel>`: expose the Gateway via Tailscale.
 - `--tailscale-reset-on-exit`: reset Tailscale serve/funnel config on shutdown.
 - `--allow-unconfigured`: allow gateway start without `gateway.mode=local` in config.
@@ -76,24 +74,21 @@ Shared options (where supported):
 - `--token <token>`: Gateway token.
 - `--password <password>`: Gateway password.
 - `--timeout <ms>`: timeout/budget (varies per command).
-- `--expect-final`: wait for a “final” response (agent calls).
+- `--expect-final`: wait for a â€œfinalâ€ response (agent calls).
 
 Note: when you set `--url`, the CLI does not fall back to config or environment credentials.
 Pass `--token` or `--password` explicitly. Missing explicit credentials is an error.
 
 ### `gateway health`
 
-```bash
-openkrab gateway health --url ws://127.0.0.1:18789
+```bash\nOpenKrab gateway health --url ws://127.0.0.1:18789
 ```
 
 ### `gateway status`
 
 `gateway status` shows the Gateway service (launchd/systemd/schtasks) plus an optional RPC probe.
 
-```bash
-openkrab gateway status
-openkrab gateway status --json
+```bash\nOpenKrab gateway status\nOpenKrab gateway status --json
 ```
 
 Options:
@@ -107,26 +102,23 @@ Options:
 
 ### `gateway probe`
 
-`gateway probe` is the “debug everything” command. It always probes:
+`gateway probe` is the â€œdebug everythingâ€ command. It always probes:
 
 - your configured remote gateway (if set), and
 - localhost (loopback) **even if remote is configured**.
 
 If multiple gateways are reachable, it prints all of them. Multiple gateways are supported when you use isolated profiles/ports (e.g., a rescue bot), but most installs still run a single gateway.
 
-```bash
-openkrab gateway probe
-openkrab gateway probe --json
+```bash\nOpenKrab gateway probe\nOpenKrab gateway probe --json
 ```
 
 #### Remote over SSH (Mac app parity)
 
-The macOS app “Remote over SSH” mode uses a local port-forward so the remote gateway (which may be bound to loopback only) becomes reachable at `ws://127.0.0.1:<port>`.
+The macOS app â€œRemote over SSHâ€ mode uses a local port-forward so the remote gateway (which may be bound to loopback only) becomes reachable at `ws://127.0.0.1:<port>`.
 
 CLI equivalent:
 
-```bash
-openkrab gateway probe --ssh user@gateway-host
+```bash\nOpenKrab gateway probe --ssh user@gateway-host
 ```
 
 Options:
@@ -144,19 +136,12 @@ Config (optional, used as defaults):
 
 Low-level RPC helper.
 
-```bash
-openkrab gateway call status
-openkrab gateway call logs.tail --params '{"sinceMs": 60000}'
+```bash\nOpenKrab gateway call status\nOpenKrab gateway call logs.tail --params '{"sinceMs": 60000}'
 ```
 
 ## Manage the Gateway service
 
-```bash
-openkrab gateway install
-openkrab gateway start
-openkrab gateway stop
-openkrab gateway restart
-openkrab gateway uninstall
+```bash\nOpenKrab gateway install\nOpenKrab gateway start\nOpenKrab gateway stop\nOpenKrab gateway restart\nOpenKrab gateway uninstall
 ```
 
 Notes:
@@ -185,8 +170,7 @@ Wide-Area discovery records include (TXT):
 
 ### `gateway discover`
 
-```bash
-openkrab gateway discover
+```bash\nOpenKrab gateway discover
 ```
 
 Options:
@@ -196,7 +180,7 @@ Options:
 
 Examples:
 
-```bash
-openkrab gateway discover --timeout 4000
-openkrab gateway discover --json | jq '.beacons[].wsUrl'
+```bash\nOpenKrab gateway discover --timeout 4000\nOpenKrab gateway discover --json | jq '.beacons[].wsUrl'
 ```
+
+

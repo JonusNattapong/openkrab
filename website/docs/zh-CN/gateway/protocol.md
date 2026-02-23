@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 实现或更新 Gateway 网关 WS 客户端
-  - 调试协议不匹配或连接失败
-  - 重新生成协议模式/模型
-summary: Gateway 网关 WebSocket 协议：握手、帧、版本控制
-title: Gateway 网关协议
+  - å®žçŽ°æˆ–æ›´æ–° Gateway ç½‘å…³ WS å®¢æˆ·ç«¯
+  - è°ƒè¯•åè®®ä¸åŒ¹é…æˆ–è¿žæŽ¥å¤±è´¥
+  - é‡æ–°ç”Ÿæˆåè®®æ¨¡å¼/æ¨¡åž‹
+summary: Gateway ç½‘å…³ WebSocket åè®®ï¼šæ¡æ‰‹ã€å¸§ã€ç‰ˆæœ¬æŽ§åˆ¶
+title: Gateway ç½‘å…³åè®®
 x-i18n:
   generated_at: "2026-02-03T07:48:42Z"
   model: claude-opus-4-5
@@ -14,33 +14,33 @@ x-i18n:
   workflow: 15
 ---
 
-# Gateway 网关协议（WebSocket）
+# Gateway ç½‘å…³åè®®ï¼ˆWebSocketï¼‰
 
-Gateway 网关 WS 协议是 OpenKrab 的**单一控制平面 + 节点传输**。所有客户端（CLI、Web UI、macOS 应用、iOS/Android 节点、无头节点）都通过 WebSocket 连接，并在握手时声明其**角色** + **作用域**。
+Gateway ç½‘å…³ WS åè®®æ˜¯ OpenKrab çš„**å•ä¸€æŽ§åˆ¶å¹³é¢ + èŠ‚ç‚¹ä¼ è¾“**ã€‚æ‰€æœ‰å®¢æˆ·ç«¯ï¼ˆCLIã€Web UIã€macOS åº”ç”¨ã€iOS/Android èŠ‚ç‚¹ã€æ— å¤´èŠ‚ç‚¹ï¼‰éƒ½é€šè¿‡ WebSocket è¿žæŽ¥ï¼Œå¹¶åœ¨æ¡æ‰‹æ—¶å£°æ˜Žå…¶**è§’è‰²** + **ä½œç”¨åŸŸ**ã€‚
 
-## 传输
+## ä¼ è¾“
 
-- WebSocket，带有 JSON 负载的文本帧。
-- 第一帧**必须**是 `connect` 请求。
+- WebSocketï¼Œå¸¦æœ‰ JSON è´Ÿè½½çš„æ–‡æœ¬å¸§ã€‚
+- ç¬¬ä¸€å¸§**å¿…é¡»**æ˜¯ `connect` è¯·æ±‚ã€‚
 
-## 握手（connect）
+## æ¡æ‰‹ï¼ˆconnectï¼‰
 
-Gateway 网关 → 客户端（连接前质询）：
+Gateway ç½‘å…³ â†’ å®¢æˆ·ç«¯ï¼ˆè¿žæŽ¥å‰è´¨è¯¢ï¼‰ï¼š
 
 ```json
 {
   "type": "event",
   "event": "connect.challenge",
-  "payload": { "nonce": "…", "ts": 1737264000000 }
+  "payload": { "nonce": "â€¦", "ts": 1737264000000 }
 }
 ```
 
-客户端 → Gateway 网关：
+å®¢æˆ·ç«¯ â†’ Gateway ç½‘å…³ï¼š
 
 ```json
 {
   "type": "req",
-  "id": "…",
+  "id": "â€¦",
   "method": "connect",
   "params": {
     "minProtocol": 3,
@@ -56,49 +56,49 @@ Gateway 网关 → 客户端（连接前质询）：
     "caps": [],
     "commands": [],
     "permissions": {},
-    "auth": { "token": "…" },
+    "auth": { "token": "â€¦" },
     "locale": "en-US",
     "userAgent": "OpenKrab-cli/1.2.3",
     "device": {
       "id": "device_fingerprint",
-      "publicKey": "…",
-      "signature": "…",
+      "publicKey": "â€¦",
+      "signature": "â€¦",
       "signedAt": 1737264000000,
-      "nonce": "…"
+      "nonce": "â€¦"
     }
   }
 }
 ```
 
-Gateway 网关 → 客户端：
+Gateway ç½‘å…³ â†’ å®¢æˆ·ç«¯ï¼š
 
 ```json
 {
   "type": "res",
-  "id": "…",
+  "id": "â€¦",
   "ok": true,
   "payload": { "type": "hello-ok", "protocol": 3, "policy": { "tickIntervalMs": 15000 } }
 }
 ```
 
-当颁发设备令牌时，`hello-ok` 还包含：
+å½“é¢å‘è®¾å¤‡ä»¤ç‰Œæ—¶ï¼Œ`hello-ok` è¿˜åŒ…å«ï¼š
 
 ```json
 {
   "auth": {
-    "deviceToken": "…",
+    "deviceToken": "â€¦",
     "role": "operator",
     "scopes": ["operator.read", "operator.write"]
   }
 }
 ```
 
-### 节点示例
+### èŠ‚ç‚¹ç¤ºä¾‹
 
 ```json
 {
   "type": "req",
-  "id": "…",
+  "id": "â€¦",
   "method": "connect",
   "params": {
     "minProtocol": 3,
@@ -114,38 +114,38 @@ Gateway 网关 → 客户端：
     "caps": ["camera", "canvas", "screen", "location", "voice"],
     "commands": ["camera.snap", "canvas.navigate", "screen.record", "location.get"],
     "permissions": { "camera.capture": true, "screen.record": false },
-    "auth": { "token": "…" },
+    "auth": { "token": "â€¦" },
     "locale": "en-US",
     "userAgent": "OpenKrab-ios/1.2.3",
     "device": {
       "id": "device_fingerprint",
-      "publicKey": "…",
-      "signature": "…",
+      "publicKey": "â€¦",
+      "signature": "â€¦",
       "signedAt": 1737264000000,
-      "nonce": "…"
+      "nonce": "â€¦"
     }
   }
 }
 ```
 
-## 帧格式
+## å¸§æ ¼å¼
 
-- **Request**：`{type:"req", id, method, params}`
-- **Response**：`{type:"res", id, ok, payload|error}`
-- **Event**：`{type:"event", event, payload, seq?, stateVersion?}`
+- **Request**ï¼š`{type:"req", id, method, params}`
+- **Response**ï¼š`{type:"res", id, ok, payload|error}`
+- **Event**ï¼š`{type:"event", event, payload, seq?, stateVersion?}`
 
-有副作用的方法需要**幂等键**（见模式）。
+æœ‰å‰¯ä½œç”¨çš„æ–¹æ³•éœ€è¦**å¹‚ç­‰é”®**ï¼ˆè§æ¨¡å¼ï¼‰ã€‚
 
-## 角色 + 作用域
+## è§’è‰² + ä½œç”¨åŸŸ
 
-### 角色
+### è§’è‰²
 
-- `operator` = 控制平面客户端（CLI/UI/自动化）。
-- `node` = 能力宿主（camera/screen/canvas/system.run）。
+- `operator` = æŽ§åˆ¶å¹³é¢å®¢æˆ·ç«¯ï¼ˆCLI/UI/è‡ªåŠ¨åŒ–ï¼‰ã€‚
+- `node` = èƒ½åŠ›å®¿ä¸»ï¼ˆcamera/screen/canvas/system.runï¼‰ã€‚
 
-### 作用域（operator）
+### ä½œç”¨åŸŸï¼ˆoperatorï¼‰
 
-常用作用域：
+å¸¸ç”¨ä½œç”¨åŸŸï¼š
 
 - `operator.read`
 - `operator.write`
@@ -153,69 +153,70 @@ Gateway 网关 → 客户端：
 - `operator.approvals`
 - `operator.pairing`
 
-### 能力/命令/权限（node）
+### èƒ½åŠ›/å‘½ä»¤/æƒé™ï¼ˆnodeï¼‰
 
-节点在连接时声明能力声明：
+èŠ‚ç‚¹åœ¨è¿žæŽ¥æ—¶å£°æ˜Žèƒ½åŠ›å£°æ˜Žï¼š
 
-- `caps`：高级能力类别。
-- `commands`：invoke 的命令允许列表。
-- `permissions`：细粒度开关（例如 `screen.record`、`camera.capture`）。
+- `caps`ï¼šé«˜çº§èƒ½åŠ›ç±»åˆ«ã€‚
+- `commands`ï¼šinvoke çš„å‘½ä»¤å…è®¸åˆ—è¡¨ã€‚
+- `permissions`ï¼šç»†ç²’åº¦å¼€å…³ï¼ˆä¾‹å¦‚ `screen.record`ã€`camera.capture`ï¼‰ã€‚
 
-Gateway 网关将这些视为**声明**并强制执行服务器端允许列表。
+Gateway ç½‘å…³å°†è¿™äº›è§†ä¸º**å£°æ˜Ž**å¹¶å¼ºåˆ¶æ‰§è¡ŒæœåŠ¡å™¨ç«¯å…è®¸åˆ—è¡¨ã€‚
 
-## 在线状态
+## åœ¨çº¿çŠ¶æ€
 
-- `system-presence` 返回以设备身份为键的条目。
-- 在线状态条目包含 `deviceId`、`roles` 和 `scopes`，以便 UI 可以为每个设备显示单行，
-  即使它同时以 **operator** 和 **node** 身份连接。
+- `system-presence` è¿”å›žä»¥è®¾å¤‡èº«ä»½ä¸ºé”®çš„æ¡ç›®ã€‚
+- åœ¨çº¿çŠ¶æ€æ¡ç›®åŒ…å« `deviceId`ã€`roles` å’Œ `scopes`ï¼Œä»¥ä¾¿ UI å¯ä»¥ä¸ºæ¯ä¸ªè®¾å¤‡æ˜¾ç¤ºå•è¡Œï¼Œ
+  å³ä½¿å®ƒåŒæ—¶ä»¥ **operator** å’Œ **node** èº«ä»½è¿žæŽ¥ã€‚
 
-### 节点辅助方法
+### èŠ‚ç‚¹è¾…åŠ©æ–¹æ³•
 
-- 节点可以调用 `skills.bins` 来获取当前的 skill 可执行文件列表，
-  用于自动允许检查。
+- èŠ‚ç‚¹å¯ä»¥è°ƒç”¨ `skills.bins` æ¥èŽ·å–å½“å‰çš„ skill å¯æ‰§è¡Œæ–‡ä»¶åˆ—è¡¨ï¼Œ
+  ç”¨äºŽè‡ªåŠ¨å…è®¸æ£€æŸ¥ã€‚
 
-## Exec 审批
+## Exec å®¡æ‰¹
 
-- 当 exec 请求需要审批时，Gateway 网关广播 `exec.approval.requested`。
-- 操作者客户端通过调用 `exec.approval.resolve` 来解决（需要 `operator.approvals` 作用域）。
+- å½“ exec è¯·æ±‚éœ€è¦å®¡æ‰¹æ—¶ï¼ŒGateway ç½‘å…³å¹¿æ’­ `exec.approval.requested`ã€‚
+- æ“ä½œè€…å®¢æˆ·ç«¯é€šè¿‡è°ƒç”¨ `exec.approval.resolve` æ¥è§£å†³ï¼ˆéœ€è¦ `operator.approvals` ä½œç”¨åŸŸï¼‰ã€‚
 
-## 版本控制
+## ç‰ˆæœ¬æŽ§åˆ¶
 
-- `PROTOCOL_VERSION` 在 `src/gateway/protocol/schema.ts` 中。
-- 客户端发送 `minProtocol` + `maxProtocol`；服务器拒绝不匹配的。
-- 模式 + 模型从 TypeBox 定义生成：
+- `PROTOCOL_VERSION` åœ¨ `src/gateway/protocol/schema.ts` ä¸­ã€‚
+- å®¢æˆ·ç«¯å‘é€ `minProtocol` + `maxProtocol`ï¼›æœåŠ¡å™¨æ‹’ç»ä¸åŒ¹é…çš„ã€‚
+- æ¨¡å¼ + æ¨¡åž‹ä»Ž TypeBox å®šä¹‰ç”Ÿæˆï¼š
   - `pnpm protocol:gen`
   - `pnpm protocol:gen:swift`
   - `pnpm protocol:check`
 
-## 认证
+## è®¤è¯
 
-- 如果设置了 `OpenKrab_GATEWAY_TOKEN`（或 `--token`），`connect.params.auth.token`
-  必须匹配，否则套接字将被关闭。
-- 配对后，Gateway 网关会颁发一个作用于连接角色 + 作用域的**设备令牌**。它在 `hello-ok.auth.deviceToken` 中返回，
-  客户端应将其持久化以供将来连接使用。
-- 设备令牌可以通过 `device.token.rotate` 和 `device.token.revoke` 轮换/撤销（需要 `operator.pairing` 作用域）。
+- å¦‚æžœè®¾ç½®äº† `OPENKRAB_GATEWAY_TOKEN`ï¼ˆæˆ– `--token`ï¼‰ï¼Œ`connect.params.auth.token`
+  å¿…é¡»åŒ¹é…ï¼Œå¦åˆ™å¥—æŽ¥å­—å°†è¢«å…³é—­ã€‚
+- é…å¯¹åŽï¼ŒGateway ç½‘å…³ä¼šé¢å‘ä¸€ä¸ªä½œç”¨äºŽè¿žæŽ¥è§’è‰² + ä½œç”¨åŸŸçš„**è®¾å¤‡ä»¤ç‰Œ**ã€‚å®ƒåœ¨ `hello-ok.auth.deviceToken` ä¸­è¿”å›žï¼Œ
+  å®¢æˆ·ç«¯åº”å°†å…¶æŒä¹…åŒ–ä»¥ä¾›å°†æ¥è¿žæŽ¥ä½¿ç”¨ã€‚
+- è®¾å¤‡ä»¤ç‰Œå¯ä»¥é€šè¿‡ `device.token.rotate` å’Œ `device.token.revoke` è½®æ¢/æ’¤é”€ï¼ˆéœ€è¦ `operator.pairing` ä½œç”¨åŸŸï¼‰ã€‚
 
-## 设备身份 + 配对
+## è®¾å¤‡èº«ä»½ + é…å¯¹
 
-- 节点应包含从密钥对指纹派生的稳定设备身份（`device.id`）。
-- Gateway 网关为每个设备 + 角色颁发令牌。
-- 新设备 ID 需要配对批准，除非启用了本地自动批准。
-- **本地**连接包括 loopback 和 Gateway 网关主机自身的 tailnet 地址
-  （因此同主机 tailnet 绑定仍可自动批准）。
-- 所有 WS 客户端在 `connect` 期间必须包含 `device` 身份（operator + node）。
-  控制 UI **仅**在启用 `gateway.controlUi.allowInsecureAuth` 时可以省略它
-  （或使用 `gateway.controlUi.dangerouslyDisableDeviceAuth` 用于紧急情况）。
-- 非本地连接必须签署服务器提供的 `connect.challenge` nonce。
+- èŠ‚ç‚¹åº”åŒ…å«ä»Žå¯†é’¥å¯¹æŒ‡çº¹æ´¾ç”Ÿçš„ç¨³å®šè®¾å¤‡èº«ä»½ï¼ˆ`device.id`ï¼‰ã€‚
+- Gateway ç½‘å…³ä¸ºæ¯ä¸ªè®¾å¤‡ + è§’è‰²é¢å‘ä»¤ç‰Œã€‚
+- æ–°è®¾å¤‡ ID éœ€è¦é…å¯¹æ‰¹å‡†ï¼Œé™¤éžå¯ç”¨äº†æœ¬åœ°è‡ªåŠ¨æ‰¹å‡†ã€‚
+- **æœ¬åœ°**è¿žæŽ¥åŒ…æ‹¬ loopback å’Œ Gateway ç½‘å…³ä¸»æœºè‡ªèº«çš„ tailnet åœ°å€
+  ï¼ˆå› æ­¤åŒä¸»æœº tailnet ç»‘å®šä»å¯è‡ªåŠ¨æ‰¹å‡†ï¼‰ã€‚
+- æ‰€æœ‰ WS å®¢æˆ·ç«¯åœ¨ `connect` æœŸé—´å¿…é¡»åŒ…å« `device` èº«ä»½ï¼ˆoperator + nodeï¼‰ã€‚
+  æŽ§åˆ¶ UI **ä»…**åœ¨å¯ç”¨ `gateway.controlUi.allowInsecureAuth` æ—¶å¯ä»¥çœç•¥å®ƒ
+  ï¼ˆæˆ–ä½¿ç”¨ `gateway.controlUi.dangerouslyDisableDeviceAuth` ç”¨äºŽç´§æ€¥æƒ…å†µï¼‰ã€‚
+- éžæœ¬åœ°è¿žæŽ¥å¿…é¡»ç­¾ç½²æœåŠ¡å™¨æä¾›çš„ `connect.challenge` nonceã€‚
 
-## TLS + 固定
+## TLS + å›ºå®š
 
-- WS 连接支持 TLS。
-- 客户端可以选择性地固定 Gateway 网关证书指纹（见 `gateway.tls`
-  配置加上 `gateway.remote.tlsFingerprint` 或 CLI `--tls-fingerprint`）。
+- WS è¿žæŽ¥æ”¯æŒ TLSã€‚
+- å®¢æˆ·ç«¯å¯ä»¥é€‰æ‹©æ€§åœ°å›ºå®š Gateway ç½‘å…³è¯ä¹¦æŒ‡çº¹ï¼ˆè§ `gateway.tls`
+  é…ç½®åŠ ä¸Š `gateway.remote.tlsFingerprint` æˆ– CLI `--tls-fingerprint`ï¼‰ã€‚
 
-## 范围
+## èŒƒå›´
 
-此协议暴露**完整的 Gateway 网关 API**（status、channels、models、chat、
-agent、sessions、nodes、approvals 等）。确切的接口由 `src/gateway/protocol/schema.ts` 中的 TypeBox 模式定义。
+æ­¤åè®®æš´éœ²**å®Œæ•´çš„ Gateway ç½‘å…³ API**ï¼ˆstatusã€channelsã€modelsã€chatã€
+agentã€sessionsã€nodesã€approvals ç­‰ï¼‰ã€‚ç¡®åˆ‡çš„æŽ¥å£ç”± `src/gateway/protocol/schema.ts` ä¸­çš„ TypeBox æ¨¡å¼å®šä¹‰ã€‚
+
 

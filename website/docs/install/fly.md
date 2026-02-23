@@ -1,11 +1,11 @@
----
+﻿---
 title: Fly.io
-description: Deploy openkrab on Fly.io
+description: Deploy OpenKrab on Fly.io
 ---
 
 # Fly.io Deployment
 
-**Goal:** openkrab Gateway running on a [Fly.io](https://fly.io) machine with persistent storage, automatic HTTPS, and Discord/channel access.
+**Goal:** OpenKrab Gateway running on a [Fly.io](https://fly.io) machine with persistent storage, automatic HTTPS, and Discord/channel access.
 
 ## What you need
 
@@ -16,8 +16,8 @@ description: Deploy openkrab on Fly.io
 
 ## Beginner quick path
 
-1. Clone repo → customize `fly.toml`
-2. Create app + volume → set secrets
+1. Clone repo â†’ customize `fly.toml`
+2. Create app + volume â†’ set secrets
 3. Deploy with `fly deploy`
 4. SSH in to create config or use Control UI
 
@@ -32,7 +32,7 @@ cd openkrab
 fly apps create my-openkrab
 
 # Create a persistent volume (1GB is usually enough)
-fly volumes create openkrab_data --size 1 --region iad
+fly volumes create OPENKRAB_DATA --size 1 --region iad
 ```
 
 **Tip:** Choose a region close to you. Common options: `lhr` (London), `iad` (Virginia), `sjc` (San Jose).
@@ -52,8 +52,8 @@ primary_region = "iad"
 
 [env]
   NODE_ENV = "production"
-  openkrab_PREFER_PNPM = "1"
-  openkrab_STATE_DIR = "/data"
+  OPENKRAB_PREFER_PNPM = "1"
+  OPENKRAB_STATE_DIR = "/data"
   NODE_OPTIONS = "--max-old-space-size=1536"
 
 [processes]
@@ -72,7 +72,7 @@ primary_region = "iad"
   memory = "2048mb"
 
 [mounts]
-  source = "openkrab_data"
+  source = "OPENKRAB_DATA"
   destination = "/data"
 ```
 
@@ -82,15 +82,15 @@ primary_region = "iad"
 | ------------------------------ | --------------------------------------------------------------------------- |
 | `--bind lan`                   | Binds to `0.0.0.0` so Fly's proxy can reach the gateway                     |
 | `--allow-unconfigured`         | Starts without a config file (you'll create one after)                      |
-| `internal_port = 3000`         | Must match `--port 3000` (or `openkrab_GATEWAY_PORT`) for Fly health checks |
+| `internal_port = 3000`         | Must match `--port 3000` (or `OPENKRAB_GATEWAY_PORT`) for Fly health checks |
 | `memory = "2048mb"`            | 512MB is too small; 2GB recommended                                         |
-| `openkrab_STATE_DIR = "/data"` | Persists state on the volume                                                |
+| `OPENKRAB_STATE_DIR = "/data"` | Persists state on the volume                                                |
 
 ## 3) Set secrets
 
 ```bash
 # Required: Gateway token (for non-loopback binding)
-fly secrets set openkrab_GATEWAY_TOKEN=$(openssl rand -hex 32)
+fly secrets set OPENKRAB_GATEWAY_TOKEN=$(openssl rand -hex 32)
 
 # Model provider API keys
 fly secrets set ANTHROPIC_API_KEY=sk-ant-...
@@ -105,7 +105,7 @@ fly secrets set DISCORD_BOT_TOKEN=MTQ...
 
 **Notes:**
 
-- Non-loopback binds (`--bind lan`) require `openkrab_GATEWAY_TOKEN` for security.
+- Non-loopback binds (`--bind lan`) require `OPENKRAB_GATEWAY_TOKEN` for security.
 - Treat these tokens like passwords.
 - **Prefer env vars over config file** for all API keys and tokens. This keeps secrets out of `openkrab.json` where they could be accidentally exposed or logged.
 
@@ -195,7 +195,7 @@ cat > /data/openkrab.json << 'EOF'
 EOF
 ```
 
-**Note:** With `openkrab_STATE_DIR=/data`, the config path is `/data/openkrab.json`.
+**Note:** With `OPENKRAB_STATE_DIR=/data`, the config path is `/data/openkrab.json`.
 
 **Note:** The Discord token can come from either:
 
@@ -223,7 +223,7 @@ fly open
 
 Or visit `https://my-openkrab.fly.dev/`
 
-Paste your gateway token (the one from `openkrab_GATEWAY_TOKEN`) to authenticate.
+Paste your gateway token (the one from `OPENKRAB_GATEWAY_TOKEN`) to authenticate.
 
 ### Logs
 
@@ -250,7 +250,7 @@ The gateway is binding to `127.0.0.1` instead of `0.0.0.0`.
 
 Fly can't reach the gateway on the configured port.
 
-**Fix:** Ensure `internal_port` matches the gateway port (set `--port 3000` or `openkrab_GATEWAY_PORT=3000`).
+**Fix:** Ensure `internal_port` matches the gateway port (set `--port 3000` or `OPENKRAB_GATEWAY_PORT=3000`).
 
 ### OOM / Memory Issues
 
@@ -319,7 +319,7 @@ fly ssh console --command "rm /data/openkrab.json"
 
 If you lose credentials or sessions after a restart, the state dir is writing to the container filesystem.
 
-**Fix:** Ensure `openkrab_STATE_DIR=/data` is set in `fly.toml` and redeploy.
+**Fix:** Ensure `OPENKRAB_STATE_DIR=/data` is set in `fly.toml` and redeploy.
 
 ## Updates
 
@@ -484,3 +484,5 @@ With the recommended config (`shared-cpu-2x`, 2GB RAM):
 - Free tier includes some allowance
 
 See [Fly.io pricing](https://fly.io/docs/about/pricing/) for details.
+
+

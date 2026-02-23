@@ -10,7 +10,7 @@ pub fn send_notification(title: &str, body: &str) -> Result<()> {
         .summary(title)
         .body(body)
         .appname("OpenKrab")
-        // .icon("krabkrab")
+        // .icon("openkrab")
         .show()?;
     Ok(())
 }
@@ -36,3 +36,4 @@ mod tests {
         assert!(send_notification("OpenKrab Test", "System notifications are working!").is_ok());
     }
 }
+

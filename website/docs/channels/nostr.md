@@ -1,7 +1,7 @@
----
+﻿---
 summary: "Nostr DM channel via NIP-04 encrypted messages"
 read_when:
-  - You want openkrab to receive DMs via Nostr
+  - You want OpenKrab to receive DMs via Nostr
   - You're setting up decentralized messaging
 title: "Nostr"
 ---
@@ -10,7 +10,7 @@ title: "Nostr"
 
 **Status:** Optional plugin (disabled by default).
 
-Nostr is a decentralized protocol for social networking. This channel enables openkrab to receive and respond to encrypted direct messages (DMs) via NIP-04.
+Nostr is a decentralized protocol for social networking. This channel enables OpenKrab to receive and respond to encrypted direct messages (DMs) via NIP-04.
 
 ## Install (on demand)
 
@@ -28,14 +28,12 @@ You can always override the choice in the prompt.
 
 ### Manual install
 
-```bash
-openkrab plugins install @openkrab/nostr
+```bash\nOpenKrab plugins install @openkrab/nostr
 ```
 
 Use a local checkout (dev workflows):
 
-```bash
-openkrab plugins install --link <path-to-openkrab>/extensions/nostr
+```bash\nOpenKrab plugins install --link <path-to-openkrab>/extensions/nostr
 ```
 
 Restart the Gateway after installing or enabling plugins.
@@ -231,3 +229,4 @@ docker run -p 7777:7777 ghcr.io/hoytech/strfry
 - Direct messages only (no group chats).
 - No media attachments.
 - NIP-04 only (NIP-17 gift-wrap planned).
+

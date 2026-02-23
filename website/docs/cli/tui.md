@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab tui` (terminal UI connected to the Gateway)"
 read_when:
   - You want a terminal UI for the Gateway (remote-friendly)
@@ -16,8 +16,6 @@ Related:
 
 ## Examples
 
-```bash
-openkrab tui
-openkrab tui --url ws://127.0.0.1:18789 --token <token>
-openkrab tui --session main --deliver
+```bash\nOpenKrab tui\nOpenKrab tui --url ws://127.0.0.1:18789 --token <token>\nOpenKrab tui --session main --deliver
 ```
+

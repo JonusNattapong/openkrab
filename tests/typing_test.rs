@@ -1,6 +1,6 @@
 use futures::executor::block_on;
 use futures::future::BoxFuture;
-use krabkrab::channels::typing::*;
+use openkrab::channels::typing::*;
 use std::sync::Arc;
 
 fn boxed_ok() -> BoxFuture<'static, Result<(), String>> {
@@ -35,3 +35,4 @@ fn test_create_typing_callbacks_runs_start() {
     block_on(f).unwrap();
     assert!(*started.lock().unwrap());
 }
+

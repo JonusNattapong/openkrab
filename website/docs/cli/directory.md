@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab directory` (self, peers, groups)"
 read_when:
   - You want to look up contacts/groups/self ids for a channel
@@ -8,7 +8,7 @@ title: "directory"
 
 # `openkrab directory`
 
-Directory lookups for channels that support it (contacts/peers, groups, and “me”).
+Directory lookups for channels that support it (contacts/peers, groups, and â€œmeâ€).
 
 ## Common flags
 
@@ -24,40 +24,32 @@ Directory lookups for channels that support it (contacts/peers, groups, and “m
 
 ## Using results with `message send`
 
-```bash
-openkrab directory peers list --channel slack --query "U0"
-openkrab message send --channel slack --target user:U012ABCDEF --message "hello"
+```bash\nOpenKrab directory peers list --channel slack --query "U0"\nOpenKrab message send --channel slack --target user:U012ABCDEF --message "hello"
 ```
 
 ## ID formats (by channel)
 
 - WhatsApp: `+15551234567` (DM), `1234567890-1234567890@g.us` (group)
 - Telegram: `@username` or numeric chat id; groups are numeric ids
-- Slack: `user:U…` and `channel:C…`
+- Slack: `user:Uâ€¦` and `channel:Câ€¦`
 - Discord: `user:<id>` and `channel:<id>`
 - Matrix (plugin): `user:@user:server`, `room:!roomId:server`, or `#alias:server`
 - Microsoft Teams (plugin): `user:<id>` and `conversation:<id>`
 - Zalo (plugin): user id (Bot API)
 - Zalo Personal / `zalouser` (plugin): thread id (DM/group) from `zca` (`me`, `friend list`, `group list`)
 
-## Self (“me”)
+## Self (â€œmeâ€)
 
-```bash
-openkrab directory self --channel zalouser
+```bash\nOpenKrab directory self --channel zalouser
 ```
 
 ## Peers (contacts/users)
 
-```bash
-openkrab directory peers list --channel zalouser
-openkrab directory peers list --channel zalouser --query "name"
-openkrab directory peers list --channel zalouser --limit 50
+```bash\nOpenKrab directory peers list --channel zalouser\nOpenKrab directory peers list --channel zalouser --query "name"\nOpenKrab directory peers list --channel zalouser --limit 50
 ```
 
 ## Groups
 
-```bash
-openkrab directory groups list --channel zalouser
-openkrab directory groups list --channel zalouser --query "work"
-openkrab directory groups members --channel zalouser --group-id <id>
+```bash\nOpenKrab directory groups list --channel zalouser\nOpenKrab directory groups list --channel zalouser --query "work"\nOpenKrab directory groups members --channel zalouser --group-id <id>
 ```
+

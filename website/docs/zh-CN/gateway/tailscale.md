@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 在 localhost 之外暴露 Gateway 网关控制 UI
-  - 自动化 tailnet 或公共仪表盘访问
-summary: 为 Gateway 网关仪表盘集成 Tailscale Serve/Funnel
+  - åœ¨ localhost ä¹‹å¤–æš´éœ² Gateway ç½‘å…³æŽ§åˆ¶ UI
+  - è‡ªåŠ¨åŒ– tailnet æˆ–å…¬å…±ä»ªè¡¨ç›˜è®¿é—®
+summary: ä¸º Gateway ç½‘å…³ä»ªè¡¨ç›˜é›†æˆ Tailscale Serve/Funnel
 title: Tailscale
 x-i18n:
   generated_at: "2026-02-03T07:49:04Z"
@@ -13,31 +13,31 @@ x-i18n:
   workflow: 15
 ---
 
-# Tailscale（Gateway 网关仪表盘）
+# Tailscaleï¼ˆGateway ç½‘å…³ä»ªè¡¨ç›˜ï¼‰
 
-OpenKrab 可以为 Gateway 网关仪表盘和 WebSocket 端口自动配置 Tailscale **Serve**（tailnet）或 **Funnel**（公共）。这使 Gateway 网关保持绑定到 loopback，同时 Tailscale 提供 HTTPS、路由和（对于 Serve）身份头。
+OpenKrab å¯ä»¥ä¸º Gateway ç½‘å…³ä»ªè¡¨ç›˜å’Œ WebSocket ç«¯å£è‡ªåŠ¨é…ç½® Tailscale **Serve**ï¼ˆtailnetï¼‰æˆ– **Funnel**ï¼ˆå…¬å…±ï¼‰ã€‚è¿™ä½¿ Gateway ç½‘å…³ä¿æŒç»‘å®šåˆ° loopbackï¼ŒåŒæ—¶ Tailscale æä¾› HTTPSã€è·¯ç”±å’Œï¼ˆå¯¹äºŽ Serveï¼‰èº«ä»½å¤´ã€‚
 
-## 模式
+## æ¨¡å¼
 
-- `serve`：仅限 Tailnet 的 Serve，通过 `tailscale serve`。Gateway 网关保持在 `127.0.0.1` 上。
-- `funnel`：通过 `tailscale funnel` 的公共 HTTPS。OpenKrab 需要共享密码。
-- `off`：默认（无 Tailscale 自动化）。
+- `serve`ï¼šä»…é™ Tailnet çš„ Serveï¼Œé€šè¿‡ `tailscale serve`ã€‚Gateway ç½‘å…³ä¿æŒåœ¨ `127.0.0.1` ä¸Šã€‚
+- `funnel`ï¼šé€šè¿‡ `tailscale funnel` çš„å…¬å…± HTTPSã€‚OpenKrab éœ€è¦å…±äº«å¯†ç ã€‚
+- `off`ï¼šé»˜è®¤ï¼ˆæ—  Tailscale è‡ªåŠ¨åŒ–ï¼‰ã€‚
 
-## 认证
+## è®¤è¯
 
-设置 `gateway.auth.mode` 来控制握手：
+è®¾ç½® `gateway.auth.mode` æ¥æŽ§åˆ¶æ¡æ‰‹ï¼š
 
-- `token`（设置 `OpenKrab_GATEWAY_TOKEN` 时的默认值）
-- `password`（通过 `OpenKrab_GATEWAY_PASSWORD` 或配置的共享密钥）
+- `token`ï¼ˆè®¾ç½® `OPENKRAB_GATEWAY_TOKEN` æ—¶çš„é»˜è®¤å€¼ï¼‰
+- `password`ï¼ˆé€šè¿‡ `OPENKRAB_GATEWAY_PASSWORD` æˆ–é…ç½®çš„å…±äº«å¯†é’¥ï¼‰
 
-当 `tailscale.mode = "serve"` 且 `gateway.auth.allowTailscale` 为 `true` 时，
-有效的 Serve 代理请求可以通过 Tailscale 身份头（`tailscale-user-login`）进行认证，无需提供令牌/密码。OpenKrab 通过本地 Tailscale 守护进程（`tailscale whois`）解析 `x-forwarded-for` 地址并将其与头匹配来验证身份，然后才接受它。
-OpenKrab 仅在请求从 loopback 到达并带有 Tailscale 的 `x-forwarded-for`、`x-forwarded-proto` 和 `x-forwarded-host` 头时才将其视为 Serve 请求。
-要要求显式凭证，设置 `gateway.auth.allowTailscale: false` 或强制 `gateway.auth.mode: "password"`。
+å½“ `tailscale.mode = "serve"` ä¸” `gateway.auth.allowTailscale` ä¸º `true` æ—¶ï¼Œ
+æœ‰æ•ˆçš„ Serve ä»£ç†è¯·æ±‚å¯ä»¥é€šè¿‡ Tailscale èº«ä»½å¤´ï¼ˆ`tailscale-user-login`ï¼‰è¿›è¡Œè®¤è¯ï¼Œæ— éœ€æä¾›ä»¤ç‰Œ/å¯†ç ã€‚OpenKrab é€šè¿‡æœ¬åœ° Tailscale å®ˆæŠ¤è¿›ç¨‹ï¼ˆ`tailscale whois`ï¼‰è§£æž `x-forwarded-for` åœ°å€å¹¶å°†å…¶ä¸Žå¤´åŒ¹é…æ¥éªŒè¯èº«ä»½ï¼Œç„¶åŽæ‰æŽ¥å—å®ƒã€‚
+OpenKrab ä»…åœ¨è¯·æ±‚ä»Ž loopback åˆ°è¾¾å¹¶å¸¦æœ‰ Tailscale çš„ `x-forwarded-for`ã€`x-forwarded-proto` å’Œ `x-forwarded-host` å¤´æ—¶æ‰å°†å…¶è§†ä¸º Serve è¯·æ±‚ã€‚
+è¦è¦æ±‚æ˜¾å¼å‡­è¯ï¼Œè®¾ç½® `gateway.auth.allowTailscale: false` æˆ–å¼ºåˆ¶ `gateway.auth.mode: "password"`ã€‚
 
-## 配置示例
+## é…ç½®ç¤ºä¾‹
 
-### 仅限 Tailnet（Serve）
+### ä»…é™ Tailnetï¼ˆServeï¼‰
 
 ```json5
 {
@@ -48,11 +48,11 @@ OpenKrab 仅在请求从 loopback 到达并带有 Tailscale 的 `x-forwarded-for
 }
 ```
 
-打开：`https://<magicdns>/`（或你配置的 `gateway.controlUi.basePath`）
+æ‰“å¼€ï¼š`https://<magicdns>/`ï¼ˆæˆ–ä½ é…ç½®çš„ `gateway.controlUi.basePath`ï¼‰
 
-### 仅限 Tailnet（绑定到 Tailnet IP）
+### ä»…é™ Tailnetï¼ˆç»‘å®šåˆ° Tailnet IPï¼‰
 
-当你希望 Gateway 网关直接监听 Tailnet IP 时使用此方式（无 Serve/Funnel）。
+å½“ä½ å¸Œæœ› Gateway ç½‘å…³ç›´æŽ¥ç›‘å¬ Tailnet IP æ—¶ä½¿ç”¨æ­¤æ–¹å¼ï¼ˆæ—  Serve/Funnelï¼‰ã€‚
 
 ```json5
 {
@@ -63,14 +63,14 @@ OpenKrab 仅在请求从 loopback 到达并带有 Tailscale 的 `x-forwarded-for
 }
 ```
 
-从另一个 Tailnet 设备连接：
+ä»Žå¦ä¸€ä¸ª Tailnet è®¾å¤‡è¿žæŽ¥ï¼š
 
-- 控制 UI：`http://<tailscale-ip>:18789/`
-- WebSocket：`ws://<tailscale-ip>:18789`
+- æŽ§åˆ¶ UIï¼š`http://<tailscale-ip>:18789/`
+- WebSocketï¼š`ws://<tailscale-ip>:18789`
 
-注意：在此模式下 loopback（`http://127.0.0.1:18789`）将**不**工作。
+æ³¨æ„ï¼šåœ¨æ­¤æ¨¡å¼ä¸‹ loopbackï¼ˆ`http://127.0.0.1:18789`ï¼‰å°†**ä¸**å·¥ä½œã€‚
 
-### 公共互联网（Funnel + 共享密码）
+### å…¬å…±äº’è”ç½‘ï¼ˆFunnel + å…±äº«å¯†ç ï¼‰
 
 ```json5
 {
@@ -82,44 +82,45 @@ OpenKrab 仅在请求从 loopback 到达并带有 Tailscale 的 `x-forwarded-for
 }
 ```
 
-优先使用 `OpenKrab_GATEWAY_PASSWORD` 而不是将密码提交到磁盘。
+ä¼˜å…ˆä½¿ç”¨ `OPENKRAB_GATEWAY_PASSWORD` è€Œä¸æ˜¯å°†å¯†ç æäº¤åˆ°ç£ç›˜ã€‚
 
-## CLI 示例
+## CLI ç¤ºä¾‹
 
 ```bash
 OpenKrab gateway --tailscale serve
 OpenKrab gateway --tailscale funnel --auth password
 ```
 
-## 注意事项
+## æ³¨æ„äº‹é¡¹
 
-- Tailscale Serve/Funnel 需要安装并登录 `tailscale` CLI。
-- `tailscale.mode: "funnel"` 除非认证模式为 `password`，否则拒绝启动，以避免公共暴露。
-- 如果你希望 OpenKrab 在关闭时撤销 `tailscale serve` 或 `tailscale funnel` 配置，设置 `gateway.tailscale.resetOnExit`。
-- `gateway.bind: "tailnet"` 是直接 Tailnet 绑定（无 HTTPS，无 Serve/Funnel）。
-- `gateway.bind: "auto"` 优先 loopback；如果你想要仅 Tailnet，使用 `tailnet`。
-- Serve/Funnel 仅暴露 **Gateway 网关控制 UI + WS**。节点通过相同的 Gateway 网关 WS 端点连接，因此 Serve 可以用于节点访问。
+- Tailscale Serve/Funnel éœ€è¦å®‰è£…å¹¶ç™»å½• `tailscale` CLIã€‚
+- `tailscale.mode: "funnel"` é™¤éžè®¤è¯æ¨¡å¼ä¸º `password`ï¼Œå¦åˆ™æ‹’ç»å¯åŠ¨ï¼Œä»¥é¿å…å…¬å…±æš´éœ²ã€‚
+- å¦‚æžœä½ å¸Œæœ› OpenKrab åœ¨å…³é—­æ—¶æ’¤é”€ `tailscale serve` æˆ– `tailscale funnel` é…ç½®ï¼Œè®¾ç½® `gateway.tailscale.resetOnExit`ã€‚
+- `gateway.bind: "tailnet"` æ˜¯ç›´æŽ¥ Tailnet ç»‘å®šï¼ˆæ—  HTTPSï¼Œæ—  Serve/Funnelï¼‰ã€‚
+- `gateway.bind: "auto"` ä¼˜å…ˆ loopbackï¼›å¦‚æžœä½ æƒ³è¦ä»… Tailnetï¼Œä½¿ç”¨ `tailnet`ã€‚
+- Serve/Funnel ä»…æš´éœ² **Gateway ç½‘å…³æŽ§åˆ¶ UI + WS**ã€‚èŠ‚ç‚¹é€šè¿‡ç›¸åŒçš„ Gateway ç½‘å…³ WS ç«¯ç‚¹è¿žæŽ¥ï¼Œå› æ­¤ Serve å¯ä»¥ç”¨äºŽèŠ‚ç‚¹è®¿é—®ã€‚
 
-## 浏览器控制（远程 Gateway 网关 + 本地浏览器）
+## æµè§ˆå™¨æŽ§åˆ¶ï¼ˆè¿œç¨‹ Gateway ç½‘å…³ + æœ¬åœ°æµè§ˆå™¨ï¼‰
 
-如果你在一台机器上运行 Gateway 网关但想在另一台机器上驱动浏览器，
-在浏览器机器上运行一个**节点主机**并让两者保持在同一个 tailnet 上。
-Gateway 网关会将浏览器操作代理到节点；不需要单独的控制服务器或 Serve URL。
+å¦‚æžœä½ åœ¨ä¸€å°æœºå™¨ä¸Šè¿è¡Œ Gateway ç½‘å…³ä½†æƒ³åœ¨å¦ä¸€å°æœºå™¨ä¸Šé©±åŠ¨æµè§ˆå™¨ï¼Œ
+åœ¨æµè§ˆå™¨æœºå™¨ä¸Šè¿è¡Œä¸€ä¸ª**èŠ‚ç‚¹ä¸»æœº**å¹¶è®©ä¸¤è€…ä¿æŒåœ¨åŒä¸€ä¸ª tailnet ä¸Šã€‚
+Gateway ç½‘å…³ä¼šå°†æµè§ˆå™¨æ“ä½œä»£ç†åˆ°èŠ‚ç‚¹ï¼›ä¸éœ€è¦å•ç‹¬çš„æŽ§åˆ¶æœåŠ¡å™¨æˆ– Serve URLã€‚
 
-避免将 Funnel 用于浏览器控制；将节点配对视为操作者访问。
+é¿å…å°† Funnel ç”¨äºŽæµè§ˆå™¨æŽ§åˆ¶ï¼›å°†èŠ‚ç‚¹é…å¯¹è§†ä¸ºæ“ä½œè€…è®¿é—®ã€‚
 
-## Tailscale 前提条件 + 限制
+## Tailscale å‰ææ¡ä»¶ + é™åˆ¶
 
-- Serve 需要为你的 tailnet 启用 HTTPS；如果缺少，CLI 会提示。
-- Serve 注入 Tailscale 身份头；Funnel 不会。
-- Funnel 需要 Tailscale v1.38.3+、MagicDNS、启用 HTTPS 和 funnel 节点属性。
-- Funnel 仅支持通过 TLS 的端口 `443`、`8443` 和 `10000`。
-- macOS 上的 Funnel 需要开源 Tailscale 应用变体。
+- Serve éœ€è¦ä¸ºä½ çš„ tailnet å¯ç”¨ HTTPSï¼›å¦‚æžœç¼ºå°‘ï¼ŒCLI ä¼šæç¤ºã€‚
+- Serve æ³¨å…¥ Tailscale èº«ä»½å¤´ï¼›Funnel ä¸ä¼šã€‚
+- Funnel éœ€è¦ Tailscale v1.38.3+ã€MagicDNSã€å¯ç”¨ HTTPS å’Œ funnel èŠ‚ç‚¹å±žæ€§ã€‚
+- Funnel ä»…æ”¯æŒé€šè¿‡ TLS çš„ç«¯å£ `443`ã€`8443` å’Œ `10000`ã€‚
+- macOS ä¸Šçš„ Funnel éœ€è¦å¼€æº Tailscale åº”ç”¨å˜ä½“ã€‚
 
-## 了解更多
+## äº†è§£æ›´å¤š
 
-- Tailscale Serve 概述：https://tailscale.com/kb/1312/serve
-- `tailscale serve` 命令：https://tailscale.com/kb/1242/tailscale-serve
-- Tailscale Funnel 概述：https://tailscale.com/kb/1223/tailscale-funnel
-- `tailscale funnel` 命令：https://tailscale.com/kb/1311/tailscale-funnel
+- Tailscale Serve æ¦‚è¿°ï¼šhttps://tailscale.com/kb/1312/serve
+- `tailscale serve` å‘½ä»¤ï¼šhttps://tailscale.com/kb/1242/tailscale-serve
+- Tailscale Funnel æ¦‚è¿°ï¼šhttps://tailscale.com/kb/1223/tailscale-funnel
+- `tailscale funnel` å‘½ä»¤ï¼šhttps://tailscale.com/kb/1311/tailscale-funnel
+
 

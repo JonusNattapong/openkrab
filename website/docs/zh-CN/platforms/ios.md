@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 配对或重新连接 iOS 节点
-  - 从源码运行 iOS 应用
-  - 调试 Gateway 网关发现或 canvas 命令
-summary: iOS 节点应用：连接到 Gateway 网关、配对、canvas 和故障排除
-title: iOS 应用
+  - é…å¯¹æˆ–é‡æ–°è¿žæŽ¥ iOS èŠ‚ç‚¹
+  - ä»Žæºç è¿è¡Œ iOS åº”ç”¨
+  - è°ƒè¯• Gateway ç½‘å…³å‘çŽ°æˆ– canvas å‘½ä»¤
+summary: iOS èŠ‚ç‚¹åº”ç”¨ï¼šè¿žæŽ¥åˆ° Gateway ç½‘å…³ã€é…å¯¹ã€canvas å’Œæ•…éšœæŽ’é™¤
+title: iOS åº”ç”¨
 x-i18n:
   generated_at: "2026-02-03T07:52:17Z"
   model: claude-opus-4-5
@@ -14,76 +14,76 @@ x-i18n:
   workflow: 15
 ---
 
-# iOS 应用（节点）
+# iOS åº”ç”¨ï¼ˆèŠ‚ç‚¹ï¼‰
 
-可用性：内部预览。iOS 应用尚未公开分发。
+å¯ç”¨æ€§ï¼šå†…éƒ¨é¢„è§ˆã€‚iOS åº”ç”¨å°šæœªå…¬å¼€åˆ†å‘ã€‚
 
-## 功能
+## åŠŸèƒ½
 
-- 通过 WebSocket（LAN 或 tailnet）连接到 Gateway 网关。
-- 暴露节点能力：Canvas、屏幕快照、相机捕获、位置、对话模式、语音唤醒。
-- 接收 `node.invoke` 命令并报告节点状态事件。
+- é€šè¿‡ WebSocketï¼ˆLAN æˆ– tailnetï¼‰è¿žæŽ¥åˆ° Gateway ç½‘å…³ã€‚
+- æš´éœ²èŠ‚ç‚¹èƒ½åŠ›ï¼šCanvasã€å±å¹•å¿«ç…§ã€ç›¸æœºæ•èŽ·ã€ä½ç½®ã€å¯¹è¯æ¨¡å¼ã€è¯­éŸ³å”¤é†’ã€‚
+- æŽ¥æ”¶ `node.invoke` å‘½ä»¤å¹¶æŠ¥å‘ŠèŠ‚ç‚¹çŠ¶æ€äº‹ä»¶ã€‚
 
-## 要求
+## è¦æ±‚
 
-- Gateway 网关运行在另一台设备上（macOS、Linux 或通过 WSL2 的 Windows）。
-- 网络路径：
-  - 通过 Bonjour 的同一 LAN，**或**
-  - 通过单播 DNS-SD 的 Tailnet（示例域：`OpenKrab.internal.`），**或**
-  - 手动主机/端口（备选）。
+- Gateway ç½‘å…³è¿è¡Œåœ¨å¦ä¸€å°è®¾å¤‡ä¸Šï¼ˆmacOSã€Linux æˆ–é€šè¿‡ WSL2 çš„ Windowsï¼‰ã€‚
+- ç½‘ç»œè·¯å¾„ï¼š
+  - é€šè¿‡ Bonjour çš„åŒä¸€ LANï¼Œ**æˆ–**
+  - é€šè¿‡å•æ’­ DNS-SD çš„ Tailnetï¼ˆç¤ºä¾‹åŸŸï¼š`OpenKrab.internal.`ï¼‰ï¼Œ**æˆ–**
+  - æ‰‹åŠ¨ä¸»æœº/ç«¯å£ï¼ˆå¤‡é€‰ï¼‰ã€‚
 
-## 快速开始（配对 + 连接）
+## å¿«é€Ÿå¼€å§‹ï¼ˆé…å¯¹ + è¿žæŽ¥ï¼‰
 
-1. 启动 Gateway 网关：
+1. å¯åŠ¨ Gateway ç½‘å…³ï¼š
 
 ```bash
 OpenKrab gateway --port 18789
 ```
 
-2. 在 iOS 应用中，打开设置并选择一个已发现的 Gateway 网关（或启用手动主机并输入主机/端口）。
+2. åœ¨ iOS åº”ç”¨ä¸­ï¼Œæ‰“å¼€è®¾ç½®å¹¶é€‰æ‹©ä¸€ä¸ªå·²å‘çŽ°çš„ Gateway ç½‘å…³ï¼ˆæˆ–å¯ç”¨æ‰‹åŠ¨ä¸»æœºå¹¶è¾“å…¥ä¸»æœº/ç«¯å£ï¼‰ã€‚
 
-3. 在 Gateway 网关主机上批准配对请求：
+3. åœ¨ Gateway ç½‘å…³ä¸»æœºä¸Šæ‰¹å‡†é…å¯¹è¯·æ±‚ï¼š
 
 ```bash
 OpenKrab nodes pending
 OpenKrab nodes approve <requestId>
 ```
 
-4. 验证连接：
+4. éªŒè¯è¿žæŽ¥ï¼š
 
 ```bash
 OpenKrab nodes status
 OpenKrab gateway call node.list --params "{}"
 ```
 
-## 发现路径
+## å‘çŽ°è·¯å¾„
 
-### Bonjour（LAN）
+### Bonjourï¼ˆLANï¼‰
 
-Gateway 网关在 `local.` 上广播 `_OpenKrab-gw._tcp`。iOS 应用会自动列出这些。
+Gateway ç½‘å…³åœ¨ `local.` ä¸Šå¹¿æ’­ `_OpenKrab-gw._tcp`ã€‚iOS åº”ç”¨ä¼šè‡ªåŠ¨åˆ—å‡ºè¿™äº›ã€‚
 
-### Tailnet（跨网络）
+### Tailnetï¼ˆè·¨ç½‘ç»œï¼‰
 
-如果 mDNS 被阻止，使用单播 DNS-SD 区域（选择一个域；示例：`OpenKrab.internal.`）和 Tailscale 分割 DNS。
-参见 [Bonjour](/gateway/bonjour) 了解 CoreDNS 示例。
+å¦‚æžœ mDNS è¢«é˜»æ­¢ï¼Œä½¿ç”¨å•æ’­ DNS-SD åŒºåŸŸï¼ˆé€‰æ‹©ä¸€ä¸ªåŸŸï¼›ç¤ºä¾‹ï¼š`OpenKrab.internal.`ï¼‰å’Œ Tailscale åˆ†å‰² DNSã€‚
+å‚è§ [Bonjour](/gateway/bonjour) äº†è§£ CoreDNS ç¤ºä¾‹ã€‚
 
-### 手动主机/端口
+### æ‰‹åŠ¨ä¸»æœº/ç«¯å£
 
-在设置中，启用**手动主机**并输入 Gateway 网关主机 + 端口（默认 `18789`）。
+åœ¨è®¾ç½®ä¸­ï¼Œå¯ç”¨**æ‰‹åŠ¨ä¸»æœº**å¹¶è¾“å…¥ Gateway ç½‘å…³ä¸»æœº + ç«¯å£ï¼ˆé»˜è®¤ `18789`ï¼‰ã€‚
 
 ## Canvas + A2UI
 
-iOS 节点渲染一个 WKWebView canvas。使用 `node.invoke` 来驱动它：
+iOS èŠ‚ç‚¹æ¸²æŸ“ä¸€ä¸ª WKWebView canvasã€‚ä½¿ç”¨ `node.invoke` æ¥é©±åŠ¨å®ƒï¼š
 
 ```bash
-OpenKrab nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18793/__OpenKrab__/canvas/"}'
+OpenKrab nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18793/__OPENKRAB__/canvas/"}'
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- Gateway 网关 canvas 主机服务于 `/__OpenKrab__/canvas/` 和 `/__OpenKrab__/a2ui/`。
-- 当广播了 canvas 主机 URL 时，iOS 节点在连接时自动导航到 A2UI。
-- 使用 `canvas.navigate` 和 `{"url":""}` 返回内置脚手架。
+- Gateway ç½‘å…³ canvas ä¸»æœºæœåŠ¡äºŽ `/__OPENKRAB__/canvas/` å’Œ `/__OPENKRAB__/a2ui/`ã€‚
+- å½“å¹¿æ’­äº† canvas ä¸»æœº URL æ—¶ï¼ŒiOS èŠ‚ç‚¹åœ¨è¿žæŽ¥æ—¶è‡ªåŠ¨å¯¼èˆªåˆ° A2UIã€‚
+- ä½¿ç”¨ `canvas.navigate` å’Œ `{"url":""}` è¿”å›žå†…ç½®è„šæ‰‹æž¶ã€‚
 
 ### Canvas eval / snapshot
 
@@ -95,21 +95,22 @@ OpenKrab nodes invoke --node "iOS Node" --command canvas.eval --params '{"javaSc
 OpenKrab nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWidth":900,"format":"jpeg"}'
 ```
 
-## 语音唤醒 + 对话模式
+## è¯­éŸ³å”¤é†’ + å¯¹è¯æ¨¡å¼
 
-- 语音唤醒和对话模式在设置中可用。
-- iOS 可能会暂停后台音频；当应用不活跃时，将语音功能视为尽力而为。
+- è¯­éŸ³å”¤é†’å’Œå¯¹è¯æ¨¡å¼åœ¨è®¾ç½®ä¸­å¯ç”¨ã€‚
+- iOS å¯èƒ½ä¼šæš‚åœåŽå°éŸ³é¢‘ï¼›å½“åº”ç”¨ä¸æ´»è·ƒæ—¶ï¼Œå°†è¯­éŸ³åŠŸèƒ½è§†ä¸ºå°½åŠ›è€Œä¸ºã€‚
 
-## 常见错误
+## å¸¸è§é”™è¯¯
 
-- `NODE_BACKGROUND_UNAVAILABLE`：将 iOS 应用带到前台（canvas/相机/屏幕命令需要它）。
-- `A2UI_HOST_NOT_CONFIGURED`：Gateway 网关未广播 canvas 主机 URL；检查 [Gateway 网关配置](/gateway/configuration) 中的 `canvasHost`。
-- 配对提示从未出现：运行 `OpenKrab nodes pending` 并手动批准。
-- 重新安装后重连失败：钥匙串配对令牌已被清除；重新配对节点。
+- `NODE_BACKGROUND_UNAVAILABLE`ï¼šå°† iOS åº”ç”¨å¸¦åˆ°å‰å°ï¼ˆcanvas/ç›¸æœº/å±å¹•å‘½ä»¤éœ€è¦å®ƒï¼‰ã€‚
+- `A2UI_HOST_NOT_CONFIGURED`ï¼šGateway ç½‘å…³æœªå¹¿æ’­ canvas ä¸»æœº URLï¼›æ£€æŸ¥ [Gateway ç½‘å…³é…ç½®](/gateway/configuration) ä¸­çš„ `canvasHost`ã€‚
+- é…å¯¹æç¤ºä»Žæœªå‡ºçŽ°ï¼šè¿è¡Œ `OpenKrab nodes pending` å¹¶æ‰‹åŠ¨æ‰¹å‡†ã€‚
+- é‡æ–°å®‰è£…åŽé‡è¿žå¤±è´¥ï¼šé’¥åŒ™ä¸²é…å¯¹ä»¤ç‰Œå·²è¢«æ¸…é™¤ï¼›é‡æ–°é…å¯¹èŠ‚ç‚¹ã€‚
 
-## 相关文档
+## ç›¸å…³æ–‡æ¡£
 
-- [配对](/gateway/pairing)
-- [设备发现](/gateway/discovery)
+- [é…å¯¹](/gateway/pairing)
+- [è®¾å¤‡å‘çŽ°](/gateway/discovery)
 - [Bonjour](/gateway/bonjour)
+
 

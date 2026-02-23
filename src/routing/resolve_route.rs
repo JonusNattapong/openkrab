@@ -1,7 +1,7 @@
-//! Ported from `openclaw/src/routing/resolve-route.ts`
+//! Ported from `OpenKrab/src/routing/resolve-route.ts`
 
 use crate::channels::chat_type::{normalize_chat_type, ChatType};
-use crate::openkrab_config::{AgentBinding, BindingMatch, OpenKrabConfig};
+use crate::OPENKRAB_CONFIG::{AgentBinding, BindingMatch, OpenKrabConfig};
 use crate::routing::session_key::{
     build_agent_main_session_key, build_agent_peer_session_key, normalize_account_id,
     normalize_agent_id, DmScope, PeerSessionKeyParams, DEFAULT_ACCOUNT_ID, DEFAULT_MAIN_KEY,
@@ -65,7 +65,7 @@ fn pick_first_existing_agent_id(cfg: &OpenKrabConfig, agent_id: &str) -> String 
 
     if let Some(agents_cfg) = &cfg.agents {
         if let Some(ref _list) = agents_cfg.defaults {
-            // Note: In openclaw, it walks the `cfg.agents.list`. However OpenKrabConfig
+            // Note: In OpenKrab, it walks the `cfg.agents.list`. However OpenKrabConfig
             // doesn't have a list of agents inside `agents` right now. It just has defaults.
             // So we'll skip the actual checking against list, and just return what was requested.
             // When openkrab's config supports agent lists, we can refine this.
@@ -345,3 +345,4 @@ pub fn resolve_agent_route(input: ResolveAgentRouteInput) -> ResolvedAgentRoute 
 
     choose(&resolve_default_agent_id(input.cfg), "default")
 }
+

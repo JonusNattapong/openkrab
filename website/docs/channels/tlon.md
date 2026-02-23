@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Tlon/Urbit support status, capabilities, and configuration"
 read_when:
   - Working on Tlon/Urbit channel features
@@ -7,7 +7,7 @@ title: "Tlon"
 
 # Tlon (plugin)
 
-Tlon is a decentralized messenger built on Urbit. openkrab connects to your Urbit ship and can
+Tlon is a decentralized messenger built on Urbit. OpenKrab connects to your Urbit ship and can
 respond to DMs and group chat messages. Group replies require an @ mention by default and can
 be further restricted via allowlists.
 
@@ -20,14 +20,12 @@ Tlon ships as a plugin and is not bundled with the core install.
 
 Install via CLI (npm registry):
 
-```bash
-openkrab plugins install @openkrab/tlon
+```bash\nOpenKrab plugins install @openkrab/tlon
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/tlon
+```bash\nOpenKrab plugins install ./extensions/tlon
 ```
 
 Details: [Plugins](/tools/plugin)
@@ -57,7 +55,7 @@ Minimal config (single account):
 
 Private/LAN ship URLs (advanced):
 
-By default, openkrab blocks private/internal hostnames and IP ranges for this plugin (SSRF hardening).
+By default, OpenKrab blocks private/internal hostnames and IP ranges for this plugin (SSRF hardening).
 If your ship URL is on a private network (for example `http://192.168.1.50:8080` or `http://localhost:8080`),
 you must explicitly opt in:
 
@@ -144,5 +142,6 @@ Use these with `openkrab message send` or cron delivery:
 ## Notes
 
 - Group replies require a mention (e.g. `~your-bot-ship`) to respond.
-- Thread replies: if the inbound message is in a thread, openkrab replies in-thread.
+- Thread replies: if the inbound message is in a thread, OpenKrab replies in-thread.
 - Media: `sendMedia` falls back to text + URL (no native upload).
+

@@ -22,7 +22,7 @@ pub async fn check_for_updates(current_version: &str) -> anyhow::Result<UpdateCh
 
     let resp = client
         .get(url)
-        .header("User-Agent", "krabkrab-cli")
+        .header("User-Agent", "openkrab-cli")
         .send()
         .await?;
 
@@ -88,7 +88,7 @@ pub fn format_update_available_hint(result: &UpdateCheckResult) -> Option<String
 
     let latest = result.latest_version.as_ref()?;
     Some(format!(
-        "Update available: {} → {}. Run 'krabkrab update' to upgrade.",
+        "Update available: {} → {}. Run 'openkrab update' to upgrade.",
         result.current_version, latest
     ))
 }
@@ -160,3 +160,4 @@ mod tests {
         assert!(line.contains("latest"));
     }
 }
+

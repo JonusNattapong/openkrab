@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 #### Documentation
-- Updated all documentation from OpenClaw to OpenKrab
+- Updated all documentation from OpenKrab to OpenKrab
 - Added comprehensive [Migration Guide](docs/install/migrating.md)
 - Updated feature status from "Partial" to "Complete" for Browser, Canvas, Hooks
 - Added detailed module statistics and line counts
@@ -42,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Corrected feature status in documentation (Browser, Canvas, Hooks are complete, not partial)
-- Updated directory references from `~/.clawdbot/` to `~/.config/krabkrab/`
+- Updated directory references from `~/.openkrab/` to `~/.config/openkrab/`
 
 ---
 
@@ -98,7 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Temporal decay for older memories
 
 #### Voice System
-- Voice wake mode — "Hey KrabKrab" activation
+- Voice wake mode — "Hey openkrab" activation
 - Talk mode — Continuous conversation
 - VAD (Voice Activity Detection)
 - Spectral analysis (FFT)
@@ -151,7 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Language**: Rust 1.75+
 - **Architecture**: Gateway WebSocket control plane + multi-channel routing
 - **Config Format**: TOML (changed from JSON)
-- **Config Location**: `~/.config/krabkrab/` (changed from `~/.clawdbot/`)
+- **Config Location**: `~/.config/openkrab/` (changed from `~/.openkrab/`)
 - **Test Coverage**: 410+ tests, 0 failures
 - **Total Lines**: ~56,276 lines of Rust
 
@@ -187,7 +187,7 @@ The following were intentionally not ported:
 Users migrating from the TypeScript version should note:
 
 1. **Config format**: JSON → TOML
-2. **Config location**: `~/.clawdbot/` → `~/.config/krabkrab/`
+2. **Config location**: `~/.openkrab/` → `~/.config/openkrab/`
 3. **CLI syntax**: Minor changes (see [Migration Guide](docs/install/migrating.md))
 4. **Most connectors**: Compatible with same tokens/webhooks
 
@@ -207,3 +207,5 @@ Highlights:
 
 For migration details, see [Migration Guide](docs/install/migrating.md).
 For porting status, see [PORTING.md](PORTING.md).
+
+

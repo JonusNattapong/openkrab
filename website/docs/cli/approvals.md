@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab approvals` (exec approvals for gateway or node hosts)"
 read_when:
   - You want to edit exec approvals from the CLI
@@ -18,28 +18,18 @@ Related:
 
 ## Common commands
 
-```bash
-openkrab approvals get
-openkrab approvals get --node <id|name|ip>
-openkrab approvals get --gateway
+```bash\nOpenKrab approvals get\nOpenKrab approvals get --node <id|name|ip>\nOpenKrab approvals get --gateway
 ```
 
 ## Replace approvals from a file
 
-```bash
-openkrab approvals set --file ./exec-approvals.json
-openkrab approvals set --node <id|name|ip> --file ./exec-approvals.json
-openkrab approvals set --gateway --file ./exec-approvals.json
+```bash\nOpenKrab approvals set --file ./exec-approvals.json\nOpenKrab approvals set --node <id|name|ip> --file ./exec-approvals.json\nOpenKrab approvals set --gateway --file ./exec-approvals.json
 ```
 
 ## Allowlist helpers
 
-```bash
-openkrab approvals allowlist add "~/Projects/**/bin/rg"
-openkrab approvals allowlist add --agent main --node <id|name|ip> "/usr/bin/uptime"
-openkrab approvals allowlist add --agent "*" "/usr/bin/uname"
-
-openkrab approvals allowlist remove "~/Projects/**/bin/rg"
+```bash\nOpenKrab approvals allowlist add "~/Projects/**/bin/rg"\nOpenKrab approvals allowlist add --agent main --node <id|name|ip> "/usr/bin/uptime"\nOpenKrab approvals allowlist add --agent "*" "/usr/bin/uname"
+\nOpenKrab approvals allowlist remove "~/Projects/**/bin/rg"
 ```
 
 ## Notes
@@ -48,3 +38,4 @@ openkrab approvals allowlist remove "~/Projects/**/bin/rg"
 - `--agent` defaults to `"*"`, which applies to all agents.
 - The node host must advertise `system.execApprovals.get/set` (macOS app or headless node host).
 - Approvals files are stored per host at `~/.openkrab/exec-approvals.json`.
+

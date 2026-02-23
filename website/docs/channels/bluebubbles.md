@@ -1,4 +1,4 @@
----
+﻿---
 summary: "iMessage via BlueBubbles macOS server (REST send/receive, typing, reactions, pairing, advanced actions)."
 read_when:
   - Setting up BlueBubbles channel
@@ -15,7 +15,7 @@ Status: bundled plugin that talks to the BlueBubbles macOS server over HTTP. **R
 
 - Runs on macOS via the BlueBubbles helper app ([bluebubbles.app](https://bluebubbles.app)).
 - Recommended/tested: macOS Sequoia (15). macOS Tahoe (26) works; edit is currently broken on Tahoe, and group icon updates may report success but not sync.
-- openkrab talks to it through its REST API (`GET /api/v1/ping`, `POST /message/text`, `POST /chat/:id/*`).
+- OpenKrab talks to it through its REST API (`GET /api/v1/ping`, `POST /message/text`, `POST /chat/:id/*`).
 - Incoming messages arrive via webhooks; outgoing replies, typing indicators, read receipts, and tapbacks are REST calls.
 - Attachments and stickers are ingested as inbound media (and surfaced to the agent when possible).
 - Pairing/allowlist works the same way as other channels (`/channels/pairing` etc) with `channels.bluebubbles.allowFrom` + pairing codes.
@@ -50,7 +50,7 @@ Security note:
 
 ## Keeping Messages.app alive (VM / headless setups)
 
-Some macOS VM / always-on setups can end up with Messages.app going “idle” (incoming events stop until the app is opened/foregrounded). A simple workaround is to **poke Messages every 5 minutes** using an AppleScript + LaunchAgent.
+Some macOS VM / always-on setups can end up with Messages.app going â€œidleâ€ (incoming events stop until the app is opened/foregrounded). A simple workaround is to **poke Messages every 5 minutes** using an AppleScript + LaunchAgent.
 
 ### 1) Save the AppleScript
 
@@ -113,7 +113,7 @@ Save this as:
 Notes:
 
 - This runs **every 300 seconds** and **on login**.
-- The first run may trigger macOS **Automation** prompts (`osascript` → Messages). Approve them in the same user session that runs the LaunchAgent.
+- The first run may trigger macOS **Automation** prompts (`osascript` â†’ Messages). Approve them in the same user session that runs the LaunchAgent.
 
 Load it:
 
@@ -126,8 +126,7 @@ launchctl load ~/Library/LaunchAgents/com.user.poke-messages.plist
 
 BlueBubbles is available in the interactive setup wizard:
 
-```
-openkrab onboard
+```\nOpenKrab onboard
 ```
 
 The wizard prompts for:
@@ -140,8 +139,7 @@ The wizard prompts for:
 
 You can also add BlueBubbles via CLI:
 
-```
-openkrab channels add bluebubbles --http-url http://192.168.1.100:1234 --password <password>
+```\nOpenKrab channels add bluebubbles --http-url http://192.168.1.100:1234 --password <password>
 ```
 
 ## Access control (DMs + groups)
@@ -195,7 +193,7 @@ Per-group configuration:
 
 - **Typing indicators**: Sent automatically before and during response generation.
 - **Read receipts**: Controlled by `channels.bluebubbles.sendReadReceipts` (default: `true`).
-- **Typing indicators**: openkrab sends typing start events; BlueBubbles clears typing automatically on send or timeout (manual stop via DELETE is unreliable).
+- **Typing indicators**: OpenKrab sends typing start events; BlueBubbles clears typing automatically on send or timeout (manual stop via DELETE is unreliable).
 
 ```json5
 {
@@ -241,16 +239,15 @@ Available actions:
 - **reply**: Reply to a specific message (`messageId`, `text`, `to`)
 - **sendWithEffect**: Send with iMessage effect (`text`, `to`, `effectId`)
 - **renameGroup**: Rename a group chat (`chatGuid`, `displayName`)
-- **setGroupIcon**: Set a group chat's icon/photo (`chatGuid`, `media`) — flaky on macOS 26 Tahoe (API may return success but the icon does not sync).
+- **setGroupIcon**: Set a group chat's icon/photo (`chatGuid`, `media`) â€” flaky on macOS 26 Tahoe (API may return success but the icon does not sync).
 - **addParticipant**: Add someone to a group (`chatGuid`, `address`)
 - **removeParticipant**: Remove someone from a group (`chatGuid`, `address`)
 - **leaveGroup**: Leave a group chat (`chatGuid`)
 - **sendAttachment**: Send media/files (`to`, `buffer`, `filename`, `asVoice`)
-  - Voice memos: set `asVoice: true` with **MP3** or **CAF** audio to send as an iMessage voice message. BlueBubbles converts MP3 → CAF when sending voice memos.
+  - Voice memos: set `asVoice: true` with **MP3** or **CAF** audio to send as an iMessage voice message. BlueBubbles converts MP3 â†’ CAF when sending voice memos.
 
 ### Message IDs (short vs full)
-
-openkrab may surface _short_ message IDs (e.g., `1`, `2`) to save tokens.
+\nOpenKrab may surface _short_ message IDs (e.g., `1`, `2`) to save tokens.
 
 - `MessageSid` / `ReplyToId` can be short IDs.
 - `MessageSidFull` / `ReplyToIdFull` contain the provider full IDs.
@@ -323,7 +320,7 @@ Prefer `chat_guid` for stable routing:
 - `chat_id:123`
 - `chat_identifier:...`
 - Direct handles: `+15555550123`, `user@example.com`
-  - If a direct handle does not have an existing DM chat, openkrab will create one via `POST /api/v1/chat/new`. This requires the BlueBubbles Private API to be enabled.
+  - If a direct handle does not have an existing DM chat, OpenKrab will create one via `POST /api/v1/chat/new`. This requires the BlueBubbles Private API to be enabled.
 
 ## Security
 
@@ -339,7 +336,8 @@ Prefer `chat_guid` for stable routing:
 - Reactions require the BlueBubbles private API (`POST /api/v1/message/react`); ensure the server version exposes it.
 - Edit/unsend require macOS 13+ and a compatible BlueBubbles server version. On macOS 26 (Tahoe), edit is currently broken due to private API changes.
 - Group icon updates can be flaky on macOS 26 (Tahoe): the API may return success but the new icon does not sync.
-- openkrab auto-hides known-broken actions based on the BlueBubbles server's macOS version. If edit still appears on macOS 26 (Tahoe), disable it manually with `channels.bluebubbles.actions.edit=false`.
+- OpenKrab auto-hides known-broken actions based on the BlueBubbles server's macOS version. If edit still appears on macOS 26 (Tahoe), disable it manually with `channels.bluebubbles.actions.edit=false`.
 - For status/health info: `openkrab status --all` or `openkrab status --deep`.
 
 For general channel workflow reference, see [Channels](/channels) and the [Plugins](/tools/plugin) guide.
+

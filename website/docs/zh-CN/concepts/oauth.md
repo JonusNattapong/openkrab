@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 你想全面了解 OpenKrab 的 OAuth 流程
-  - 你遇到了令牌失效/登出问题
-  - 你想了解 setup-token 或 OAuth 认证流程
-  - 你想使用多账户或配置文件路由
-summary: OpenKrab 中的 OAuth：令牌交换、存储和多账户模式
+  - ä½ æƒ³å…¨é¢äº†è§£ OpenKrab çš„ OAuth æµç¨‹
+  - ä½ é‡åˆ°äº†ä»¤ç‰Œå¤±æ•ˆ/ç™»å‡ºé—®é¢˜
+  - ä½ æƒ³äº†è§£ setup-token æˆ– OAuth è®¤è¯æµç¨‹
+  - ä½ æƒ³ä½¿ç”¨å¤šè´¦æˆ·æˆ–é…ç½®æ–‡ä»¶è·¯ç”±
+summary: OpenKrab ä¸­çš„ OAuthï¼šä»¤ç‰Œäº¤æ¢ã€å­˜å‚¨å’Œå¤šè´¦æˆ·æ¨¡å¼
 title: OAuth
 x-i18n:
   generated_at: "2026-02-01T20:23:29Z"
@@ -17,136 +17,137 @@ x-i18n:
 
 # OAuth
 
-OpenKrab 支持通过 OAuth 进行"订阅认证"，适用于提供此功能的提供商（特别是 **OpenAI Codex（ChatGPT OAuth）**）。对于 Anthropic 订阅，请使用 **setup-token** 流程。本页说明：
+OpenKrab æ”¯æŒé€šè¿‡ OAuth è¿›è¡Œ"è®¢é˜…è®¤è¯"ï¼Œé€‚ç”¨äºŽæä¾›æ­¤åŠŸèƒ½çš„æä¾›å•†ï¼ˆç‰¹åˆ«æ˜¯ **OpenAI Codexï¼ˆChatGPT OAuthï¼‰**ï¼‰ã€‚å¯¹äºŽ Anthropic è®¢é˜…ï¼Œè¯·ä½¿ç”¨ **setup-token** æµç¨‹ã€‚æœ¬é¡µè¯´æ˜Žï¼š
 
-- OAuth **令牌交换**的工作原理（PKCE）
-- 令牌**存储**在哪里（以及原因）
-- 如何处理**多账户**（配置文件 + 按会话覆盖）
+- OAuth **ä»¤ç‰Œäº¤æ¢**çš„å·¥ä½œåŽŸç†ï¼ˆPKCEï¼‰
+- ä»¤ç‰Œ**å­˜å‚¨**åœ¨å“ªé‡Œï¼ˆä»¥åŠåŽŸå› ï¼‰
+- å¦‚ä½•å¤„ç†**å¤šè´¦æˆ·**ï¼ˆé…ç½®æ–‡ä»¶ + æŒ‰ä¼šè¯è¦†ç›–ï¼‰
 
-OpenKrab 还支持**提供商插件**，它们自带 OAuth 或 API 密钥流程。通过以下命令运行：
+OpenKrab è¿˜æ”¯æŒ**æä¾›å•†æ’ä»¶**ï¼Œå®ƒä»¬è‡ªå¸¦ OAuth æˆ– API å¯†é’¥æµç¨‹ã€‚é€šè¿‡ä»¥ä¸‹å‘½ä»¤è¿è¡Œï¼š
 
 ```bash
 OpenKrab models auth login --provider <id>
 ```
 
-## 令牌汇聚点（为什么需要它）
+## ä»¤ç‰Œæ±‡èšç‚¹ï¼ˆä¸ºä»€ä¹ˆéœ€è¦å®ƒï¼‰
 
-OAuth 提供商通常在登录/刷新流程中发放**新的刷新令牌**。某些提供商（或 OAuth 客户端）在为同一用户/应用发放新令牌时，可能会使旧的刷新令牌失效。
+OAuth æä¾›å•†é€šå¸¸åœ¨ç™»å½•/åˆ·æ–°æµç¨‹ä¸­å‘æ”¾**æ–°çš„åˆ·æ–°ä»¤ç‰Œ**ã€‚æŸäº›æä¾›å•†ï¼ˆæˆ– OAuth å®¢æˆ·ç«¯ï¼‰åœ¨ä¸ºåŒä¸€ç”¨æˆ·/åº”ç”¨å‘æ”¾æ–°ä»¤ç‰Œæ—¶ï¼Œå¯èƒ½ä¼šä½¿æ—§çš„åˆ·æ–°ä»¤ç‰Œå¤±æ•ˆã€‚
 
-实际症状：
+å®žé™…ç—‡çŠ¶ï¼š
 
-- 你通过 OpenKrab _和_ Claude Code / Codex CLI 登录 → 其中一个稍后会随机"登出"
+- ä½ é€šè¿‡ OpenKrab _å’Œ_ Claude Code / Codex CLI ç™»å½• â†’ å…¶ä¸­ä¸€ä¸ªç¨åŽä¼šéšæœº"ç™»å‡º"
 
-为减少这种情况，OpenKrab 将 `auth-profiles.json` 视为**令牌汇聚点**：
+ä¸ºå‡å°‘è¿™ç§æƒ…å†µï¼ŒOpenKrab å°† `auth-profiles.json` è§†ä¸º**ä»¤ç‰Œæ±‡èšç‚¹**ï¼š
 
-- 运行时从**同一个位置**读取凭据
-- 我们可以保留多个配置文件并确定性地路由它们
+- è¿è¡Œæ—¶ä»Ž**åŒä¸€ä¸ªä½ç½®**è¯»å–å‡­æ®
+- æˆ‘ä»¬å¯ä»¥ä¿ç•™å¤šä¸ªé…ç½®æ–‡ä»¶å¹¶ç¡®å®šæ€§åœ°è·¯ç”±å®ƒä»¬
 
-## 存储（令牌存放位置）
+## å­˜å‚¨ï¼ˆä»¤ç‰Œå­˜æ”¾ä½ç½®ï¼‰
 
-密钥按**智能体**存储：
+å¯†é’¥æŒ‰**æ™ºèƒ½ä½“**å­˜å‚¨ï¼š
 
-- 认证配置文件（OAuth + API 密钥）：`~/.OpenKrab/agents/<agentId>/agent/auth-profiles.json`
-- 运行时缓存（自动管理；请勿编辑）：`~/.OpenKrab/agents/<agentId>/agent/auth.json`
+- è®¤è¯é…ç½®æ–‡ä»¶ï¼ˆOAuth + API å¯†é’¥ï¼‰ï¼š`~/.OpenKrab/agents/<agentId>/agent/auth-profiles.json`
+- è¿è¡Œæ—¶ç¼“å­˜ï¼ˆè‡ªåŠ¨ç®¡ç†ï¼›è¯·å‹¿ç¼–è¾‘ï¼‰ï¼š`~/.OpenKrab/agents/<agentId>/agent/auth.json`
 
-仅用于导入的旧版文件（仍然支持，但不是主存储）：
+ä»…ç”¨äºŽå¯¼å…¥çš„æ—§ç‰ˆæ–‡ä»¶ï¼ˆä»ç„¶æ”¯æŒï¼Œä½†ä¸æ˜¯ä¸»å­˜å‚¨ï¼‰ï¼š
 
-- `~/.OpenKrab/credentials/oauth.json`（首次使用时导入到 `auth-profiles.json`）
+- `~/.OpenKrab/credentials/oauth.json`ï¼ˆé¦–æ¬¡ä½¿ç”¨æ—¶å¯¼å…¥åˆ° `auth-profiles.json`ï¼‰
 
-以上所有路径也遵循 `$OpenKrab_STATE_DIR`（状态目录覆盖）。完整参考：[/gateway/configuration](/gateway/configuration#auth-storage-oauth--api-keys)
+ä»¥ä¸Šæ‰€æœ‰è·¯å¾„ä¹Ÿéµå¾ª `$OPENKRAB_STATE_DIR`ï¼ˆçŠ¶æ€ç›®å½•è¦†ç›–ï¼‰ã€‚å®Œæ•´å‚è€ƒï¼š[/gateway/configuration](/gateway/configuration#auth-storage-oauth--api-keys)
 
-## Anthropic setup-token（订阅认证）
+## Anthropic setup-tokenï¼ˆè®¢é˜…è®¤è¯ï¼‰
 
-在任意机器上运行 `claude setup-token`，然后将其粘贴到 OpenKrab 中：
+åœ¨ä»»æ„æœºå™¨ä¸Šè¿è¡Œ `claude setup-token`ï¼Œç„¶åŽå°†å…¶ç²˜è´´åˆ° OpenKrab ä¸­ï¼š
 
 ```bash
 OpenKrab models auth setup-token --provider anthropic
 ```
 
-如果你在其他地方生成了令牌，可以手动粘贴：
+å¦‚æžœä½ åœ¨å…¶ä»–åœ°æ–¹ç”Ÿæˆäº†ä»¤ç‰Œï¼Œå¯ä»¥æ‰‹åŠ¨ç²˜è´´ï¼š
 
 ```bash
 OpenKrab models auth paste-token --provider anthropic
 ```
 
-验证：
+éªŒè¯ï¼š
 
 ```bash
 OpenKrab models status
 ```
 
-## OAuth 交换（登录工作原理）
+## OAuth äº¤æ¢ï¼ˆç™»å½•å·¥ä½œåŽŸç†ï¼‰
 
-OpenKrab 的交互式登录流程在 `@mariozechner/pi-ai` 中实现，并集成到向导/命令中。
+OpenKrab çš„äº¤äº’å¼ç™»å½•æµç¨‹åœ¨ `@mariozechner/pi-ai` ä¸­å®žçŽ°ï¼Œå¹¶é›†æˆåˆ°å‘å¯¼/å‘½ä»¤ä¸­ã€‚
 
-### Anthropic（Claude Pro/Max）setup-token
+### Anthropicï¼ˆClaude Pro/Maxï¼‰setup-token
 
-流程概要：
+æµç¨‹æ¦‚è¦ï¼š
 
-1. 运行 `claude setup-token`
-2. 将令牌粘贴到 OpenKrab
-3. 作为令牌认证配置文件存储（无刷新）
+1. è¿è¡Œ `claude setup-token`
+2. å°†ä»¤ç‰Œç²˜è´´åˆ° OpenKrab
+3. ä½œä¸ºä»¤ç‰Œè®¤è¯é…ç½®æ–‡ä»¶å­˜å‚¨ï¼ˆæ— åˆ·æ–°ï¼‰
 
-向导路径为 `OpenKrab onboard` → 认证选择 `setup-token`（Anthropic）。
+å‘å¯¼è·¯å¾„ä¸º `OpenKrab onboard` â†’ è®¤è¯é€‰æ‹© `setup-token`ï¼ˆAnthropicï¼‰ã€‚
 
-### OpenAI Codex（ChatGPT OAuth）
+### OpenAI Codexï¼ˆChatGPT OAuthï¼‰
 
-流程概要（PKCE）：
+æµç¨‹æ¦‚è¦ï¼ˆPKCEï¼‰ï¼š
 
-1. 生成 PKCE 验证器/质询 + 随机 `state`
-2. 打开 `https://auth.openai.com/oauth/authorize?...`
-3. 尝试在 `http://127.0.0.1:1455/auth/callback` 捕获回调
-4. 如果回调无法绑定（或你在远程/无头环境中），手动粘贴重定向 URL/代码
-5. 在 `https://auth.openai.com/oauth/token` 进行交换
-6. 从访问令牌中提取 `accountId` 并存储 `{ access, refresh, expires, accountId }`
+1. ç”Ÿæˆ PKCE éªŒè¯å™¨/è´¨è¯¢ + éšæœº `state`
+2. æ‰“å¼€ `https://auth.openai.com/oauth/authorize?...`
+3. å°è¯•åœ¨ `http://127.0.0.1:1455/auth/callback` æ•èŽ·å›žè°ƒ
+4. å¦‚æžœå›žè°ƒæ— æ³•ç»‘å®šï¼ˆæˆ–ä½ åœ¨è¿œç¨‹/æ— å¤´çŽ¯å¢ƒä¸­ï¼‰ï¼Œæ‰‹åŠ¨ç²˜è´´é‡å®šå‘ URL/ä»£ç 
+5. åœ¨ `https://auth.openai.com/oauth/token` è¿›è¡Œäº¤æ¢
+6. ä»Žè®¿é—®ä»¤ç‰Œä¸­æå– `accountId` å¹¶å­˜å‚¨ `{ access, refresh, expires, accountId }`
 
-向导路径为 `OpenKrab onboard` → 认证选择 `openai-codex`。
+å‘å¯¼è·¯å¾„ä¸º `OpenKrab onboard` â†’ è®¤è¯é€‰æ‹© `openai-codex`ã€‚
 
-## 刷新 + 过期
+## åˆ·æ–° + è¿‡æœŸ
 
-配置文件存储 `expires` 时间戳。
+é…ç½®æ–‡ä»¶å­˜å‚¨ `expires` æ—¶é—´æˆ³ã€‚
 
-运行时：
+è¿è¡Œæ—¶ï¼š
 
-- 如果 `expires` 在未来 → 使用已存储的访问令牌
-- 如果已过期 → 刷新（在文件锁下）并覆盖已存储的凭据
+- å¦‚æžœ `expires` åœ¨æœªæ¥ â†’ ä½¿ç”¨å·²å­˜å‚¨çš„è®¿é—®ä»¤ç‰Œ
+- å¦‚æžœå·²è¿‡æœŸ â†’ åˆ·æ–°ï¼ˆåœ¨æ–‡ä»¶é”ä¸‹ï¼‰å¹¶è¦†ç›–å·²å­˜å‚¨çš„å‡­æ®
 
-刷新流程是自动的；你通常不需要手动管理令牌。
+åˆ·æ–°æµç¨‹æ˜¯è‡ªåŠ¨çš„ï¼›ä½ é€šå¸¸ä¸éœ€è¦æ‰‹åŠ¨ç®¡ç†ä»¤ç‰Œã€‚
 
-## 多账户（配置文件）+ 路由
+## å¤šè´¦æˆ·ï¼ˆé…ç½®æ–‡ä»¶ï¼‰+ è·¯ç”±
 
-两种模式：
+ä¸¤ç§æ¨¡å¼ï¼š
 
-### 1）推荐：独立智能体
+### 1ï¼‰æŽ¨èï¼šç‹¬ç«‹æ™ºèƒ½ä½“
 
-如果你希望"个人"和"工作"永远不交叉，请使用隔离的智能体（独立的会话 + 凭据 + 工作区）：
+å¦‚æžœä½ å¸Œæœ›"ä¸ªäºº"å’Œ"å·¥ä½œ"æ°¸è¿œä¸äº¤å‰ï¼Œè¯·ä½¿ç”¨éš”ç¦»çš„æ™ºèƒ½ä½“ï¼ˆç‹¬ç«‹çš„ä¼šè¯ + å‡­æ® + å·¥ä½œåŒºï¼‰ï¼š
 
 ```bash
 OpenKrab agents add work
 OpenKrab agents add personal
 ```
 
-然后按智能体配置认证（向导），并将聊天路由到正确的智能体。
+ç„¶åŽæŒ‰æ™ºèƒ½ä½“é…ç½®è®¤è¯ï¼ˆå‘å¯¼ï¼‰ï¼Œå¹¶å°†èŠå¤©è·¯ç”±åˆ°æ­£ç¡®çš„æ™ºèƒ½ä½“ã€‚
 
-### 2）高级：单个智能体中的多个配置文件
+### 2ï¼‰é«˜çº§ï¼šå•ä¸ªæ™ºèƒ½ä½“ä¸­çš„å¤šä¸ªé…ç½®æ–‡ä»¶
 
-`auth-profiles.json` 支持同一提供商的多个配置文件 ID。
+`auth-profiles.json` æ”¯æŒåŒä¸€æä¾›å•†çš„å¤šä¸ªé…ç½®æ–‡ä»¶ IDã€‚
 
-选择使用哪个配置文件：
+é€‰æ‹©ä½¿ç”¨å“ªä¸ªé…ç½®æ–‡ä»¶ï¼š
 
-- 通过配置顺序全局设置（`auth.order`）
-- 通过 `/model ...@<profileId>` 按会话设置
+- é€šè¿‡é…ç½®é¡ºåºå…¨å±€è®¾ç½®ï¼ˆ`auth.order`ï¼‰
+- é€šè¿‡ `/model ...@<profileId>` æŒ‰ä¼šè¯è®¾ç½®
 
-示例（会话覆盖）：
+ç¤ºä¾‹ï¼ˆä¼šè¯è¦†ç›–ï¼‰ï¼š
 
 - `/model Opus@anthropic:work`
 
-如何查看存在哪些配置文件 ID：
+å¦‚ä½•æŸ¥çœ‹å­˜åœ¨å“ªäº›é…ç½®æ–‡ä»¶ IDï¼š
 
-- `OpenKrab channels list --json`（显示 `auth[]`）
+- `OpenKrab channels list --json`ï¼ˆæ˜¾ç¤º `auth[]`ï¼‰
 
-相关文档：
+ç›¸å…³æ–‡æ¡£ï¼š
 
-- [/concepts/model-failover](/concepts/model-failover)（轮换 + 冷却规则）
-- [/tools/slash-commands](/tools/slash-commands)（命令界面）
+- [/concepts/model-failover](/concepts/model-failover)ï¼ˆè½®æ¢ + å†·å´è§„åˆ™ï¼‰
+- [/tools/slash-commands](/tools/slash-commands)ï¼ˆå‘½ä»¤ç•Œé¢ï¼‰
+
 

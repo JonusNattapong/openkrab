@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Optional Docker-based setup and onboarding for openkrab"
 read_when:
   - You want a containerized gateway instead of local installs
@@ -12,13 +12,13 @@ Docker is **optional**. Use it only if you want a containerized gateway or to va
 
 ## Is Docker right for me?
 
-- **Yes**: you want an isolated, throwaway gateway environment or to run openkrab on a host without local installs.
-- **No**: you’re running on your own machine and just want the fastest dev loop. Use the normal install flow instead.
+- **Yes**: you want an isolated, throwaway gateway environment or to run OpenKrab on a host without local installs.
+- **No**: youâ€™re running on your own machine and just want the fastest dev loop. Use the normal install flow instead.
 - **Sandboxing note**: agent sandboxing uses Docker too, but it does **not** require the full gateway to run in Docker. See [Sandboxing](/gateway/sandboxing).
 
 This guide covers:
 
-- Containerized Gateway (full openkrab in Docker)
+- Containerized Gateway (full OpenKrab in Docker)
 - Per-session Agent Sandbox (host gateway + Docker-isolated agent tools)
 
 Sandboxing details: [Sandboxing](/gateway/sandboxing)
@@ -48,14 +48,14 @@ This script:
 
 Optional env vars:
 
-- `openkrab_DOCKER_APT_PACKAGES` — install extra apt packages during build
-- `openkrab_EXTRA_MOUNTS` — add extra host bind mounts
-- `openkrab_HOME_VOLUME` — persist `/home/node` in a named volume
+- `OPENKRAB_DOCKER_APT_PACKAGES` â€” install extra apt packages during build
+- `OPENKRAB_EXTRA_MOUNTS` â€” add extra host bind mounts
+- `OPENKRAB_HOME_VOLUME` â€” persist `/home/node` in a named volume
 
 After it finishes:
 
 - Open `http://127.0.0.1:18789/` in your browser.
-- Paste the token into the Control UI (Settings → token).
+- Paste the token into the Control UI (Settings â†’ token).
 - Need the URL again? Run `docker compose run --rm openkrab-cli dashboard --no-open`.
 
 It writes config/workspace on the host:
@@ -67,21 +67,21 @@ Running on a VPS? See [Hetzner (Docker VPS)](/install/hetzner).
 
 ### Shell Helpers (optional)
 
-For easier day-to-day Docker management, install `ClawDock`:
+For easier day-to-day Docker management, install `Krabdock`:
 
 ```bash
-mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/openkrab/openkrab/main/scripts/shell-helpers/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
+mkdir -p ~/.Krabdock && curl -sL https://raw.githubusercontent.com/openkrab/openkrab/main/scripts/shell-helpers/Krabdock-helpers.sh -o ~/.Krabdock/Krabdock-helpers.sh
 ```
 
 **Add to your shell config (zsh):**
 
 ```bash
-echo 'source ~/.clawdock/clawdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
+echo 'source ~/.Krabdock/Krabdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
 ```
 
-Then use `clawdock-start`, `clawdock-stop`, `clawdock-dashboard`, etc. Run `clawdock-help` for all commands.
+Then use `Krabdock-start`, `Krabdock-stop`, `Krabdock-dashboard`, etc. Run `Krabdock-help` for all commands.
 
-See [`ClawDock` Helper README](https://github.com/openkrab/openkrab/blob/main/scripts/shell-helpers/README.md) for details.
+See [`Krabdock` Helper README](https://github.com/openkrab/openkrab/blob/main/scripts/shell-helpers/README.md) for details.
 
 ### Manual flow (compose)
 
@@ -92,7 +92,7 @@ docker compose up -d openkrab-gateway
 ```
 
 Note: run `docker compose ...` from the repo root. If you enabled
-`openkrab_EXTRA_MOUNTS` or `openkrab_HOME_VOLUME`, the setup script writes
+`OPENKRAB_EXTRA_MOUNTS` or `OPENKRAB_HOME_VOLUME`, the setup script writes
 `docker-compose.extra.yml`; include it when running Compose elsewhere:
 
 ```bash
@@ -101,7 +101,7 @@ docker compose -f docker-compose.yml -f docker-compose.extra.yml <command>
 
 ### Control UI token + pairing (Docker)
 
-If you see “unauthorized” or “disconnected (1008): pairing required”, fetch a
+If you see â€œunauthorizedâ€ or â€œdisconnected (1008): pairing requiredâ€, fetch a
 fresh dashboard link and approve the browser device:
 
 ```bash
@@ -115,14 +115,14 @@ More detail: [Dashboard](/web/dashboard), [Devices](/cli/devices).
 ### Extra mounts (optional)
 
 If you want to mount additional host directories into the containers, set
-`openkrab_EXTRA_MOUNTS` before running `docker-setup.sh`. This accepts a
+`OPENKRAB_EXTRA_MOUNTS` before running `docker-setup.sh`. This accepts a
 comma-separated list of Docker bind mounts and applies them to both
 `openkrab-gateway` and `openkrab-cli` by generating `docker-compose.extra.yml`.
 
 Example:
 
 ```bash
-export openkrab_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+export OPENKRAB_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
 ./docker-setup.sh
 ```
 
@@ -130,58 +130,58 @@ Notes:
 
 - Paths must be shared with Docker Desktop on macOS/Windows.
 - Each entry must be `source:target[:options]` with no spaces, tabs, or newlines.
-- If you edit `openkrab_EXTRA_MOUNTS`, rerun `docker-setup.sh` to regenerate the
+- If you edit `OPENKRAB_EXTRA_MOUNTS`, rerun `docker-setup.sh` to regenerate the
   extra compose file.
-- `docker-compose.extra.yml` is generated. Don’t hand-edit it.
+- `docker-compose.extra.yml` is generated. Donâ€™t hand-edit it.
 
 ### Persist the entire container home (optional)
 
 If you want `/home/node` to persist across container recreation, set a named
-volume via `openkrab_HOME_VOLUME`. This creates a Docker volume and mounts it at
+volume via `OPENKRAB_HOME_VOLUME`. This creates a Docker volume and mounts it at
 `/home/node`, while keeping the standard config/workspace bind mounts. Use a
 named volume here (not a bind path); for bind mounts, use
-`openkrab_EXTRA_MOUNTS`.
+`OPENKRAB_EXTRA_MOUNTS`.
 
 Example:
 
 ```bash
-export openkrab_HOME_VOLUME="openkrab_home"
+export OPENKRAB_HOME_VOLUME="OPENKRAB_HOME"
 ./docker-setup.sh
 ```
 
 You can combine this with extra mounts:
 
 ```bash
-export openkrab_HOME_VOLUME="openkrab_home"
-export openkrab_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+export OPENKRAB_HOME_VOLUME="OPENKRAB_HOME"
+export OPENKRAB_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
 ./docker-setup.sh
 ```
 
 Notes:
 
 - Named volumes must match `^[A-Za-z0-9][A-Za-z0-9_.-]*$`.
-- If you change `openkrab_HOME_VOLUME`, rerun `docker-setup.sh` to regenerate the
+- If you change `OPENKRAB_HOME_VOLUME`, rerun `docker-setup.sh` to regenerate the
   extra compose file.
 - The named volume persists until removed with `docker volume rm <name>`.
 
 ### Install extra apt packages (optional)
 
 If you need system packages inside the image (for example, build tools or media
-libraries), set `openkrab_DOCKER_APT_PACKAGES` before running `docker-setup.sh`.
+libraries), set `OPENKRAB_DOCKER_APT_PACKAGES` before running `docker-setup.sh`.
 This installs the packages during the image build, so they persist even if the
 container is deleted.
 
 Example:
 
 ```bash
-export openkrab_DOCKER_APT_PACKAGES="ffmpeg build-essential"
+export OPENKRAB_DOCKER_APT_PACKAGES="ffmpeg build-essential"
 ./docker-setup.sh
 ```
 
 Notes:
 
 - This accepts a space-separated list of apt package names.
-- If you change `openkrab_DOCKER_APT_PACKAGES`, rerun `docker-setup.sh` to rebuild
+- If you change `OPENKRAB_DOCKER_APT_PACKAGES`, rerun `docker-setup.sh` to rebuild
   the image.
 
 ### Power-user / full-featured container (opt-in)
@@ -198,14 +198,14 @@ If you want a more full-featured container, use these opt-in knobs:
 1. **Persist `/home/node`** so browser downloads and tool caches survive:
 
 ```bash
-export openkrab_HOME_VOLUME="openkrab_home"
+export OPENKRAB_HOME_VOLUME="OPENKRAB_HOME"
 ./docker-setup.sh
 ```
 
 2. **Bake system deps into the image** (repeatable + persistent):
 
 ```bash
-export openkrab_DOCKER_APT_PACKAGES="git curl jq"
+export OPENKRAB_DOCKER_APT_PACKAGES="git curl jq"
 ./docker-setup.sh
 ```
 
@@ -217,14 +217,14 @@ docker compose run --rm openkrab-cli \
 ```
 
 If you need Playwright to install system deps, rebuild the image with
-`openkrab_DOCKER_APT_PACKAGES` instead of using `--with-deps` at runtime.
+`OPENKRAB_DOCKER_APT_PACKAGES` instead of using `--with-deps` at runtime.
 
 4. **Persist Playwright browser downloads**:
 
 - Set `PLAYWRIGHT_BROWSERS_PATH=/home/node/.cache/ms-playwright` in
   `docker-compose.yml`.
-- Ensure `/home/node` persists via `openkrab_HOME_VOLUME`, or mount
-  `/home/node/.cache/ms-playwright` via `openkrab_EXTRA_MOUNTS`.
+- Ensure `/home/node` persists via `OPENKRAB_HOME_VOLUME`, or mount
+  `/home/node/.cache/ms-playwright` via `OPENKRAB_EXTRA_MOUNTS`.
 
 ### Permissions + EACCES
 
@@ -306,7 +306,7 @@ URL you land on and paste it back into the wizard to finish auth.
 ### Health check
 
 ```bash
-docker compose exec openkrab-gateway node dist/index.js health --token "$openkrab_GATEWAY_TOKEN"
+docker compose exec openkrab-gateway node dist/index.js health --token "$OPENKRAB_GATEWAY_TOKEN"
 ```
 
 ### E2E smoke test (Docker)
@@ -378,7 +378,7 @@ If you plan to install packages in `setupCommand`, note:
 - Default `docker.network` is `"none"` (no egress).
 - `readOnlyRoot: true` blocks package installs.
 - `user` must be root for `apt-get` (omit `user` or set `user: "0:0"`).
-  openkrab auto-recreates containers when `setupCommand` (or docker config) changes
+  OpenKrab auto-recreates containers when `setupCommand` (or docker config) changes
   unless the container was **recently used** (within ~5 minutes). Hot containers
   log a warning with the exact `openkrab sandbox recreate ...` command.
 
@@ -581,7 +581,9 @@ Example:
 - Container not running: it will auto-create per session on demand.
 - Permission errors in sandbox: set `docker.user` to a UID:GID that matches your
   mounted workspace ownership (or chown the workspace folder).
-- Custom tools not found: openkrab runs commands with `sh -lc` (login shell), which
+- Custom tools not found: OpenKrab runs commands with `sh -lc` (login shell), which
   sources `/etc/profile` and may reset PATH. Set `docker.env.PATH` to prepend your
   custom tool paths (e.g., `/custom/bin:/usr/local/share/npm-global/bin`), or add
   a script under `/etc/profile.d/` in your Dockerfile.
+
+

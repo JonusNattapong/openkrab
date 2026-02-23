@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab agent` (send one agent turn via the Gateway)"
 read_when:
   - You want to run one agent turn from scripts (optionally deliver reply)
@@ -16,9 +16,6 @@ Related:
 
 ## Examples
 
-```bash
-openkrab agent --to +15555550123 --message "status update" --deliver
-openkrab agent --agent ops --message "Summarize logs"
-openkrab agent --session-id 1234 --message "Summarize inbox" --thinking medium
-openkrab agent --agent ops --message "Generate report" --deliver --reply-channel slack --reply-to "#reports"
+```bash\nOpenKrab agent --to +15555550123 --message "status update" --deliver\nOpenKrab agent --agent ops --message "Summarize logs"\nOpenKrab agent --session-id 1234 --message "Summarize inbox" --thinking medium\nOpenKrab agent --agent ops --message "Generate report" --deliver --reply-channel slack --reply-to "#reports"
 ```
+

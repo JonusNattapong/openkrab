@@ -1,5 +1,5 @@
 //! role_routing — Role-based routing rule.
-//! Ported from OpenClaw's `resolve-route.ts` memberRoleIds support.
+//! Ported from OpenKrab's `resolve-route.ts` memberRoleIds support.
 //!
 //! Allows routing decisions to be made based on the sender's roles
 //! (e.g. admin, moderator) in a group context.
@@ -255,3 +255,4 @@ mod tests {
         }
     }
 }
+

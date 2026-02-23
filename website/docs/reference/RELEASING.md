@@ -1,4 +1,4 @@
----
+﻿---
 title: "Release Checklist"
 summary: "Step-by-step release checklist for npm + macOS app"
 read_when:
@@ -13,7 +13,7 @@ Use `pnpm` (Node 22+) from the repo root. Keep the working tree clean before tag
 
 ## Operator trigger
 
-When the operator says “release”, immediately do this preflight (no extra questions unless blocked):
+When the operator says â€œreleaseâ€, immediately do this preflight (no extra questions unless blocked):
 
 - Read this doc and `docs/platforms/mac/release.md`.
 - Load env from `~/.profile` and confirm `SPARKLE_PRIVATE_KEY_FILE` + App Store Connect vars are set (SPARKLE_PRIVATE_KEY_FILE should live in `~/.profile`).
@@ -46,8 +46,8 @@ When the operator says “release”, immediately do this preflight (no extra qu
 - [ ] `pnpm check`
 - [ ] `pnpm test` (or `pnpm test:coverage` if you need coverage output)
 - [ ] `pnpm release:check` (verifies npm pack contents)
-- [ ] `OpenKrab_INSTALL_SMOKE_SKIP_NONROOT=1 pnpm test:install:smoke` (Docker install smoke test, fast path; required before release)
-  - If the immediate previous npm release is known broken, set `OpenKrab_INSTALL_SMOKE_PREVIOUS=<last-good-version>` or `OpenKrab_INSTALL_SMOKE_SKIP_PREVIOUS=1` for the preinstall step.
+- [ ] `OPENKRAB_INSTALL_SMOKE_SKIP_NONROOT=1 pnpm test:install:smoke` (Docker install smoke test, fast path; required before release)
+  - If the immediate previous npm release is known broken, set `OPENKRAB_INSTALL_SMOKE_PREVIOUS=<last-good-version>` or `OPENKRAB_INSTALL_SMOKE_SKIP_PREVIOUS=1` for the preinstall step.
 - [ ] (Optional) Full installer smoke (adds non-root + CLI coverage): `pnpm test:install:smoke`
 - [ ] (Optional) Installer E2E (Docker, runs `curl -fsSL https://OpenKrab.ai/install.sh | bash`, onboards, then runs real tool calls):
   - `pnpm test:install:e2e:openai` (requires `OPENAI_API_KEY`)
@@ -119,4 +119,5 @@ Current npm plugin list (update as needed):
 
 Release notes must also call out **new optional bundled plugins** that are **not
 on by default** (example: `tlon`).
+
 

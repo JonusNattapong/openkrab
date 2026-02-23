@@ -677,7 +677,7 @@ pub fn resolve_dm_policy(account: &ResolvedDiscordAccount) -> DmPolicyResolution
         policy,
         allow_from,
         allow_from_path,
-        approve_hint: format!("krabkrab pairing approve discord <discordUserId>"),
+        approve_hint: format!("openkrab pairing approve discord <discordUserId>"),
     }
 }
 
@@ -1296,3 +1296,4 @@ mod tests {
         assert_eq!(parsed, MessageAction::ThreadCreate);
     }
 }
+

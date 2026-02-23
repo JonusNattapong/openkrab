@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Agent workspace: location, layout, and backup strategy"
 read_when:
   - You need to explain the agent workspace or its file layout
@@ -17,14 +17,14 @@ sessions.
 **Important:** the workspace is the **default cwd**, not a hard sandbox. Tools
 resolve relative paths against the workspace, but absolute paths can still reach
 elsewhere on the host unless sandboxing is enabled. If you need isolation, use
-[`agents.defaults.sandbox`](/gateway/sandboxing) (and/or per‑agent sandbox config).
+[`agents.defaults.sandbox`](/gateway/sandboxing) (and/or perâ€‘agent sandbox config).
 When sandboxing is enabled and `workspaceAccess` is not `"rw"`, tools operate
 inside a sandbox workspace under `~/.openkrab/sandboxes`, not your host workspace.
 
 ## Default location
 
 - Default: `~/.openkrab/workspace`
-- If `openkrab_PROFILE` is set and not `"default"`, the default becomes
+- If `OPENKRAB_PROFILE` is set and not `"default"`, the default becomes
   `~/.openkrab/workspace-<profile>`.
 - Override in `~/.openkrab/openkrab.json`:
 
@@ -61,7 +61,7 @@ If you intentionally keep multiple workspaces, make sure
 
 ## Workspace file map (what each file means)
 
-These are the standard files openkrab expects inside the workspace:
+These are the standard files OpenKrab expects inside the workspace:
 
 - `AGENTS.md`
   - Operating instructions for the agent and how it should use memory.
@@ -114,7 +114,7 @@ See [Memory](/concepts/memory) for the workflow and automatic memory flush.
 - `canvas/` (optional)
   - Canvas UI files for node displays (for example `canvas/index.html`).
 
-If any bootstrap file is missing, openkrab injects a "missing file" marker into
+If any bootstrap file is missing, OpenKrab injects a "missing file" marker into
 the session and continues. Large bootstrap files are truncated when injected;
 adjust limits with `agents.defaults.bootstrapMaxChars` (default: 20000) and
 `agents.defaults.bootstrapTotalMaxChars` (default: 150000).
@@ -232,3 +232,5 @@ Suggested `.gitignore` starter:
   [Channel routing](/channels/channel-routing) for routing configuration.
 - If `agents.defaults.sandbox` is enabled, non-main sessions can use per-session sandbox
   workspaces under `agents.defaults.sandbox.workspaceRoot`.
+
+

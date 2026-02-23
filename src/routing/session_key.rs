@@ -1,8 +1,8 @@
 //! session_key — Complex session key construction and parsing.
-//! Ported from `openclaw/src/routing/session-key.ts`.
+//! Ported from `OpenKrab/src/routing/session-key.ts`.
 //!
 //! Builds composite session keys from connector + channel + thread + agent +
-//! account + DM scope, following the same format as OpenClaw.
+//! account + DM scope, following the same format as OpenKrab.
 
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -637,3 +637,4 @@ mod tests {
         assert_eq!(key, "discord:bot1:group:guild_123");
     }
 }
+

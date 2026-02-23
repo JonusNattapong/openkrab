@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Guidance for choosing between heartbeat and cron jobs for automation"
 read_when:
   - Deciding how to schedule recurring tasks
@@ -101,8 +101,7 @@ per-job offset in a 0-5 minute window.
 
 ### Cron example: Daily morning briefing
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Morning briefing" \
   --cron "0 7 * * *" \
   --tz "America/New_York" \
@@ -118,8 +117,7 @@ This runs at exactly 7:00 AM New York time, uses Opus for quality, and announces
 
 ### Cron example: One-shot reminder
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Meeting reminder" \
   --at "20m" \
   --session main \
@@ -177,14 +175,11 @@ The most efficient setup uses **both**:
 **Cron jobs** (precise timing):
 
 ```bash
-# Daily morning briefing at 7am
-openkrab cron add --name "Morning brief" --cron "0 7 * * *" --session isolated --message "..." --announce
+# Daily morning briefing at 7am\nOpenKrab cron add --name "Morning brief" --cron "0 7 * * *" --session isolated --message "..." --announce
 
-# Weekly project review on Mondays at 9am
-openkrab cron add --name "Weekly review" --cron "0 9 * * 1" --session isolated --message "..." --model opus
+# Weekly project review on Mondays at 9am\nOpenKrab cron add --name "Weekly review" --cron "0 9 * * 1" --session isolated --message "..." --model opus
 
-# One-shot reminder
-openkrab cron add --name "Call back" --at "2h" --session main --system-event "Call back the client" --wake now
+# One-shot reminder\nOpenKrab cron add --name "Call back" --at "2h" --session main --system-event "Call back the client" --wake now
 ```
 
 ## Lobster: Deterministic workflows with approvals
@@ -235,8 +230,7 @@ Use `--session main` with `--system-event` when you want:
 - The agent to handle it during the next heartbeat with full context
 - No separate isolated run
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Check project" \
   --every "4h" \
   --session main \
@@ -253,8 +247,7 @@ Use `--session isolated` when you want:
 - Announce summaries directly to a channel
 - History that doesn't clutter main session
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Deep analysis" \
   --cron "0 6 * * 0" \
   --session isolated \
@@ -284,3 +277,4 @@ openkrab cron add \
 - [Heartbeat](/gateway/heartbeat) - full heartbeat configuration
 - [Cron jobs](/automation/cron-jobs) - full cron CLI and API reference
 - [System](/cli/system) - system events + heartbeat controls
+

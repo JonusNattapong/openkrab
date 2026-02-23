@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab plugins` (list, install, uninstall, enable/disable, doctor)"
 read_when:
   - You want to install or manage in-process Gateway plugins
@@ -18,18 +18,10 @@ Related:
 
 ## Commands
 
-```bash
-openkrab plugins list
-openkrab plugins info <id>
-openkrab plugins enable <id>
-openkrab plugins disable <id>
-openkrab plugins uninstall <id>
-openkrab plugins doctor
-openkrab plugins update <id>
-openkrab plugins update --all
+```bash\nOpenKrab plugins list\nOpenKrab plugins info <id>\nOpenKrab plugins enable <id>\nOpenKrab plugins disable <id>\nOpenKrab plugins uninstall <id>\nOpenKrab plugins doctor\nOpenKrab plugins update <id>\nOpenKrab plugins update --all
 ```
 
-Bundled plugins ship with openkrab but start disabled. Use `plugins enable` to
+Bundled plugins ship with OpenKrab but start disabled. Use `plugins enable` to
 activate them.
 
 All plugins must ship a `openkrab.plugin.json` file with an inline JSON Schema
@@ -38,9 +30,7 @@ the plugin from loading and fail config validation.
 
 ### Install
 
-```bash
-openkrab plugins install <path-or-spec>
-openkrab plugins install <npm-spec> --pin
+```bash\nOpenKrab plugins install <path-or-spec>\nOpenKrab plugins install <npm-spec> --pin
 ```
 
 Security note: treat plugin installs like running code. Prefer pinned versions.
@@ -52,8 +42,7 @@ Supported archives: `.zip`, `.tgz`, `.tar.gz`, `.tar`.
 
 Use `--link` to avoid copying a local directory (adds to `plugins.load.paths`):
 
-```bash
-openkrab plugins install -l ./my-plugin
+```bash\nOpenKrab plugins install -l ./my-plugin
 ```
 
 Use `--pin` on npm installs to save the resolved exact spec (`name@version`) in
@@ -61,10 +50,7 @@ Use `--pin` on npm installs to save the resolved exact spec (`name@version`) in
 
 ### Uninstall
 
-```bash
-openkrab plugins uninstall <id>
-openkrab plugins uninstall <id> --dry-run
-openkrab plugins uninstall <id> --keep-files
+```bash\nOpenKrab plugins uninstall <id>\nOpenKrab plugins uninstall <id> --dry-run\nOpenKrab plugins uninstall <id> --keep-files
 ```
 
 `uninstall` removes plugin records from `plugins.entries`, `plugins.installs`,
@@ -72,21 +58,19 @@ the plugin allowlist, and linked `plugins.load.paths` entries when applicable.
 For active memory plugins, the memory slot resets to `memory-core`.
 
 By default, uninstall also removes the plugin install directory under the active
-state dir extensions root (`$openkrab_STATE_DIR/extensions/<id>`). Use
+state dir extensions root (`$OPENKRAB_STATE_DIR/extensions/<id>`). Use
 `--keep-files` to keep files on disk.
 
 `--keep-config` is supported as a deprecated alias for `--keep-files`.
 
 ### Update
 
-```bash
-openkrab plugins update <id>
-openkrab plugins update --all
-openkrab plugins update <id> --dry-run
+```bash\nOpenKrab plugins update <id>\nOpenKrab plugins update --all\nOpenKrab plugins update <id> --dry-run
 ```
 
 Updates only apply to plugins installed from npm (tracked in `plugins.installs`).
 
-When a stored integrity hash exists and the fetched artifact hash changes,
-openkrab prints a warning and asks for confirmation before proceeding. Use
+When a stored integrity hash exists and the fetched artifact hash changes,\nOpenKrab prints a warning and asks for confirmation before proceeding. Use
 global `--yes` to bypass prompts in CI/non-interactive runs.
+
+

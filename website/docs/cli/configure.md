@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab configure` (interactive configuration prompts)"
 read_when:
   - You want to tweak credentials, devices, or agent defaults interactively
@@ -27,7 +27,6 @@ Notes:
 
 ## Examples
 
-```bash
-openkrab configure
-openkrab configure --section models --section channels
+```bash\nOpenKrab configure\nOpenKrab configure --section models --section channels
 ```
+

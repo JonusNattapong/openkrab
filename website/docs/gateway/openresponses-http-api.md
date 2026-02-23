@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Expose an OpenResponses-compatible /v1/responses HTTP endpoint from the Gateway"
 read_when:
   - Integrating clients that speak the OpenResponses API
@@ -8,7 +8,7 @@ title: "OpenResponses API"
 
 # OpenResponses API (HTTP)
 
-openkrab’s Gateway can serve an OpenResponses-compatible `POST /v1/responses` endpoint.
+openkrabâ€™s Gateway can serve an OpenResponses-compatible `POST /v1/responses` endpoint.
 
 This endpoint is **disabled by default**. Enable it in config first.
 
@@ -26,8 +26,8 @@ Uses the Gateway auth configuration. Send a bearer token:
 
 Notes:
 
-- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `openkrab_GATEWAY_TOKEN`).
-- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `openkrab_GATEWAY_PASSWORD`).
+- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `OPENKRAB_GATEWAY_TOKEN`).
+- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `OPENKRAB_GATEWAY_PASSWORD`).
 - If `gateway.auth.rateLimit` is configured and too many auth failures occur, the endpoint returns `429` with `Retry-After`.
 
 ## Choosing an agent
@@ -37,7 +37,7 @@ No custom headers required: encode the agent id in the OpenResponses `model` fie
 - `model: "openkrab:<agentId>"` (example: `"openkrab:main"`, `"openkrab:beta"`)
 - `model: "agent:<agentId>"` (alias)
 
-Or target a specific openkrab agent by header:
+Or target a specific OpenKrab agent by header:
 
 - `x-openkrab-agent-id: <agentId>` (default: `main`)
 
@@ -112,7 +112,7 @@ Accepted but **currently ignored**:
 Roles: `system`, `developer`, `user`, `assistant`.
 
 - `system` and `developer` are appended to the system prompt.
-- The most recent `user` or `function_call_output` item becomes the “current message.”
+- The most recent `user` or `function_call_output` item becomes the â€œcurrent message.â€
 - Earlier user/assistant messages are included as history for context.
 
 ### `function_call_output` (turn-based tools)
@@ -331,3 +331,5 @@ curl -N http://127.0.0.1:18789/v1/responses \
     "input": "hi"
   }'
 ```
+
+

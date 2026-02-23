@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Nextcloud Talk support status, capabilities, and configuration"
 read_when:
   - Working on Nextcloud Talk channel features
@@ -15,18 +15,15 @@ Nextcloud Talk ships as a plugin and is not bundled with the core install.
 
 Install via CLI (npm registry):
 
-```bash
-openkrab plugins install @openkrab/nextcloud-talk
+```bash\nOpenKrab plugins install @openkrab/nextcloud-talk
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/nextcloud-talk
+```bash\nOpenKrab plugins install ./extensions/nextcloud-talk
 ```
 
-If you choose Nextcloud Talk during configure/onboarding and a git checkout is detected,
-openkrab will offer the local install path automatically.
+If you choose Nextcloud Talk during configure/onboarding and a git checkout is detected,\nOpenKrab will offer the local install path automatically.
 
 Details: [Plugins](/tools/plugin)
 
@@ -136,3 +133,4 @@ Provider options:
 - `channels.nextcloud-talk.blockStreaming`: disable block streaming for this channel.
 - `channels.nextcloud-talk.blockStreamingCoalesce`: block streaming coalesce tuning.
 - `channels.nextcloud-talk.mediaMaxMb`: inbound media cap (MB).
+

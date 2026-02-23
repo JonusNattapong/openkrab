@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Plan: Add OpenResponses /v1/responses endpoint and deprecate chat completions cleanly"
 owner: "openkrab"
 status: "draft"
@@ -9,8 +9,7 @@ title: "OpenResponses Gateway Plan"
 # OpenResponses Gateway Integration Plan
 
 ## Context
-
-openkrab Gateway currently exposes a minimal OpenAI-compatible Chat Completions endpoint at
+\nOpenKrab Gateway currently exposes a minimal OpenAI-compatible Chat Completions endpoint at
 `/v1/chat/completions` (see [OpenAI Chat Completions](/gateway/openai-http-api)).
 
 Open Responses is an open inference standard based on the OpenAI Responses API. It is designed
@@ -121,3 +120,4 @@ Key points extracted:
 
 - Add a new docs page for `/v1/responses` usage and examples.
 - Update `/gateway/openai-http-api` with a legacy note and pointer to `/v1/responses`.
+

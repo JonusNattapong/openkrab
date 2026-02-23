@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Testing kit: unit/e2e/live suites, Docker runners, and what each test covers"
 read_when:
   - Running tests locally or in CI
@@ -8,10 +8,9 @@ title: "Testing"
 ---
 
 # Testing
+\nOpenKrab has three Vitest suites (unit/integration, e2e, live) and a small set of Docker runners.
 
-openkrab has three Vitest suites (unit/integration, e2e, live) and a small set of Docker runners.
-
-This doc is a “how we test” guide:
+This doc is a â€œhow we testâ€ guide:
 
 - What each suite covers (and what it deliberately does _not_ cover)
 - Which commands to run for common workflows (local, pre-push, debugging)
@@ -37,7 +36,7 @@ Tip: when you only need one failing case, prefer narrowing live tests via the al
 
 ## Test suites (what runs where)
 
-Think of the suites as “increasing realism” (and increasing flakiness/cost):
+Think of the suites as â€œincreasing realismâ€ (and increasing flakiness/cost):
 
 ### Unit / integration (default)
 
@@ -53,9 +52,9 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
   - No real keys required
   - Should be fast and stable
 - Pool note:
-  - openkrab uses Vitest `vmForks` on Node 22/23 for faster unit shards.
-  - On Node 24+, openkrab automatically falls back to regular `forks` to avoid Node VM linking errors (`ERR_VM_MODULE_LINK_FAILURE` / `module is already linked`).
-  - Override manually with `openkrab_TEST_VM_FORKS=0` (force `forks`) or `openkrab_TEST_VM_FORKS=1` (force `vmForks`).
+  - OpenKrab uses Vitest `vmForks` on Node 22/23 for faster unit shards.
+  - On Node 24+, OpenKrab automatically falls back to regular `forks` to avoid Node VM linking errors (`ERR_VM_MODULE_LINK_FAILURE` / `module is already linked`).
+  - Override manually with `OPENKRAB_TEST_VM_FORKS=0` (force `forks`) or `OPENKRAB_TEST_VM_FORKS=1` (force `vmForks`).
 
 ### E2E (gateway smoke)
 
@@ -67,8 +66,8 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
   - Uses adaptive workers (CI: 2-4, local: 4-8).
   - Runs in silent mode by default to reduce console I/O overhead.
 - Useful overrides:
-  - `openkrab_E2E_WORKERS=<n>` to force worker count (capped at 16).
-  - `openkrab_E2E_VERBOSE=1` to re-enable verbose console output.
+  - `OPENKRAB_E2E_WORKERS=<n>` to force worker count (capped at 16).
+  - `OPENKRAB_E2E_VERBOSE=1` to re-enable verbose console output.
 - Scope:
   - Multi-instance gateway end-to-end behavior
   - WebSocket/HTTP surfaces, node pairing, and heavier networking
@@ -82,16 +81,16 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
 - Command: `pnpm test:live`
 - Config: `vitest.live.config.ts`
 - Files: `src/**/*.live.test.ts`
-- Default: **enabled** by `pnpm test:live` (sets `openkrab_LIVE_TEST=1`)
+- Default: **enabled** by `pnpm test:live` (sets `OPENKRAB_LIVE_TEST=1`)
 - Scope:
-  - “Does this provider/model actually work _today_ with real creds?”
+  - â€œDoes this provider/model actually work _today_ with real creds?â€
   - Catch provider format changes, tool-calling quirks, auth issues, and rate limit behavior
 - Expectations:
   - Not CI-stable by design (real networks, real provider policies, quotas, outages)
   - Costs money / uses rate limits
-  - Prefer running narrowed subsets instead of “everything”
+  - Prefer running narrowed subsets instead of â€œeverythingâ€
   - Live runs will source `~/.profile` to pick up missing API keys
-- API key rotation (provider-specific): set `*_API_KEYS` with comma/semicolon format or `*_API_KEY_1`, `*_API_KEY_2` (for example `OPENAI_API_KEYS`, `ANTHROPIC_API_KEYS`, `GEMINI_API_KEYS`) or per-live override via `openkrab_LIVE_*_KEY`; tests retry on rate limit responses.
+- API key rotation (provider-specific): set `*_API_KEYS` with comma/semicolon format or `*_API_KEY_1`, `*_API_KEY_2` (for example `OPENAI_API_KEYS`, `ANTHROPIC_API_KEYS`, `GEMINI_API_KEYS`) or per-live override via `OPENKRAB_LIVE_*_KEY`; tests retry on rate limit responses.
 
 ## Which suite should I run?
 
@@ -99,14 +98,14 @@ Use this decision table:
 
 - Editing logic/tests: run `pnpm test` (and `pnpm test:coverage` if you changed a lot)
 - Touching gateway networking / WS protocol / pairing: add `pnpm test:e2e`
-- Debugging “my bot is down” / provider-specific failures / tool calling: run a narrowed `pnpm test:live`
+- Debugging â€œmy bot is downâ€ / provider-specific failures / tool calling: run a narrowed `pnpm test:live`
 
 ## Live: model smoke (profile keys)
 
 Live tests are split into two layers so we can isolate failures:
 
-- “Direct model” tells us the provider/model can answer at all with the given key.
-- “Gateway smoke” tells us the full gateway+agent pipeline works for that model (sessions, history, tools, sandbox policy, etc.).
+- â€œDirect modelâ€ tells us the provider/model can answer at all with the given key.
+- â€œGateway smokeâ€ tells us the full gateway+agent pipeline works for that model (sessions, history, tools, sandbox policy, etc.).
 
 ### Layer 1: Direct model completion (no gateway)
 
@@ -116,50 +115,50 @@ Live tests are split into two layers so we can isolate failures:
   - Use `getApiKeyForModel` to select models you have creds for
   - Run a small completion per model (and targeted regressions where needed)
 - How to enable:
-  - `pnpm test:live` (or `openkrab_LIVE_TEST=1` if invoking Vitest directly)
-- Set `openkrab_LIVE_MODELS=modern` (or `all`, alias for modern) to actually run this suite; otherwise it skips to keep `pnpm test:live` focused on gateway smoke
+  - `pnpm test:live` (or `OPENKRAB_LIVE_TEST=1` if invoking Vitest directly)
+- Set `OPENKRAB_LIVE_MODELS=modern` (or `all`, alias for modern) to actually run this suite; otherwise it skips to keep `pnpm test:live` focused on gateway smoke
 - How to select models:
-  - `openkrab_LIVE_MODELS=modern` to run the modern allowlist (Opus/Sonnet/Haiku 4.5, GPT-5.x + Codex, Gemini 3, GLM 4.7, MiniMax M2.1, Grok 4)
-  - `openkrab_LIVE_MODELS=all` is an alias for the modern allowlist
-  - or `openkrab_LIVE_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-6,..."` (comma allowlist)
+  - `OPENKRAB_LIVE_MODELS=modern` to run the modern allowlist (Opus/Sonnet/Haiku 4.5, GPT-5.x + Codex, Gemini 3, GLM 4.7, MiniMax M2.1, Grok 4)
+  - `OPENKRAB_LIVE_MODELS=all` is an alias for the modern allowlist
+  - or `OPENKRAB_LIVE_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-6,..."` (comma allowlist)
 - How to select providers:
-  - `openkrab_LIVE_PROVIDERS="google,google-antigravity,google-gemini-cli"` (comma allowlist)
+  - `OPENKRAB_LIVE_PROVIDERS="google,google-antigravity,google-gemini-cli"` (comma allowlist)
 - Where keys come from:
   - By default: profile store and env fallbacks
-  - Set `openkrab_LIVE_REQUIRE_PROFILE_KEYS=1` to enforce **profile store** only
+  - Set `OPENKRAB_LIVE_REQUIRE_PROFILE_KEYS=1` to enforce **profile store** only
 - Why this exists:
-  - Separates “provider API is broken / key is invalid” from “gateway agent pipeline is broken”
+  - Separates â€œprovider API is broken / key is invalidâ€ from â€œgateway agent pipeline is brokenâ€
   - Contains small, isolated regressions (example: OpenAI Responses/Codex Responses reasoning replay + tool-call flows)
 
-### Layer 2: Gateway + dev agent smoke (what “@openkrab” actually does)
+### Layer 2: Gateway + dev agent smoke (what â€œ@openkrabâ€ actually does)
 
 - Test: `src/gateway/gateway-models.profiles.live.test.ts`
 - Goal:
   - Spin up an in-process gateway
   - Create/patch a `agent:dev:*` session (model override per run)
   - Iterate models-with-keys and assert:
-    - “meaningful” response (no tools)
+    - â€œmeaningfulâ€ response (no tools)
     - a real tool invocation works (read probe)
     - optional extra tool probes (exec+read probe)
-    - OpenAI regression paths (tool-call-only → follow-up) keep working
+    - OpenAI regression paths (tool-call-only â†’ follow-up) keep working
 - Probe details (so you can explain failures quickly):
   - `read` probe: the test writes a nonce file in the workspace and asks the agent to `read` it and echo the nonce back.
   - `exec+read` probe: the test asks the agent to `exec`-write a nonce into a temp file, then `read` it back.
   - image probe: the test attaches a generated PNG (cat + randomized code) and expects the model to return `cat <CODE>`.
   - Implementation reference: `src/gateway/gateway-models.profiles.live.test.ts` and `src/gateway/live-image-probe.ts`.
 - How to enable:
-  - `pnpm test:live` (or `openkrab_LIVE_TEST=1` if invoking Vitest directly)
+  - `pnpm test:live` (or `OPENKRAB_LIVE_TEST=1` if invoking Vitest directly)
 - How to select models:
   - Default: modern allowlist (Opus/Sonnet/Haiku 4.5, GPT-5.x + Codex, Gemini 3, GLM 4.7, MiniMax M2.1, Grok 4)
-  - `openkrab_LIVE_GATEWAY_MODELS=all` is an alias for the modern allowlist
-  - Or set `openkrab_LIVE_GATEWAY_MODELS="provider/model"` (or comma list) to narrow
-- How to select providers (avoid “OpenRouter everything”):
-  - `openkrab_LIVE_GATEWAY_PROVIDERS="google,google-antigravity,google-gemini-cli,openai,anthropic,zai,minimax"` (comma allowlist)
+  - `OPENKRAB_LIVE_GATEWAY_MODELS=all` is an alias for the modern allowlist
+  - Or set `OPENKRAB_LIVE_GATEWAY_MODELS="provider/model"` (or comma list) to narrow
+- How to select providers (avoid â€œOpenRouter everythingâ€):
+  - `OPENKRAB_LIVE_GATEWAY_PROVIDERS="google,google-antigravity,google-gemini-cli,openai,anthropic,zai,minimax"` (comma allowlist)
 - Tool + image probes are always on in this live test:
   - `read` probe + `exec+read` probe (tool stress)
   - image probe runs when the model advertises image input support
   - Flow (high level):
-    - Test generates a tiny PNG with “CAT” + random code (`src/gateway/live-image-probe.ts`)
+    - Test generates a tiny PNG with â€œCATâ€ + random code (`src/gateway/live-image-probe.ts`)
     - Sends it via `agent` `attachments: [{ mimeType: "image/png", content: "<base64>" }]`
     - Gateway parses attachments into `images[]` (`src/gateway/server-methods/agent.ts` + `src/gateway/chat-attachments.ts`)
     - Embedded agent forwards a multimodal user message to the model
@@ -167,9 +166,7 @@ Live tests are split into two layers so we can isolate failures:
 
 Tip: to see what you can test on your machine (and the exact `provider/model` ids), run:
 
-```bash
-openkrab models list
-openkrab models list --json
+```bash\nOpenKrab models list\nOpenKrab models list --json
 ```
 
 ## Live: Anthropic setup-token smoke
@@ -177,19 +174,18 @@ openkrab models list --json
 - Test: `src/agents/anthropic.setup-token.live.test.ts`
 - Goal: verify Claude Code CLI setup-token (or a pasted setup-token profile) can complete an Anthropic prompt.
 - Enable:
-  - `pnpm test:live` (or `openkrab_LIVE_TEST=1` if invoking Vitest directly)
-  - `openkrab_LIVE_SETUP_TOKEN=1`
+  - `pnpm test:live` (or `OPENKRAB_LIVE_TEST=1` if invoking Vitest directly)
+  - `OPENKRAB_LIVE_SETUP_TOKEN=1`
 - Token sources (pick one):
-  - Profile: `openkrab_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test`
-  - Raw token: `openkrab_LIVE_SETUP_TOKEN_VALUE=sk-ant-oat01-...`
+  - Profile: `OPENKRAB_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test`
+  - Raw token: `OPENKRAB_LIVE_SETUP_TOKEN_VALUE=sk-ant-oat01-...`
 - Model override (optional):
-  - `openkrab_LIVE_SETUP_TOKEN_MODEL=anthropic/claude-opus-4-6`
+  - `OPENKRAB_LIVE_SETUP_TOKEN_MODEL=anthropic/claude-opus-4-6`
 
 Setup example:
 
-```bash
-openkrab models auth paste-token --provider anthropic --profile-id anthropic:setup-token-test
-openkrab_LIVE_SETUP_TOKEN=1 openkrab_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test pnpm test:live src/agents/anthropic.setup-token.live.test.ts
+```bash\nOpenKrab models auth paste-token --provider anthropic --profile-id anthropic:setup-token-test
+OPENKRAB_LIVE_SETUP_TOKEN=1 OPENKRAB_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test pnpm test:live src/agents/anthropic.setup-token.live.test.ts
 ```
 
 ## Live: CLI backend smoke (Claude Code CLI or other local CLIs)
@@ -197,29 +193,29 @@ openkrab_LIVE_SETUP_TOKEN=1 openkrab_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-to
 - Test: `src/gateway/gateway-cli-backend.live.test.ts`
 - Goal: validate the Gateway + agent pipeline using a local CLI backend, without touching your default config.
 - Enable:
-  - `pnpm test:live` (or `openkrab_LIVE_TEST=1` if invoking Vitest directly)
-  - `openkrab_LIVE_CLI_BACKEND=1`
+  - `pnpm test:live` (or `OPENKRAB_LIVE_TEST=1` if invoking Vitest directly)
+  - `OPENKRAB_LIVE_CLI_BACKEND=1`
 - Defaults:
   - Model: `claude-cli/claude-sonnet-4-6`
   - Command: `claude`
   - Args: `["-p","--output-format","json","--dangerously-skip-permissions"]`
 - Overrides (optional):
-  - `openkrab_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-opus-4-6"`
-  - `openkrab_LIVE_CLI_BACKEND_MODEL="codex-cli/gpt-5.3-codex"`
-  - `openkrab_LIVE_CLI_BACKEND_COMMAND="/full/path/to/claude"`
-  - `openkrab_LIVE_CLI_BACKEND_ARGS='["-p","--output-format","json","--permission-mode","bypassPermissions"]'`
-  - `openkrab_LIVE_CLI_BACKEND_CLEAR_ENV='["ANTHROPIC_API_KEY","ANTHROPIC_API_KEY_OLD"]'`
-  - `openkrab_LIVE_CLI_BACKEND_IMAGE_PROBE=1` to send a real image attachment (paths are injected into the prompt).
-  - `openkrab_LIVE_CLI_BACKEND_IMAGE_ARG="--image"` to pass image file paths as CLI args instead of prompt injection.
-  - `openkrab_LIVE_CLI_BACKEND_IMAGE_MODE="repeat"` (or `"list"`) to control how image args are passed when `IMAGE_ARG` is set.
-  - `openkrab_LIVE_CLI_BACKEND_RESUME_PROBE=1` to send a second turn and validate resume flow.
-- `openkrab_LIVE_CLI_BACKEND_DISABLE_MCP_CONFIG=0` to keep Claude Code CLI MCP config enabled (default disables MCP config with a temporary empty file).
+  - `OPENKRAB_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-opus-4-6"`
+  - `OPENKRAB_LIVE_CLI_BACKEND_MODEL="codex-cli/gpt-5.3-codex"`
+  - `OPENKRAB_LIVE_CLI_BACKEND_COMMAND="/full/path/to/claude"`
+  - `OPENKRAB_LIVE_CLI_BACKEND_ARGS='["-p","--output-format","json","--permission-mode","bypassPermissions"]'`
+  - `OPENKRAB_LIVE_CLI_BACKEND_CLEAR_ENV='["ANTHROPIC_API_KEY","ANTHROPIC_API_KEY_OLD"]'`
+  - `OPENKRAB_LIVE_CLI_BACKEND_IMAGE_PROBE=1` to send a real image attachment (paths are injected into the prompt).
+  - `OPENKRAB_LIVE_CLI_BACKEND_IMAGE_ARG="--image"` to pass image file paths as CLI args instead of prompt injection.
+  - `OPENKRAB_LIVE_CLI_BACKEND_IMAGE_MODE="repeat"` (or `"list"`) to control how image args are passed when `IMAGE_ARG` is set.
+  - `OPENKRAB_LIVE_CLI_BACKEND_RESUME_PROBE=1` to send a second turn and validate resume flow.
+- `OPENKRAB_LIVE_CLI_BACKEND_DISABLE_MCP_CONFIG=0` to keep Claude Code CLI MCP config enabled (default disables MCP config with a temporary empty file).
 
 Example:
 
 ```bash
-openkrab_LIVE_CLI_BACKEND=1 \
-  openkrab_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-sonnet-4-6" \
+OPENKRAB_LIVE_CLI_BACKEND=1 \
+  OPENKRAB_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-sonnet-4-6" \
   pnpm test:live src/gateway/gateway-cli-backend.live.test.ts
 ```
 
@@ -228,17 +224,17 @@ openkrab_LIVE_CLI_BACKEND=1 \
 Narrow, explicit allowlists are fastest and least flaky:
 
 - Single model, direct (no gateway):
-  - `openkrab_LIVE_MODELS="openai/gpt-5.2" pnpm test:live src/agents/models.profiles.live.test.ts`
+  - `OPENKRAB_LIVE_MODELS="openai/gpt-5.2" pnpm test:live src/agents/models.profiles.live.test.ts`
 
 - Single model, gateway smoke:
-  - `openkrab_LIVE_GATEWAY_MODELS="openai/gpt-5.2" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+  - `OPENKRAB_LIVE_GATEWAY_MODELS="openai/gpt-5.2" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
 - Tool calling across several providers:
-  - `openkrab_LIVE_GATEWAY_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-6,google/gemini-3-flash-preview,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+  - `OPENKRAB_LIVE_GATEWAY_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-6,google/gemini-3-flash-preview,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
 - Google focus (Gemini API key + Antigravity):
-  - Gemini (API key): `openkrab_LIVE_GATEWAY_MODELS="google/gemini-3-flash-preview" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
-  - Antigravity (OAuth): `openkrab_LIVE_GATEWAY_MODELS="google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-pro-high" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+  - Gemini (API key): `OPENKRAB_LIVE_GATEWAY_MODELS="google/gemini-3-flash-preview" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+  - Antigravity (OAuth): `OPENKRAB_LIVE_GATEWAY_MODELS="google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-pro-high" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
 Notes:
 
@@ -246,16 +242,16 @@ Notes:
 - `google-antigravity/...` uses the Antigravity OAuth bridge (Cloud Code Assist-style agent endpoint).
 - `google-gemini-cli/...` uses the local Gemini CLI on your machine (separate auth + tooling quirks).
 - Gemini API vs Gemini CLI:
-  - API: openkrab calls Google’s hosted Gemini API over HTTP (API key / profile auth); this is what most users mean by “Gemini”.
-  - CLI: openkrab shells out to a local `gemini` binary; it has its own auth and can behave differently (streaming/tool support/version skew).
+  - API: OpenKrab calls Googleâ€™s hosted Gemini API over HTTP (API key / profile auth); this is what most users mean by â€œGeminiâ€.
+  - CLI: OpenKrab shells out to a local `gemini` binary; it has its own auth and can behave differently (streaming/tool support/version skew).
 
 ## Live: model matrix (what we cover)
 
-There is no fixed “CI model list” (live is opt-in), but these are the **recommended** models to cover regularly on a dev machine with keys.
+There is no fixed â€œCI model listâ€ (live is opt-in), but these are the **recommended** models to cover regularly on a dev machine with keys.
 
 ### Modern smoke set (tool calling + image)
 
-This is the “common models” run we expect to keep working:
+This is the â€œcommon modelsâ€ run we expect to keep working:
 
 - OpenAI (non-Codex): `openai/gpt-5.2` (optional: `openai/gpt-5.1`)
 - OpenAI Codex: `openai-codex/gpt-5.3-codex` (optional: `openai-codex/gpt-5.3-codex-codex`)
@@ -266,7 +262,7 @@ This is the “common models” run we expect to keep working:
 - MiniMax: `minimax/minimax-m2.1`
 
 Run gateway smoke with tools + image:
-`openkrab_LIVE_GATEWAY_MODELS="openai/gpt-5.2,openai-codex/gpt-5.3-codex,anthropic/claude-opus-4-6,google/gemini-3-pro-preview,google/gemini-3-flash-preview,google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-flash,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+`OPENKRAB_LIVE_GATEWAY_MODELS="openai/gpt-5.2,openai-codex/gpt-5.3-codex,anthropic/claude-opus-4-6,google/gemini-3-pro-preview,google/gemini-3-flash-preview,google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-flash,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
 ### Baseline: tool calling (Read + optional Exec)
 
@@ -281,13 +277,13 @@ Pick at least one per provider family:
 Optional additional coverage (nice to have):
 
 - xAI: `xai/grok-4` (or latest available)
-- Mistral: `mistral/`… (pick one “tools” capable model you have enabled)
-- Cerebras: `cerebras/`… (if you have access)
-- LM Studio: `lmstudio/`… (local; tool calling depends on API mode)
+- Mistral: `mistral/`â€¦ (pick one â€œtoolsâ€ capable model you have enabled)
+- Cerebras: `cerebras/`â€¦ (if you have access)
+- LM Studio: `lmstudio/`â€¦ (local; tool calling depends on API mode)
 
-### Vision: image send (attachment → multimodal message)
+### Vision: image send (attachment â†’ multimodal message)
 
-Include at least one image-capable model in `openkrab_LIVE_GATEWAY_MODELS` (Claude/Gemini/OpenAI vision-capable variants, etc.) to exercise the image probe.
+Include at least one image-capable model in `OPENKRAB_LIVE_GATEWAY_MODELS` (Claude/Gemini/OpenAI vision-capable variants, etc.) to exercise the image probe.
 
 ### Aggregators / alternate gateways
 
@@ -301,17 +297,17 @@ More providers you can include in the live matrix (if you have creds/config):
 - Built-in: `openai`, `openai-codex`, `anthropic`, `google`, `google-vertex`, `google-antigravity`, `google-gemini-cli`, `zai`, `openrouter`, `opencode`, `xai`, `groq`, `cerebras`, `mistral`, `github-copilot`
 - Via `models.providers` (custom endpoints): `minimax` (cloud/API), plus any OpenAI/Anthropic-compatible proxy (LM Studio, vLLM, LiteLLM, etc.)
 
-Tip: don’t try to hardcode “all models” in docs. The authoritative list is whatever `discoverModels(...)` returns on your machine + whatever keys are available.
+Tip: donâ€™t try to hardcode â€œall modelsâ€ in docs. The authoritative list is whatever `discoverModels(...)` returns on your machine + whatever keys are available.
 
 ## Credentials (never commit)
 
 Live tests discover credentials the same way the CLI does. Practical implications:
 
 - If the CLI works, live tests should find the same keys.
-- If a live test says “no creds”, debug the same way you’d debug `openkrab models list` / model selection.
+- If a live test says â€œno credsâ€, debug the same way youâ€™d debug `openkrab models list` / model selection.
 
-- Profile store: `~/.openkrab/credentials/` (preferred; what “profile keys” means in the tests)
-- Config: `~/.openkrab/openkrab.json` (or `openkrab_CONFIG_PATH`)
+- Profile store: `~/.openkrab/credentials/` (preferred; what â€œprofile keysâ€ means in the tests)
+- Config: `~/.openkrab/openkrab.json` (or `OPENKRAB_CONFIG_PATH`)
 
 If you want to rely on env keys (e.g. exported in your `~/.profile`), run local tests after `source ~/.profile`, or use the Docker runners below (they can mount `~/.profile` into the container).
 
@@ -320,7 +316,7 @@ If you want to rely on env keys (e.g. exported in your `~/.profile`), run local 
 - Test: `src/media-understanding/providers/deepgram/audio.live.test.ts`
 - Enable: `DEEPGRAM_API_KEY=... DEEPGRAM_LIVE_TEST=1 pnpm test:live src/media-understanding/providers/deepgram/audio.live.test.ts`
 
-## Docker runners (optional “works in Linux” checks)
+## Docker runners (optional â€œworks in Linuxâ€ checks)
 
 These run `pnpm test:live` inside the repo Docker image, mounting your local config dir and workspace (and sourcing `~/.profile` if mounted):
 
@@ -332,11 +328,11 @@ These run `pnpm test:live` inside the repo Docker image, mounting your local con
 
 Useful env vars:
 
-- `openkrab_CONFIG_DIR=...` (default: `~/.openkrab`) mounted to `/home/node/.openkrab`
-- `openkrab_WORKSPACE_DIR=...` (default: `~/.openkrab/workspace`) mounted to `/home/node/.openkrab/workspace`
-- `openkrab_PROFILE_FILE=...` (default: `~/.profile`) mounted to `/home/node/.profile` and sourced before running tests
-- `openkrab_LIVE_GATEWAY_MODELS=...` / `openkrab_LIVE_MODELS=...` to narrow the run
-- `openkrab_LIVE_REQUIRE_PROFILE_KEYS=1` to ensure creds come from the profile store (not env)
+- `OPENKRAB_CONFIG_DIR=...` (default: `~/.openkrab`) mounted to `/home/node/.openkrab`
+- `OPENKRAB_WORKSPACE_DIR=...` (default: `~/.openkrab/workspace`) mounted to `/home/node/.openkrab/workspace`
+- `OPENKRAB_PROFILE_FILE=...` (default: `~/.profile`) mounted to `/home/node/.profile` and sourced before running tests
+- `OPENKRAB_LIVE_GATEWAY_MODELS=...` / `OPENKRAB_LIVE_MODELS=...` to narrow the run
+- `OPENKRAB_LIVE_REQUIRE_PROFILE_KEYS=1` to ensure creds come from the profile store (not env)
 
 ## Docs sanity
 
@@ -344,19 +340,19 @@ Run docs checks after doc edits: `pnpm docs:list`.
 
 ## Offline regression (CI-safe)
 
-These are “real pipeline” regressions without real providers:
+These are â€œreal pipelineâ€ regressions without real providers:
 
 - Gateway tool calling (mock OpenAI, real gateway + agent loop): `src/gateway/gateway.tool-calling.mock-openai.test.ts`
 - Gateway wizard (WS `wizard.start`/`wizard.next`, writes config + auth enforced): `src/gateway/gateway.wizard.e2e.test.ts`
 
 ## Agent reliability evals (skills)
 
-We already have a few CI-safe tests that behave like “agent reliability evals”:
+We already have a few CI-safe tests that behave like â€œagent reliability evalsâ€:
 
 - Mock tool-calling through the real gateway + agent loop (`src/gateway/gateway.tool-calling.mock-openai.test.ts`).
 - End-to-end wizard flows that validate session wiring and config effects (`src/gateway/gateway.wizard.e2e.test.ts`).
 
-What’s still missing for skills (see [Skills](/tools/skills)):
+Whatâ€™s still missing for skills (see [Skills](/tools/skills)):
 
 - **Decisioning:** when skills are listed in the prompt, does the agent pick the right skill (or avoid irrelevant ones)?
 - **Compliance:** does the agent read `SKILL.md` before use and follow required steps/args?
@@ -373,7 +369,9 @@ Future evals should stay deterministic first:
 When you fix a provider/model issue discovered in live:
 
 - Add a CI-safe regression if possible (mock/stub provider, or capture the exact request-shape transformation)
-- If it’s inherently live-only (rate limits, auth policies), keep the live test narrow and opt-in via env vars
+- If itâ€™s inherently live-only (rate limits, auth policies), keep the live test narrow and opt-in via env vars
 - Prefer targeting the smallest layer that catches the bug:
-  - provider request conversion/replay bug → direct models test
-  - gateway session/history/tool pipeline bug → gateway live smoke or CI-safe gateway mock test
+  - provider request conversion/replay bug â†’ direct models test
+  - gateway session/history/tool pipeline bug â†’ gateway live smoke or CI-safe gateway mock test
+
+

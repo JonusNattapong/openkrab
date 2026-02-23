@@ -1,4 +1,4 @@
----
+﻿---
 title: "Configuration Reference"
 description: "Complete field-by-field reference for ~/.openkrab/openkrab.json"
 ---
@@ -7,7 +7,7 @@ description: "Complete field-by-field reference for ~/.openkrab/openkrab.json"
 
 Every field available in `~/.openkrab/openkrab.json`. For a task-oriented overview, see [Configuration](/gateway/configuration).
 
-Config format is **JSON5** (comments + trailing commas allowed). All fields are optional — openkrab uses safe defaults when omitted.
+Config format is **JSON5** (comments + trailing commas allowed). All fields are optional â€” OpenKrab uses safe defaults when omitted.
 
 ---
 
@@ -379,8 +379,7 @@ Chat modes: `oncall` (respond on @-mention, default), `onmessage` (every message
 **Reaction notification modes:** `off`, `own` (default), `all`, `allowlist` (from `reactionAllowlist`).
 
 ### iMessage
-
-openkrab spawns `imsg rpc` (JSON-RPC over stdio). No daemon or port required.
+\nOpenKrab spawns `imsg rpc` (JSON-RPC over stdio). No daemon or port required.
 
 ```json5
 {
@@ -485,7 +484,7 @@ Group messages default to **require mention** (metadata mention or regex pattern
 }
 ```
 
-Resolution: per-DM override → provider default → no limit (all retained).
+Resolution: per-DM override â†’ provider default â†’ no limit (all retained).
 
 Supported: `telegram`, `whatsapp`, `discord`, `slack`, `signal`, `imessage`, `msteams`.
 
@@ -563,7 +562,7 @@ Default: `~/.openkrab/workspace`.
 
 ### `agents.defaults.repoRoot`
 
-Optional repository root shown in the system prompt's Runtime line. If unset, openkrab auto-detects by walking upward from the workspace.
+Optional repository root shown in the system prompt's Runtime line. If unset, OpenKrab auto-detects by walking upward from the workspace.
 
 ```json5
 {
@@ -665,7 +664,7 @@ Time format in system prompt. Default: `auto` (OS preference).
 }
 ```
 
-- `model.primary`: format `provider/model` (e.g. `anthropic/claude-opus-4-6`). If you omit the provider, openkrab assumes `anthropic` (deprecated).
+- `model.primary`: format `provider/model` (e.g. `anthropic/claude-opus-4-6`). If you omit the provider, OpenKrab assumes `anthropic` (deprecated).
 - `models`: the configured model catalog and allowlist for `/model`. Each entry can include `alias` (shortcut) and `params` (provider-specific: `temperature`, `maxTokens`).
 - `imageModel`: only used if the primary model lacks image input.
 - `maxConcurrent`: max parallel agent runs across sessions (each session still serialized). Default: 1.
@@ -747,7 +746,7 @@ Periodic heartbeat runs.
 - `every`: duration string (ms/s/m/h). Default: `30m`.
 - `suppressToolErrorWarnings`: when true, suppresses tool error warning payloads during heartbeat runs.
 - Per-agent: set `agents.list[].heartbeat`. When any agent defines `heartbeat`, **only those agents** run heartbeats.
-- Heartbeats run full agent turns — shorter intervals burn more tokens.
+- Heartbeats run full agent turns â€” shorter intervals burn more tokens.
 
 ### `agents.defaults.compaction`
 
@@ -835,7 +834,7 @@ See [Session Pruning](/concepts/session-pruning) for behavior details.
 
 - Non-Telegram channels require explicit `*.blockStreaming: true` to enable block replies.
 - Channel overrides: `channels.<channel>.blockStreamingCoalesce` (and per-account variants). Signal/Slack/Discord/Google Chat default `minChars: 1500`.
-- `humanDelay`: randomized pause between block replies. `natural` = 800–2500ms. Per-agent override: `agents.list[].humanDelay`.
+- `humanDelay`: randomized pause between block replies. `natural` = 800â€“2500ms. Per-agent override: `agents.list[].humanDelay`.
 
 See [Streaming](/concepts/streaming) for behavior + chunking details.
 
@@ -953,7 +952,7 @@ Optional **Docker sandboxing** for the embedded agent. See [Sandboxing](/gateway
 
 **`setupCommand`** runs once after container creation (via `sh -lc`). Needs network egress, writable root, root user.
 
-**Containers default to `network: "none"`** — set to `"bridge"` if the agent needs outbound access.
+**Containers default to `network: "none"`** â€” set to `"bridge"` if the agent needs outbound access.
 
 **Inbound attachments** are staged into `media/inbound/*` in the active workspace.
 
@@ -989,7 +988,7 @@ scripts/sandbox-browser-setup.sh   # optional browser image
         identity: {
           name: "Samantha",
           theme: "helpful sloth",
-          emoji: "🦥",
+          emoji: "ðŸ¦¥",
           avatar: "avatars/samantha.png",
         },
         groupChat: { mentionPatterns: ["@openkrab"] },
@@ -1213,8 +1212,8 @@ See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for preceden
 ```json5
 {
   messages: {
-    responsePrefix: "🦞", // or "auto"
-    ackReaction: "👀",
+    responsePrefix: "ðŸ¦ž", // or "auto"
+    ackReaction: "ðŸ‘€",
     ackReactionScope: "group-mentions", // group-mentions | group-all | direct | all
     removeAckAfterReply: false,
     queue: {
@@ -1242,7 +1241,7 @@ See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for preceden
 
 Per-channel/account overrides: `channels.<channel>.responsePrefix`, `channels.<channel>.accounts.<id>.responsePrefix`.
 
-Resolution (most specific wins): account → channel → global. `""` disables and stops cascade. `"auto"` derives `[{identity.name}]`.
+Resolution (most specific wins): account â†’ channel â†’ global. `""` disables and stops cascade. `"auto"` derives `[{identity.name}]`.
 
 **Template variables:**
 
@@ -1258,9 +1257,9 @@ Variables are case-insensitive. `{think}` is an alias for `{thinkingLevel}`.
 
 ### Ack reaction
 
-- Defaults to active agent's `identity.emoji`, otherwise `"👀"`. Set `""` to disable.
+- Defaults to active agent's `identity.emoji`, otherwise `"ðŸ‘€"`. Set `""` to disable.
 - Per-channel overrides: `channels.<channel>.ackReaction`, `channels.<channel>.accounts.<id>.ackReaction`.
-- Resolution order: account → channel → `messages.ackReaction` → identity fallback.
+- Resolution order: account â†’ channel â†’ `messages.ackReaction` â†’ identity fallback.
 - Scope: `group-mentions` (default), `group-all`, `direct`, `all`.
 - `removeAckAfterReply`: removes ack after reply (Slack/Discord/Telegram/Google Chat only).
 
@@ -1323,7 +1322,7 @@ Defaults for Talk mode (macOS/iOS/Android).
   talk: {
     voiceId: "elevenlabs_voice_id",
     voiceAliases: {
-      Clawd: "EXAVITQu4vr4xnSDxMaL",
+      Krabd: "EXAVITQu4vr4xnSDxMaL",
       Roger: "CwhRBWXzGAHq8TQ4Fs17",
     },
     modelId: "eleven_v3",
@@ -1380,7 +1379,7 @@ Global tool allow/deny policy (deny wins). Case-insensitive, supports `*` wildca
 
 ### `tools.byProvider`
 
-Further restrict tools for specific providers or models. Order: base profile → provider profile → allow/deny.
+Further restrict tools for specific providers or models. Order: base profile â†’ provider profile â†’ allow/deny.
 
 ```json5
 {
@@ -1541,11 +1540,11 @@ Configures inbound media understanding (image/audio/video):
 
 **Common fields:**
 
-- `capabilities`: optional list (`image`, `audio`, `video`). Defaults: `openai`/`anthropic`/`minimax` → image, `google` → image+audio+video, `groq` → audio.
+- `capabilities`: optional list (`image`, `audio`, `video`). Defaults: `openai`/`anthropic`/`minimax` â†’ image, `google` â†’ image+audio+video, `groq` â†’ audio.
 - `prompt`, `maxChars`, `maxBytes`, `timeoutSeconds`, `language`: per-entry overrides.
 - Failures fall back to the next entry.
 
-Provider auth follows standard order: auth profiles → env vars → `models.providers.*.apiKey`.
+Provider auth follows standard order: auth profiles â†’ env vars â†’ `models.providers.*.apiKey`.
 
 </Accordion>
 
@@ -1609,8 +1608,7 @@ Notes:
 ---
 
 ## Custom providers and base URLs
-
-openkrab uses the pi-coding-agent model catalog. Add custom providers via `models.providers` in config or `~/.openkrab/agents/<agentId>/agent/models.json`.
+\nOpenKrab uses the pi-coding-agent model catalog. Add custom providers via `models.providers` in config or `~/.openkrab/agents/<agentId>/agent/models.json`.
 
 ```json5
 {
@@ -1639,7 +1637,7 @@ openkrab uses the pi-coding-agent model catalog. Add custom providers via `model
 ```
 
 - Use `authHeader: true` + `headers` for custom auth needs.
-- Override agent config root with `openkrab_AGENT_DIR` (or `PI_CODING_AGENT_DIR`).
+- Override agent config root with `OPENKRAB_AGENT_DIR` (or `PI_CODING_AGENT_DIR`).
 
 ### Provider examples
 
@@ -1947,7 +1945,7 @@ See [Plugins](/tools/plugin).
 
 - `evaluateEnabled: false` disables `act:evaluate` and `wait --fn`.
 - Remote profiles are attach-only (start/stop/reset disabled).
-- Auto-detect order: default browser if Chromium-based → Chrome → Brave → Edge → Chromium → Chrome Canary.
+- Auto-detect order: default browser if Chromium-based â†’ Chrome â†’ Brave â†’ Edge â†’ Chromium â†’ Chrome Canary.
 - Control service: loopback only (port derived from `gateway.port`, default `18791`).
 
 ---
@@ -1982,7 +1980,7 @@ See [Plugins](/tools/plugin).
     auth: {
       mode: "token", // none | token | password | trusted-proxy
       token: "your-token",
-      // password: "your-password", // or openkrab_GATEWAY_PASSWORD
+      // password: "your-password", // or OPENKRAB_GATEWAY_PASSWORD
       // trustedProxy: { userHeader: "x-forwarded-user" }, // for mode=trusted-proxy; see /gateway/trusted-proxy-auth
       allowTailscale: true,
       rateLimit: {
@@ -2023,7 +2021,7 @@ See [Plugins](/tools/plugin).
 <Accordion title="Gateway field details">
 
 - `mode`: `local` (run gateway) or `remote` (connect to remote gateway). Gateway refuses to start unless `local`.
-- `port`: single multiplexed port for WS + HTTP. Precedence: `--port` > `openkrab_GATEWAY_PORT` > `gateway.port` > `18789`.
+- `port`: single multiplexed port for WS + HTTP. Precedence: `--port` > `OPENKRAB_GATEWAY_PORT` > `gateway.port` > `18789`.
 - `bind`: `auto`, `loopback` (default), `lan` (`0.0.0.0`), `tailnet` (Tailscale IP only), or `custom`.
 - **Auth**: required by default. Non-loopback binds require a shared token/password. Onboarding wizard generates a token by default.
 - `auth.mode: "none"`: explicit no-auth mode. Use only for trusted local loopback setups; this is intentionally not offered by onboarding prompts.
@@ -2054,9 +2052,8 @@ See [Plugins](/tools/plugin).
 Run multiple gateways on one host with unique ports and state dirs:
 
 ```bash
-openkrab_CONFIG_PATH=~/.openkrab/a.json \
-openkrab_STATE_DIR=~/.openkrab-a \
-openkrab gateway --port 19001
+OPENKRAB_CONFIG_PATH=~/.openkrab/a.json \
+OPENKRAB_STATE_DIR=~/.openkrab-a \\nOpenKrab gateway --port 19001
 ```
 
 Convenience flags: `--dev` (uses `~/.openkrab-dev` + port `19001`), `--profile <name>` (uses `~/.openkrab-<name>`).
@@ -2102,14 +2099,14 @@ Auth: `Authorization: Bearer <token>` or `x-openkrab-token: <token>`.
 
 **Endpoints:**
 
-- `POST /hooks/wake` → `{ text, mode?: "now"|"next-heartbeat" }`
-- `POST /hooks/agent` → `{ message, name?, agentId?, sessionKey?, wakeMode?, deliver?, channel?, to?, model?, thinking?, timeoutSeconds? }`
+- `POST /hooks/wake` â†’ `{ text, mode?: "now"|"next-heartbeat" }`
+- `POST /hooks/agent` â†’ `{ message, name?, agentId?, sessionKey?, wakeMode?, deliver?, channel?, to?, model?, thinking?, timeoutSeconds? }`
   - `sessionKey` from request payload is accepted only when `hooks.allowRequestSessionKey=true` (default: `false`).
-- `POST /hooks/<name>` → resolved via `hooks.mappings`
+- `POST /hooks/<name>` â†’ resolved via `hooks.mappings`
 
 <Accordion title="Mapping details">
 
-- `match.path` matches sub-path after `/hooks` (e.g. `/hooks/gmail` → `gmail`).
+- `match.path` matches sub-path after `/hooks` (e.g. `/hooks/gmail` â†’ `gmail`).
 - `match.source` matches a payload field for generic paths.
 - Templates like `{{messages[0].subject}}` read from the payload.
 - `transform` can point to a JS/TS module returning a hook action.
@@ -2147,7 +2144,7 @@ Auth: `Authorization: Bearer <token>` or `x-openkrab-token: <token>`.
 }
 ```
 
-- Gateway auto-starts `gog gmail watch serve` on boot when configured. Set `openkrab_SKIP_GMAIL_WATCHER=1` to disable.
+- Gateway auto-starts `gog gmail watch serve` on boot when configured. Set `OPENKRAB_SKIP_GMAIL_WATCHER=1` to disable.
 - Don't run a separate `gog gmail watch serve` alongside the Gateway.
 
 ---
@@ -2159,21 +2156,21 @@ Auth: `Authorization: Bearer <token>` or `x-openkrab-token: <token>`.
   canvasHost: {
     root: "~/.openkrab/workspace/canvas",
     liveReload: true,
-    // enabled: false, // or openkrab_SKIP_CANVAS_HOST=1
+    // enabled: false, // or OPENKRAB_SKIP_CANVAS_HOST=1
   },
 }
 ```
 
 - Serves agent-editable HTML/CSS/JS and A2UI over HTTP under the Gateway port:
-  - `http://<gateway-host>:<gateway.port>/__openkrab__/canvas/`
-  - `http://<gateway-host>:<gateway.port>/__openkrab__/a2ui/`
+  - `http://<gateway-host>:<gateway.port>/__OPENKRAB__/canvas/`
+  - `http://<gateway-host>:<gateway.port>/__OPENKRAB__/a2ui/`
 - Local-only: keep `gateway.bind: "loopback"` (default).
 - Non-loopback binds: canvas routes require Gateway auth (token/password/trusted-proxy), same as other Gateway HTTP surfaces.
 - Node WebViews typically don't send auth headers; after a node is paired and connected, the Gateway advertises node-scoped capability URLs for canvas/A2UI access.
 - Capability URLs are bound to the active node WS session and expire quickly. IP-based fallback is not used.
 - Injects live-reload client into served HTML.
 - Auto-creates starter `index.html` when empty.
-- Also serves A2UI at `/__openkrab__/a2ui/`.
+- Also serves A2UI at `/__OPENKRAB__/a2ui/`.
 - Changes require a gateway restart.
 - Disable live reload for large directories or `EMFILE` errors.
 
@@ -2195,7 +2192,7 @@ Auth: `Authorization: Bearer <token>` or `x-openkrab-token: <token>`.
 
 - `minimal` (default): omit `cliPath` + `sshPort` from TXT records.
 - `full`: include `cliPath` + `sshPort`.
-- Hostname defaults to `openkrab`. Override with `openkrab_MDNS_HOSTNAME`.
+- Hostname defaults to `openkrab`. Override with `OPENKRAB_MDNS_HOSTNAME`.
 
 ### Wide-area (DNS-SD)
 
@@ -2244,7 +2241,7 @@ Reference env vars in any config string with `${VAR_NAME}`:
 ```json5
 {
   gateway: {
-    auth: { token: "${openkrab_GATEWAY_TOKEN}" },
+    auth: { token: "${OPENKRAB_GATEWAY_TOKEN}" },
   },
 }
 ```
@@ -2328,7 +2325,7 @@ Metadata written by CLI wizards (`onboard`, `configure`, `doctor`):
         identity: {
           name: "Samantha",
           theme: "helpful sloth",
-          emoji: "🦥",
+          emoji: "ðŸ¦¥",
           avatar: "avatars/samantha.png",
         },
       },
@@ -2339,7 +2336,7 @@ Metadata written by CLI wizards (`onboard`, `configure`, `doctor`):
 
 Written by the macOS onboarding assistant. Derives defaults:
 
-- `messages.ackReaction` from `identity.emoji` (falls back to 👀)
+- `messages.ackReaction` from `identity.emoji` (falls back to ðŸ‘€)
 - `mentionPatterns` from `identity.name`/`identity.emoji`
 - `avatar` accepts: workspace-relative path, `http(s)` URL, or `data:` URI
 
@@ -2407,7 +2404,7 @@ Template placeholders expanded in `tools.media.*.models[].args`:
 | `{{IsNewSession}}` | `"true"` when new session created                 |
 | `{{MediaUrl}}`     | Inbound media pseudo-URL                          |
 | `{{MediaPath}}`    | Local media path                                  |
-| `{{MediaType}}`    | Media type (image/audio/document/…)               |
+| `{{MediaType}}`    | Media type (image/audio/document/â€¦)               |
 | `{{Transcript}}`   | Audio transcript                                  |
 | `{{Prompt}}`       | Resolved media prompt for CLI entries             |
 | `{{MaxChars}}`     | Resolved max output chars for CLI entries         |
@@ -2446,4 +2443,6 @@ Split config into multiple files:
 
 ---
 
-_Related: [Configuration](/gateway/configuration) · [Configuration Examples](/gateway/configuration-examples) · [Doctor](/gateway/doctor)_
+_Related: [Configuration](/gateway/configuration) Â· [Configuration Examples](/gateway/configuration-examples) Â· [Doctor](/gateway/doctor)_
+
+

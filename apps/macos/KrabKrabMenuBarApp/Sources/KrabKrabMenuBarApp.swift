@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @main
-struct KrabKrabMenuBarApp: App {
+struct openkrabMenuBarApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
@@ -29,7 +29,7 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("KrabKrab macOS")
+            Text("openkrab macOS")
                 .font(.title2)
                 .bold()
 
@@ -65,7 +65,7 @@ struct SettingsView: View {
             HStack {
                 Text("Wake Phrase:")
                     .bold()
-                TextField("hey krabkrab", text: $state.wakePhrase)
+                TextField("hey openkrab", text: $state.wakePhrase)
             }
 
             Divider()
@@ -85,7 +85,7 @@ struct SettingsView: View {
                 Button("Trigger Test Notification") {
                     Task {
                         await state.notifications.send(
-                            title: "KrabKrab",
+                            title: "openkrab",
                             body: "Test notification from macOS menu bar app"
                         )
                     }
@@ -97,3 +97,4 @@ struct SettingsView: View {
         .padding(16)
     }
 }
+

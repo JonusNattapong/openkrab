@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Browser-based control UI for the Gateway (chat, nodes, config)"
 read_when:
   - You want to operate the Gateway from a browser
@@ -33,7 +33,7 @@ Auth is supplied during the WebSocket handshake via:
 ## Device pairing (first connection)
 
 When you connect to the Control UI from a new browser or device, the Gateway
-requires a **one-time pairing approval** — even if you're on the same Tailnet
+requires a **one-time pairing approval** â€” even if you're on the same Tailnet
 with `gateway.auth.allowTailscale: true`. This is a security measure to prevent
 unauthorized access.
 
@@ -121,7 +121,7 @@ By default, Serve requests can authenticate via Tailscale identity headers
 (`tailscale-user-login`) when `gateway.auth.allowTailscale` is `true`. OpenKrab
 verifies the identity by resolving the `x-forwarded-for` address with
 `tailscale whois` and matching it to the header, and only accepts these when the
-request hits loopback with Tailscale’s `x-forwarded-*` headers. Set
+request hits loopback with Tailscaleâ€™s `x-forwarded-*` headers. Set
 `gateway.auth.allowTailscale: false` (or force `gateway.auth.mode: "password"`)
 if you want to require a token/password even for Serve traffic.
 
@@ -176,7 +176,7 @@ pnpm ui:build # auto-installs UI deps on first run
 Optional absolute base (when you want fixed asset URLs):
 
 ```bash
-OpenKrab_CONTROL_UI_BASE_PATH=/OpenKrab/ pnpm ui:build
+OPENKRAB_CONTROL_UI_BASE_PATH=/OpenKrab/ pnpm ui:build
 ```
 
 For local development (separate dev server):
@@ -230,4 +230,5 @@ Example:
 ```
 
 Remote access setup details: [Remote access](/gateway/remote).
+
 

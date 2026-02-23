@@ -1,23 +1,23 @@
----
-summary: "Clawnet refactor: unify network protocol, roles, auth, approvals, identity"
+﻿---
+summary: "Krabnet refactor: unify network protocol, roles, auth, approvals, identity"
 read_when:
   - Planning a unified network protocol for nodes + operator clients
   - Reworking approvals, pairing, TLS, and presence across devices
-title: "Clawnet Refactor"
+title: "Krabnet Refactor"
 ---
 
-# Clawnet refactor (protocol + auth unification)
+# Krabnet refactor (protocol + auth unification)
 
 ## Hi
 
-Hi Peter — great direction; this unlocks simpler UX + stronger security.
+Hi Peter â€” great direction; this unlocks simpler UX + stronger security.
 
 ## Purpose
 
 Single, rigorous document for:
 
 - Current state: protocols, flows, trust boundaries.
-- Pain points: approvals, multi‑hop routing, UI duplication.
+- Pain points: approvals, multiâ€‘hop routing, UI duplication.
 - Proposed new state: one protocol, scoped roles, unified auth/pairing, TLS pinning.
 - Identity model: stable IDs + cute slugs.
 - Migration plan, risks, open questions.
@@ -32,15 +32,15 @@ Single, rigorous document for:
 - Minimal code duplication.
 - Single machine should appear once (no UI/node duplicate entry).
 
-## Non‑goals (explicit)
+## Nonâ€‘goals (explicit)
 
-- Remove capability separation (still need least‑privilege).
+- Remove capability separation (still need leastâ€‘privilege).
 - Expose full gateway control plane without scope checks.
-- Make auth depend on human labels (slugs remain non‑security).
+- Make auth depend on human labels (slugs remain nonâ€‘security).
 
 ---
 
-# Current state (as‑is)
+# Current state (asâ€‘is)
 
 ## Two protocols
 
@@ -68,17 +68,17 @@ Single, rigorous document for:
 
 ## Control plane clients today
 
-- CLI → Gateway WS via `callGateway` (`src/gateway/call.ts`).
-- macOS app UI → Gateway WS (`GatewayConnection`).
-- Web Control UI → Gateway WS.
-- ACP → Gateway WS.
+- CLI â†’ Gateway WS via `callGateway` (`src/gateway/call.ts`).
+- macOS app UI â†’ Gateway WS (`GatewayConnection`).
+- Web Control UI â†’ Gateway WS.
+- ACP â†’ Gateway WS.
 - Browser control uses its own HTTP control server.
 
 ## Nodes today
 
 - macOS app in node mode connects to Gateway bridge (`MacNodeBridgeSession`).
 - iOS/Android apps connect to Gateway bridge.
-- Pairing + per‑node token stored on gateway.
+- Pairing + perâ€‘node token stored on gateway.
 
 ## Current approval flow (exec)
 
@@ -87,7 +87,7 @@ Single, rigorous document for:
 - Node runtime decides approval.
 - UI prompt shown by mac app (when node == mac app).
 - Node returns `invoke-res` to Gateway.
-- Multi‑hop, UI tied to node host.
+- Multiâ€‘hop, UI tied to node host.
 
 ## Presence + identity today
 
@@ -108,7 +108,7 @@ Single, rigorous document for:
 
 ---
 
-# Proposed new state (Clawnet)
+# Proposed new state (Krabnet)
 
 ## One protocol, two roles
 
@@ -138,7 +138,7 @@ Single WS protocol with role + scope.
 
 ### Key rule
 
-Role is per‑connection, not per device. A device may open both roles, separately.
+Role is perâ€‘connection, not per device. A device may open both roles, separately.
 
 ---
 
@@ -164,29 +164,29 @@ Every client provides:
   - capabilities/commands
 - Client persists token, reconnects authenticated.
 
-## Device‑bound auth (avoid bearer token replay)
+## Deviceâ€‘bound auth (avoid bearer token replay)
 
 Preferred: device keypairs.
 
 - Device generates keypair once.
 - `deviceId = fingerprint(publicKey)`.
 - Gateway sends nonce; device signs; gateway verifies.
-- Tokens are issued to a public key (proof‑of‑possession), not a string.
+- Tokens are issued to a public key (proofâ€‘ofâ€‘possession), not a string.
 
 Alternatives:
 
 - mTLS (client certs): strongest, more ops complexity.
-- Short‑lived bearer tokens only as a temporary phase (rotate + revoke early).
+- Shortâ€‘lived bearer tokens only as a temporary phase (rotate + revoke early).
 
 ## Silent approval (SSH heuristic)
 
 Define it precisely to avoid a weak link. Prefer one:
 
-- **Local‑only**: auto‑pair when client connects via loopback/Unix socket.
+- **Localâ€‘only**: autoâ€‘pair when client connects via loopback/Unix socket.
 - **Challenge via SSH**: gateway issues nonce; client proves SSH by fetching it.
-- **Physical presence window**: after a local approval on gateway host UI, allow auto‑pair for a short window (e.g. 10 minutes).
+- **Physical presence window**: after a local approval on gateway host UI, allow autoâ€‘pair for a short window (e.g. 10 minutes).
 
-Always log + record auto‑approvals.
+Always log + record autoâ€‘approvals.
 
 ---
 
@@ -221,7 +221,7 @@ Approval happens on node host (mac app node runtime). Prompt appears where node 
 
 ## Proposed
 
-Approval is **gateway‑hosted**, UI delivered to operator clients.
+Approval is **gatewayâ€‘hosted**, UI delivered to operator clients.
 
 ### New flow
 
@@ -251,24 +251,24 @@ Approval is **gateway‑hosted**, UI delivered to operator clients.
 
 ## iPhone app
 
-- **Node role** for: mic, camera, voice chat, location, push‑to‑talk.
+- **Node role** for: mic, camera, voice chat, location, pushâ€‘toâ€‘talk.
 - Optional **operator.read** for status and chat view.
 - Optional **operator.write/admin** only when explicitly enabled.
 
 ## macOS app
 
 - Operator role by default (control UI).
-- Node role when “Mac node” enabled (system.run, screen, camera).
-- Same deviceId for both connections → merged UI entry.
+- Node role when â€œMac nodeâ€ enabled (system.run, screen, camera).
+- Same deviceId for both connections â†’ merged UI entry.
 
 ## CLI
 
 - Operator role always.
 - Scope derived by subcommand:
-  - `status`, `logs` → read
-  - `agent`, `message` → write
-  - `config`, `channels` → admin
-  - approvals + pairing → `operator.approvals` / `operator.pairing`
+  - `status`, `logs` â†’ read
+  - `agent`, `message` â†’ write
+  - `config`, `channels` â†’ admin
+  - approvals + pairing â†’ `operator.approvals` / `operator.pairing`
 
 ---
 
@@ -281,7 +281,7 @@ Preferred:
 
 - Keypair fingerprint (public key hash).
 
-## Cute slug (lobster‑themed)
+## Cute slug (lobsterâ€‘themed)
 
 Human label only.
 
@@ -291,7 +291,7 @@ Human label only.
 
 ## UI grouping
 
-Same `deviceId` across roles → single “Instance” row:
+Same `deviceId` across roles â†’ single â€œInstanceâ€ row:
 
 - Badge: `operator`, `node`.
 - Shows capabilities + last seen.
@@ -332,9 +332,9 @@ Same `deviceId` across roles → single “Instance” row:
 - Migrate iOS/Android/mac node to WS.
 - Keep bridge as fallback; remove once stable.
 
-## Phase 6: Device‑bound auth
+## Phase 6: Deviceâ€‘bound auth
 
-- Require key‑based identity for all non‑local connections.
+- Require keyâ€‘based identity for all nonâ€‘local connections.
 - Add revocation + rotation UI.
 
 ---
@@ -342,7 +342,7 @@ Same `deviceId` across roles → single “Instance” row:
 # Security notes
 
 - Role/allowlist enforced at gateway boundary.
-- No client gets “full” API without operator scope.
+- No client gets â€œfullâ€ API without operator scope.
 - Pairing required for _all_ connections.
 - TLS + pinning reduces MITM risk for mobile.
 - SSH silent approval is a convenience; still recorded + revocable.
@@ -361,27 +361,27 @@ Options:
 
 1. WS binary frames + chunking + backpressure rules.
 2. Separate streaming endpoint (still TLS + auth).
-3. Keep bridge longer for media‑heavy commands, migrate last.
+3. Keep bridge longer for mediaâ€‘heavy commands, migrate last.
 
 Pick one before implementation to avoid drift.
 
 # Capability + command policy
 
-- Node‑reported caps/commands are treated as **claims**.
-- Gateway enforces per‑platform allowlists.
+- Nodeâ€‘reported caps/commands are treated as **claims**.
+- Gateway enforces perâ€‘platform allowlists.
 - Any new command requires operator approval or explicit allowlist change.
 - Audit changes with timestamps.
 
 # Audit + rate limiting
 
 - Log: pairing requests, approvals/denials, token issuance/rotation/revocation.
-- Rate‑limit pairing spam and approval prompts.
+- Rateâ€‘limit pairing spam and approval prompts.
 
 # Protocol hygiene
 
 - Explicit protocol version + error codes.
 - Reconnect rules + heartbeat policy.
-- Presence TTL and last‑seen semantics.
+- Presence TTL and lastâ€‘seen semantics.
 
 ---
 
@@ -393,17 +393,17 @@ Pick one before implementation to avoid drift.
 
 2. Operator scope granularity
    - read/write/admin + approvals + pairing (minimum viable).
-   - Consider per‑feature scopes later.
+   - Consider perâ€‘feature scopes later.
 
 3. Token rotation + revocation UX
-   - Auto‑rotate on role change.
+   - Autoâ€‘rotate on role change.
    - UI to revoke by deviceId + role.
 
 4. Discovery
    - Extend current Bonjour TXT to include WS TLS fingerprint + role hints.
    - Treat as locator hints only.
 
-5. Cross‑network approval
+5. Crossâ€‘network approval
    - Broadcast to all operator clients; active UI shows modal.
    - First response wins; gateway enforces atomicity.
 
@@ -413,5 +413,6 @@ Pick one before implementation to avoid drift.
 
 - Today: WS control plane + Bridge node transport.
 - Pain: approvals + duplication + two stacks.
-- Proposal: one WS protocol with explicit roles + scopes, unified pairing + TLS pinning, gateway‑hosted approvals, stable device IDs + cute slugs.
+- Proposal: one WS protocol with explicit roles + scopes, unified pairing + TLS pinning, gatewayâ€‘hosted approvals, stable device IDs + cute slugs.
 - Outcome: simpler UX, stronger security, less duplication, better mobile routing.
+

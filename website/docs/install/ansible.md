@@ -1,5 +1,5 @@
----
-summary: "Automated, hardened openkrab installation with Ansible, Tailscale VPN, and firewall isolation"
+﻿---
+summary: "Automated, hardened OpenKrab installation with Ansible, Tailscale VPN, and firewall isolation"
 read_when:
   - You want automated server deployment with security hardening
   - You need firewall-isolated setup with VPN access
@@ -9,7 +9,7 @@ title: "Ansible"
 
 # Ansible Installation
 
-The recommended way to deploy openkrab to production servers is via **[openkrab-ansible](https://github.com/openkrab/openkrab-ansible)** — an automated installer with security-first architecture.
+The recommended way to deploy OpenKrab to production servers is via **[openkrab-ansible](https://github.com/openkrab/openkrab-ansible)** â€” an automated installer with security-first architecture.
 
 ## Quick Start
 
@@ -19,18 +19,18 @@ One-command install:
 curl -fsSL https://raw.githubusercontent.com/openkrab/openkrab-ansible/main/install.sh | bash
 ```
 
-> **📦 Full guide: [github.com/openkrab/openkrab-ansible](https://github.com/openkrab/openkrab-ansible)**
+> **ðŸ“¦ Full guide: [github.com/openkrab/openkrab-ansible](https://github.com/openkrab/openkrab-ansible)**
 >
 > The openkrab-ansible repo is the source of truth for Ansible deployment. This page is a quick overview.
 
 ## What You Get
 
-- 🔒 **Firewall-first security**: UFW + Docker isolation (only SSH + Tailscale accessible)
-- 🔐 **Tailscale VPN**: Secure remote access without exposing services publicly
-- 🐳 **Docker**: Isolated sandbox containers, localhost-only bindings
-- 🛡️ **Defense in depth**: 4-layer security architecture
-- 🚀 **One-command setup**: Complete deployment in minutes
-- 🔧 **Systemd integration**: Auto-start on boot with hardening
+- ðŸ”’ **Firewall-first security**: UFW + Docker isolation (only SSH + Tailscale accessible)
+- ðŸ” **Tailscale VPN**: Secure remote access without exposing services publicly
+- ðŸ³ **Docker**: Isolated sandbox containers, localhost-only bindings
+- ðŸ›¡ï¸ **Defense in depth**: 4-layer security architecture
+- ðŸš€ **One-command setup**: Complete deployment in minutes
+- ðŸ”§ **Systemd integration**: Auto-start on boot with hardening
 
 ## Requirements
 
@@ -54,7 +54,7 @@ Note: The gateway runs **directly on the host** (not in Docker), but agent sandb
 
 ## Post-Install Setup
 
-After installation completes, switch to the openkrab user:
+After installation completes, switch to the OpenKrab user:
 
 ```bash
 sudo -i -u openkrab
@@ -62,7 +62,7 @@ sudo -i -u openkrab
 
 The post-install script will guide you through:
 
-1. **Onboarding wizard**: Configure openkrab settings
+1. **Onboarding wizard**: Configure OpenKrab settings
 2. **Provider login**: Connect WhatsApp/Telegram/Discord/Signal
 3. **Gateway testing**: Verify the installation
 4. **Tailscale setup**: Connect to your VPN mesh
@@ -74,14 +74,13 @@ The post-install script will guide you through:
 sudo systemctl status openkrab
 
 # View live logs
-sudo journalctl -u openkrab -f
+sudo journalctl -u OpenKrab -f
 
 # Restart gateway
 sudo systemctl restart openkrab
 
-# Provider login (run as openkrab user)
-sudo -i -u openkrab
-openkrab channels login
+# Provider login (run as OpenKrab user)
+sudo -i -u openkrab\nOpenKrab channels login
 ```
 
 ## Security Architecture
@@ -133,7 +132,7 @@ ansible-galaxy collection install -r requirements.yml
 
 ## Updating openkrab
 
-The Ansible installer sets up openkrab for manual updates. See [Updating](/install/updating) for the standard update flow.
+The Ansible installer sets up OpenKrab for manual updates. See [Updating](/install/updating) for the standard update flow.
 
 To re-run the Ansible playbook (e.g., for configuration changes):
 
@@ -158,7 +157,7 @@ If you're locked out:
 
 ```bash
 # Check logs
-sudo journalctl -u openkrab -n 100
+sudo journalctl -u OpenKrab -n 100
 
 # Verify permissions
 sudo ls -la /opt/openkrab
@@ -180,7 +179,7 @@ sudo docker images | grep openkrab-sandbox
 
 # Build sandbox image if missing
 cd /opt/openkrab/openkrab
-sudo -u openkrab ./scripts/sandbox-setup.sh
+sudo -u OpenKrab ./scripts/sandbox-setup.sh
 ```
 
 ### Provider login fails
@@ -188,8 +187,7 @@ sudo -u openkrab ./scripts/sandbox-setup.sh
 Make sure you're running as the `openkrab` user:
 
 ```bash
-sudo -i -u openkrab
-openkrab channels login
+sudo -i -u openkrab\nOpenKrab channels login
 ```
 
 ## Advanced Configuration
@@ -202,7 +200,8 @@ For detailed security architecture and troubleshooting:
 
 ## Related
 
-- [openkrab-ansible](https://github.com/openkrab/openkrab-ansible) — full deployment guide
-- [Docker](/install/docker) — containerized gateway setup
-- [Sandboxing](/gateway/sandboxing) — agent sandbox configuration
-- [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) — per-agent isolation
+- [openkrab-ansible](https://github.com/openkrab/openkrab-ansible) â€” full deployment guide
+- [Docker](/install/docker) â€” containerized gateway setup
+- [Sandboxing](/gateway/sandboxing) â€” agent sandbox configuration
+- [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) â€” per-agent isolation
+

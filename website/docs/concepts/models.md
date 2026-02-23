@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Models CLI: list, set, aliases, fallbacks, scan, status"
 read_when:
   - Adding or modifying models CLI (models list/set/scan/aliases/fallbacks)
@@ -14,8 +14,7 @@ rotation, cooldowns, and how that interacts with fallbacks.
 Quick provider overview + examples: [/concepts/model-providers](/concepts/model-providers).
 
 ## How model selection works
-
-openkrab selects models in this order:
+\nOpenKrab selects models in this order:
 
 1. **Primary** model (`agents.defaults.model.primary` or `agents.defaults.model`).
 2. **Fallbacks** in `agents.defaults.model.fallbacks` (in order).
@@ -24,8 +23,8 @@ openkrab selects models in this order:
 
 Related:
 
-- `agents.defaults.models` is the allowlist/catalog of models openkrab can use (plus aliases).
-- `agents.defaults.imageModel` is used **only when** the primary model can’t accept images.
+- `agents.defaults.models` is the allowlist/catalog of models OpenKrab can use (plus aliases).
+- `agents.defaults.imageModel` is used **only when** the primary model canâ€™t accept images.
 - Per-agent defaults can override `agents.defaults.model` via `agents.list[].model` plus bindings (see [/concepts/multi-agent](/concepts/multi-agent)).
 
 ## Quick model picks (anecdotal)
@@ -35,10 +34,9 @@ Related:
 
 ## Setup wizard (recommended)
 
-If you don’t want to hand-edit config, run the onboarding wizard:
+If you donâ€™t want to hand-edit config, run the onboarding wizard:
 
-```bash
-openkrab onboard
+```bash\nOpenKrab onboard
 ```
 
 It can set up model + auth for common providers, including **OpenAI Code (Codex)
@@ -58,18 +56,17 @@ to `zai/*`.
 Provider configuration examples (including OpenCode Zen) live in
 [/gateway/configuration](/gateway/configuration#opencode-zen-multi-model-proxy).
 
-## “Model is not allowed” (and why replies stop)
+## â€œModel is not allowedâ€ (and why replies stop)
 
 If `agents.defaults.models` is set, it becomes the **allowlist** for `/model` and for
-session overrides. When a user selects a model that isn’t in that allowlist,
-openkrab returns:
+session overrides. When a user selects a model that isnâ€™t in that allowlist,\nOpenKrab returns:
 
 ```
 Model "provider/model" is not allowed. Use /model to list available models.
 ```
 
 This happens **before** a normal reply is generated, so the message can feel
-like it “didn’t respond.” The fix is to either:
+like it â€œdidnâ€™t respond.â€ The fix is to either:
 
 - Add the model to `agents.defaults.models`, or
 - Clear the allowlist (remove `agents.defaults.models`), or
@@ -108,31 +105,16 @@ Notes:
 - `/model status` is the detailed view (auth candidates and, when configured, provider endpoint `baseUrl` + `api` mode).
 - Model refs are parsed by splitting on the **first** `/`. Use `provider/model` when typing `/model <ref>`.
 - If the model ID itself contains `/` (OpenRouter-style), you must include the provider prefix (example: `/model openrouter/moonshotai/kimi-k2`).
-- If you omit the provider, openkrab treats the input as an alias or a model for the **default provider** (only works when there is no `/` in the model ID).
+- If you omit the provider, OpenKrab treats the input as an alias or a model for the **default provider** (only works when there is no `/` in the model ID).
 
 Full command behavior/config: [Slash commands](/tools/slash-commands).
 
 ## CLI commands
 
-```bash
-openkrab models list
-openkrab models status
-openkrab models set <provider/model>
-openkrab models set-image <provider/model>
-
-openkrab models aliases list
-openkrab models aliases add <alias> <provider/model>
-openkrab models aliases remove <alias>
-
-openkrab models fallbacks list
-openkrab models fallbacks add <provider/model>
-openkrab models fallbacks remove <provider/model>
-openkrab models fallbacks clear
-
-openkrab models image-fallbacks list
-openkrab models image-fallbacks add <provider/model>
-openkrab models image-fallbacks remove <provider/model>
-openkrab models image-fallbacks clear
+```bash\nOpenKrab models list\nOpenKrab models status\nOpenKrab models set <provider/model>\nOpenKrab models set-image <provider/model>
+\nOpenKrab models aliases list\nOpenKrab models aliases add <alias> <provider/model>\nOpenKrab models aliases remove <alias>
+\nOpenKrab models fallbacks list\nOpenKrab models fallbacks add <provider/model>\nOpenKrab models fallbacks remove <provider/model>\nOpenKrab models fallbacks clear
+\nOpenKrab models image-fallbacks list\nOpenKrab models image-fallbacks add <provider/model>\nOpenKrab models image-fallbacks remove <provider/model>\nOpenKrab models image-fallbacks clear
 ```
 
 `openkrab models` (no subcommand) is a shortcut for `models status`.
@@ -145,7 +127,7 @@ Shows configured models by default. Useful flags:
 - `--local`: local providers only
 - `--provider <name>`: filter by provider
 - `--plain`: one model per line
-- `--json`: machine‑readable output
+- `--json`: machineâ€‘readable output
 
 ### `models status`
 
@@ -162,13 +144,12 @@ Use `--check` for automation (exit `1` when missing/expired, `2` when expiring).
 Preferred Anthropic auth is the Claude Code CLI setup-token (run anywhere; paste on the gateway host if needed):
 
 ```bash
-claude setup-token
-openkrab models status
+claude setup-token\nOpenKrab models status
 ```
 
 ## Scanning (OpenRouter free models)
 
-`openkrab models scan` inspects OpenRouter’s **free model catalog** and can
+`openkrab models scan` inspects OpenRouterâ€™s **free model catalog** and can
 optionally probe models for tool and image support.
 
 Key flags:
@@ -198,7 +179,7 @@ Input
 - Optional filters: `--max-age-days`, `--min-params`, `--provider`, `--max-candidates`
 - Probe controls: `--timeout`, `--concurrency`
 
-When run in a TTY, you can select fallbacks interactively. In non‑interactive
+When run in a TTY, you can select fallbacks interactively. In nonâ€‘interactive
 mode, pass `--yes` to accept defaults.
 
 ## Models registry (`models.json`)
@@ -206,3 +187,4 @@ mode, pass `--yes` to accept defaults.
 Custom providers in `models.providers` are written into `models.json` under the
 agent directory (default `~/.openkrab/agents/<agentId>/models.json`). This file
 is merged by default unless `models.mode` is set to `replace`.
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Broadcast a WhatsApp message to multiple agents"
 read_when:
   - Configuring broadcast groups
@@ -14,11 +14,11 @@ title: "Broadcast Groups"
 
 ## Overview
 
-Broadcast Groups enable multiple agents to process and respond to the same message simultaneously. This allows you to create specialized agent teams that work together in a single WhatsApp group or DM — all using one phone number.
+Broadcast Groups enable multiple agents to process and respond to the same message simultaneously. This allows you to create specialized agent teams that work together in a single WhatsApp group or DM â€” all using one phone number.
 
 Current scope: **WhatsApp only** (web channel).
 
-Broadcast groups are evaluated after channel allowlists and group activation rules. In WhatsApp groups, this means broadcasts happen when openkrab would normally reply (for example: on mention, depending on your group settings).
+Broadcast groups are evaluated after channel allowlists and group activation rules. In WhatsApp groups, this means broadcasts happen when OpenKrab would normally reply (for example: on mention, depending on your group settings).
 
 ## Use Cases
 
@@ -83,7 +83,7 @@ Add a top-level `broadcast` section (next to `bindings`). Keys are WhatsApp peer
 }
 ```
 
-**Result:** When openkrab would reply in this chat, it will run all three agents.
+**Result:** When OpenKrab would reply in this chat, it will run all three agents.
 
 ### Processing Strategy
 
@@ -196,7 +196,7 @@ Workspace: /Users/pascal/openkrab-alfred/
 Tools: read, write, exec
 ```
 
-**Bärbel's context:**
+**BÃ¤rbel's context:**
 
 ```
 Session: agent:baerbel:whatsapp:group:120363403215116621@g.us
@@ -219,8 +219,8 @@ Design each agent with a single, clear responsibility:
 }
 ```
 
-✅ **Good:** Each agent has one job  
-❌ **Bad:** One generic "dev-helper" agent
+âœ… **Good:** Each agent has one job  
+âŒ **Bad:** One generic "dev-helper" agent
 
 ### 2. Use Descriptive Names
 
@@ -266,7 +266,7 @@ With many agents, consider:
 Agents fail independently. One agent's error doesn't block others:
 
 ```
-Message → [Agent A ✓, Agent B ✗ error, Agent C ✓]
+Message â†’ [Agent A âœ“, Agent B âœ— error, Agent C âœ“]
 Result: Agent A and C respond, Agent B logs error
 ```
 
@@ -276,10 +276,10 @@ Result: Agent A and C respond, Agent B logs error
 
 Broadcast groups currently work with:
 
-- ✅ WhatsApp (implemented)
-- 🚧 Telegram (planned)
-- 🚧 Discord (planned)
-- 🚧 Slack (planned)
+- âœ… WhatsApp (implemented)
+- ðŸš§ Telegram (planned)
+- ðŸš§ Discord (planned)
+- ðŸš§ Slack (planned)
 
 ### Routing
 
@@ -376,7 +376,7 @@ tail -f ~/.openkrab/logs/gateway.log | grep broadcast
 **Responses:**
 
 - code-formatter: "Fixed indentation and added type hints"
-- security-scanner: "⚠️ SQL injection vulnerability in line 12"
+- security-scanner: "âš ï¸ SQL injection vulnerability in line 12"
 - test-coverage: "Coverage is 45%, missing tests for error cases"
 - docs-checker: "Missing docstring for function `process_data`"
 
@@ -440,3 +440,4 @@ Planned features:
 - [Multi-Agent Configuration](/tools/multi-agent-sandbox-tools)
 - [Routing Configuration](/channels/channel-routing)
 - [Session Management](/concepts/sessions)
+

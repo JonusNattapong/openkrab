@@ -1,7 +1,7 @@
----
+﻿---
 summary: "openkrab capabilities across channels, routing, media, and UX."
 read_when:
-  - You want a full list of what openkrab supports
+  - You want a full list of what OpenKrab supports
 title: "Features"
 ---
 
@@ -51,3 +51,4 @@ title: "Features"
 Legacy Claude, Codex, Gemini, and Opencode paths have been removed. Pi is the only
 coding agent path.
 </Note>
+

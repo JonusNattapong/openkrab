@@ -1,4 +1,4 @@
-//! OpenKrabConfig — port of `openkrab/src/config/types.openkrab.ts` (Phase 1-4 core config)
+﻿//! OpenKrabConfig â€” port of `openkrab/src/config/types.openkrab.ts` (Phase 1-4 core config)
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -798,14 +798,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn openkrab_config_default() {
+    fn OPENKRAB_CONFIG_DEFAULT() {
         let cfg = OpenKrabConfig::default();
         assert!(cfg.meta.is_none());
         assert!(cfg.auth.is_none());
     }
 
     #[test]
-    fn openkrab_config_serialize() {
+    fn OPENKRAB_CONFIG_SERIALIZE() {
         let cfg = OpenKrabConfig {
             meta: Some(ConfigMeta {
                 last_touched_version: Some("1.0.0".to_string()),
@@ -847,3 +847,4 @@ mod tests {
         assert_eq!(tc.accounts["default"].token.as_deref(), Some("bot_token"));
     }
 }
+

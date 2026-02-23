@@ -1,9 +1,9 @@
----
-summary: "Schema-accurate configuration examples for common openkrab setups"
+﻿---
+summary: "Schema-accurate configuration examples for common OpenKrab setups"
 read_when:
   - Learning how to configure openkrab
   - Looking for configuration examples
-  - Setting up openkrab for the first time
+  - Setting up OpenKrab for the first time
 title: "Configuration Examples"
 ---
 
@@ -29,9 +29,9 @@ Save to `~/.openkrab/openkrab.json` and you can DM the bot from that number.
 ```json5
 {
   identity: {
-    name: "Clawd",
+    name: "Krabd",
     theme: "helpful assistant",
-    emoji: "🦞",
+    emoji: "ðŸ¦ž",
   },
   agent: {
     workspace: "~/.openkrab/workspace",
@@ -87,7 +87,7 @@ Save to `~/.openkrab/openkrab.json` and you can DM the bot from that number.
   identity: {
     name: "Samantha",
     theme: "helpful sloth",
-    emoji: "🦥",
+    emoji: "ðŸ¦¥",
   },
 
   // Logging
@@ -103,7 +103,7 @@ Save to `~/.openkrab/openkrab.json` and you can DM the bot from that number.
   messages: {
     messagePrefix: "[openkrab]",
     responsePrefix: ">",
-    ackReaction: "👀",
+    ackReaction: "ðŸ‘€",
     ackReactionScope: "group-mentions",
   },
 
@@ -462,7 +462,7 @@ Save to `~/.openkrab/openkrab.json` and you can DM the bot from that number.
 
 ### Secure DM mode (shared inbox / multi-user DMs)
 
-If more than one person can DM your bot (multiple entries in `allowFrom`, pairing approvals for multiple people, or `dmPolicy: "open"`), enable **secure DM mode** so DMs from different senders don’t share one context by default:
+If more than one person can DM your bot (multiple entries in `allowFrom`, pairing approvals for multiple people, or `dmPolicy: "open"`), enable **secure DM mode** so DMs from different senders donâ€™t share one context by default:
 
 ```json5
 {
@@ -618,3 +618,5 @@ If more than one person can DM your bot (multiple entries in `allowFrom`, pairin
 - Provider IDs differ (phone numbers, user IDs, channel IDs). Use the provider docs to confirm the format.
 - Optional sections to add later: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`, `signal`, `imessage`.
 - See [Providers](/channels/whatsapp) and [Troubleshooting](/gateway/troubleshooting) for deeper setup notes.
+
+

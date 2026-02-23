@@ -1,9 +1,9 @@
-import Foundation
+﻿import Foundation
 
 struct AgentClient {
     private let executablePath: String
 
-    init(executablePath: String = ProcessInfo.processInfo.environment["KRABKRAB_CLI_PATH"] ?? "krabkrab") {
+    init(executablePath: String = ProcessInfo.processInfo.environment["OPENKRAB_CLI_PATH"] ?? "openkrab") {
         self.executablePath = executablePath
     }
 
@@ -35,7 +35,7 @@ struct AgentClient {
                     continuation.resume(throwing: NSError(
                         domain: "AgentClient",
                         code: Int(proc.terminationStatus),
-                        userInfo: [NSLocalizedDescriptionKey: err.isEmpty ? "krabkrab ask failed" : err]
+                        userInfo: [NSLocalizedDescriptionKey: err.isEmpty ? "openkrab ask failed" : err]
                     ))
                 }
             }
@@ -48,3 +48,5 @@ struct AgentClient {
         }
     }
 }
+
+

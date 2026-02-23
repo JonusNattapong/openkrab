@@ -1,4 +1,4 @@
-//! Administrative and operational CLI commands.
+﻿//! Administrative and operational CLI commands.
 
 use crate::daemon::daemon_status;
 use crate::hooks::events;
@@ -23,7 +23,7 @@ pub fn skills_command(action: &str) -> String {
             let eligible = report.skills.iter().filter(|s| s.eligible).count();
             let total = report.skills.len();
             format!(
-                "Skills Status Check\n\nTotal: {}\n✓ Eligible: {}\n✗ Not eligible: {}",
+                "Skills Status Check\n\nTotal: {}\nâœ“ Eligible: {}\nâœ— Not eligible: {}",
                 total,
                 eligible,
                 total - eligible
@@ -42,7 +42,7 @@ pub fn skills_command(action: &str) -> String {
 
 pub fn sandbox_command(action: &str) -> String {
     let cfg = match crate::config_io::load_config() {
-        Ok(c) => crate::config::openkrab_to_app_config(&c),
+        Ok(c) => crate::config::OPENKRAB_TO_APP_CONFIG(&c),
         Err(_) => crate::config::AppConfig::default(),
     };
     match action.trim() {
@@ -74,7 +74,7 @@ pub fn nodes_command(action: &str) -> String {
                             .get("status")
                             .and_then(|v| v.as_str())
                             .unwrap_or("unknown");
-                        output.push_str(&format!("• {} [{}] - {}\n", id, platform, status));
+                        output.push_str(&format!("â€¢ {} [{}] - {}\n", id, platform, status));
                     }
                     output
                 } else {
@@ -95,27 +95,27 @@ pub fn nodes_command(action: &str) -> String {
                     format!("nodes run: {} (requires gateway connection)", cmd)
                 }
                 "camera" => {
-                    "nodes camera: Use 'krabkrab nodes status' to list nodes, then invoke camera action".to_string()
+                    "nodes camera: Use 'openkrab nodes status' to list nodes, then invoke camera action".to_string()
                 }
                 "screen" => {
-                    "nodes screen: Use 'krabkrab nodes status' to list nodes".to_string()
+                    "nodes screen: Use 'openkrab nodes status' to list nodes".to_string()
                 }
                 "pairing" => {
-                    "nodes pairing: Use 'krabkrab pairing' commands instead".to_string()
+                    "nodes pairing: Use 'openkrab pairing' commands instead".to_string()
                 }
                 "notify" => {
-                    "nodes notify: Use 'krabkrab nodes status' to list nodes".to_string()
+                    "nodes notify: Use 'openkrab nodes status' to list nodes".to_string()
                 }
                 _ => {
                     format!(
                         "Nodes management\n\nAvailable actions:\n\
-                         • list - List all nodes\n\
-                         • status - Show node status\n\
-                         • pairing - Node pairing (use 'krabkrab pairing')\n\
-                         • invoke - Run commands on nodes\n\
-                         • camera - Capture from node camera\n\
-                         • screen - Screen capture from nodes\n\n\
-                         Usage: krabkrab nodes <action>"
+                         â€¢ list - List all nodes\n\
+                         â€¢ status - Show node status\n\
+                         â€¢ pairing - Node pairing (use 'openkrab pairing')\n\
+                         â€¢ invoke - Run commands on nodes\n\
+                         â€¢ camera - Capture from node camera\n\
+                         â€¢ screen - Screen capture from nodes\n\n\
+                         Usage: openkrab nodes <action>"
                     )
                 }
             }
@@ -137,7 +137,7 @@ pub fn browser_command(action: &str) -> String {
                 output.push('\n');
                 for profile in profiles {
                     output.push_str(&format!(
-                        "• {} (CDP: {})\n",
+                        "â€¢ {} (CDP: {})\n",
                         profile.name, profile.cdp_http_url
                     ));
                 }
@@ -152,23 +152,23 @@ pub fn browser_command(action: &str) -> String {
                     format!("browser open: (requires gateway running with browser plugin)")
                 }
                 "screenshot" => {
-                    "browser screenshot: Use 'krabkrab browser list' to see profiles".to_string()
+                    "browser screenshot: Use 'openkrab browser list' to see profiles".to_string()
                 }
                 "tabs" => "browser tabs: Requires active CDP connection".to_string(),
                 "create" | "add" => {
-                    "browser create: Use 'krabkrab browser list' to see existing profiles"
+                    "browser create: Use 'openkrab browser list' to see existing profiles"
                         .to_string()
                 }
                 _ => {
                     format!(
                         "Browser management (Chrome/Chromium CDP)\n\n\
                          Available actions:\n\
-                         • list - List browser profiles\n\
-                         • status - Show browser status\n\
-                         • open <url> - Open URL in browser\n\
-                         • screenshot - Take screenshot\n\
-                         • tabs - List open tabs\n\n\
-                         Usage: krabkrab browser <action> [args]"
+                         â€¢ list - List browser profiles\n\
+                         â€¢ status - Show browser status\n\
+                         â€¢ open <url> - Open URL in browser\n\
+                         â€¢ screenshot - Take screenshot\n\
+                         â€¢ tabs - List open tabs\n\n\
+                         Usage: openkrab browser <action> [args]"
                     )
                 }
             }
@@ -212,7 +212,7 @@ pub fn webhooks_command(action: &str) -> String {
                     if !account.allowlist.is_empty() || account.enabled {
                         found = true;
                         output.push_str(&format!(
-                            "✓ GoogleChat [{}]: enabled={}\n",
+                            "âœ“ GoogleChat [{}]: enabled={}\n",
                             name, account.enabled
                         ));
                     }
@@ -221,7 +221,7 @@ pub fn webhooks_command(action: &str) -> String {
                     if !account.allowlist.is_empty() || account.enabled {
                         found = true;
                         output.push_str(&format!(
-                            "✓ MSTeams [{}]: enabled={}\n",
+                            "âœ“ MSTeams [{}]: enabled={}\n",
                             name, account.enabled
                         ));
                     }
@@ -231,8 +231,8 @@ pub fn webhooks_command(action: &str) -> String {
             if !found {
                 output.push_str("No webhooks configured.\n");
                 output.push_str("\nTo add webhooks:\n");
-                output.push_str("  krabkrab channels add googlechat --token <token>\n");
-                output.push_str("  krabkrab channels add msteams --token <token>\n");
+                output.push_str("  openkrab channels add googlechat --token <token>\n");
+                output.push_str("  openkrab channels add msteams --token <token>\n");
             }
 
             output
@@ -242,10 +242,10 @@ pub fn webhooks_command(action: &str) -> String {
             format!(
                 "Webhooks management\n\n\
                  Available actions:\n\
-                 • list - List configured webhooks\n\
-                 • test - Test webhook endpoint\n\n\
+                 â€¢ list - List configured webhooks\n\
+                 â€¢ test - Test webhook endpoint\n\n\
                  Note: Webhooks are configured per-channel.\n\
-                 Use: krabkrab channels add <channel>"
+                 Use: openkrab channels add <channel>"
             )
         }
     }
@@ -310,9 +310,9 @@ pub fn exec_approvals_command(action: &str) -> String {
             format!(
                 "Execution Approvals Policy\n\n\
                  Available actions:\n\
-                 • list - Show current approval policies\n\
-                 • allow <user> - Add user to allowed list\n\
-                 • deny <user> - Remove user from allowed list\n\n\
+                 â€¢ list - Show current approval policies\n\
+                 â€¢ allow <user> - Add user to allowed list\n\
+                 â€¢ deny <user> - Remove user from allowed list\n\n\
                  Note: Execution approvals control which users can approve\n\
                  dangerous commands (bash, run) in channels like Discord."
             )
@@ -345,8 +345,8 @@ pub fn dns_command(action: &str) -> String {
             format!(
                 "DNS Service Discovery\n\n\
                  Available actions:\n\
-                 • list - List known DNS services\n\
-                 • status - Show DNS discovery status\n\n\
+                 â€¢ list - List known DNS services\n\
+                 â€¢ status - Show DNS discovery status\n\n\
                  DNS discovery helps detect services like gateways,\n\
                  nodes, and other devices on the local network."
             )
@@ -372,8 +372,8 @@ pub fn directory_command(action: &str) -> String {
             format!(
                 "Service Directory\n\n\
                  Available actions:\n\
-                 • list - List registered services\n\
-                 • status - Show directory status\n\n\
+                 â€¢ list - List registered services\n\
+                 â€¢ status - Show directory status\n\n\
                  Service directory tracks registered services and their\n\
                  connection details for the gateway."
             )
@@ -411,7 +411,7 @@ pub fn devices_command(action: &str) -> String {
                     for (acc_name, acc) in &telegram.accounts {
                         for id in &acc.allowlist {
                             found = true;
-                            output.push_str(&format!("✓ Telegram [{}]: {}\n", acc_name, id));
+                            output.push_str(&format!("âœ“ Telegram [{}]: {}\n", acc_name, id));
                         }
                     }
                 }
@@ -419,40 +419,40 @@ pub fn devices_command(action: &str) -> String {
                     for (acc_name, acc) in &discord.accounts {
                         for id in &acc.allowlist {
                             found = true;
-                            output.push_str(&format!("✓ Discord [{}]: {}\n", acc_name, id));
+                            output.push_str(&format!("âœ“ Discord [{}]: {}\n", acc_name, id));
                         }
                     }
                 }
                 for (acc_name, acc) in &channels.slack {
                     for id in &acc.allowlist {
                         found = true;
-                        output.push_str(&format!("✓ Slack [{}]: {}\n", acc_name, id));
+                        output.push_str(&format!("âœ“ Slack [{}]: {}\n", acc_name, id));
                     }
                 }
                 for (acc_name, acc) in &channels.whatsapp {
                     for id in &acc.allowlist {
                         found = true;
-                        output.push_str(&format!("✓ WhatsApp [{}]: {}\n", acc_name, id));
+                        output.push_str(&format!("âœ“ WhatsApp [{}]: {}\n", acc_name, id));
                     }
                 }
             }
 
             if !found {
                 output.push_str("No paired devices.\n");
-                output.push_str("\nUse 'krabkrab pairing' to manage device pairing.\n");
+                output.push_str("\nUse 'openkrab pairing' to manage device pairing.\n");
             }
 
             output
         }
-        "revoke" => "devices revoke: Use 'krabkrab pairing revoke <device-id>' instead".to_string(),
+        "revoke" => "devices revoke: Use 'openkrab pairing revoke <device-id>' instead".to_string(),
         _ => {
             format!(
                 "Paired Devices Management\n\n\
                  Available actions:\n\
-                 • list - List paired devices\n\
-                 • revoke - Revoke a device (use pairing revoke)\n\n\
+                 â€¢ list - List paired devices\n\
+                 â€¢ revoke - Revoke a device (use pairing revoke)\n\n\
                  Note: Paired devices are managed via the pairing system.\n\
-                 Use: krabkrab pairing"
+                 Use: openkrab pairing"
             )
         }
     }
@@ -468,3 +468,5 @@ pub fn daemon_command(action: &str) -> String {
         ),
     }
 }
+
+

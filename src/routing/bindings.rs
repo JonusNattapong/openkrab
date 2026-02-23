@@ -1,5 +1,5 @@
 //! bindings — Channel-Agent binding resolution.
-//! Ported from `openclaw/src/routing/bindings.ts`.
+//! Ported from `OpenKrab/src/routing/bindings.ts`.
 //!
 //! Maps channels to agents via config-driven bindings.
 //! Allows multi-account connectors to route to different agents.
@@ -11,7 +11,7 @@ use crate::routing::session_key::{normalize_account_id, normalize_agent_id};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-pub use crate::openkrab_config::{AgentBinding, BindingMatch};
+pub use crate::OPENKRAB_CONFIG::{AgentBinding, BindingMatch};
 
 /// Binding configuration extracted from main config.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -280,3 +280,4 @@ mod tests {
         assert_eq!(accounts, vec!["bot1"]);
     }
 }
+

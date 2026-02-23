@@ -63,7 +63,7 @@ pub async fn setup_onboarding_shell_completion(
 ) -> Result<()> {
     let shell = detect_shell();
     let profile = profile_hint(shell);
-    let cli_name = "krabkrab";
+    let cli_name = "openkrab";
 
     // In quickstart mode, auto-install
     let should_install = if flow == WizardFlow::Quickstart {
@@ -190,8 +190,8 @@ fn powershell_completion_script(cli_name: &str) -> String {
 }
 
 fn append_managed_block(path: &std::path::Path, content: &str) -> Result<()> {
-    const START: &str = "# >>> krabkrab completion >>>";
-    const END: &str = "# <<< krabkrab completion <<<";
+    const START: &str = "# >>> openkrab completion >>>";
+    const END: &str = "# <<< openkrab completion <<<";
 
     let mut existing = if path.exists() {
         std::fs::read_to_string(path)?
@@ -281,3 +281,4 @@ mod tests {
         assert!(hint.contains("source ~/.bashrc"));
     }
 }
+

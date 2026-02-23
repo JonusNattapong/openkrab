@@ -1,7 +1,7 @@
----
+﻿---
 description: Real-world OpenKrab projects from the community
-summary: 社区构建的基于 OpenKrab 的项目和集成
-title: 案例展示
+summary: ç¤¾åŒºæž„å»ºçš„åŸºäºŽ OpenKrab çš„é¡¹ç›®å’Œé›†æˆ
+title: æ¡ˆä¾‹å±•ç¤º
 x-i18n:
   generated_at: "2026-02-03T10:11:36Z"
   model: claude-opus-4-5
@@ -11,17 +11,17 @@ x-i18n:
   workflow: 15
 ---
 
-# 案例展示
+# æ¡ˆä¾‹å±•ç¤º
 
-来自社区的真实项目。看看大家正在用 OpenKrab 构建什么。
+æ¥è‡ªç¤¾åŒºçš„çœŸå®žé¡¹ç›®ã€‚çœ‹çœ‹å¤§å®¶æ­£åœ¨ç”¨ OpenKrab æž„å»ºä»€ä¹ˆã€‚
 
 <Info>
-**想要展示你的项目？** 在 [Discord 的 #showcase 频道](https://discord.gg/clawd) 分享或在 [X 上 @OpenKrab](https://x.com/OpenKrab)。
+**æƒ³è¦å±•ç¤ºä½ çš„é¡¹ç›®ï¼Ÿ** åœ¨ [Discord çš„ #showcase é¢‘é“](https://discord.gg/Krabd) åˆ†äº«æˆ–åœ¨ [X ä¸Š @OpenKrab](https://x.com/OpenKrab)ã€‚
 </Info>
 
-## 🎥 OpenKrab 实战演示
+## ðŸŽ¥ OpenKrab å®žæˆ˜æ¼”ç¤º
 
-VelvetShark 的完整设置演练（28 分钟）。
+VelvetShark çš„å®Œæ•´è®¾ç½®æ¼”ç»ƒï¼ˆ28 åˆ†é’Ÿï¼‰ã€‚
 
 <div
   style={{
@@ -43,7 +43,7 @@ VelvetShark 的完整设置演练（28 分钟）。
   />
 </div>
 
-[在 YouTube 上观看](https://www.youtube.com/watch?v=SaWSPZoPX34)
+[åœ¨ YouTube ä¸Šè§‚çœ‹](https://www.youtube.com/watch?v=SaWSPZoPX34)
 
 <div
   style={{
@@ -65,7 +65,7 @@ VelvetShark 的完整设置演练（28 分钟）。
   />
 </div>
 
-[在 YouTube 上观看](https://www.youtube.com/watch?v=mMSKQvlmFuQ)
+[åœ¨ YouTube ä¸Šè§‚çœ‹](https://www.youtube.com/watch?v=mMSKQvlmFuQ)
 
 <div
   style={{
@@ -87,338 +87,340 @@ VelvetShark 的完整设置演练（28 分钟）。
   />
 </div>
 
-[在 YouTube 上观看](https://www.youtube.com/watch?v=5kkIJNUGFho)
+[åœ¨ YouTube ä¸Šè§‚çœ‹](https://www.youtube.com/watch?v=5kkIJNUGFho)
 
-## 🆕 Discord 最新分享
+## ðŸ†• Discord æœ€æ–°åˆ†äº«
 
 <CardGroup cols={2}>
 
-<Card title="PR 审查 → Telegram 反馈" icon="code-pull-request" href="https://x.com/i/status/2010878524543131691">
-  **@bangnokia** • `review` `github` `telegram`
+<Card title="PR å®¡æŸ¥ â†’ Telegram åé¦ˆ" icon="code-pull-request" href="https://x.com/i/status/2010878524543131691">
+  **@bangnokia** â€¢ `review` `github` `telegram`
 
-OpenCode 完成更改 → 打开 PR → OpenKrab 审查差异并在 Telegram 中回复"小建议"加上明确的合并决定（包括需要先应用的关键修复）。
+OpenCode å®Œæˆæ›´æ”¹ â†’ æ‰“å¼€ PR â†’ OpenKrab å®¡æŸ¥å·®å¼‚å¹¶åœ¨ Telegram ä¸­å›žå¤"å°å»ºè®®"åŠ ä¸Šæ˜Žç¡®çš„åˆå¹¶å†³å®šï¼ˆåŒ…æ‹¬éœ€è¦å…ˆåº”ç”¨çš„å…³é”®ä¿®å¤ï¼‰ã€‚
 
   <img src="/assets/showcase/pr-review-telegram.jpg" alt="OpenKrab PR review feedback delivered in Telegram" />
 </Card>
 
-<Card title="几分钟内创建酒窖 Skill" icon="wine-glass" href="https://x.com/i/status/2010916352454791216">
-  **@prades_maxime** • `skills` `local` `csv`
+<Card title="å‡ åˆ†é’Ÿå†…åˆ›å»ºé…’çª– Skill" icon="wine-glass" href="https://x.com/i/status/2010916352454791216">
+  **@prades_maxime** â€¢ `skills` `local` `csv`
 
-向"Robby"（@OpenKrab）请求一个本地酒窖 skill。它请求一个示例 CSV 导出 + 存储位置，然后快速构建/测试该 skill（示例中有 962 瓶酒）。
+å‘"Robby"ï¼ˆ@OpenKrabï¼‰è¯·æ±‚ä¸€ä¸ªæœ¬åœ°é…’çª– skillã€‚å®ƒè¯·æ±‚ä¸€ä¸ªç¤ºä¾‹ CSV å¯¼å‡º + å­˜å‚¨ä½ç½®ï¼Œç„¶åŽå¿«é€Ÿæž„å»º/æµ‹è¯•è¯¥ skillï¼ˆç¤ºä¾‹ä¸­æœ‰ 962 ç“¶é…’ï¼‰ã€‚
 
   <img src="/assets/showcase/wine-cellar-skill.jpg" alt="OpenKrab building a local wine cellar skill from CSV" />
 </Card>
 
-<Card title="Tesco 购物自动驾驶" icon="cart-shopping" href="https://x.com/i/status/2009724862470689131">
-  **@marchattonhere** • `automation` `browser` `shopping`
+<Card title="Tesco è´­ç‰©è‡ªåŠ¨é©¾é©¶" icon="cart-shopping" href="https://x.com/i/status/2009724862470689131">
+  **@marchattonhere** â€¢ `automation` `browser` `shopping`
 
-每周餐饮计划 → 常购商品 → 预订配送时段 → 确认订单。无需 API，仅使用浏览器控制。
+æ¯å‘¨é¤é¥®è®¡åˆ’ â†’ å¸¸è´­å•†å“ â†’ é¢„è®¢é…é€æ—¶æ®µ â†’ ç¡®è®¤è®¢å•ã€‚æ— éœ€ APIï¼Œä»…ä½¿ç”¨æµè§ˆå™¨æŽ§åˆ¶ã€‚
 
   <img src="/assets/showcase/tesco-shop.jpg" alt="Tesco shop automation via chat" />
 </Card>
 
-<Card title="SNAG 截图转 Markdown" icon="scissors" href="https://github.com/am-will/snag">
-  **@am-will** • `devtools` `screenshots` `markdown`
+<Card title="SNAG æˆªå›¾è½¬ Markdown" icon="scissors" href="https://github.com/am-will/snag">
+  **@am-will** â€¢ `devtools` `screenshots` `markdown`
 
-快捷键选择屏幕区域 → Gemini 视觉 → 即时 Markdown 到剪贴板。
+å¿«æ·é”®é€‰æ‹©å±å¹•åŒºåŸŸ â†’ Gemini è§†è§‰ â†’ å³æ—¶ Markdown åˆ°å‰ªè´´æ¿ã€‚
 
   <img src="/assets/showcase/snag.png" alt="SNAG screenshot-to-markdown tool" />
 </Card>
 
 <Card title="Agents UI" icon="window-maximize" href="https://releaseflow.net/kitze/agents-ui">
-  **@kitze** • `ui` `skills` `sync`
+  **@kitze** â€¢ `ui` `skills` `sync`
 
-跨 Agents、Claude、Codex 和 OpenKrab 管理 skills/命令的桌面应用。
+è·¨ Agentsã€Claudeã€Codex å’Œ OpenKrab ç®¡ç† skills/å‘½ä»¤çš„æ¡Œé¢åº”ç”¨ã€‚
 
   <img src="/assets/showcase/agents-ui.jpg" alt="Agents UI app" />
 </Card>
 
-<Card title="Telegram 语音备忘录 (papla.media)" icon="microphone" href="https://papla.media/docs">
-  **社区** • `voice` `tts` `telegram`
+<Card title="Telegram è¯­éŸ³å¤‡å¿˜å½• (papla.media)" icon="microphone" href="https://papla.media/docs">
+  **ç¤¾åŒº** â€¢ `voice` `tts` `telegram`
 
-封装 papla.media TTS 并将结果作为 Telegram 语音备忘录发送（无烦人的自动播放）。
+å°è£… papla.media TTS å¹¶å°†ç»“æžœä½œä¸º Telegram è¯­éŸ³å¤‡å¿˜å½•å‘é€ï¼ˆæ— çƒ¦äººçš„è‡ªåŠ¨æ’­æ”¾ï¼‰ã€‚
 
   <img src="/assets/showcase/papla-tts.jpg" alt="Telegram voice note output from TTS" />
 </Card>
 
-<Card title="CodexMonitor" icon="eye" href="https://clawhub.com/odrobnik/codexmonitor">
-  **@odrobnik** • `devtools` `codex` `brew`
+<Card title="CodexMonitor" icon="eye" href="https://KrabHub.com/odrobnik/codexmonitor">
+  **@odrobnik** â€¢ `devtools` `codex` `brew`
 
-Homebrew 安装的助手工具，用于列出/检查/监视本地 OpenAI Codex 会话（CLI + VS Code）。
+Homebrew å®‰è£…çš„åŠ©æ‰‹å·¥å…·ï¼Œç”¨äºŽåˆ—å‡º/æ£€æŸ¥/ç›‘è§†æœ¬åœ° OpenAI Codex ä¼šè¯ï¼ˆCLI + VS Codeï¼‰ã€‚
 
-  <img src="/assets/showcase/codexmonitor.png" alt="CodexMonitor on ClawHub" />
+  <img src="/assets/showcase/codexmonitor.png" alt="CodexMonitor on KrabHub" />
 </Card>
 
-<Card title="Bambu 3D 打印机控制" icon="print" href="https://clawhub.com/tobiasbischoff/bambu-cli">
-  **@tobiasbischoff** • `hardware` `3d-printing` `skill`
+<Card title="Bambu 3D æ‰“å°æœºæŽ§åˆ¶" icon="print" href="https://KrabHub.com/tobiasbischoff/bambu-cli">
+  **@tobiasbischoff** â€¢ `hardware` `3d-printing` `skill`
 
-控制和排查 BambuLab 打印机：状态、任务、摄像头、AMS、校准等。
+æŽ§åˆ¶å’ŒæŽ’æŸ¥ BambuLab æ‰“å°æœºï¼šçŠ¶æ€ã€ä»»åŠ¡ã€æ‘„åƒå¤´ã€AMSã€æ ¡å‡†ç­‰ã€‚
 
-  <img src="/assets/showcase/bambu-cli.png" alt="Bambu CLI skill on ClawHub" />
+  <img src="/assets/showcase/bambu-cli.png" alt="Bambu CLI skill on KrabHub" />
 </Card>
 
-<Card title="维也纳交通 (Wiener Linien)" icon="train" href="https://clawhub.com/hjanuschka/wienerlinien">
-  **@hjanuschka** • `travel` `transport` `skill`
+<Card title="ç»´ä¹Ÿçº³äº¤é€š (Wiener Linien)" icon="train" href="https://KrabHub.com/hjanuschka/wienerlinien">
+  **@hjanuschka** â€¢ `travel` `transport` `skill`
 
-维也纳公共交通的实时发车时间、中断信息、电梯状态和路线规划。
+ç»´ä¹Ÿçº³å…¬å…±äº¤é€šçš„å®žæ—¶å‘è½¦æ—¶é—´ã€ä¸­æ–­ä¿¡æ¯ã€ç”µæ¢¯çŠ¶æ€å’Œè·¯çº¿è§„åˆ’ã€‚
 
-  <img src="/assets/showcase/wienerlinien.png" alt="Wiener Linien skill on ClawHub" />
+  <img src="/assets/showcase/wienerlinien.png" alt="Wiener Linien skill on KrabHub" />
 </Card>
 
-<Card title="ParentPay 学校餐食" icon="utensils" href="#">
-  **@George5562** • `automation` `browser` `parenting`
+<Card title="ParentPay å­¦æ ¡é¤é£Ÿ" icon="utensils" href="#">
+  **@George5562** â€¢ `automation` `browser` `parenting`
 
-通过 ParentPay 自动预订英国学校餐食。使用鼠标坐标实现可靠的表格单元格点击。
+é€šè¿‡ ParentPay è‡ªåŠ¨é¢„è®¢è‹±å›½å­¦æ ¡é¤é£Ÿã€‚ä½¿ç”¨é¼ æ ‡åæ ‡å®žçŽ°å¯é çš„è¡¨æ ¼å•å…ƒæ ¼ç‚¹å‡»ã€‚
 </Card>
 
-<Card title="R2 上传 (Send Me My Files)" icon="cloud-arrow-up" href="https://clawhub.com/skills/r2-upload">
-  **@julianengel** • `files` `r2` `presigned-urls`
+<Card title="R2 ä¸Šä¼  (Send Me My Files)" icon="cloud-arrow-up" href="https://KrabHub.com/skills/r2-upload">
+  **@julianengel** â€¢ `files` `r2` `presigned-urls`
 
-上传到 Cloudflare R2/S3 并生成安全的预签名下载链接。非常适合远程 OpenKrab 实例。
+ä¸Šä¼ åˆ° Cloudflare R2/S3 å¹¶ç”Ÿæˆå®‰å…¨çš„é¢„ç­¾åä¸‹è½½é“¾æŽ¥ã€‚éžå¸¸é€‚åˆè¿œç¨‹ OpenKrab å®žä¾‹ã€‚
 </Card>
 
-<Card title="通过 Telegram 开发 iOS 应用" icon="mobile" href="#">
-  **@coard** • `ios` `xcode` `testflight`
+<Card title="é€šè¿‡ Telegram å¼€å‘ iOS åº”ç”¨" icon="mobile" href="#">
+  **@coard** â€¢ `ios` `xcode` `testflight`
 
-构建了一个完整的带有地图和语音录制功能的 iOS 应用，完全通过 Telegram 聊天部署到 TestFlight。
+æž„å»ºäº†ä¸€ä¸ªå®Œæ•´çš„å¸¦æœ‰åœ°å›¾å’Œè¯­éŸ³å½•åˆ¶åŠŸèƒ½çš„ iOS åº”ç”¨ï¼Œå®Œå…¨é€šè¿‡ Telegram èŠå¤©éƒ¨ç½²åˆ° TestFlightã€‚
 
   <img src="/assets/showcase/ios-testflight.jpg" alt="iOS app on TestFlight" />
 </Card>
 
-<Card title="Oura 戒指健康助手" icon="heart-pulse" href="#">
-  **@AS** • `health` `oura` `calendar`
+<Card title="Oura æˆ’æŒ‡å¥åº·åŠ©æ‰‹" icon="heart-pulse" href="#">
+  **@AS** â€¢ `health` `oura` `calendar`
 
-个人 AI 健康助手，将 Oura 戒指数据与日历、预约和健身房计划集成。
+ä¸ªäºº AI å¥åº·åŠ©æ‰‹ï¼Œå°† Oura æˆ’æŒ‡æ•°æ®ä¸Žæ—¥åŽ†ã€é¢„çº¦å’Œå¥èº«æˆ¿è®¡åˆ’é›†æˆã€‚
 
   <img src="/assets/showcase/oura-health.png" alt="Oura ring health assistant" />
 </Card>
-<Card title="Kev 的梦之队 (14+ 智能体)" icon="robot" href="https://github.com/adam91holt/orchestrated-ai-articles">
-  **@adam91holt** • `multi-agent` `orchestration` `architecture` `manifesto`
+<Card title="Kev çš„æ¢¦ä¹‹é˜Ÿ (14+ æ™ºèƒ½ä½“)" icon="robot" href="https://github.com/adam91holt/orchestrated-ai-articles">
+  **@adam91holt** â€¢ `multi-agent` `orchestration` `architecture` `manifesto`
 
-一个 Gateway 网关下的 14+ 智能体，Opus 4.5 编排器将任务委派给 Codex 工作者。全面的[技术文章](https://github.com/adam91holt/orchestrated-ai-articles)涵盖梦之队阵容、模型选择、沙箱隔离、webhook、心跳和委派流程。用于智能体沙箱隔离的 [Clawdspace](https://github.com/adam91holt/clawdspace)。[博客文章](https://adams-ai-journey.ghost.io/2026-the-year-of-the-orchestrator/)。
+ä¸€ä¸ª Gateway ç½‘å…³ä¸‹çš„ 14+ æ™ºèƒ½ä½“ï¼ŒOpus 4.5 ç¼–æŽ’å™¨å°†ä»»åŠ¡å§”æ´¾ç»™ Codex å·¥ä½œè€…ã€‚å…¨é¢çš„[æŠ€æœ¯æ–‡ç« ](https://github.com/adam91holt/orchestrated-ai-articles)æ¶µç›–æ¢¦ä¹‹é˜Ÿé˜µå®¹ã€æ¨¡åž‹é€‰æ‹©ã€æ²™ç®±éš”ç¦»ã€webhookã€å¿ƒè·³å’Œå§”æ´¾æµç¨‹ã€‚ç”¨äºŽæ™ºèƒ½ä½“æ²™ç®±éš”ç¦»çš„ [Krabdspace](https://github.com/adam91holt/Krabdspace)ã€‚[åšå®¢æ–‡ç« ](https://adams-ai-journey.ghost.io/2026-the-year-of-the-orchestrator/)ã€‚
 </Card>
 
 <Card title="Linear CLI" icon="terminal" href="https://github.com/Finesssee/linear-cli">
-  **@NessZerra** • `devtools` `linear` `cli` `issues`
+  **@NessZerra** â€¢ `devtools` `linear` `cli` `issues`
 
-与智能体工作流（Claude Code、OpenKrab）集成的 Linear CLI。从终端管理问题、项目和工作流。首个外部 PR 已合并！
+ä¸Žæ™ºèƒ½ä½“å·¥ä½œæµï¼ˆClaude Codeã€OpenKrabï¼‰é›†æˆçš„ Linear CLIã€‚ä»Žç»ˆç«¯ç®¡ç†é—®é¢˜ã€é¡¹ç›®å’Œå·¥ä½œæµã€‚é¦–ä¸ªå¤–éƒ¨ PR å·²åˆå¹¶ï¼
 </Card>
 
 <Card title="Beeper CLI" icon="message" href="https://github.com/blqke/beepcli">
-  **@jules** • `messaging` `beeper` `cli` `automation`
+  **@jules** â€¢ `messaging` `beeper` `cli` `automation`
 
-通过 Beeper Desktop 读取、发送和归档消息。使用 Beeper 本地 MCP API，让智能体可以在一个地方管理你的所有聊天（iMessage、WhatsApp 等）。
+é€šè¿‡ Beeper Desktop è¯»å–ã€å‘é€å’Œå½’æ¡£æ¶ˆæ¯ã€‚ä½¿ç”¨ Beeper æœ¬åœ° MCP APIï¼Œè®©æ™ºèƒ½ä½“å¯ä»¥åœ¨ä¸€ä¸ªåœ°æ–¹ç®¡ç†ä½ çš„æ‰€æœ‰èŠå¤©ï¼ˆiMessageã€WhatsApp ç­‰ï¼‰ã€‚
 </Card>
 
 </CardGroup>
 
-## 🤖 自动化与工作流
+## ðŸ¤– è‡ªåŠ¨åŒ–ä¸Žå·¥ä½œæµ
 
 <CardGroup cols={2}>
 
-<Card title="Winix 空气净化器控制" icon="wind" href="https://x.com/antonplex/status/2010518442471006253">
-  **@antonplex** • `automation` `hardware` `air-quality`
+<Card title="Winix ç©ºæ°”å‡€åŒ–å™¨æŽ§åˆ¶" icon="wind" href="https://x.com/antonplex/status/2010518442471006253">
+  **@antonplex** â€¢ `automation` `hardware` `air-quality`
 
-Claude Code 发现并确认了净化器控制，然后 OpenKrab 接管来管理房间空气质量。
+Claude Code å‘çŽ°å¹¶ç¡®è®¤äº†å‡€åŒ–å™¨æŽ§åˆ¶ï¼Œç„¶åŽ OpenKrab æŽ¥ç®¡æ¥ç®¡ç†æˆ¿é—´ç©ºæ°”è´¨é‡ã€‚
 
   <img src="/assets/showcase/winix-air-purifier.jpg" alt="Winix air purifier control via OpenKrab" />
 </Card>
 
-<Card title="美丽天空相机拍摄" icon="camera" href="https://x.com/signalgaining/status/2010523120604746151">
-  **@signalgaining** • `automation` `camera` `skill` `images`
+<Card title="ç¾Žä¸½å¤©ç©ºç›¸æœºæ‹æ‘„" icon="camera" href="https://x.com/signalgaining/status/2010523120604746151">
+  **@signalgaining** â€¢ `automation` `camera` `skill` `images`
 
-由屋顶摄像头触发：让 OpenKrab 在天空看起来很美的时候拍一张照片——它设计了一个 skill 并拍摄了照片。
+ç”±å±‹é¡¶æ‘„åƒå¤´è§¦å‘ï¼šè®© OpenKrab åœ¨å¤©ç©ºçœ‹èµ·æ¥å¾ˆç¾Žçš„æ—¶å€™æ‹ä¸€å¼ ç…§ç‰‡â€”â€”å®ƒè®¾è®¡äº†ä¸€ä¸ª skill å¹¶æ‹æ‘„äº†ç…§ç‰‡ã€‚
 
   <img src="/assets/showcase/roof-camera-sky.jpg" alt="Roof camera sky snapshot captured by OpenKrab" />
 </Card>
 
-<Card title="可视化晨间简报场景" icon="robot" href="https://x.com/buddyhadry/status/2010005331925954739">
-  **@buddyhadry** • `automation` `briefing` `images` `telegram`
+<Card title="å¯è§†åŒ–æ™¨é—´ç®€æŠ¥åœºæ™¯" icon="robot" href="https://x.com/buddyhadry/status/2010005331925954739">
+  **@buddyhadry** â€¢ `automation` `briefing` `images` `telegram`
 
-定时提示每天早上通过 OpenKrab 角色生成一张"场景"图片（天气、任务、日期、喜欢的帖子/引言）。
+å®šæ—¶æç¤ºæ¯å¤©æ—©ä¸Šé€šè¿‡ OpenKrab è§’è‰²ç”Ÿæˆä¸€å¼ "åœºæ™¯"å›¾ç‰‡ï¼ˆå¤©æ°”ã€ä»»åŠ¡ã€æ—¥æœŸã€å–œæ¬¢çš„å¸–å­/å¼•è¨€ï¼‰ã€‚
 </Card>
 
-<Card title="板式网球场地预订" icon="calendar-check" href="https://github.com/joshp123/padel-cli">
-  **@joshp123** • `automation` `booking` `cli`
+<Card title="æ¿å¼ç½‘çƒåœºåœ°é¢„è®¢" icon="calendar-check" href="https://github.com/joshp123/padel-cli">
+  **@joshp123** â€¢ `automation` `booking` `cli`
   
-  Playtomic 可用性检查器 + 预订 CLI。再也不会错过空闲场地。
+  Playtomic å¯ç”¨æ€§æ£€æŸ¥å™¨ + é¢„è®¢ CLIã€‚å†ä¹Ÿä¸ä¼šé”™è¿‡ç©ºé—²åœºåœ°ã€‚
   
   <img src="/assets/showcase/padel-screenshot.jpg" alt="padel-cli screenshot" />
 </Card>
 
-<Card title="会计收件" icon="file-invoice-dollar">
-  **社区** • `automation` `email` `pdf`
+<Card title="ä¼šè®¡æ”¶ä»¶" icon="file-invoice-dollar">
+  **ç¤¾åŒº** â€¢ `automation` `email` `pdf`
   
-  从邮件收集 PDF，为税务顾问准备文档。月度会计自动运行。
+  ä»Žé‚®ä»¶æ”¶é›† PDFï¼Œä¸ºç¨ŽåŠ¡é¡¾é—®å‡†å¤‡æ–‡æ¡£ã€‚æœˆåº¦ä¼šè®¡è‡ªåŠ¨è¿è¡Œã€‚
 </Card>
 
-<Card title="沙发土豆开发模式" icon="couch" href="https://davekiss.com">
-  **@davekiss** • `telegram` `website` `migration` `astro`
+<Card title="æ²™å‘åœŸè±†å¼€å‘æ¨¡å¼" icon="couch" href="https://davekiss.com">
+  **@davekiss** â€¢ `telegram` `website` `migration` `astro`
 
-一边看 Netflix 一边通过 Telegram 重建整个个人网站——Notion → Astro，迁移了 18 篇文章，DNS 转到 Cloudflare。从未打开笔记本电脑。
+ä¸€è¾¹çœ‹ Netflix ä¸€è¾¹é€šè¿‡ Telegram é‡å»ºæ•´ä¸ªä¸ªäººç½‘ç«™â€”â€”Notion â†’ Astroï¼Œè¿ç§»äº† 18 ç¯‡æ–‡ç« ï¼ŒDNS è½¬åˆ° Cloudflareã€‚ä»Žæœªæ‰“å¼€ç¬”è®°æœ¬ç”µè„‘ã€‚
 </Card>
 
-<Card title="求职智能体" icon="briefcase">
-  **@attol8** • `automation` `api` `skill`
+<Card title="æ±‚èŒæ™ºèƒ½ä½“" icon="briefcase">
+  **@attol8** â€¢ `automation` `api` `skill`
 
-搜索职位列表，与简历关键词匹配，返回带链接的相关机会。使用 JSearch API 在 30 分钟内构建。
+æœç´¢èŒä½åˆ—è¡¨ï¼Œä¸Žç®€åŽ†å…³é”®è¯åŒ¹é…ï¼Œè¿”å›žå¸¦é“¾æŽ¥çš„ç›¸å…³æœºä¼šã€‚ä½¿ç”¨ JSearch API åœ¨ 30 åˆ†é’Ÿå†…æž„å»ºã€‚
 </Card>
 
-<Card title="Jira Skill 构建器" icon="diagram-project" href="https://x.com/jdrhyne/status/2008336434827002232">
-  **@jdrhyne** • `automation` `jira` `skill` `devtools`
+<Card title="Jira Skill æž„å»ºå™¨" icon="diagram-project" href="https://x.com/jdrhyne/status/2008336434827002232">
+  **@jdrhyne** â€¢ `automation` `jira` `skill` `devtools`
 
-OpenKrab 连接到 Jira，然后即时生成一个新的 skill（在它出现在 ClawHub 之前）。
+OpenKrab è¿žæŽ¥åˆ° Jiraï¼Œç„¶åŽå³æ—¶ç”Ÿæˆä¸€ä¸ªæ–°çš„ skillï¼ˆåœ¨å®ƒå‡ºçŽ°åœ¨ KrabHub ä¹‹å‰ï¼‰ã€‚
 </Card>
 
-<Card title="通过 Telegram 创建 Todoist Skill" icon="list-check" href="https://x.com/iamsubhrajyoti/status/2009949389884920153">
-  **@iamsubhrajyoti** • `automation` `todoist` `skill` `telegram`
+<Card title="é€šè¿‡ Telegram åˆ›å»º Todoist Skill" icon="list-check" href="https://x.com/iamsubhrajyoti/status/2009949389884920153">
+  **@iamsubhrajyoti** â€¢ `automation` `todoist` `skill` `telegram`
 
-自动化 Todoist 任务，并让 OpenKrab 直接在 Telegram 聊天中生成 skill。
+è‡ªåŠ¨åŒ– Todoist ä»»åŠ¡ï¼Œå¹¶è®© OpenKrab ç›´æŽ¥åœ¨ Telegram èŠå¤©ä¸­ç”Ÿæˆ skillã€‚
 </Card>
 
-<Card title="TradingView 分析" icon="chart-line">
-  **@bheem1798** • `finance` `browser` `automation`
+<Card title="TradingView åˆ†æž" icon="chart-line">
+  **@bheem1798** â€¢ `finance` `browser` `automation`
 
-通过浏览器自动化登录 TradingView，截取图表屏幕截图，并按需执行技术分析。无需 API——只需浏览器控制。
+é€šè¿‡æµè§ˆå™¨è‡ªåŠ¨åŒ–ç™»å½• TradingViewï¼Œæˆªå–å›¾è¡¨å±å¹•æˆªå›¾ï¼Œå¹¶æŒ‰éœ€æ‰§è¡ŒæŠ€æœ¯åˆ†æžã€‚æ— éœ€ APIâ€”â€”åªéœ€æµè§ˆå™¨æŽ§åˆ¶ã€‚
 </Card>
 
-<Card title="Slack 自动支持" icon="slack">
-  **@henrymascot** • `slack` `automation` `support`
+<Card title="Slack è‡ªåŠ¨æ”¯æŒ" icon="slack">
+  **@henrymascot** â€¢ `slack` `automation` `support`
 
-监视公司 Slack 频道，提供有用的回复，并将通知转发到 Telegram。在没有被要求的情况下自主修复了已部署应用中的生产 bug。
+ç›‘è§†å…¬å¸ Slack é¢‘é“ï¼Œæä¾›æœ‰ç”¨çš„å›žå¤ï¼Œå¹¶å°†é€šçŸ¥è½¬å‘åˆ° Telegramã€‚åœ¨æ²¡æœ‰è¢«è¦æ±‚çš„æƒ…å†µä¸‹è‡ªä¸»ä¿®å¤äº†å·²éƒ¨ç½²åº”ç”¨ä¸­çš„ç”Ÿäº§ bugã€‚
 </Card>
 
 </CardGroup>
 
-## 🧠 知识与记忆
+## ðŸ§  çŸ¥è¯†ä¸Žè®°å¿†
 
 <CardGroup cols={2}>
 
-<Card title="xuezh 中文学习" icon="language" href="https://github.com/joshp123/xuezh">
-  **@joshp123** • `learning` `voice` `skill`
+<Card title="xuezh ä¸­æ–‡å­¦ä¹ " icon="language" href="https://github.com/joshp123/xuezh">
+  **@joshp123** â€¢ `learning` `voice` `skill`
   
-  通过 OpenKrab 实现带有发音反馈和学习流程的中文学习引擎。
+  é€šè¿‡ OpenKrab å®žçŽ°å¸¦æœ‰å‘éŸ³åé¦ˆå’Œå­¦ä¹ æµç¨‹çš„ä¸­æ–‡å­¦ä¹ å¼•æ“Žã€‚
   
   <img src="/assets/showcase/xuezh-pronunciation.jpeg" alt="xuezh pronunciation feedback" />
 </Card>
 
-<Card title="WhatsApp 记忆库" icon="vault">
-  **社区** • `memory` `transcription` `indexing`
+<Card title="WhatsApp è®°å¿†åº“" icon="vault">
+  **ç¤¾åŒº** â€¢ `memory` `transcription` `indexing`
   
-  导入完整的 WhatsApp 导出，转录 1k+ 条语音备忘录，与 git 日志交叉检查，输出链接的 markdown 报告。
+  å¯¼å…¥å®Œæ•´çš„ WhatsApp å¯¼å‡ºï¼Œè½¬å½• 1k+ æ¡è¯­éŸ³å¤‡å¿˜å½•ï¼Œä¸Ž git æ—¥å¿—äº¤å‰æ£€æŸ¥ï¼Œè¾“å‡ºé“¾æŽ¥çš„ markdown æŠ¥å‘Šã€‚
 </Card>
 
-<Card title="Karakeep 语义搜索" icon="magnifying-glass" href="https://github.com/jamesbrooksco/karakeep-semantic-search">
-  **@jamesbrooksco** • `search` `vector` `bookmarks`
+<Card title="Karakeep è¯­ä¹‰æœç´¢" icon="magnifying-glass" href="https://github.com/jamesbrooksco/karakeep-semantic-search">
+  **@jamesbrooksco** â€¢ `search` `vector` `bookmarks`
   
-  使用 Qdrant + OpenAI/Ollama embeddings 为 Karakeep 书签添加向量搜索。
+  ä½¿ç”¨ Qdrant + OpenAI/Ollama embeddings ä¸º Karakeep ä¹¦ç­¾æ·»åŠ å‘é‡æœç´¢ã€‚
 </Card>
 
-<Card title="Inside-Out-2 记忆" icon="brain">
-  **社区** • `memory` `beliefs` `self-model`
+<Card title="Inside-Out-2 è®°å¿†" icon="brain">
+  **ç¤¾åŒº** â€¢ `memory` `beliefs` `self-model`
   
-  独立的记忆管理器，将会话文件转化为记忆 → 信念 → 演化的自我模型。
-</Card>
-
-</CardGroup>
-
-## 🎙️ 语音与电话
-
-<CardGroup cols={2}>
-
-<Card title="Clawdia 电话桥接" icon="phone" href="https://github.com/alejandroOPI/clawdia-bridge">
-  **@alejandroOPI** • `voice` `vapi` `bridge`
-  
-  Vapi 语音助手 ↔ OpenKrab HTTP 桥接。与你的智能体进行近实时电话通话。
-</Card>
-
-<Card title="OpenRouter 转录" icon="microphone" href="https://clawhub.com/obviyus/openrouter-transcribe">
-  **@obviyus** • `transcription` `multilingual` `skill`
-
-通过 OpenRouter（Gemini 等）进行多语言音频转录。可在 ClawHub 获取。
+  ç‹¬ç«‹çš„è®°å¿†ç®¡ç†å™¨ï¼Œå°†ä¼šè¯æ–‡ä»¶è½¬åŒ–ä¸ºè®°å¿† â†’ ä¿¡å¿µ â†’ æ¼”åŒ–çš„è‡ªæˆ‘æ¨¡åž‹ã€‚
 </Card>
 
 </CardGroup>
 
-## 🏗️ 基础设施与部署
+## ðŸŽ™ï¸ è¯­éŸ³ä¸Žç”µè¯
 
 <CardGroup cols={2}>
 
-<Card title="Home Assistant 插件" icon="home" href="https://github.com/ngutman/OpenKrab-ha-addon">
-  **@ngutman** • `homeassistant` `docker` `raspberry-pi`
+<Card title="Krabdia ç”µè¯æ¡¥æŽ¥" icon="phone" href="https://github.com/alejandroOPI/Krabdia-bridge">
+  **@alejandroOPI** â€¢ `voice` `vapi` `bridge`
   
-  在 Home Assistant OS 上运行的 OpenKrab Gateway 网关，支持 SSH 隧道和持久状态。
+  Vapi è¯­éŸ³åŠ©æ‰‹ â†” OpenKrab HTTP æ¡¥æŽ¥ã€‚ä¸Žä½ çš„æ™ºèƒ½ä½“è¿›è¡Œè¿‘å®žæ—¶ç”µè¯é€šè¯ã€‚
 </Card>
 
-<Card title="Home Assistant Skill" icon="toggle-on" href="https://clawhub.com/skills/homeassistant">
-  **ClawHub** • `homeassistant` `skill` `automation`
-  
-  通过自然语言控制和自动化 Home Assistant 设备。
-</Card>
+<Card title="OpenRouter è½¬å½•" icon="microphone" href="https://KrabHub.com/obviyus/openrouter-transcribe">
+  **@obviyus** â€¢ `transcription` `multilingual` `skill`
 
-<Card title="Nix 打包" icon="snowflake" href="https://github.com/OpenKrab/nix-OpenKrab">
-  **@OpenKrab** • `nix` `packaging` `deployment`
-  
-  开箱即用的 nixified OpenKrab 配置，用于可复现的部署。
-</Card>
-
-<Card title="CalDAV 日历" icon="calendar" href="https://clawhub.com/skills/caldav-calendar">
-  **ClawHub** • `calendar` `caldav` `skill`
-  
-  使用 khal/vdirsyncer 的日历 skill。自托管日历集成。
+é€šè¿‡ OpenRouterï¼ˆGemini ç­‰ï¼‰è¿›è¡Œå¤šè¯­è¨€éŸ³é¢‘è½¬å½•ã€‚å¯åœ¨ KrabHub èŽ·å–ã€‚
 </Card>
 
 </CardGroup>
 
-## 🏠 家居与硬件
+## ðŸ—ï¸ åŸºç¡€è®¾æ–½ä¸Žéƒ¨ç½²
 
 <CardGroup cols={2}>
 
-<Card title="GoHome 自动化" icon="house-signal" href="https://github.com/joshp123/gohome">
-  **@joshp123** • `home` `nix` `grafana`
+<Card title="Home Assistant æ’ä»¶" icon="home" href="https://github.com/ngutman/OpenKrab-ha-addon">
+  **@ngutman** â€¢ `homeassistant` `docker` `raspberry-pi`
   
-  Nix 原生家庭自动化，以 OpenKrab 作为界面，加上漂亮的 Grafana 仪表板。
+  åœ¨ Home Assistant OS ä¸Šè¿è¡Œçš„ OpenKrab Gateway ç½‘å…³ï¼Œæ”¯æŒ SSH éš§é“å’ŒæŒä¹…çŠ¶æ€ã€‚
+</Card>
+
+<Card title="Home Assistant Skill" icon="toggle-on" href="https://KrabHub.com/skills/homeassistant">
+  **KrabHub** â€¢ `homeassistant` `skill` `automation`
+  
+  é€šè¿‡è‡ªç„¶è¯­è¨€æŽ§åˆ¶å’Œè‡ªåŠ¨åŒ– Home Assistant è®¾å¤‡ã€‚
+</Card>
+
+<Card title="Nix æ‰“åŒ…" icon="snowflake" href="https://github.com/OpenKrab/nix-OpenKrab">
+  **@OpenKrab** â€¢ `nix` `packaging` `deployment`
+  
+  å¼€ç®±å³ç”¨çš„ nixified OpenKrab é…ç½®ï¼Œç”¨äºŽå¯å¤çŽ°çš„éƒ¨ç½²ã€‚
+</Card>
+
+<Card title="CalDAV æ—¥åŽ†" icon="calendar" href="https://KrabHub.com/skills/caldav-calendar">
+  **KrabHub** â€¢ `calendar` `caldav` `skill`
+  
+  ä½¿ç”¨ khal/vdirsyncer çš„æ—¥åŽ† skillã€‚è‡ªæ‰˜ç®¡æ—¥åŽ†é›†æˆã€‚
+</Card>
+
+</CardGroup>
+
+## ðŸ  å®¶å±…ä¸Žç¡¬ä»¶
+
+<CardGroup cols={2}>
+
+<Card title="GoHome è‡ªåŠ¨åŒ–" icon="house-signal" href="https://github.com/joshp123/gohome">
+  **@joshp123** â€¢ `home` `nix` `grafana`
+  
+  Nix åŽŸç”Ÿå®¶åº­è‡ªåŠ¨åŒ–ï¼Œä»¥ OpenKrab ä½œä¸ºç•Œé¢ï¼ŒåŠ ä¸Šæ¼‚äº®çš„ Grafana ä»ªè¡¨æ¿ã€‚
   
   <img src="/assets/showcase/gohome-grafana.png" alt="GoHome Grafana dashboard" />
 </Card>
 
-<Card title="Roborock 扫地机器人" icon="robot" href="https://github.com/joshp123/gohome/tree/main/plugins/roborock">
-  **@joshp123** • `vacuum` `iot` `plugin`
+<Card title="Roborock æ‰«åœ°æœºå™¨äºº" icon="robot" href="https://github.com/joshp123/gohome/tree/main/plugins/roborock">
+  **@joshp123** â€¢ `vacuum` `iot` `plugin`
   
-  通过自然对话控制你的 Roborock 扫地机器人。
+  é€šè¿‡è‡ªç„¶å¯¹è¯æŽ§åˆ¶ä½ çš„ Roborock æ‰«åœ°æœºå™¨äººã€‚
   
   <img src="/assets/showcase/roborock-screenshot.jpg" alt="Roborock status" />
 </Card>
 
 </CardGroup>
 
-## 🌟 社区项目
+## ðŸŒŸ ç¤¾åŒºé¡¹ç›®
 
 <CardGroup cols={2}>
 
-<Card title="StarSwap 市场" icon="star" href="https://star-swap.com/">
-  **社区** • `marketplace` `astronomy` `webapp`
+<Card title="StarSwap å¸‚åœº" icon="star" href="https://star-swap.com/">
+  **ç¤¾åŒº** â€¢ `marketplace` `astronomy` `webapp`
   
-  完整的天文设备市场。围绕 OpenKrab 生态系统构建。
+  å®Œæ•´çš„å¤©æ–‡è®¾å¤‡å¸‚åœºã€‚å›´ç»• OpenKrab ç”Ÿæ€ç³»ç»Ÿæž„å»ºã€‚
 </Card>
 
 </CardGroup>
 
 ---
 
-## 提交你的项目
+## æäº¤ä½ çš„é¡¹ç›®
 
-有想分享的东西？我们很乐意展示它！
+æœ‰æƒ³åˆ†äº«çš„ä¸œè¥¿ï¼Ÿæˆ‘ä»¬å¾ˆä¹æ„å±•ç¤ºå®ƒï¼
 
 <Steps>
-  <Step title="分享它">
-    在 [Discord 的 #showcase 频道](https://discord.gg/clawd) 发布或在 [Twitter 上 @OpenKrab](https://x.com/OpenKrab)
+  <Step title="åˆ†äº«å®ƒ">
+    åœ¨ [Discord çš„ #showcase é¢‘é“](https://discord.gg/Krabd) å‘å¸ƒæˆ–åœ¨ [Twitter ä¸Š @OpenKrab](https://x.com/OpenKrab)
   </Step>
-  <Step title="包含详细信息">
-    告诉我们它做什么，链接到仓库/演示，如果有的话分享截图
+  <Step title="åŒ…å«è¯¦ç»†ä¿¡æ¯">
+    å‘Šè¯‰æˆ‘ä»¬å®ƒåšä»€ä¹ˆï¼Œé“¾æŽ¥åˆ°ä»“åº“/æ¼”ç¤ºï¼Œå¦‚æžœæœ‰çš„è¯åˆ†äº«æˆªå›¾
   </Step>
-  <Step title="获得展示">
-    我们会将优秀项目添加到此页面
+  <Step title="èŽ·å¾—å±•ç¤º">
+    æˆ‘ä»¬ä¼šå°†ä¼˜ç§€é¡¹ç›®æ·»åŠ åˆ°æ­¤é¡µé¢
   </Step>
 </Steps>
+
+
 

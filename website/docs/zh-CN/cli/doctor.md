@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 你遇到连接/认证问题，需要引导式修复
-  - 你更新后想进行完整性检查
-summary: "`OpenKrab doctor` 的 CLI 参考（健康检查 + 引导式修复）"
+  - ä½ é‡åˆ°è¿žæŽ¥/è®¤è¯é—®é¢˜ï¼Œéœ€è¦å¼•å¯¼å¼ä¿®å¤
+  - ä½ æ›´æ–°åŽæƒ³è¿›è¡Œå®Œæ•´æ€§æ£€æŸ¥
+summary: "`OpenKrab doctor` çš„ CLI å‚è€ƒï¼ˆå¥åº·æ£€æŸ¥ + å¼•å¯¼å¼ä¿®å¤ï¼‰"
 title: doctor
 x-i18n:
   generated_at: "2026-02-03T10:04:15Z"
@@ -15,14 +15,14 @@ x-i18n:
 
 # `OpenKrab doctor`
 
-Gateway 网关和渠道的健康检查 + 快速修复。
+Gateway ç½‘å…³å’Œæ¸ é“çš„å¥åº·æ£€æŸ¥ + å¿«é€Ÿä¿®å¤ã€‚
 
-相关内容：
+ç›¸å…³å†…å®¹ï¼š
 
-- 故障排除：[故障排除](/gateway/troubleshooting)
-- 安全审计：[安全](/gateway/security)
+- æ•…éšœæŽ’é™¤ï¼š[æ•…éšœæŽ’é™¤](/gateway/troubleshooting)
+- å®‰å…¨å®¡è®¡ï¼š[å®‰å…¨](/gateway/security)
 
-## 示例
+## ç¤ºä¾‹
 
 ```bash
 OpenKrab doctor
@@ -30,20 +30,21 @@ OpenKrab doctor --repair
 OpenKrab doctor --deep
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 交互式提示（如钥匙串/OAuth 修复）仅在 stdin 是 TTY 且**未**设置 `--non-interactive` 时运行。无头运行（cron、Telegram、无终端）将跳过提示。
-- `--fix`（`--repair` 的别名）会将备份写入 `~/.OpenKrab/OpenKrab.json.bak`，并删除未知的配置键，同时列出每个删除项。
+- äº¤äº’å¼æç¤ºï¼ˆå¦‚é’¥åŒ™ä¸²/OAuth ä¿®å¤ï¼‰ä»…åœ¨ stdin æ˜¯ TTY ä¸”**æœª**è®¾ç½® `--non-interactive` æ—¶è¿è¡Œã€‚æ— å¤´è¿è¡Œï¼ˆcronã€Telegramã€æ— ç»ˆç«¯ï¼‰å°†è·³è¿‡æç¤ºã€‚
+- `--fix`ï¼ˆ`--repair` çš„åˆ«åï¼‰ä¼šå°†å¤‡ä»½å†™å…¥ `~/.OpenKrab/OpenKrab.json.bak`ï¼Œå¹¶åˆ é™¤æœªçŸ¥çš„é…ç½®é”®ï¼ŒåŒæ—¶åˆ—å‡ºæ¯ä¸ªåˆ é™¤é¡¹ã€‚
 
-## macOS：`launchctl` 环境变量覆盖
+## macOSï¼š`launchctl` çŽ¯å¢ƒå˜é‡è¦†ç›–
 
-如果你之前运行过 `launchctl setenv OpenKrab_GATEWAY_TOKEN ...`（或 `...PASSWORD`），该值会覆盖你的配置文件，并可能导致持续的"未授权"错误。
+å¦‚æžœä½ ä¹‹å‰è¿è¡Œè¿‡ `launchctl setenv OPENKRAB_GATEWAY_TOKEN ...`ï¼ˆæˆ– `...PASSWORD`ï¼‰ï¼Œè¯¥å€¼ä¼šè¦†ç›–ä½ çš„é…ç½®æ–‡ä»¶ï¼Œå¹¶å¯èƒ½å¯¼è‡´æŒç»­çš„"æœªæŽˆæƒ"é”™è¯¯ã€‚
 
 ```bash
-launchctl getenv OpenKrab_GATEWAY_TOKEN
-launchctl getenv OpenKrab_GATEWAY_PASSWORD
+launchctl getenv OPENKRAB_GATEWAY_TOKEN
+launchctl getenv OPENKRAB_GATEWAY_PASSWORD
 
-launchctl unsetenv OpenKrab_GATEWAY_TOKEN
-launchctl unsetenv OpenKrab_GATEWAY_PASSWORD
+launchctl unsetenv OPENKRAB_GATEWAY_TOKEN
+launchctl unsetenv OPENKRAB_GATEWAY_PASSWORD
 ```
+
 

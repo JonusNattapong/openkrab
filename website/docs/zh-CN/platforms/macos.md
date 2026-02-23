@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 实现 macOS 应用功能
-  - 在 macOS 上更改 Gateway 网关生命周期或节点桥接
-summary: OpenKrab macOS 配套应用（菜单栏 + Gateway 网关代理）
-title: macOS 应用
+  - å®žçŽ° macOS åº”ç”¨åŠŸèƒ½
+  - åœ¨ macOS ä¸Šæ›´æ”¹ Gateway ç½‘å…³ç”Ÿå‘½å‘¨æœŸæˆ–èŠ‚ç‚¹æ¡¥æŽ¥
+summary: OpenKrab macOS é…å¥—åº”ç”¨ï¼ˆèœå•æ  + Gateway ç½‘å…³ä»£ç†ï¼‰
+title: macOS åº”ç”¨
 x-i18n:
   generated_at: "2026-02-03T07:53:14Z"
   model: claude-opus-4-5
@@ -13,57 +13,57 @@ x-i18n:
   workflow: 15
 ---
 
-# OpenKrab macOS 配套应用（菜单栏 + Gateway 网关代理）
+# OpenKrab macOS é…å¥—åº”ç”¨ï¼ˆèœå•æ  + Gateway ç½‘å…³ä»£ç†ï¼‰
 
-macOS 应用是 OpenKrab 的**菜单栏配套应用**。它拥有权限，在本地管理/附加到 Gateway 网关（launchd 或手动），并作为节点向智能体暴露 macOS 功能。
+macOS åº”ç”¨æ˜¯ OpenKrab çš„**èœå•æ é…å¥—åº”ç”¨**ã€‚å®ƒæ‹¥æœ‰æƒé™ï¼Œåœ¨æœ¬åœ°ç®¡ç†/é™„åŠ åˆ° Gateway ç½‘å…³ï¼ˆlaunchd æˆ–æ‰‹åŠ¨ï¼‰ï¼Œå¹¶ä½œä¸ºèŠ‚ç‚¹å‘æ™ºèƒ½ä½“æš´éœ² macOS åŠŸèƒ½ã€‚
 
-## 功能
+## åŠŸèƒ½
 
-- 在菜单栏中显示原生通知和状态。
-- 拥有 TCC 提示（通知、辅助功能、屏幕录制、麦克风、语音识别、自动化/AppleScript）。
-- 运行或连接到 Gateway 网关（本地或远程）。
-- 暴露 macOS 专用工具（Canvas、相机、屏幕录制、`system.run`）。
-- 在**远程**模式下启动本地节点主机服务（launchd），在**本地**模式下停止它。
-- 可选地托管 **PeekabooBridge** 用于 UI 自动化。
-- 根据请求通过 npm/pnpm 安装全局 CLI（`OpenKrab`）（不建议使用 bun 作为 Gateway 网关运行时）。
+- åœ¨èœå•æ ä¸­æ˜¾ç¤ºåŽŸç”Ÿé€šçŸ¥å’ŒçŠ¶æ€ã€‚
+- æ‹¥æœ‰ TCC æç¤ºï¼ˆé€šçŸ¥ã€è¾…åŠ©åŠŸèƒ½ã€å±å¹•å½•åˆ¶ã€éº¦å…‹é£Žã€è¯­éŸ³è¯†åˆ«ã€è‡ªåŠ¨åŒ–/AppleScriptï¼‰ã€‚
+- è¿è¡Œæˆ–è¿žæŽ¥åˆ° Gateway ç½‘å…³ï¼ˆæœ¬åœ°æˆ–è¿œç¨‹ï¼‰ã€‚
+- æš´éœ² macOS ä¸“ç”¨å·¥å…·ï¼ˆCanvasã€ç›¸æœºã€å±å¹•å½•åˆ¶ã€`system.run`ï¼‰ã€‚
+- åœ¨**è¿œç¨‹**æ¨¡å¼ä¸‹å¯åŠ¨æœ¬åœ°èŠ‚ç‚¹ä¸»æœºæœåŠ¡ï¼ˆlaunchdï¼‰ï¼Œåœ¨**æœ¬åœ°**æ¨¡å¼ä¸‹åœæ­¢å®ƒã€‚
+- å¯é€‰åœ°æ‰˜ç®¡ **PeekabooBridge** ç”¨äºŽ UI è‡ªåŠ¨åŒ–ã€‚
+- æ ¹æ®è¯·æ±‚é€šè¿‡ npm/pnpm å®‰è£…å…¨å±€ CLIï¼ˆ`OpenKrab`ï¼‰ï¼ˆä¸å»ºè®®ä½¿ç”¨ bun ä½œä¸º Gateway ç½‘å…³è¿è¡Œæ—¶ï¼‰ã€‚
 
-## 本地 vs 远程模式
+## æœ¬åœ° vs è¿œç¨‹æ¨¡å¼
 
-- **本地**（默认）：如果存在运行中的本地 Gateway 网关，应用附加到它；否则通过 `OpenKrab gateway install` 启用 launchd 服务。
-- **远程**：应用通过 SSH/Tailscale 连接到 Gateway 网关，从不启动本地进程。
-  应用启动本地**节点主机服务**，以便远程 Gateway 网关可以访问此 Mac。
-  应用不会将 Gateway 网关作为子进程生成。
+- **æœ¬åœ°**ï¼ˆé»˜è®¤ï¼‰ï¼šå¦‚æžœå­˜åœ¨è¿è¡Œä¸­çš„æœ¬åœ° Gateway ç½‘å…³ï¼Œåº”ç”¨é™„åŠ åˆ°å®ƒï¼›å¦åˆ™é€šè¿‡ `OpenKrab gateway install` å¯ç”¨ launchd æœåŠ¡ã€‚
+- **è¿œç¨‹**ï¼šåº”ç”¨é€šè¿‡ SSH/Tailscale è¿žæŽ¥åˆ° Gateway ç½‘å…³ï¼Œä»Žä¸å¯åŠ¨æœ¬åœ°è¿›ç¨‹ã€‚
+  åº”ç”¨å¯åŠ¨æœ¬åœ°**èŠ‚ç‚¹ä¸»æœºæœåŠ¡**ï¼Œä»¥ä¾¿è¿œç¨‹ Gateway ç½‘å…³å¯ä»¥è®¿é—®æ­¤ Macã€‚
+  åº”ç”¨ä¸ä¼šå°† Gateway ç½‘å…³ä½œä¸ºå­è¿›ç¨‹ç”Ÿæˆã€‚
 
-## Launchd 控制
+## Launchd æŽ§åˆ¶
 
-应用管理一个标记为 `bot.molt.gateway` 的每用户 LaunchAgent（使用 `--profile`/`OpenKrab_PROFILE` 时为 `bot.molt.<profile>`；旧版 `com.OpenKrab.*` 仍会卸载）。
+åº”ç”¨ç®¡ç†ä¸€ä¸ªæ ‡è®°ä¸º `bot.molt.gateway` çš„æ¯ç”¨æˆ· LaunchAgentï¼ˆä½¿ç”¨ `--profile`/`OPENKRAB_PROFILE` æ—¶ä¸º `bot.molt.<profile>`ï¼›æ—§ç‰ˆ `com.OpenKrab.*` ä»ä¼šå¸è½½ï¼‰ã€‚
 
 ```bash
 launchctl kickstart -k gui/$UID/bot.molt.gateway
 launchctl bootout gui/$UID/bot.molt.gateway
 ```
 
-运行命名配置文件时，将标签替换为 `bot.molt.<profile>`。
+è¿è¡Œå‘½åé…ç½®æ–‡ä»¶æ—¶ï¼Œå°†æ ‡ç­¾æ›¿æ¢ä¸º `bot.molt.<profile>`ã€‚
 
-如果 LaunchAgent 未安装，从应用中启用它或运行 `OpenKrab gateway install`。
+å¦‚æžœ LaunchAgent æœªå®‰è£…ï¼Œä»Žåº”ç”¨ä¸­å¯ç”¨å®ƒæˆ–è¿è¡Œ `OpenKrab gateway install`ã€‚
 
-## 节点功能（mac）
+## èŠ‚ç‚¹åŠŸèƒ½ï¼ˆmacï¼‰
 
-macOS 应用将自身呈现为一个节点。常用命令：
+macOS åº”ç”¨å°†è‡ªèº«å‘ˆçŽ°ä¸ºä¸€ä¸ªèŠ‚ç‚¹ã€‚å¸¸ç”¨å‘½ä»¤ï¼š
 
-- Canvas：`canvas.present`、`canvas.navigate`、`canvas.eval`、`canvas.snapshot`、`canvas.a2ui.*`
-- 相机：`camera.snap`、`camera.clip`
-- 屏幕：`screen.record`
-- 系统：`system.run`、`system.notify`
+- Canvasï¼š`canvas.present`ã€`canvas.navigate`ã€`canvas.eval`ã€`canvas.snapshot`ã€`canvas.a2ui.*`
+- ç›¸æœºï¼š`camera.snap`ã€`camera.clip`
+- å±å¹•ï¼š`screen.record`
+- ç³»ç»Ÿï¼š`system.run`ã€`system.notify`
 
-节点报告一个 `permissions` 映射，以便智能体可以决定什么是允许的。
+èŠ‚ç‚¹æŠ¥å‘Šä¸€ä¸ª `permissions` æ˜ å°„ï¼Œä»¥ä¾¿æ™ºèƒ½ä½“å¯ä»¥å†³å®šä»€ä¹ˆæ˜¯å…è®¸çš„ã€‚
 
-节点服务 + 应用 IPC：
+èŠ‚ç‚¹æœåŠ¡ + åº”ç”¨ IPCï¼š
 
-- 当无头节点主机服务运行时（远程模式），它作为节点连接到 Gateway 网关 WS。
-- `system.run` 在 macOS 应用中执行（UI/TCC 上下文）通过本地 Unix 套接字；提示 + 输出保留在应用内。
+- å½“æ— å¤´èŠ‚ç‚¹ä¸»æœºæœåŠ¡è¿è¡Œæ—¶ï¼ˆè¿œç¨‹æ¨¡å¼ï¼‰ï¼Œå®ƒä½œä¸ºèŠ‚ç‚¹è¿žæŽ¥åˆ° Gateway ç½‘å…³ WSã€‚
+- `system.run` åœ¨ macOS åº”ç”¨ä¸­æ‰§è¡Œï¼ˆUI/TCC ä¸Šä¸‹æ–‡ï¼‰é€šè¿‡æœ¬åœ° Unix å¥—æŽ¥å­—ï¼›æç¤º + è¾“å‡ºä¿ç•™åœ¨åº”ç”¨å†…ã€‚
 
-图示（SCI）：
+å›¾ç¤ºï¼ˆSCIï¼‰ï¼š
 
 ```
 Gateway -> Node Service (WS)
@@ -72,15 +72,15 @@ Gateway -> Node Service (WS)
              Mac App (UI + TCC + system.run)
 ```
 
-## Exec 审批（system.run）
+## Exec å®¡æ‰¹ï¼ˆsystem.runï¼‰
 
-`system.run` 由 macOS 应用中的 **Exec 审批**控制（设置 → Exec approvals）。安全 + 询问 + 允许列表本地存储在 Mac 上：
+`system.run` ç”± macOS åº”ç”¨ä¸­çš„ **Exec å®¡æ‰¹**æŽ§åˆ¶ï¼ˆè®¾ç½® â†’ Exec approvalsï¼‰ã€‚å®‰å…¨ + è¯¢é—® + å…è®¸åˆ—è¡¨æœ¬åœ°å­˜å‚¨åœ¨ Mac ä¸Šï¼š
 
 ```
 ~/.OpenKrab/exec-approvals.json
 ```
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```json
 {
@@ -99,54 +99,54 @@ Gateway -> Node Service (WS)
 }
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `allowlist` 条目是解析后二进制路径的 glob 模式。
-- 在提示中选择"Always Allow"会将该命令添加到允许列表。
-- `system.run` 环境覆盖会被过滤（删除 `PATH`、`DYLD_*`、`LD_*`、`NODE_OPTIONS`、`PYTHON*`、`PERL*`、`RUBYOPT`），然后与应用的环境合并。
+- `allowlist` æ¡ç›®æ˜¯è§£æžåŽäºŒè¿›åˆ¶è·¯å¾„çš„ glob æ¨¡å¼ã€‚
+- åœ¨æç¤ºä¸­é€‰æ‹©"Always Allow"ä¼šå°†è¯¥å‘½ä»¤æ·»åŠ åˆ°å…è®¸åˆ—è¡¨ã€‚
+- `system.run` çŽ¯å¢ƒè¦†ç›–ä¼šè¢«è¿‡æ»¤ï¼ˆåˆ é™¤ `PATH`ã€`DYLD_*`ã€`LD_*`ã€`NODE_OPTIONS`ã€`PYTHON*`ã€`PERL*`ã€`RUBYOPT`ï¼‰ï¼Œç„¶åŽä¸Žåº”ç”¨çš„çŽ¯å¢ƒåˆå¹¶ã€‚
 
-## 深度链接
+## æ·±åº¦é“¾æŽ¥
 
-应用为本地操作注册 `OpenKrab://` URL 方案。
+åº”ç”¨ä¸ºæœ¬åœ°æ“ä½œæ³¨å†Œ `OpenKrab://` URL æ–¹æ¡ˆã€‚
 
 ### `OpenKrab://agent`
 
-触发 Gateway 网关 `agent` 请求。
+è§¦å‘ Gateway ç½‘å…³ `agent` è¯·æ±‚ã€‚
 
 ```bash
 open 'OpenKrab://agent?message=Hello%20from%20deep%20link'
 ```
 
-查询参数：
+æŸ¥è¯¢å‚æ•°ï¼š
 
-- `message`（必需）
-- `sessionKey`（可选）
-- `thinking`（可选）
-- `deliver` / `to` / `channel`（可选）
-- `timeoutSeconds`（可选）
-- `key`（可选无人值守模式密钥）
+- `message`ï¼ˆå¿…éœ€ï¼‰
+- `sessionKey`ï¼ˆå¯é€‰ï¼‰
+- `thinking`ï¼ˆå¯é€‰ï¼‰
+- `deliver` / `to` / `channel`ï¼ˆå¯é€‰ï¼‰
+- `timeoutSeconds`ï¼ˆå¯é€‰ï¼‰
+- `key`ï¼ˆå¯é€‰æ— äººå€¼å®ˆæ¨¡å¼å¯†é’¥ï¼‰
 
-安全：
+å®‰å…¨ï¼š
 
-- 没有 `key` 时，应用会提示确认。
-- 有有效的 `key` 时，运行是无人值守的（用于个人自动化）。
+- æ²¡æœ‰ `key` æ—¶ï¼Œåº”ç”¨ä¼šæç¤ºç¡®è®¤ã€‚
+- æœ‰æœ‰æ•ˆçš„ `key` æ—¶ï¼Œè¿è¡Œæ˜¯æ— äººå€¼å®ˆçš„ï¼ˆç”¨äºŽä¸ªäººè‡ªåŠ¨åŒ–ï¼‰ã€‚
 
-## 新手引导流程（典型）
+## æ–°æ‰‹å¼•å¯¼æµç¨‹ï¼ˆå…¸åž‹ï¼‰
 
-1. 安装并启动 **OpenKrab.app**。
-2. 完成权限清单（TCC 提示）。
-3. 确保**本地**模式处于活动状态且 Gateway 网关正在运行。
-4. 如果你想要终端访问，安装 CLI。
+1. å®‰è£…å¹¶å¯åŠ¨ **OpenKrab.app**ã€‚
+2. å®Œæˆæƒé™æ¸…å•ï¼ˆTCC æç¤ºï¼‰ã€‚
+3. ç¡®ä¿**æœ¬åœ°**æ¨¡å¼å¤„äºŽæ´»åŠ¨çŠ¶æ€ä¸” Gateway ç½‘å…³æ­£åœ¨è¿è¡Œã€‚
+4. å¦‚æžœä½ æƒ³è¦ç»ˆç«¯è®¿é—®ï¼Œå®‰è£… CLIã€‚
 
-## 构建和开发工作流程（原生）
+## æž„å»ºå’Œå¼€å‘å·¥ä½œæµç¨‹ï¼ˆåŽŸç”Ÿï¼‰
 
 - `cd apps/macos && swift build`
-- `swift run OpenKrab`（或 Xcode）
-- 打包应用：`scripts/package-mac-app.sh`
+- `swift run OpenKrab`ï¼ˆæˆ– Xcodeï¼‰
+- æ‰“åŒ…åº”ç”¨ï¼š`scripts/package-mac-app.sh`
 
-## 调试 Gateway 网关连接（macOS CLI）
+## è°ƒè¯• Gateway ç½‘å…³è¿žæŽ¥ï¼ˆmacOS CLIï¼‰
 
-使用调试 CLI 来执行与 macOS 应用使用的相同的 Gateway 网关 WebSocket 握手和发现逻辑，而无需启动应用。
+ä½¿ç”¨è°ƒè¯• CLI æ¥æ‰§è¡Œä¸Ž macOS åº”ç”¨ä½¿ç”¨çš„ç›¸åŒçš„ Gateway ç½‘å…³ WebSocket æ¡æ‰‹å’Œå‘çŽ°é€»è¾‘ï¼Œè€Œæ— éœ€å¯åŠ¨åº”ç”¨ã€‚
 
 ```bash
 cd apps/macos
@@ -154,41 +154,42 @@ swift run OpenKrab-mac connect --json
 swift run OpenKrab-mac discover --timeout 3000 --json
 ```
 
-Connect 选项：
+Connect é€‰é¡¹ï¼š
 
-- `--url <ws://host:port>`：覆盖配置
-- `--mode <local|remote>`：从配置解析（默认：配置或 local）
-- `--probe`：强制进行新的健康探测
-- `--timeout <ms>`：请求超时（默认：`15000`）
-- `--json`：用于比较的结构化输出
+- `--url <ws://host:port>`ï¼šè¦†ç›–é…ç½®
+- `--mode <local|remote>`ï¼šä»Žé…ç½®è§£æžï¼ˆé»˜è®¤ï¼šé…ç½®æˆ– localï¼‰
+- `--probe`ï¼šå¼ºåˆ¶è¿›è¡Œæ–°çš„å¥åº·æŽ¢æµ‹
+- `--timeout <ms>`ï¼šè¯·æ±‚è¶…æ—¶ï¼ˆé»˜è®¤ï¼š`15000`ï¼‰
+- `--json`ï¼šç”¨äºŽæ¯”è¾ƒçš„ç»“æž„åŒ–è¾“å‡º
 
-Discovery 选项：
+Discovery é€‰é¡¹ï¼š
 
-- `--include-local`：包含会被过滤为"本地"的 Gateway 网关
-- `--timeout <ms>`：总体发现窗口（默认：`2000`）
-- `--json`：用于比较的结构化输出
+- `--include-local`ï¼šåŒ…å«ä¼šè¢«è¿‡æ»¤ä¸º"æœ¬åœ°"çš„ Gateway ç½‘å…³
+- `--timeout <ms>`ï¼šæ€»ä½“å‘çŽ°çª—å£ï¼ˆé»˜è®¤ï¼š`2000`ï¼‰
+- `--json`ï¼šç”¨äºŽæ¯”è¾ƒçš„ç»“æž„åŒ–è¾“å‡º
 
-提示：与 `OpenKrab gateway discover --json` 比较，查看 macOS 应用的发现管道（NWBrowser + tailnet DNS-SD 回退）是否与 Node CLI 基于 `dns-sd` 的发现不同。
+æç¤ºï¼šä¸Ž `OpenKrab gateway discover --json` æ¯”è¾ƒï¼ŒæŸ¥çœ‹ macOS åº”ç”¨çš„å‘çŽ°ç®¡é“ï¼ˆNWBrowser + tailnet DNS-SD å›žé€€ï¼‰æ˜¯å¦ä¸Ž Node CLI åŸºäºŽ `dns-sd` çš„å‘çŽ°ä¸åŒã€‚
 
-## 远程连接管道（SSH 隧道）
+## è¿œç¨‹è¿žæŽ¥ç®¡é“ï¼ˆSSH éš§é“ï¼‰
 
-当 macOS 应用在**远程**模式下运行时，它会打开一个 SSH 隧道，以便本地 UI 组件可以像在 localhost 上一样与远程 Gateway 网关通信。
+å½“ macOS åº”ç”¨åœ¨**è¿œç¨‹**æ¨¡å¼ä¸‹è¿è¡Œæ—¶ï¼Œå®ƒä¼šæ‰“å¼€ä¸€ä¸ª SSH éš§é“ï¼Œä»¥ä¾¿æœ¬åœ° UI ç»„ä»¶å¯ä»¥åƒåœ¨ localhost ä¸Šä¸€æ ·ä¸Žè¿œç¨‹ Gateway ç½‘å…³é€šä¿¡ã€‚
 
-### 控制隧道（Gateway 网关 WebSocket 端口）
+### æŽ§åˆ¶éš§é“ï¼ˆGateway ç½‘å…³ WebSocket ç«¯å£ï¼‰
 
-- **目的：**健康检查、状态、Web Chat、配置和其他控制平面调用。
-- **本地端口：**Gateway 网关端口（默认 `18789`），始终稳定。
-- **远程端口：**远程主机上的相同 Gateway 网关端口。
-- **行为：**无随机本地端口；应用复用现有的健康隧道或在需要时重启它。
-- **SSH 形式：**`ssh -N -L <local>:127.0.0.1:<remote>`，带有 BatchMode + ExitOnForwardFailure + keepalive 选项。
-- **IP 报告：**SSH 隧道使用 loopback，因此 Gateway 网关将看到节点 IP 为 `127.0.0.1`。如果你想要显示真实的客户端 IP，请使用 **Direct (ws/wss)** 传输（参见 [macOS 远程访问](/platforms/mac/remote)）。
+- **ç›®çš„ï¼š**å¥åº·æ£€æŸ¥ã€çŠ¶æ€ã€Web Chatã€é…ç½®å’Œå…¶ä»–æŽ§åˆ¶å¹³é¢è°ƒç”¨ã€‚
+- **æœ¬åœ°ç«¯å£ï¼š**Gateway ç½‘å…³ç«¯å£ï¼ˆé»˜è®¤ `18789`ï¼‰ï¼Œå§‹ç»ˆç¨³å®šã€‚
+- **è¿œç¨‹ç«¯å£ï¼š**è¿œç¨‹ä¸»æœºä¸Šçš„ç›¸åŒ Gateway ç½‘å…³ç«¯å£ã€‚
+- **è¡Œä¸ºï¼š**æ— éšæœºæœ¬åœ°ç«¯å£ï¼›åº”ç”¨å¤ç”¨çŽ°æœ‰çš„å¥åº·éš§é“æˆ–åœ¨éœ€è¦æ—¶é‡å¯å®ƒã€‚
+- **SSH å½¢å¼ï¼š**`ssh -N -L <local>:127.0.0.1:<remote>`ï¼Œå¸¦æœ‰ BatchMode + ExitOnForwardFailure + keepalive é€‰é¡¹ã€‚
+- **IP æŠ¥å‘Šï¼š**SSH éš§é“ä½¿ç”¨ loopbackï¼Œå› æ­¤ Gateway ç½‘å…³å°†çœ‹åˆ°èŠ‚ç‚¹ IP ä¸º `127.0.0.1`ã€‚å¦‚æžœä½ æƒ³è¦æ˜¾ç¤ºçœŸå®žçš„å®¢æˆ·ç«¯ IPï¼Œè¯·ä½¿ç”¨ **Direct (ws/wss)** ä¼ è¾“ï¼ˆå‚è§ [macOS è¿œç¨‹è®¿é—®](/platforms/mac/remote)ï¼‰ã€‚
 
-有关设置步骤，请参阅 [macOS 远程访问](/platforms/mac/remote)。有关协议详情，请参阅 [Gateway 网关协议](/gateway/protocol)。
+æœ‰å…³è®¾ç½®æ­¥éª¤ï¼Œè¯·å‚é˜… [macOS è¿œç¨‹è®¿é—®](/platforms/mac/remote)ã€‚æœ‰å…³åè®®è¯¦æƒ…ï¼Œè¯·å‚é˜… [Gateway ç½‘å…³åè®®](/gateway/protocol)ã€‚
 
-## 相关文档
+## ç›¸å…³æ–‡æ¡£
 
-- [Gateway 网关运维手册](/gateway)
-- [Gateway 网关（macOS）](/platforms/mac/bundled-gateway)
-- [macOS 权限](/platforms/mac/permissions)
+- [Gateway ç½‘å…³è¿ç»´æ‰‹å†Œ](/gateway)
+- [Gateway ç½‘å…³ï¼ˆmacOSï¼‰](/platforms/mac/bundled-gateway)
+- [macOS æƒé™](/platforms/mac/permissions)
 - [Canvas](/platforms/mac/canvas)
+
 

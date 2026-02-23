@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 // ─── Hook event ───────────────────────────────────────────────────────────────
 
-/// Well-known lifecycle event names (mirrors openclaw hook events).
+/// Well-known lifecycle event names (mirrors OpenKrab hook events).
 pub mod events {
     pub const MESSAGE_INBOUND: &str = "message:inbound";
     pub const MESSAGE_OUTBOUND: &str = "message:outbound";
@@ -202,3 +202,4 @@ mod tests {
         reg.emit("unknown:event", &p); // should not panic
     }
 }
+

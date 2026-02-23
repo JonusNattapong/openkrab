@@ -99,7 +99,7 @@ fn run_voice_action(action: &str, payload: &Value) -> Result<Value> {
             let wake_phrase = payload
                 .get("wake_phrase")
                 .and_then(Value::as_str)
-                .unwrap_or("hey krabkrab");
+                .unwrap_or("hey openkrab");
             let is_awake = payload
                 .get("is_awake")
                 .and_then(Value::as_bool)
@@ -506,7 +506,7 @@ fn run_macos_feature(action: &str, payload: &Value) -> Result<Value> {
             let title = payload
                 .get("title")
                 .and_then(Value::as_str)
-                .unwrap_or("KrabKrab");
+                .unwrap_or("openkrab");
             let body = payload.get("body").and_then(Value::as_str).unwrap_or("");
             let sound = payload
                 .get("sound")
@@ -951,7 +951,7 @@ mod tests {
         let out = bridge_command(
             "voice",
             Some("detect"),
-            Some(r#"{"transcript":"hey krabkrab open calendar","wake_phrase":"hey krabkrab","is_awake":false}"#),
+            Some(r#"{"transcript":"hey openkrab open calendar","wake_phrase":"hey openkrab","is_awake":false}"#),
             Some("rust"),
         )
         .unwrap();
@@ -1033,3 +1033,4 @@ mod tests {
         assert!(out.contains("imessage parser executed"));
     }
 }
+

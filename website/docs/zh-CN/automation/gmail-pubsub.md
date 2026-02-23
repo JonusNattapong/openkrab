@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 将 Gmail 收件箱触发器接入 OpenKrab
-  - 为智能体唤醒设置 Pub/Sub 推送
-summary: 通过 gogcli 将 Gmail Pub/Sub 推送接入 OpenKrab webhooks
+  - å°† Gmail æ”¶ä»¶ç®±è§¦å‘å™¨æŽ¥å…¥ OpenKrab
+  - ä¸ºæ™ºèƒ½ä½“å”¤é†’è®¾ç½® Pub/Sub æŽ¨é€
+summary: é€šè¿‡ gogcli å°† Gmail Pub/Sub æŽ¨é€æŽ¥å…¥ OpenKrab webhooks
 title: Gmail PubSub
 x-i18n:
   generated_at: "2026-02-03T07:43:25Z"
@@ -15,37 +15,37 @@ x-i18n:
 
 # Gmail Pub/Sub -> OpenKrab
 
-目标：Gmail watch -> Pub/Sub 推送 -> `gog gmail watch serve` -> OpenKrab webhook。
+ç›®æ ‡ï¼šGmail watch -> Pub/Sub æŽ¨é€ -> `gog gmail watch serve` -> OpenKrab webhookã€‚
 
-## 前置条件
+## å‰ç½®æ¡ä»¶
 
-- 已安装并登录 `gcloud`（[安装指南](https://docs.cloud.google.com/sdk/docs/install-sdk)）。
-- 已安装 `gog` (gogcli) 并为 Gmail 账户授权（[gogcli.sh](https://gogcli.sh/)）。
-- 已启用 OpenKrab hooks（参见 [Webhooks](/automation/webhook)）。
-- 已登录 `tailscale`（[tailscale.com](https://tailscale.com/)）。支持的设置使用 Tailscale Funnel 作为公共 HTTPS 端点。
-  其他隧道服务也可以使用，但需要自行配置/不受支持，需要手动接入。
-  目前，我们支持的是 Tailscale。
+- å·²å®‰è£…å¹¶ç™»å½• `gcloud`ï¼ˆ[å®‰è£…æŒ‡å—](https://docs.cloud.google.com/sdk/docs/install-sdk)ï¼‰ã€‚
+- å·²å®‰è£… `gog` (gogcli) å¹¶ä¸º Gmail è´¦æˆ·æŽˆæƒï¼ˆ[gogcli.sh](https://gogcli.sh/)ï¼‰ã€‚
+- å·²å¯ç”¨ OpenKrab hooksï¼ˆå‚è§ [Webhooks](/automation/webhook)ï¼‰ã€‚
+- å·²ç™»å½• `tailscale`ï¼ˆ[tailscale.com](https://tailscale.com/)ï¼‰ã€‚æ”¯æŒçš„è®¾ç½®ä½¿ç”¨ Tailscale Funnel ä½œä¸ºå…¬å…± HTTPS ç«¯ç‚¹ã€‚
+  å…¶ä»–éš§é“æœåŠ¡ä¹Ÿå¯ä»¥ä½¿ç”¨ï¼Œä½†éœ€è¦è‡ªè¡Œé…ç½®/ä¸å—æ”¯æŒï¼Œéœ€è¦æ‰‹åŠ¨æŽ¥å…¥ã€‚
+  ç›®å‰ï¼Œæˆ‘ä»¬æ”¯æŒçš„æ˜¯ Tailscaleã€‚
 
-示例 hook 配置（启用 Gmail 预设映射）：
+ç¤ºä¾‹ hook é…ç½®ï¼ˆå¯ç”¨ Gmail é¢„è®¾æ˜ å°„ï¼‰ï¼š
 
 ```json5
 {
   hooks: {
     enabled: true,
-    token: "OpenKrab_HOOK_TOKEN",
+    token: "OPENKRAB_HOOK_TOKEN",
     path: "/hooks",
     presets: ["gmail"],
   },
 }
 ```
 
-要将 Gmail 摘要投递到聊天界面，请用设置了 `deliver` 以及可选的 `channel`/`to` 的映射覆盖预设：
+è¦å°† Gmail æ‘˜è¦æŠ•é€’åˆ°èŠå¤©ç•Œé¢ï¼Œè¯·ç”¨è®¾ç½®äº† `deliver` ä»¥åŠå¯é€‰çš„ `channel`/`to` çš„æ˜ å°„è¦†ç›–é¢„è®¾ï¼š
 
 ```json5
 {
   hooks: {
     enabled: true,
-    token: "OpenKrab_HOOK_TOKEN",
+    token: "OPENKRAB_HOOK_TOKEN",
     presets: ["gmail"],
     mappings: [
       {
@@ -65,11 +65,11 @@ x-i18n:
 }
 ```
 
-如果你想使用固定渠道，请设置 `channel` + `to`。否则 `channel: "last"` 会使用上次的投递路由（默认回退到 WhatsApp）。
+å¦‚æžœä½ æƒ³ä½¿ç”¨å›ºå®šæ¸ é“ï¼Œè¯·è®¾ç½® `channel` + `to`ã€‚å¦åˆ™ `channel: "last"` ä¼šä½¿ç”¨ä¸Šæ¬¡çš„æŠ•é€’è·¯ç”±ï¼ˆé»˜è®¤å›žé€€åˆ° WhatsAppï¼‰ã€‚
 
-要为 Gmail 运行强制使用更便宜的模型，请在映射中设置 `model`（`provider/model` 或别名）。如果你强制启用了 `agents.defaults.models`，请将其包含在内。
+è¦ä¸º Gmail è¿è¡Œå¼ºåˆ¶ä½¿ç”¨æ›´ä¾¿å®œçš„æ¨¡åž‹ï¼Œè¯·åœ¨æ˜ å°„ä¸­è®¾ç½® `model`ï¼ˆ`provider/model` æˆ–åˆ«åï¼‰ã€‚å¦‚æžœä½ å¼ºåˆ¶å¯ç”¨äº† `agents.defaults.models`ï¼Œè¯·å°†å…¶åŒ…å«åœ¨å†…ã€‚
 
-要专门为 Gmail hooks 设置默认模型和思考级别，请在配置中添加 `hooks.gmail.model` / `hooks.gmail.thinking`：
+è¦ä¸“é—¨ä¸º Gmail hooks è®¾ç½®é»˜è®¤æ¨¡åž‹å’Œæ€è€ƒçº§åˆ«ï¼Œè¯·åœ¨é…ç½®ä¸­æ·»åŠ  `hooks.gmail.model` / `hooks.gmail.thinking`ï¼š
 
 ```json5
 {
@@ -82,74 +82,74 @@ x-i18n:
 }
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 映射中的每个 hook 的 `model`/`thinking` 仍会覆盖这些默认值。
-- 回退顺序：`hooks.gmail.model` → `agents.defaults.model.fallbacks` → 主模型（认证/速率限制/超时）。
-- 如果设置了 `agents.defaults.models`，Gmail 模型必须在允许列表中。
-- Gmail hook 内容默认使用外部内容安全边界包装。
-  要禁用（危险），请设置 `hooks.gmail.allowUnsafeExternalContent: true`。
+- æ˜ å°„ä¸­çš„æ¯ä¸ª hook çš„ `model`/`thinking` ä»ä¼šè¦†ç›–è¿™äº›é»˜è®¤å€¼ã€‚
+- å›žé€€é¡ºåºï¼š`hooks.gmail.model` â†’ `agents.defaults.model.fallbacks` â†’ ä¸»æ¨¡åž‹ï¼ˆè®¤è¯/é€ŸçŽ‡é™åˆ¶/è¶…æ—¶ï¼‰ã€‚
+- å¦‚æžœè®¾ç½®äº† `agents.defaults.models`ï¼ŒGmail æ¨¡åž‹å¿…é¡»åœ¨å…è®¸åˆ—è¡¨ä¸­ã€‚
+- Gmail hook å†…å®¹é»˜è®¤ä½¿ç”¨å¤–éƒ¨å†…å®¹å®‰å…¨è¾¹ç•ŒåŒ…è£…ã€‚
+  è¦ç¦ç”¨ï¼ˆå±é™©ï¼‰ï¼Œè¯·è®¾ç½® `hooks.gmail.allowUnsafeExternalContent: true`ã€‚
 
-要进一步自定义负载处理，请添加 `hooks.mappings` 或在 `hooks.transformsDir` 下添加 JS/TS 转换模块（参见 [Webhooks](/automation/webhook)）。
+è¦è¿›ä¸€æ­¥è‡ªå®šä¹‰è´Ÿè½½å¤„ç†ï¼Œè¯·æ·»åŠ  `hooks.mappings` æˆ–åœ¨ `hooks.transformsDir` ä¸‹æ·»åŠ  JS/TS è½¬æ¢æ¨¡å—ï¼ˆå‚è§ [Webhooks](/automation/webhook)ï¼‰ã€‚
 
-## 向导（推荐）
+## å‘å¯¼ï¼ˆæŽ¨èï¼‰
 
-使用 OpenKrab 助手将所有内容接入在一起（在 macOS 上通过 brew 安装依赖）：
+ä½¿ç”¨ OpenKrab åŠ©æ‰‹å°†æ‰€æœ‰å†…å®¹æŽ¥å…¥åœ¨ä¸€èµ·ï¼ˆåœ¨ macOS ä¸Šé€šè¿‡ brew å®‰è£…ä¾èµ–ï¼‰ï¼š
 
 ```bash
 OpenKrab webhooks gmail setup \
   --account OpenKrab@gmail.com
 ```
 
-默认设置：
+é»˜è®¤è®¾ç½®ï¼š
 
-- 使用 Tailscale Funnel 作为公共推送端点。
-- 为 `OpenKrab webhooks gmail run` 写入 `hooks.gmail` 配置。
-- 启用 Gmail hook 预设（`hooks.presets: ["gmail"]`）。
+- ä½¿ç”¨ Tailscale Funnel ä½œä¸ºå…¬å…±æŽ¨é€ç«¯ç‚¹ã€‚
+- ä¸º `OpenKrab webhooks gmail run` å†™å…¥ `hooks.gmail` é…ç½®ã€‚
+- å¯ç”¨ Gmail hook é¢„è®¾ï¼ˆ`hooks.presets: ["gmail"]`ï¼‰ã€‚
 
-路径说明：当启用 `tailscale.mode` 时，OpenKrab 会自动将 `hooks.gmail.serve.path` 设置为 `/`，并将公共路径保持在 `hooks.gmail.tailscale.path`（默认 `/gmail-pubsub`），因为 Tailscale 在代理之前会剥离设置的路径前缀。
-如果你需要后端接收带前缀的路径，请将 `hooks.gmail.tailscale.target`（或 `--tailscale-target`）设置为完整 URL，如 `http://127.0.0.1:8788/gmail-pubsub`，并匹配 `hooks.gmail.serve.path`。
+è·¯å¾„è¯´æ˜Žï¼šå½“å¯ç”¨ `tailscale.mode` æ—¶ï¼ŒOpenKrab ä¼šè‡ªåŠ¨å°† `hooks.gmail.serve.path` è®¾ç½®ä¸º `/`ï¼Œå¹¶å°†å…¬å…±è·¯å¾„ä¿æŒåœ¨ `hooks.gmail.tailscale.path`ï¼ˆé»˜è®¤ `/gmail-pubsub`ï¼‰ï¼Œå› ä¸º Tailscale åœ¨ä»£ç†ä¹‹å‰ä¼šå‰¥ç¦»è®¾ç½®çš„è·¯å¾„å‰ç¼€ã€‚
+å¦‚æžœä½ éœ€è¦åŽç«¯æŽ¥æ”¶å¸¦å‰ç¼€çš„è·¯å¾„ï¼Œè¯·å°† `hooks.gmail.tailscale.target`ï¼ˆæˆ– `--tailscale-target`ï¼‰è®¾ç½®ä¸ºå®Œæ•´ URLï¼Œå¦‚ `http://127.0.0.1:8788/gmail-pubsub`ï¼Œå¹¶åŒ¹é… `hooks.gmail.serve.path`ã€‚
 
-想要自定义端点？使用 `--push-endpoint <url>` 或 `--tailscale off`。
+æƒ³è¦è‡ªå®šä¹‰ç«¯ç‚¹ï¼Ÿä½¿ç”¨ `--push-endpoint <url>` æˆ– `--tailscale off`ã€‚
 
-平台说明：在 macOS 上，向导通过 Homebrew 安装 `gcloud`、`gogcli` 和 `tailscale`；在 Linux 上请先手动安装它们。
+å¹³å°è¯´æ˜Žï¼šåœ¨ macOS ä¸Šï¼Œå‘å¯¼é€šè¿‡ Homebrew å®‰è£… `gcloud`ã€`gogcli` å’Œ `tailscale`ï¼›åœ¨ Linux ä¸Šè¯·å…ˆæ‰‹åŠ¨å®‰è£…å®ƒä»¬ã€‚
 
-Gateway 网关自动启动（推荐）：
+Gateway ç½‘å…³è‡ªåŠ¨å¯åŠ¨ï¼ˆæŽ¨èï¼‰ï¼š
 
-- 当 `hooks.enabled=true` 且设置了 `hooks.gmail.account` 时，Gateway 网关会在启动时运行 `gog gmail watch serve` 并自动续期 watch。
-- 设置 `OpenKrab_SKIP_GMAIL_WATCHER=1` 可退出（如果你自己运行守护进程则很有用）。
-- 不要同时运行手动守护进程，否则会遇到 `listen tcp 127.0.0.1:8788: bind: address already in use`。
+- å½“ `hooks.enabled=true` ä¸”è®¾ç½®äº† `hooks.gmail.account` æ—¶ï¼ŒGateway ç½‘å…³ä¼šåœ¨å¯åŠ¨æ—¶è¿è¡Œ `gog gmail watch serve` å¹¶è‡ªåŠ¨ç»­æœŸ watchã€‚
+- è®¾ç½® `OPENKRAB_SKIP_GMAIL_WATCHER=1` å¯é€€å‡ºï¼ˆå¦‚æžœä½ è‡ªå·±è¿è¡Œå®ˆæŠ¤è¿›ç¨‹åˆ™å¾ˆæœ‰ç”¨ï¼‰ã€‚
+- ä¸è¦åŒæ—¶è¿è¡Œæ‰‹åŠ¨å®ˆæŠ¤è¿›ç¨‹ï¼Œå¦åˆ™ä¼šé‡åˆ° `listen tcp 127.0.0.1:8788: bind: address already in use`ã€‚
 
-手动守护进程（启动 `gog gmail watch serve` + 自动续期）：
+æ‰‹åŠ¨å®ˆæŠ¤è¿›ç¨‹ï¼ˆå¯åŠ¨ `gog gmail watch serve` + è‡ªåŠ¨ç»­æœŸï¼‰ï¼š
 
 ```bash
 OpenKrab webhooks gmail run
 ```
 
-## 一次性设置
+## ä¸€æ¬¡æ€§è®¾ç½®
 
-1. 选择**拥有 `gog` 使用的 OAuth 客户端**的 GCP 项目。
+1. é€‰æ‹©**æ‹¥æœ‰ `gog` ä½¿ç”¨çš„ OAuth å®¢æˆ·ç«¯**çš„ GCP é¡¹ç›®ã€‚
 
 ```bash
 gcloud auth login
 gcloud config set project <project-id>
 ```
 
-注意：Gmail watch 要求 Pub/Sub 主题与 OAuth 客户端位于同一项目中。
+æ³¨æ„ï¼šGmail watch è¦æ±‚ Pub/Sub ä¸»é¢˜ä¸Ž OAuth å®¢æˆ·ç«¯ä½äºŽåŒä¸€é¡¹ç›®ä¸­ã€‚
 
-2. 启用 API：
+2. å¯ç”¨ APIï¼š
 
 ```bash
 gcloud services enable gmail.googleapis.com pubsub.googleapis.com
 ```
 
-3. 创建主题：
+3. åˆ›å»ºä¸»é¢˜ï¼š
 
 ```bash
 gcloud pubsub topics create gog-gmail-watch
 ```
 
-4. 允许 Gmail push 发布：
+4. å…è®¸ Gmail push å‘å¸ƒï¼š
 
 ```bash
 gcloud pubsub topics add-iam-policy-binding gog-gmail-watch \
@@ -157,7 +157,7 @@ gcloud pubsub topics add-iam-policy-binding gog-gmail-watch \
   --role=roles/pubsub.publisher
 ```
 
-## 启动 watch
+## å¯åŠ¨ watch
 
 ```bash
 gog gmail watch start \
@@ -166,11 +166,11 @@ gog gmail watch start \
   --topic projects/<project-id>/topics/gog-gmail-watch
 ```
 
-保存输出中的 `history_id`（用于调试）。
+ä¿å­˜è¾“å‡ºä¸­çš„ `history_id`ï¼ˆç”¨äºŽè°ƒè¯•ï¼‰ã€‚
 
-## 运行推送处理程序
+## è¿è¡ŒæŽ¨é€å¤„ç†ç¨‹åº
 
-本地示例（共享 token 认证）：
+æœ¬åœ°ç¤ºä¾‹ï¼ˆå…±äº« token è®¤è¯ï¼‰ï¼š
 
 ```bash
 gog gmail watch serve \
@@ -180,28 +180,28 @@ gog gmail watch serve \
   --path /gmail-pubsub \
   --token <shared> \
   --hook-url http://127.0.0.1:18789/hooks/gmail \
-  --hook-token OpenKrab_HOOK_TOKEN \
+  --hook-token OPENKRAB_HOOK_TOKEN \
   --include-body \
   --max-bytes 20000
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `--token` 保护推送端点（`x-gog-token` 或 `?token=`）。
-- `--hook-url` 指向 OpenKrab `/hooks/gmail`（已映射；隔离运行 + 摘要发送到主线程）。
-- `--include-body` 和 `--max-bytes` 控制发送到 OpenKrab 的正文片段。
+- `--token` ä¿æŠ¤æŽ¨é€ç«¯ç‚¹ï¼ˆ`x-gog-token` æˆ– `?token=`ï¼‰ã€‚
+- `--hook-url` æŒ‡å‘ OpenKrab `/hooks/gmail`ï¼ˆå·²æ˜ å°„ï¼›éš”ç¦»è¿è¡Œ + æ‘˜è¦å‘é€åˆ°ä¸»çº¿ç¨‹ï¼‰ã€‚
+- `--include-body` å’Œ `--max-bytes` æŽ§åˆ¶å‘é€åˆ° OpenKrab çš„æ­£æ–‡ç‰‡æ®µã€‚
 
-推荐：`OpenKrab webhooks gmail run` 封装了相同的流程并自动续期 watch。
+æŽ¨èï¼š`OpenKrab webhooks gmail run` å°è£…äº†ç›¸åŒçš„æµç¨‹å¹¶è‡ªåŠ¨ç»­æœŸ watchã€‚
 
-## 暴露处理程序（高级，不受支持）
+## æš´éœ²å¤„ç†ç¨‹åºï¼ˆé«˜çº§ï¼Œä¸å—æ”¯æŒï¼‰
 
-如果你需要非 Tailscale 隧道，请手动接入并在推送订阅中使用公共 URL（不受支持，无保护措施）：
+å¦‚æžœä½ éœ€è¦éž Tailscale éš§é“ï¼Œè¯·æ‰‹åŠ¨æŽ¥å…¥å¹¶åœ¨æŽ¨é€è®¢é˜…ä¸­ä½¿ç”¨å…¬å…± URLï¼ˆä¸å—æ”¯æŒï¼Œæ— ä¿æŠ¤æŽªæ–½ï¼‰ï¼š
 
 ```bash
 cloudflared tunnel --url http://127.0.0.1:8788 --no-autoupdate
 ```
 
-使用生成的 URL 作为推送端点：
+ä½¿ç”¨ç”Ÿæˆçš„ URL ä½œä¸ºæŽ¨é€ç«¯ç‚¹ï¼š
 
 ```bash
 gcloud pubsub subscriptions create gog-gmail-watch-push \
@@ -209,15 +209,15 @@ gcloud pubsub subscriptions create gog-gmail-watch-push \
   --push-endpoint "https://<public-url>/gmail-pubsub?token=<shared>"
 ```
 
-生产环境：使用稳定的 HTTPS 端点并配置 Pub/Sub OIDC JWT，然后运行：
+ç”Ÿäº§çŽ¯å¢ƒï¼šä½¿ç”¨ç¨³å®šçš„ HTTPS ç«¯ç‚¹å¹¶é…ç½® Pub/Sub OIDC JWTï¼Œç„¶åŽè¿è¡Œï¼š
 
 ```bash
 gog gmail watch serve --verify-oidc --oidc-email <svc@...>
 ```
 
-## 测试
+## æµ‹è¯•
 
-向被监视的收件箱发送一条消息：
+å‘è¢«ç›‘è§†çš„æ”¶ä»¶ç®±å‘é€ä¸€æ¡æ¶ˆæ¯ï¼š
 
 ```bash
 gog gmail send \
@@ -227,24 +227,25 @@ gog gmail send \
   --body "ping"
 ```
 
-检查 watch 状态和历史记录：
+æ£€æŸ¥ watch çŠ¶æ€å’ŒåŽ†å²è®°å½•ï¼š
 
 ```bash
 gog gmail watch status --account OpenKrab@gmail.com
 gog gmail history --account OpenKrab@gmail.com --since <historyId>
 ```
 
-## 故障排除
+## æ•…éšœæŽ’é™¤
 
-- `Invalid topicName`：项目不匹配（主题不在 OAuth 客户端项目中）。
-- `User not authorized`：主题缺少 `roles/pubsub.publisher`。
-- 空消息：Gmail push 仅提供 `historyId`；通过 `gog gmail history` 获取。
+- `Invalid topicName`ï¼šé¡¹ç›®ä¸åŒ¹é…ï¼ˆä¸»é¢˜ä¸åœ¨ OAuth å®¢æˆ·ç«¯é¡¹ç›®ä¸­ï¼‰ã€‚
+- `User not authorized`ï¼šä¸»é¢˜ç¼ºå°‘ `roles/pubsub.publisher`ã€‚
+- ç©ºæ¶ˆæ¯ï¼šGmail push ä»…æä¾› `historyId`ï¼›é€šè¿‡ `gog gmail history` èŽ·å–ã€‚
 
-## 清理
+## æ¸…ç†
 
 ```bash
 gog gmail watch stop --account OpenKrab@gmail.com
 gcloud pubsub subscriptions delete gog-gmail-watch-push
 gcloud pubsub topics delete gog-gmail-watch
 ```
+
 

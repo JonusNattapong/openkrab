@@ -1,4 +1,4 @@
-use krabkrab::channels::registry::*;
+use openkrab::channels::registry::*;
 
 #[test]
 fn list_and_normalize() {
@@ -14,3 +14,4 @@ fn list_and_normalize() {
     );
     assert_eq!(normalize_chat_channel_id(Some("unknown")), None);
 }
+

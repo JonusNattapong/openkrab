@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 你想了解 `OpenKrab.ai/install.sh` 的工作机制
-  - 你想自动化安装（CI / 无头环境）
-  - 你想从 GitHub 检出安装
-summary: 安装器脚本的工作原理（install.sh + install-cli.sh）、参数和自动化
-title: 安装器内部机制
+  - ä½ æƒ³äº†è§£ `OpenKrab.ai/install.sh` çš„å·¥ä½œæœºåˆ¶
+  - ä½ æƒ³è‡ªåŠ¨åŒ–å®‰è£…ï¼ˆCI / æ— å¤´çŽ¯å¢ƒï¼‰
+  - ä½ æƒ³ä»Ž GitHub æ£€å‡ºå®‰è£…
+summary: å®‰è£…å™¨è„šæœ¬çš„å·¥ä½œåŽŸç†ï¼ˆinstall.sh + install-cli.shï¼‰ã€å‚æ•°å’Œè‡ªåŠ¨åŒ–
+title: å®‰è£…å™¨å†…éƒ¨æœºåˆ¶
 x-i18n:
   generated_at: "2026-02-01T21:07:55Z"
   model: claude-opus-4-5
@@ -14,92 +14,92 @@ x-i18n:
   workflow: 14
 ---
 
-# 安装器内部机制
+# å®‰è£…å™¨å†…éƒ¨æœºåˆ¶
 
-OpenKrab 提供两个安装器脚本（托管在 `OpenKrab.ai`）：
+OpenKrab æä¾›ä¸¤ä¸ªå®‰è£…å™¨è„šæœ¬ï¼ˆæ‰˜ç®¡åœ¨ `OpenKrab.ai`ï¼‰ï¼š
 
-- `https://OpenKrab.ai/install.sh` — "推荐"安装器（默认全局 npm 安装；也可从 GitHub 检出安装）
-- `https://OpenKrab.ai/install-cli.sh` — 无需 root 权限的 CLI 安装器（安装到带有独立 Node 的前缀目录）
-- `https://OpenKrab.ai/install.ps1` — Windows PowerShell 安装器（默认 npm；可选 git 安装）
+- `https://OpenKrab.ai/install.sh` â€” "æŽ¨è"å®‰è£…å™¨ï¼ˆé»˜è®¤å…¨å±€ npm å®‰è£…ï¼›ä¹Ÿå¯ä»Ž GitHub æ£€å‡ºå®‰è£…ï¼‰
+- `https://OpenKrab.ai/install-cli.sh` â€” æ— éœ€ root æƒé™çš„ CLI å®‰è£…å™¨ï¼ˆå®‰è£…åˆ°å¸¦æœ‰ç‹¬ç«‹ Node çš„å‰ç¼€ç›®å½•ï¼‰
+- `https://OpenKrab.ai/install.ps1` â€” Windows PowerShell å®‰è£…å™¨ï¼ˆé»˜è®¤ npmï¼›å¯é€‰ git å®‰è£…ï¼‰
 
-查看当前参数/行为，运行：
+æŸ¥çœ‹å½“å‰å‚æ•°/è¡Œä¸ºï¼Œè¿è¡Œï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --help
 ```
 
-Windows (PowerShell) 帮助：
+Windows (PowerShell) å¸®åŠ©ï¼š
 
 ```powershell
 & ([scriptblock]::Create((iwr -useb https://OpenKrab.ai/install.ps1))) -?
 ```
 
-如果安装器完成但在新终端中找不到 `OpenKrab`，通常是 Node/npm PATH 问题。参见：[安装](/install#nodejs--npm-path-sanity)。
+å¦‚æžœå®‰è£…å™¨å®Œæˆä½†åœ¨æ–°ç»ˆç«¯ä¸­æ‰¾ä¸åˆ° `OpenKrab`ï¼Œé€šå¸¸æ˜¯ Node/npm PATH é—®é¢˜ã€‚å‚è§ï¼š[å®‰è£…](/install#nodejs--npm-path-sanity)ã€‚
 
-## install.sh（推荐）
+## install.shï¼ˆæŽ¨èï¼‰
 
-功能概述：
+åŠŸèƒ½æ¦‚è¿°ï¼š
 
-- 检测操作系统（macOS / Linux / WSL）。
-- 确保 Node.js **22+**（macOS 通过 Homebrew；Linux 通过 NodeSource）。
-- 选择安装方式：
-  - `npm`（默认）：`npm install -g OpenKrab@latest`
-  - `git`：克隆/构建源码检出并安装包装脚本
-- 在 Linux 上：必要时将 npm 前缀切换到 `~/.npm-global`，以避免全局 npm 权限错误。
-- 如果是升级现有安装：运行 `OpenKrab doctor --non-interactive`（尽力执行）。
-- 对于 git 安装：安装/更新后运行 `OpenKrab doctor --non-interactive`（尽力执行）。
-- 通过默认设置 `SHARP_IGNORE_GLOBAL_LIBVIPS=1` 来缓解 `sharp` 原生安装问题（避免使用系统 libvips 编译）。
+- æ£€æµ‹æ“ä½œç³»ç»Ÿï¼ˆmacOS / Linux / WSLï¼‰ã€‚
+- ç¡®ä¿ Node.js **22+**ï¼ˆmacOS é€šè¿‡ Homebrewï¼›Linux é€šè¿‡ NodeSourceï¼‰ã€‚
+- é€‰æ‹©å®‰è£…æ–¹å¼ï¼š
+  - `npm`ï¼ˆé»˜è®¤ï¼‰ï¼š`npm install -g OpenKrab@latest`
+  - `git`ï¼šå…‹éš†/æž„å»ºæºç æ£€å‡ºå¹¶å®‰è£…åŒ…è£…è„šæœ¬
+- åœ¨ Linux ä¸Šï¼šå¿…è¦æ—¶å°† npm å‰ç¼€åˆ‡æ¢åˆ° `~/.npm-global`ï¼Œä»¥é¿å…å…¨å±€ npm æƒé™é”™è¯¯ã€‚
+- å¦‚æžœæ˜¯å‡çº§çŽ°æœ‰å®‰è£…ï¼šè¿è¡Œ `OpenKrab doctor --non-interactive`ï¼ˆå°½åŠ›æ‰§è¡Œï¼‰ã€‚
+- å¯¹äºŽ git å®‰è£…ï¼šå®‰è£…/æ›´æ–°åŽè¿è¡Œ `OpenKrab doctor --non-interactive`ï¼ˆå°½åŠ›æ‰§è¡Œï¼‰ã€‚
+- é€šè¿‡é»˜è®¤è®¾ç½® `SHARP_IGNORE_GLOBAL_LIBVIPS=1` æ¥ç¼“è§£ `sharp` åŽŸç”Ÿå®‰è£…é—®é¢˜ï¼ˆé¿å…ä½¿ç”¨ç³»ç»Ÿ libvips ç¼–è¯‘ï¼‰ã€‚
 
-如果你*希望* `sharp` 链接到全局安装的 libvips（或你正在调试），请设置：
+å¦‚æžœä½ *å¸Œæœ›* `sharp` é“¾æŽ¥åˆ°å…¨å±€å®‰è£…çš„ libvipsï¼ˆæˆ–ä½ æ­£åœ¨è°ƒè¯•ï¼‰ï¼Œè¯·è®¾ç½®ï¼š
 
 ```bash
 SHARP_IGNORE_GLOBAL_LIBVIPS=0 curl -fsSL https://OpenKrab.ai/install.sh | bash
 ```
 
-### 可发现性 / "git 安装"提示
+### å¯å‘çŽ°æ€§ / "git å®‰è£…"æç¤º
 
-如果你在**已有的 OpenKrab 源码检出目录中**运行安装器（通过 `package.json` + `pnpm-workspace.yaml` 检测），它会提示：
+å¦‚æžœä½ åœ¨**å·²æœ‰çš„ OpenKrab æºç æ£€å‡ºç›®å½•ä¸­**è¿è¡Œå®‰è£…å™¨ï¼ˆé€šè¿‡ `package.json` + `pnpm-workspace.yaml` æ£€æµ‹ï¼‰ï¼Œå®ƒä¼šæç¤ºï¼š
 
-- 更新并使用此检出（`git`）
-- 或迁移到全局 npm 安装（`npm`）
+- æ›´æ–°å¹¶ä½¿ç”¨æ­¤æ£€å‡ºï¼ˆ`git`ï¼‰
+- æˆ–è¿ç§»åˆ°å…¨å±€ npm å®‰è£…ï¼ˆ`npm`ï¼‰
 
-在非交互式上下文中（无 TTY / `--no-prompt`），你必须传入 `--install-method git|npm`（或设置 `OpenKrab_INSTALL_METHOD`），否则脚本将以退出码 `2` 退出。
+åœ¨éžäº¤äº’å¼ä¸Šä¸‹æ–‡ä¸­ï¼ˆæ—  TTY / `--no-prompt`ï¼‰ï¼Œä½ å¿…é¡»ä¼ å…¥ `--install-method git|npm`ï¼ˆæˆ–è®¾ç½® `OPENKRAB_INSTALL_METHOD`ï¼‰ï¼Œå¦åˆ™è„šæœ¬å°†ä»¥é€€å‡ºç  `2` é€€å‡ºã€‚
 
-### 为什么需要 Git
+### ä¸ºä»€ä¹ˆéœ€è¦ Git
 
-`--install-method git` 路径（克隆 / 拉取）需要 Git。
+`--install-method git` è·¯å¾„ï¼ˆå…‹éš† / æ‹‰å–ï¼‰éœ€è¦ Gitã€‚
 
-对于 `npm` 安装，Git *通常*不是必需的，但某些环境仍然需要它（例如通过 git URL 获取软件包或依赖时）。安装器目前会确保 Git 存在，以避免在全新发行版上出现 `spawn git ENOENT` 错误。
+å¯¹äºŽ `npm` å®‰è£…ï¼ŒGit *é€šå¸¸*ä¸æ˜¯å¿…éœ€çš„ï¼Œä½†æŸäº›çŽ¯å¢ƒä»ç„¶éœ€è¦å®ƒï¼ˆä¾‹å¦‚é€šè¿‡ git URL èŽ·å–è½¯ä»¶åŒ…æˆ–ä¾èµ–æ—¶ï¼‰ã€‚å®‰è£…å™¨ç›®å‰ä¼šç¡®ä¿ Git å­˜åœ¨ï¼Œä»¥é¿å…åœ¨å…¨æ–°å‘è¡Œç‰ˆä¸Šå‡ºçŽ° `spawn git ENOENT` é”™è¯¯ã€‚
 
-### 为什么在全新 Linux 上 npm 会报 `EACCES`
+### ä¸ºä»€ä¹ˆåœ¨å…¨æ–° Linux ä¸Š npm ä¼šæŠ¥ `EACCES`
 
-在某些 Linux 设置中（尤其是通过系统包管理器或 NodeSource 安装 Node 后），npm 的全局前缀指向 root 拥有的位置。此时 `npm install -g ...` 会报 `EACCES` / `mkdir` 权限错误。
+åœ¨æŸäº› Linux è®¾ç½®ä¸­ï¼ˆå°¤å…¶æ˜¯é€šè¿‡ç³»ç»ŸåŒ…ç®¡ç†å™¨æˆ– NodeSource å®‰è£… Node åŽï¼‰ï¼Œnpm çš„å…¨å±€å‰ç¼€æŒ‡å‘ root æ‹¥æœ‰çš„ä½ç½®ã€‚æ­¤æ—¶ `npm install -g ...` ä¼šæŠ¥ `EACCES` / `mkdir` æƒé™é”™è¯¯ã€‚
 
-`install.sh` 通过将前缀切换到以下位置来缓解此问题：
+`install.sh` é€šè¿‡å°†å‰ç¼€åˆ‡æ¢åˆ°ä»¥ä¸‹ä½ç½®æ¥ç¼“è§£æ­¤é—®é¢˜ï¼š
 
-- `~/.npm-global`（并在存在时将其添加到 `~/.bashrc` / `~/.zshrc` 的 `PATH` 中）
+- `~/.npm-global`ï¼ˆå¹¶åœ¨å­˜åœ¨æ—¶å°†å…¶æ·»åŠ åˆ° `~/.bashrc` / `~/.zshrc` çš„ `PATH` ä¸­ï¼‰
 
-## install-cli.sh（无需 root 权限的 CLI 安装器）
+## install-cli.shï¼ˆæ— éœ€ root æƒé™çš„ CLI å®‰è£…å™¨ï¼‰
 
-此脚本将 `OpenKrab` 安装到前缀目录（默认：`~/.OpenKrab`），同时在该前缀下安装专用的 Node 运行时，因此可以在不想改动系统 Node/npm 的机器上使用。
+æ­¤è„šæœ¬å°† `OpenKrab` å®‰è£…åˆ°å‰ç¼€ç›®å½•ï¼ˆé»˜è®¤ï¼š`~/.OpenKrab`ï¼‰ï¼ŒåŒæ—¶åœ¨è¯¥å‰ç¼€ä¸‹å®‰è£…ä¸“ç”¨çš„ Node è¿è¡Œæ—¶ï¼Œå› æ­¤å¯ä»¥åœ¨ä¸æƒ³æ”¹åŠ¨ç³»ç»Ÿ Node/npm çš„æœºå™¨ä¸Šä½¿ç”¨ã€‚
 
-帮助：
+å¸®åŠ©ï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install-cli.sh | bash -s -- --help
 ```
 
-## install.ps1（Windows PowerShell）
+## install.ps1ï¼ˆWindows PowerShellï¼‰
 
-功能概述：
+åŠŸèƒ½æ¦‚è¿°ï¼š
 
-- 确保 Node.js **22+**（winget/Chocolatey/Scoop 或手动安装）。
-- 选择安装方式：
-  - `npm`（默认）：`npm install -g OpenKrab@latest`
-  - `git`：克隆/构建源码检出并安装包装脚本
-- 在升级和 git 安装时运行 `OpenKrab doctor --non-interactive`（尽力执行）。
+- ç¡®ä¿ Node.js **22+**ï¼ˆwinget/Chocolatey/Scoop æˆ–æ‰‹åŠ¨å®‰è£…ï¼‰ã€‚
+- é€‰æ‹©å®‰è£…æ–¹å¼ï¼š
+  - `npm`ï¼ˆé»˜è®¤ï¼‰ï¼š`npm install -g OpenKrab@latest`
+  - `git`ï¼šå…‹éš†/æž„å»ºæºç æ£€å‡ºå¹¶å®‰è£…åŒ…è£…è„šæœ¬
+- åœ¨å‡çº§å’Œ git å®‰è£…æ—¶è¿è¡Œ `OpenKrab doctor --non-interactive`ï¼ˆå°½åŠ›æ‰§è¡Œï¼‰ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```powershell
 iwr -useb https://OpenKrab.ai/install.ps1 | iex
@@ -113,17 +113,18 @@ iwr -useb https://OpenKrab.ai/install.ps1 | iex -InstallMethod git
 iwr -useb https://OpenKrab.ai/install.ps1 | iex -InstallMethod git -GitDir "C:\\OpenKrab"
 ```
 
-环境变量：
+çŽ¯å¢ƒå˜é‡ï¼š
 
-- `OpenKrab_INSTALL_METHOD=git|npm`
-- `OpenKrab_GIT_DIR=...`
+- `OPENKRAB_INSTALL_METHOD=git|npm`
+- `OPENKRAB_GIT_DIR=...`
 
-Git 要求：
+Git è¦æ±‚ï¼š
 
-如果你选择 `-InstallMethod git` 但未安装 Git，安装器会打印 Git for Windows 的链接（`https://git-scm.com/download/win`）并退出。
+å¦‚æžœä½ é€‰æ‹© `-InstallMethod git` ä½†æœªå®‰è£… Gitï¼Œå®‰è£…å™¨ä¼šæ‰“å° Git for Windows çš„é“¾æŽ¥ï¼ˆ`https://git-scm.com/download/win`ï¼‰å¹¶é€€å‡ºã€‚
 
-常见 Windows 问题：
+å¸¸è§ Windows é—®é¢˜ï¼š
 
-- **npm error spawn git / ENOENT**：安装 Git for Windows 并重新打开 PowerShell，然后重新运行安装器。
-- **"OpenKrab" 不是可识别的命令**：你的 npm 全局 bin 文件夹不在 PATH 中。大多数系统使用 `%AppData%\\npm`。你也可以运行 `npm config get prefix` 并将 `\\bin` 添加到 PATH，然后重新打开 PowerShell。
+- **npm error spawn git / ENOENT**ï¼šå®‰è£… Git for Windows å¹¶é‡æ–°æ‰“å¼€ PowerShellï¼Œç„¶åŽé‡æ–°è¿è¡Œå®‰è£…å™¨ã€‚
+- **"OpenKrab" ä¸æ˜¯å¯è¯†åˆ«çš„å‘½ä»¤**ï¼šä½ çš„ npm å…¨å±€ bin æ–‡ä»¶å¤¹ä¸åœ¨ PATH ä¸­ã€‚å¤§å¤šæ•°ç³»ç»Ÿä½¿ç”¨ `%AppData%\\npm`ã€‚ä½ ä¹Ÿå¯ä»¥è¿è¡Œ `npm config get prefix` å¹¶å°† `\\bin` æ·»åŠ åˆ° PATHï¼Œç„¶åŽé‡æ–°æ‰“å¼€ PowerShellã€‚
+
 

@@ -113,7 +113,7 @@ fn resolve_message_prefix(cfg: &Value, agent_id: &str, _opts: Option<&str>) -> S
     {
         return msg_pref.to_string();
     }
-    resolve_identity_name_prefix(cfg, agent_id).unwrap_or_else(|| "[krabkrab]".to_string())
+    resolve_identity_name_prefix(cfg, agent_id).unwrap_or_else(|| "[openkrab]".to_string())
 }
 
 pub fn create_reply_prefix_context(
@@ -173,3 +173,4 @@ pub fn create_reply_prefix_options(
         bundle.on_model_selected,
     )
 }
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Diagnostics flags for targeted debug logs"
 read_when:
   - You need targeted debug logs without raising global logging levels
@@ -43,13 +43,13 @@ Restart the gateway after changing flags.
 ## Env override (one-off)
 
 ```bash
-openkrab_DIAGNOSTICS=telegram.http,telegram.payload
+OPENKRAB_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 Disable all flags:
 
 ```bash
-openkrab_DIAGNOSTICS=0
+OPENKRAB_DIAGNOSTICS=0
 ```
 
 ## Where logs go
@@ -89,3 +89,4 @@ For remote gateways, you can also use `openkrab logs --follow` (see [/cli/logs](
 - If `logging.level` is set higher than `warn`, these logs may be suppressed. Default `info` is fine.
 - Flags are safe to leave enabled; they only affect log volume for the specific subsystem.
 - Use [/logging](/logging) to change log destinations, levels, and redaction.
+

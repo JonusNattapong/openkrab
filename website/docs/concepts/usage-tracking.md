@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Usage tracking surfaces and credential requirements"
 read_when:
   - You are wiring provider usage/quota surfaces
@@ -15,12 +15,12 @@ title: "Usage Tracking"
 
 ## Where it shows up
 
-- `/status` in chats: emoji‑rich status card with session tokens + estimated cost (API key only). Provider usage shows for the **current model provider** when available.
+- `/status` in chats: emojiâ€‘rich status card with session tokens + estimated cost (API key only). Provider usage shows for the **current model provider** when available.
 - `/usage off|tokens|full` in chats: per-response usage footer (OAuth shows tokens only).
-- `/usage cost` in chats: local cost summary aggregated from openkrab session logs.
+- `/usage cost` in chats: local cost summary aggregated from OpenKrab session logs.
 - CLI: `openkrab status --usage` prints a full per-provider breakdown.
 - CLI: `openkrab channels list` prints the same usage snapshot alongside provider config (use `--no-usage` to skip).
-- macOS menu bar: “Usage” section under Context (only if available).
+- macOS menu bar: â€œUsageâ€ section under Context (only if available).
 
 ## Providers + credentials
 
@@ -29,7 +29,8 @@ title: "Usage Tracking"
 - **Gemini CLI**: OAuth tokens in auth profiles.
 - **Antigravity**: OAuth tokens in auth profiles.
 - **OpenAI Codex**: OAuth tokens in auth profiles (accountId used when present).
-- **MiniMax**: API key (coding plan key; `MINIMAX_CODE_PLAN_KEY` or `MINIMAX_API_KEY`); uses the 5‑hour coding plan window.
+- **MiniMax**: API key (coding plan key; `MINIMAX_CODE_PLAN_KEY` or `MINIMAX_API_KEY`); uses the 5â€‘hour coding plan window.
 - **z.ai**: API key via env/config/auth store.
 
 Usage is hidden if no matching OAuth/API credentials exist.
+

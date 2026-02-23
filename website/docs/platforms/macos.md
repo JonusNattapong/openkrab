@@ -1,4 +1,4 @@
----
+﻿---
 summary: "OpenKrab macOS companion app (menu bar + gateway broker)"
 read_when:
   - Implementing macOS app features
@@ -8,7 +8,7 @@ title: "macOS App"
 
 # OpenKrab macOS Companion (menu bar + gateway broker)
 
-The macOS app is the **menu‑bar companion** for OpenKrab. It owns permissions,
+The macOS app is the **menuâ€‘bar companion** for OpenKrab. It owns permissions,
 manages/attaches to the Gateway locally (launchd or manual), and exposes macOS
 capabilities to the agent as a node.
 
@@ -18,7 +18,7 @@ capabilities to the agent as a node.
 - Owns TCC prompts (Notifications, Accessibility, Screen Recording, Microphone,
   Speech Recognition, Automation/AppleScript).
 - Runs or connects to the Gateway (local or remote).
-- Exposes macOS‑only tools (Canvas, Camera, Screen Recording, `system.run`).
+- Exposes macOSâ€‘only tools (Canvas, Camera, Screen Recording, `system.run`).
 - Starts the local node host service in **remote** mode (launchd), and stops it in **local** mode.
 - Optionally hosts **PeekabooBridge** for UI automation.
 - Installs the global CLI (`OpenKrab`) via npm/pnpm on request (bun not recommended for the Gateway runtime).
@@ -34,8 +34,8 @@ capabilities to the agent as a node.
 
 ## Launchd control
 
-The app manages a per‑user LaunchAgent labeled `bot.molt.gateway`
-(or `bot.molt.<profile>` when using `--profile`/`OpenKrab_PROFILE`; legacy `com.OpenKrab.*` still unloads).
+The app manages a perâ€‘user LaunchAgent labeled `bot.molt.gateway`
+(or `bot.molt.<profile>` when using `--profile`/`OPENKRAB_PROFILE`; legacy `com.OpenKrab.*` still unloads).
 
 ```bash
 launchctl kickstart -k gui/$UID/bot.molt.gateway
@@ -44,7 +44,7 @@ launchctl bootout gui/$UID/bot.molt.gateway
 
 Replace the label with `bot.molt.<profile>` when running a named profile.
 
-If the LaunchAgent isn’t installed, enable it from the app or run
+If the LaunchAgent isnâ€™t installed, enable it from the app or run
 `OpenKrab gateway install`.
 
 ## Node capabilities (mac)
@@ -56,7 +56,7 @@ The macOS app presents itself as a node. Common commands:
 - Screen: `screen.record`
 - System: `system.run`, `system.notify`
 
-The node reports a `permissions` map so agents can decide what’s allowed.
+The node reports a `permissions` map so agents can decide whatâ€™s allowed.
 
 Node service + app IPC:
 
@@ -74,7 +74,7 @@ Gateway -> Node Service (WS)
 
 ## Exec approvals (system.run)
 
-`system.run` is controlled by **Exec approvals** in the macOS app (Settings → Exec approvals).
+`system.run` is controlled by **Exec approvals** in the macOS app (Settings â†’ Exec approvals).
 Security + ask + allowlist are stored locally on the Mac in:
 
 ```
@@ -103,8 +103,8 @@ Example:
 Notes:
 
 - `allowlist` entries are glob patterns for resolved binary paths.
-- Choosing “Always Allow” in the prompt adds that command to the allowlist.
-- `system.run` environment overrides are filtered (drops `PATH`, `DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`) and then merged with the app’s environment.
+- Choosing â€œAlways Allowâ€ in the prompt adds that command to the allowlist.
+- `system.run` environment overrides are filtered (drops `PATH`, `DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`) and then merged with the appâ€™s environment.
 
 ## Deep links
 
@@ -167,13 +167,13 @@ Connect options:
 
 Discovery options:
 
-- `--include-local`: include gateways that would be filtered as “local”
+- `--include-local`: include gateways that would be filtered as â€œlocalâ€
 - `--timeout <ms>`: overall discovery window (default: `2000`)
 - `--json`: structured output for diffing
 
 Tip: compare against `OpenKrab gateway discover --json` to see whether the
-macOS app’s discovery pipeline (NWBrowser + tailnet DNS‑SD fallback) differs from
-the Node CLI’s `dns-sd` based discovery.
+macOS appâ€™s discovery pipeline (NWBrowser + tailnet DNSâ€‘SD fallback) differs from
+the Node CLIâ€™s `dns-sd` based discovery.
 
 ## Remote connection plumbing (SSH tunnels)
 
@@ -202,4 +202,5 @@ details, see [Gateway protocol](/gateway/protocol).
 - [Gateway (macOS)](/platforms/mac/bundled-gateway)
 - [macOS permissions](/platforms/mac/permissions)
 - [Canvas](/platforms/mac/canvas)
+
 

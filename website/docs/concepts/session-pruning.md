@@ -1,4 +1,4 @@
----
+﻿---
 title: "Session Pruning"
 summary: "Session pruning: tool-result trimming to reduce context bloat"
 read_when:
@@ -22,26 +22,26 @@ Session pruning trims **old tool results** from the in-memory context right befo
 
 - **OAuth or setup-token** profiles: enable `cache-ttl` pruning and set heartbeat to `1h`.
 - **API key** profiles: enable `cache-ttl` pruning, set heartbeat to `30m`, and default `cacheControlTtl` to `1h` on Anthropic models.
-- If you set any of these values explicitly, openkrab does **not** override them.
+- If you set any of these values explicitly, OpenKrab does **not** override them.
 
 ## What this improves (cost + cache behavior)
 
 - **Why prune:** Anthropic prompt caching only applies within the TTL. If a session goes idle past the TTL, the next request re-caches the full prompt unless you trim it first.
 - **What gets cheaper:** pruning reduces the **cacheWrite** size for that first request after the TTL expires.
-- **Why the TTL reset matters:** once pruning runs, the cache window resets, so follow‑up requests can reuse the freshly cached prompt instead of re-caching the full history again.
-- **What it does not do:** pruning doesn’t add tokens or “double” costs; it only changes what gets cached on that first post‑TTL request.
+- **Why the TTL reset matters:** once pruning runs, the cache window resets, so followâ€‘up requests can reuse the freshly cached prompt instead of re-caching the full history again.
+- **What it does not do:** pruning doesnâ€™t add tokens or â€œdoubleâ€ costs; it only changes what gets cached on that first postâ€‘TTL request.
 
 ## What can be pruned
 
 - Only `toolResult` messages.
 - User + assistant messages are **never** modified.
 - The last `keepLastAssistants` assistant messages are protected; tool results after that cutoff are not pruned.
-- If there aren’t enough assistant messages to establish the cutoff, pruning is skipped.
+- If there arenâ€™t enough assistant messages to establish the cutoff, pruning is skipped.
 - Tool results containing **image blocks** are skipped (never trimmed/cleared).
 
 ## Context window estimation
 
-Pruning uses an estimated context window (chars ≈ tokens × 4). The base window is resolved in this order:
+Pruning uses an estimated context window (chars â‰ˆ tokens Ã— 4). The base window is resolved in this order:
 
 1. `models.providers.*.models[].contextWindow` override.
 2. Model definition `contextWindow` (from the model registry).
@@ -121,3 +121,4 @@ Restrict pruning to specific tools:
 ```
 
 See config reference: [Gateway Configuration](/gateway/configuration)
+

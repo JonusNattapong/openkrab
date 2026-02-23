@@ -40,12 +40,12 @@ pub fn build_status_summary(cfg: &AppConfig) -> StatusSummary {
 
     // Generate warnings
     if channels_configured == 0 {
-        warnings.push("No channels configured. Run 'krabkrab onboard' to set up.".to_string());
+        warnings.push("No channels configured. Run 'openkrab onboard' to set up.".to_string());
     }
 
     if auth_profiles == 0 {
         warnings.push(
-            "No auth profiles configured. Run 'krabkrab auth add' to add credentials.".to_string(),
+            "No auth profiles configured. Run 'openkrab auth add' to add credentials.".to_string(),
         );
     }
 
@@ -195,3 +195,4 @@ mod tests {
         assert_eq!(summary.warnings[0], "Normal warning");
     }
 }
+

@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 添加或修改 doctor 迁移
-  - 引入破坏性配置更改
-summary: Doctor 命令：健康检查、配置迁移和修复步骤
+  - æ·»åŠ æˆ–ä¿®æ”¹ doctor è¿ç§»
+  - å¼•å…¥ç ´åæ€§é…ç½®æ›´æ”¹
+summary: Doctor å‘½ä»¤ï¼šå¥åº·æ£€æŸ¥ã€é…ç½®è¿ç§»å’Œä¿®å¤æ­¥éª¤
 title: Doctor
 x-i18n:
   generated_at: "2026-02-03T07:49:03Z"
@@ -15,225 +15,226 @@ x-i18n:
 
 # Doctor
 
-`OpenKrab doctor` 是 OpenKrab 的修复 + 迁移工具。它修复过时的配置/状态，检查健康状况，并提供可操作的修复步骤。
+`OpenKrab doctor` æ˜¯ OpenKrab çš„ä¿®å¤ + è¿ç§»å·¥å…·ã€‚å®ƒä¿®å¤è¿‡æ—¶çš„é…ç½®/çŠ¶æ€ï¼Œæ£€æŸ¥å¥åº·çŠ¶å†µï¼Œå¹¶æä¾›å¯æ“ä½œçš„ä¿®å¤æ­¥éª¤ã€‚
 
-## 快速开始
+## å¿«é€Ÿå¼€å§‹
 
 ```bash
 OpenKrab doctor
 ```
 
-### 无头/自动化
+### æ— å¤´/è‡ªåŠ¨åŒ–
 
 ```bash
 OpenKrab doctor --yes
 ```
 
-无需提示接受默认值（包括适用时的重启/服务/沙箱修复步骤）。
+æ— éœ€æç¤ºæŽ¥å—é»˜è®¤å€¼ï¼ˆåŒ…æ‹¬é€‚ç”¨æ—¶çš„é‡å¯/æœåŠ¡/æ²™ç®±ä¿®å¤æ­¥éª¤ï¼‰ã€‚
 
 ```bash
 OpenKrab doctor --repair
 ```
 
-无需提示应用推荐的修复（安全时进行修复 + 重启）。
+æ— éœ€æç¤ºåº”ç”¨æŽ¨èçš„ä¿®å¤ï¼ˆå®‰å…¨æ—¶è¿›è¡Œä¿®å¤ + é‡å¯ï¼‰ã€‚
 
 ```bash
 OpenKrab doctor --repair --force
 ```
 
-也应用激进的修复（覆盖自定义 supervisor 配置）。
+ä¹Ÿåº”ç”¨æ¿€è¿›çš„ä¿®å¤ï¼ˆè¦†ç›–è‡ªå®šä¹‰ supervisor é…ç½®ï¼‰ã€‚
 
 ```bash
 OpenKrab doctor --non-interactive
 ```
 
-无需提示运行，仅应用安全迁移（配置规范化 + 磁盘状态移动）。跳过需要人工确认的重启/服务/沙箱操作。
-检测到时自动运行遗留状态迁移。
+æ— éœ€æç¤ºè¿è¡Œï¼Œä»…åº”ç”¨å®‰å…¨è¿ç§»ï¼ˆé…ç½®è§„èŒƒåŒ– + ç£ç›˜çŠ¶æ€ç§»åŠ¨ï¼‰ã€‚è·³è¿‡éœ€è¦äººå·¥ç¡®è®¤çš„é‡å¯/æœåŠ¡/æ²™ç®±æ“ä½œã€‚
+æ£€æµ‹åˆ°æ—¶è‡ªåŠ¨è¿è¡Œé—ç•™çŠ¶æ€è¿ç§»ã€‚
 
 ```bash
 OpenKrab doctor --deep
 ```
 
-扫描系统服务以查找额外的 Gateway 网关安装（launchd/systemd/schtasks）。
+æ‰«æç³»ç»ŸæœåŠ¡ä»¥æŸ¥æ‰¾é¢å¤–çš„ Gateway ç½‘å…³å®‰è£…ï¼ˆlaunchd/systemd/schtasksï¼‰ã€‚
 
-如果你想在写入前查看更改，请先打开配置文件：
+å¦‚æžœä½ æƒ³åœ¨å†™å…¥å‰æŸ¥çœ‹æ›´æ”¹ï¼Œè¯·å…ˆæ‰“å¼€é…ç½®æ–‡ä»¶ï¼š
 
 ```bash
 cat ~/.OpenKrab/OpenKrab.json
 ```
 
-## 功能概述
+## åŠŸèƒ½æ¦‚è¿°
 
-- git 安装的可选预检更新（仅交互模式）。
-- UI 协议新鲜度检查（当协议 schema 较新时重建 Control UI）。
-- 健康检查 + 重启提示。
-- Skills 状态摘要（符合条件/缺失/被阻止）。
-- 遗留值的配置规范化。
-- OpenCode Zen 提供商覆盖警告（`models.providers.opencode`）。
-- 遗留磁盘状态迁移（会话/智能体目录/WhatsApp 认证）。
-- 状态完整性和权限检查（会话、记录、状态目录）。
-- 本地运行时的配置文件权限检查（chmod 600）。
-- 模型认证健康：检查 OAuth 过期，可刷新即将过期的 token，并报告认证配置文件冷却/禁用状态。
-- 额外工作区目录检测（`~/OpenKrab`）。
-- 启用沙箱隔离时的沙箱镜像修复。
-- 遗留服务迁移和额外 Gateway 网关检测。
-- Gateway 网关运行时检查（服务已安装但未运行；缓存的 launchd 标签）。
-- 渠道状态警告（从运行中的 Gateway 网关探测）。
-- Supervisor 配置审计（launchd/systemd/schtasks）及可选修复。
-- Gateway 网关运行时最佳实践检查（Node vs Bun，版本管理器路径）。
-- Gateway 网关端口冲突诊断（默认 `18789`）。
-- 开放私信策略的安全警告。
-- 未设置 `gateway.auth.token` 时的 Gateway 网关认证警告（本地模式；提供 token 生成）。
-- Linux 上的 systemd linger 检查。
-- 源码安装检查（pnpm workspace 不匹配、缺失 UI 资产、缺失 tsx 二进制文件）。
-- 写入更新后的配置 + 向导元数据。
+- git å®‰è£…çš„å¯é€‰é¢„æ£€æ›´æ–°ï¼ˆä»…äº¤äº’æ¨¡å¼ï¼‰ã€‚
+- UI åè®®æ–°é²œåº¦æ£€æŸ¥ï¼ˆå½“åè®® schema è¾ƒæ–°æ—¶é‡å»º Control UIï¼‰ã€‚
+- å¥åº·æ£€æŸ¥ + é‡å¯æç¤ºã€‚
+- Skills çŠ¶æ€æ‘˜è¦ï¼ˆç¬¦åˆæ¡ä»¶/ç¼ºå¤±/è¢«é˜»æ­¢ï¼‰ã€‚
+- é—ç•™å€¼çš„é…ç½®è§„èŒƒåŒ–ã€‚
+- OpenCode Zen æä¾›å•†è¦†ç›–è­¦å‘Šï¼ˆ`models.providers.opencode`ï¼‰ã€‚
+- é—ç•™ç£ç›˜çŠ¶æ€è¿ç§»ï¼ˆä¼šè¯/æ™ºèƒ½ä½“ç›®å½•/WhatsApp è®¤è¯ï¼‰ã€‚
+- çŠ¶æ€å®Œæ•´æ€§å’Œæƒé™æ£€æŸ¥ï¼ˆä¼šè¯ã€è®°å½•ã€çŠ¶æ€ç›®å½•ï¼‰ã€‚
+- æœ¬åœ°è¿è¡Œæ—¶çš„é…ç½®æ–‡ä»¶æƒé™æ£€æŸ¥ï¼ˆchmod 600ï¼‰ã€‚
+- æ¨¡åž‹è®¤è¯å¥åº·ï¼šæ£€æŸ¥ OAuth è¿‡æœŸï¼Œå¯åˆ·æ–°å³å°†è¿‡æœŸçš„ tokenï¼Œå¹¶æŠ¥å‘Šè®¤è¯é…ç½®æ–‡ä»¶å†·å´/ç¦ç”¨çŠ¶æ€ã€‚
+- é¢å¤–å·¥ä½œåŒºç›®å½•æ£€æµ‹ï¼ˆ`~/OpenKrab`ï¼‰ã€‚
+- å¯ç”¨æ²™ç®±éš”ç¦»æ—¶çš„æ²™ç®±é•œåƒä¿®å¤ã€‚
+- é—ç•™æœåŠ¡è¿ç§»å’Œé¢å¤– Gateway ç½‘å…³æ£€æµ‹ã€‚
+- Gateway ç½‘å…³è¿è¡Œæ—¶æ£€æŸ¥ï¼ˆæœåŠ¡å·²å®‰è£…ä½†æœªè¿è¡Œï¼›ç¼“å­˜çš„ launchd æ ‡ç­¾ï¼‰ã€‚
+- æ¸ é“çŠ¶æ€è­¦å‘Šï¼ˆä»Žè¿è¡Œä¸­çš„ Gateway ç½‘å…³æŽ¢æµ‹ï¼‰ã€‚
+- Supervisor é…ç½®å®¡è®¡ï¼ˆlaunchd/systemd/schtasksï¼‰åŠå¯é€‰ä¿®å¤ã€‚
+- Gateway ç½‘å…³è¿è¡Œæ—¶æœ€ä½³å®žè·µæ£€æŸ¥ï¼ˆNode vs Bunï¼Œç‰ˆæœ¬ç®¡ç†å™¨è·¯å¾„ï¼‰ã€‚
+- Gateway ç½‘å…³ç«¯å£å†²çªè¯Šæ–­ï¼ˆé»˜è®¤ `18789`ï¼‰ã€‚
+- å¼€æ”¾ç§ä¿¡ç­–ç•¥çš„å®‰å…¨è­¦å‘Šã€‚
+- æœªè®¾ç½® `gateway.auth.token` æ—¶çš„ Gateway ç½‘å…³è®¤è¯è­¦å‘Šï¼ˆæœ¬åœ°æ¨¡å¼ï¼›æä¾› token ç”Ÿæˆï¼‰ã€‚
+- Linux ä¸Šçš„ systemd linger æ£€æŸ¥ã€‚
+- æºç å®‰è£…æ£€æŸ¥ï¼ˆpnpm workspace ä¸åŒ¹é…ã€ç¼ºå¤± UI èµ„äº§ã€ç¼ºå¤± tsx äºŒè¿›åˆ¶æ–‡ä»¶ï¼‰ã€‚
+- å†™å…¥æ›´æ–°åŽçš„é…ç½® + å‘å¯¼å…ƒæ•°æ®ã€‚
 
-## 详细行为和原理
+## è¯¦ç»†è¡Œä¸ºå’ŒåŽŸç†
 
-### 0）可选更新（git 安装）
+### 0ï¼‰å¯é€‰æ›´æ–°ï¼ˆgit å®‰è£…ï¼‰
 
-如果这是 git 检出且 doctor 以交互模式运行，它会在运行 doctor 之前提供更新（fetch/rebase/build）。
+å¦‚æžœè¿™æ˜¯ git æ£€å‡ºä¸” doctor ä»¥äº¤äº’æ¨¡å¼è¿è¡Œï¼Œå®ƒä¼šåœ¨è¿è¡Œ doctor ä¹‹å‰æä¾›æ›´æ–°ï¼ˆfetch/rebase/buildï¼‰ã€‚
 
-### 1）配置规范化
+### 1ï¼‰é…ç½®è§„èŒƒåŒ–
 
-如果配置包含遗留值形式（例如没有渠道特定覆盖的 `messages.ackReaction`），doctor 会将它们规范化为当前 schema。
+å¦‚æžœé…ç½®åŒ…å«é—ç•™å€¼å½¢å¼ï¼ˆä¾‹å¦‚æ²¡æœ‰æ¸ é“ç‰¹å®šè¦†ç›–çš„ `messages.ackReaction`ï¼‰ï¼Œdoctor ä¼šå°†å®ƒä»¬è§„èŒƒåŒ–ä¸ºå½“å‰ schemaã€‚
 
-### 2）遗留配置键迁移
+### 2ï¼‰é—ç•™é…ç½®é”®è¿ç§»
 
-当配置包含已弃用的键时，其他命令会拒绝运行并要求你运行 `OpenKrab doctor`。
+å½“é…ç½®åŒ…å«å·²å¼ƒç”¨çš„é”®æ—¶ï¼Œå…¶ä»–å‘½ä»¤ä¼šæ‹’ç»è¿è¡Œå¹¶è¦æ±‚ä½ è¿è¡Œ `OpenKrab doctor`ã€‚
 
-Doctor 将：
+Doctor å°†ï¼š
 
-- 解释找到了哪些遗留键。
-- 显示它应用的迁移。
-- 使用更新后的 schema 重写 `~/.OpenKrab/OpenKrab.json`。
+- è§£é‡Šæ‰¾åˆ°äº†å“ªäº›é—ç•™é”®ã€‚
+- æ˜¾ç¤ºå®ƒåº”ç”¨çš„è¿ç§»ã€‚
+- ä½¿ç”¨æ›´æ–°åŽçš„ schema é‡å†™ `~/.OpenKrab/OpenKrab.json`ã€‚
 
-Gateway 网关在检测到遗留配置格式时也会在启动时自动运行 doctor 迁移，因此过时的配置无需手动干预即可修复。
+Gateway ç½‘å…³åœ¨æ£€æµ‹åˆ°é—ç•™é…ç½®æ ¼å¼æ—¶ä¹Ÿä¼šåœ¨å¯åŠ¨æ—¶è‡ªåŠ¨è¿è¡Œ doctor è¿ç§»ï¼Œå› æ­¤è¿‡æ—¶çš„é…ç½®æ— éœ€æ‰‹åŠ¨å¹²é¢„å³å¯ä¿®å¤ã€‚
 
-当前迁移：
+å½“å‰è¿ç§»ï¼š
 
-- `routing.allowFrom` → `channels.whatsapp.allowFrom`
-- `routing.groupChat.requireMention` → `channels.whatsapp/telegram/imessage.groups."*".requireMention`
-- `routing.groupChat.historyLimit` → `messages.groupChat.historyLimit`
-- `routing.groupChat.mentionPatterns` → `messages.groupChat.mentionPatterns`
-- `routing.queue` → `messages.queue`
-- `routing.bindings` → 顶级 `bindings`
-- `routing.agents`/`routing.defaultAgentId` → `agents.list` + `agents.list[].default`
-- `routing.agentToAgent` → `tools.agentToAgent`
-- `routing.transcribeAudio` → `tools.media.audio.models`
-- `bindings[].match.accountID` → `bindings[].match.accountId`
-- `identity` → `agents.list[].identity`
-- `agent.*` → `agents.defaults` + `tools.*`（tools/elevated/exec/sandbox/subagents）
+- `routing.allowFrom` â†’ `channels.whatsapp.allowFrom`
+- `routing.groupChat.requireMention` â†’ `channels.whatsapp/telegram/imessage.groups."*".requireMention`
+- `routing.groupChat.historyLimit` â†’ `messages.groupChat.historyLimit`
+- `routing.groupChat.mentionPatterns` â†’ `messages.groupChat.mentionPatterns`
+- `routing.queue` â†’ `messages.queue`
+- `routing.bindings` â†’ é¡¶çº§ `bindings`
+- `routing.agents`/`routing.defaultAgentId` â†’ `agents.list` + `agents.list[].default`
+- `routing.agentToAgent` â†’ `tools.agentToAgent`
+- `routing.transcribeAudio` â†’ `tools.media.audio.models`
+- `bindings[].match.accountID` â†’ `bindings[].match.accountId`
+- `identity` â†’ `agents.list[].identity`
+- `agent.*` â†’ `agents.defaults` + `tools.*`ï¼ˆtools/elevated/exec/sandbox/subagentsï¼‰
 - `agent.model`/`allowedModels`/`modelAliases`/`modelFallbacks`/`imageModelFallbacks`
-  → `agents.defaults.models` + `agents.defaults.model.primary/fallbacks` + `agents.defaults.imageModel.primary/fallbacks`
+  â†’ `agents.defaults.models` + `agents.defaults.model.primary/fallbacks` + `agents.defaults.imageModel.primary/fallbacks`
 
-### 2b）OpenCode Zen 提供商覆盖
+### 2bï¼‰OpenCode Zen æä¾›å•†è¦†ç›–
 
-如果你手动添加了 `models.providers.opencode`（或 `opencode-zen`），它会覆盖 `@mariozechner/pi-ai` 中内置的 OpenCode Zen 目录。这可能会强制将每个模型放到单个 API 上或将成本归零。Doctor 会发出警告，以便你可以移除覆盖并恢复每模型 API 路由 + 成本。
+å¦‚æžœä½ æ‰‹åŠ¨æ·»åŠ äº† `models.providers.opencode`ï¼ˆæˆ– `opencode-zen`ï¼‰ï¼Œå®ƒä¼šè¦†ç›– `@mariozechner/pi-ai` ä¸­å†…ç½®çš„ OpenCode Zen ç›®å½•ã€‚è¿™å¯èƒ½ä¼šå¼ºåˆ¶å°†æ¯ä¸ªæ¨¡åž‹æ”¾åˆ°å•ä¸ª API ä¸Šæˆ–å°†æˆæœ¬å½’é›¶ã€‚Doctor ä¼šå‘å‡ºè­¦å‘Šï¼Œä»¥ä¾¿ä½ å¯ä»¥ç§»é™¤è¦†ç›–å¹¶æ¢å¤æ¯æ¨¡åž‹ API è·¯ç”± + æˆæœ¬ã€‚
 
-### 3）遗留状态迁移（磁盘布局）
+### 3ï¼‰é—ç•™çŠ¶æ€è¿ç§»ï¼ˆç£ç›˜å¸ƒå±€ï¼‰
 
-Doctor 可以将旧的磁盘布局迁移到当前结构：
+Doctor å¯ä»¥å°†æ—§çš„ç£ç›˜å¸ƒå±€è¿ç§»åˆ°å½“å‰ç»“æž„ï¼š
 
-- 会话存储 + 记录：
-  - 从 `~/.OpenKrab/sessions/` 到 `~/.OpenKrab/agents/<agentId>/sessions/`
-- 智能体目录：
-  - 从 `~/.OpenKrab/agent/` 到 `~/.OpenKrab/agents/<agentId>/agent/`
-- WhatsApp 认证状态（Baileys）：
-  - 从遗留的 `~/.OpenKrab/credentials/*.json`（除 `oauth.json` 外）
-  - 到 `~/.OpenKrab/credentials/whatsapp/<accountId>/...`（默认账户 id：`default`）
+- ä¼šè¯å­˜å‚¨ + è®°å½•ï¼š
+  - ä»Ž `~/.OpenKrab/sessions/` åˆ° `~/.OpenKrab/agents/<agentId>/sessions/`
+- æ™ºèƒ½ä½“ç›®å½•ï¼š
+  - ä»Ž `~/.OpenKrab/agent/` åˆ° `~/.OpenKrab/agents/<agentId>/agent/`
+- WhatsApp è®¤è¯çŠ¶æ€ï¼ˆBaileysï¼‰ï¼š
+  - ä»Žé—ç•™çš„ `~/.OpenKrab/credentials/*.json`ï¼ˆé™¤ `oauth.json` å¤–ï¼‰
+  - åˆ° `~/.OpenKrab/credentials/whatsapp/<accountId>/...`ï¼ˆé»˜è®¤è´¦æˆ· idï¼š`default`ï¼‰
 
-这些迁移是尽力而为且幂等的；当 doctor 将任何遗留文件夹作为备份保留时会发出警告。Gateway 网关/CLI 也会在启动时自动迁移遗留会话 + 智能体目录，因此历史/认证/模型会落在每智能体路径中，无需手动运行 doctor。WhatsApp 认证有意仅通过 `OpenKrab doctor` 迁移。
+è¿™äº›è¿ç§»æ˜¯å°½åŠ›è€Œä¸ºä¸”å¹‚ç­‰çš„ï¼›å½“ doctor å°†ä»»ä½•é—ç•™æ–‡ä»¶å¤¹ä½œä¸ºå¤‡ä»½ä¿ç•™æ—¶ä¼šå‘å‡ºè­¦å‘Šã€‚Gateway ç½‘å…³/CLI ä¹Ÿä¼šåœ¨å¯åŠ¨æ—¶è‡ªåŠ¨è¿ç§»é—ç•™ä¼šè¯ + æ™ºèƒ½ä½“ç›®å½•ï¼Œå› æ­¤åŽ†å²/è®¤è¯/æ¨¡åž‹ä¼šè½åœ¨æ¯æ™ºèƒ½ä½“è·¯å¾„ä¸­ï¼Œæ— éœ€æ‰‹åŠ¨è¿è¡Œ doctorã€‚WhatsApp è®¤è¯æœ‰æ„ä»…é€šè¿‡ `OpenKrab doctor` è¿ç§»ã€‚
 
-### 4）状态完整性检查（会话持久化、路由和安全）
+### 4ï¼‰çŠ¶æ€å®Œæ•´æ€§æ£€æŸ¥ï¼ˆä¼šè¯æŒä¹…åŒ–ã€è·¯ç”±å’Œå®‰å…¨ï¼‰
 
-状态目录是操作的核心。如果它消失，你会丢失会话、凭证、日志和配置（除非你在别处有备份）。
+çŠ¶æ€ç›®å½•æ˜¯æ“ä½œçš„æ ¸å¿ƒã€‚å¦‚æžœå®ƒæ¶ˆå¤±ï¼Œä½ ä¼šä¸¢å¤±ä¼šè¯ã€å‡­è¯ã€æ—¥å¿—å’Œé…ç½®ï¼ˆé™¤éžä½ åœ¨åˆ«å¤„æœ‰å¤‡ä»½ï¼‰ã€‚
 
-Doctor 检查：
+Doctor æ£€æŸ¥ï¼š
 
-- **状态目录缺失**：警告灾难性状态丢失，提示重新创建目录，并提醒你它无法恢复丢失的数据。
-- **状态目录权限**：验证可写性；提供修复权限（并在检测到所有者/组不匹配时发出 `chown` 提示）。
-- **会话目录缺失**：`sessions/` 和会话存储目录是持久化历史和避免 `ENOENT` 崩溃所必需的。
-- **记录不匹配**：当最近的会话条目缺少记录文件时发出警告。
-- **主会话"1 行 JSONL"**：当主记录只有一行时标记（历史未累积）。
-- **多个状态目录**：当多个 `~/.OpenKrab` 文件夹存在于不同 home 目录或当 `OpenKrab_STATE_DIR` 指向别处时发出警告（历史可能在安装之间分裂）。
-- **远程模式提醒**：如果 `gateway.mode=remote`，doctor 会提醒你在远程主机上运行它（状态在那里）。
-- **配置文件权限**：当 `~/.OpenKrab/OpenKrab.json` 对组/其他用户可读时发出警告，并提供收紧到 `600` 的选项。
+- **çŠ¶æ€ç›®å½•ç¼ºå¤±**ï¼šè­¦å‘Šç¾éš¾æ€§çŠ¶æ€ä¸¢å¤±ï¼Œæç¤ºé‡æ–°åˆ›å»ºç›®å½•ï¼Œå¹¶æé†’ä½ å®ƒæ— æ³•æ¢å¤ä¸¢å¤±çš„æ•°æ®ã€‚
+- **çŠ¶æ€ç›®å½•æƒé™**ï¼šéªŒè¯å¯å†™æ€§ï¼›æä¾›ä¿®å¤æƒé™ï¼ˆå¹¶åœ¨æ£€æµ‹åˆ°æ‰€æœ‰è€…/ç»„ä¸åŒ¹é…æ—¶å‘å‡º `chown` æç¤ºï¼‰ã€‚
+- **ä¼šè¯ç›®å½•ç¼ºå¤±**ï¼š`sessions/` å’Œä¼šè¯å­˜å‚¨ç›®å½•æ˜¯æŒä¹…åŒ–åŽ†å²å’Œé¿å… `ENOENT` å´©æºƒæ‰€å¿…éœ€çš„ã€‚
+- **è®°å½•ä¸åŒ¹é…**ï¼šå½“æœ€è¿‘çš„ä¼šè¯æ¡ç›®ç¼ºå°‘è®°å½•æ–‡ä»¶æ—¶å‘å‡ºè­¦å‘Šã€‚
+- **ä¸»ä¼šè¯"1 è¡Œ JSONL"**ï¼šå½“ä¸»è®°å½•åªæœ‰ä¸€è¡Œæ—¶æ ‡è®°ï¼ˆåŽ†å²æœªç´¯ç§¯ï¼‰ã€‚
+- **å¤šä¸ªçŠ¶æ€ç›®å½•**ï¼šå½“å¤šä¸ª `~/.OpenKrab` æ–‡ä»¶å¤¹å­˜åœ¨äºŽä¸åŒ home ç›®å½•æˆ–å½“ `OPENKRAB_STATE_DIR` æŒ‡å‘åˆ«å¤„æ—¶å‘å‡ºè­¦å‘Šï¼ˆåŽ†å²å¯èƒ½åœ¨å®‰è£…ä¹‹é—´åˆ†è£‚ï¼‰ã€‚
+- **è¿œç¨‹æ¨¡å¼æé†’**ï¼šå¦‚æžœ `gateway.mode=remote`ï¼Œdoctor ä¼šæé†’ä½ åœ¨è¿œç¨‹ä¸»æœºä¸Šè¿è¡Œå®ƒï¼ˆçŠ¶æ€åœ¨é‚£é‡Œï¼‰ã€‚
+- **é…ç½®æ–‡ä»¶æƒé™**ï¼šå½“ `~/.OpenKrab/OpenKrab.json` å¯¹ç»„/å…¶ä»–ç”¨æˆ·å¯è¯»æ—¶å‘å‡ºè­¦å‘Šï¼Œå¹¶æä¾›æ”¶ç´§åˆ° `600` çš„é€‰é¡¹ã€‚
 
-### 5）模型认证健康（OAuth 过期）
+### 5ï¼‰æ¨¡åž‹è®¤è¯å¥åº·ï¼ˆOAuth è¿‡æœŸï¼‰
 
-Doctor 检查认证存储中的 OAuth 配置文件，在 token 即将过期/已过期时发出警告，并在安全时刷新它们。如果 Anthropic Claude Code 配置文件过时，它会建议运行 `claude setup-token`（或粘贴 setup-token）。
-刷新提示仅在交互运行（TTY）时出现；`--non-interactive` 跳过刷新尝试。
+Doctor æ£€æŸ¥è®¤è¯å­˜å‚¨ä¸­çš„ OAuth é…ç½®æ–‡ä»¶ï¼Œåœ¨ token å³å°†è¿‡æœŸ/å·²è¿‡æœŸæ—¶å‘å‡ºè­¦å‘Šï¼Œå¹¶åœ¨å®‰å…¨æ—¶åˆ·æ–°å®ƒä»¬ã€‚å¦‚æžœ Anthropic Claude Code é…ç½®æ–‡ä»¶è¿‡æ—¶ï¼Œå®ƒä¼šå»ºè®®è¿è¡Œ `claude setup-token`ï¼ˆæˆ–ç²˜è´´ setup-tokenï¼‰ã€‚
+åˆ·æ–°æç¤ºä»…åœ¨äº¤äº’è¿è¡Œï¼ˆTTYï¼‰æ—¶å‡ºçŽ°ï¼›`--non-interactive` è·³è¿‡åˆ·æ–°å°è¯•ã€‚
 
-Doctor 还会报告由于以下原因暂时不可用的认证配置文件：
+Doctor è¿˜ä¼šæŠ¥å‘Šç”±äºŽä»¥ä¸‹åŽŸå› æš‚æ—¶ä¸å¯ç”¨çš„è®¤è¯é…ç½®æ–‡ä»¶ï¼š
 
-- 短冷却（速率限制/超时/认证失败）
-- 长禁用（账单/信用失败）
+- çŸ­å†·å´ï¼ˆé€ŸçŽ‡é™åˆ¶/è¶…æ—¶/è®¤è¯å¤±è´¥ï¼‰
+- é•¿ç¦ç”¨ï¼ˆè´¦å•/ä¿¡ç”¨å¤±è´¥ï¼‰
 
-### 6）Hooks 模型验证
+### 6ï¼‰Hooks æ¨¡åž‹éªŒè¯
 
-如果设置了 `hooks.gmail.model`，doctor 会根据目录和允许列表验证模型引用，并在无法解析或不允许时发出警告。
+å¦‚æžœè®¾ç½®äº† `hooks.gmail.model`ï¼Œdoctor ä¼šæ ¹æ®ç›®å½•å’Œå…è®¸åˆ—è¡¨éªŒè¯æ¨¡åž‹å¼•ç”¨ï¼Œå¹¶åœ¨æ— æ³•è§£æžæˆ–ä¸å…è®¸æ—¶å‘å‡ºè­¦å‘Šã€‚
 
-### 7）沙箱镜像修复
+### 7ï¼‰æ²™ç®±é•œåƒä¿®å¤
 
-当启用沙箱隔离时，doctor 检查 Docker 镜像，并在当前镜像缺失时提供构建或切换到遗留名称的选项。
+å½“å¯ç”¨æ²™ç®±éš”ç¦»æ—¶ï¼Œdoctor æ£€æŸ¥ Docker é•œåƒï¼Œå¹¶åœ¨å½“å‰é•œåƒç¼ºå¤±æ—¶æä¾›æž„å»ºæˆ–åˆ‡æ¢åˆ°é—ç•™åç§°çš„é€‰é¡¹ã€‚
 
-### 8）Gateway 网关服务迁移和清理提示
+### 8ï¼‰Gateway ç½‘å…³æœåŠ¡è¿ç§»å’Œæ¸…ç†æç¤º
 
-Doctor 检测遗留的 Gateway 网关服务（launchd/systemd/schtasks），并提供删除它们并使用当前 Gateway 网关端口安装 OpenKrab 服务的选项。它还可以扫描额外的类 Gateway 网关服务并打印清理提示。
-配置文件命名的 OpenKrab Gateway 网关服务被视为一等公民，不会被标记为"额外的"。
+Doctor æ£€æµ‹é—ç•™çš„ Gateway ç½‘å…³æœåŠ¡ï¼ˆlaunchd/systemd/schtasksï¼‰ï¼Œå¹¶æä¾›åˆ é™¤å®ƒä»¬å¹¶ä½¿ç”¨å½“å‰ Gateway ç½‘å…³ç«¯å£å®‰è£… OpenKrab æœåŠ¡çš„é€‰é¡¹ã€‚å®ƒè¿˜å¯ä»¥æ‰«æé¢å¤–çš„ç±» Gateway ç½‘å…³æœåŠ¡å¹¶æ‰“å°æ¸…ç†æç¤ºã€‚
+é…ç½®æ–‡ä»¶å‘½åçš„ OpenKrab Gateway ç½‘å…³æœåŠ¡è¢«è§†ä¸ºä¸€ç­‰å…¬æ°‘ï¼Œä¸ä¼šè¢«æ ‡è®°ä¸º"é¢å¤–çš„"ã€‚
 
-### 9）安全警告
+### 9ï¼‰å®‰å…¨è­¦å‘Š
 
-当提供商对私信开放而没有允许列表，或当策略以危险方式配置时，Doctor 会发出警告。
+å½“æä¾›å•†å¯¹ç§ä¿¡å¼€æ”¾è€Œæ²¡æœ‰å…è®¸åˆ—è¡¨ï¼Œæˆ–å½“ç­–ç•¥ä»¥å±é™©æ–¹å¼é…ç½®æ—¶ï¼ŒDoctor ä¼šå‘å‡ºè­¦å‘Šã€‚
 
-### 10）systemd linger（Linux）
+### 10ï¼‰systemd lingerï¼ˆLinuxï¼‰
 
-如果作为 systemd 用户服务运行，doctor 确保启用 lingering，以便 Gateway 网关在注销后保持活动。
+å¦‚æžœä½œä¸º systemd ç”¨æˆ·æœåŠ¡è¿è¡Œï¼Œdoctor ç¡®ä¿å¯ç”¨ lingeringï¼Œä»¥ä¾¿ Gateway ç½‘å…³åœ¨æ³¨é”€åŽä¿æŒæ´»åŠ¨ã€‚
 
-### 11）Skills 状态
+### 11ï¼‰Skills çŠ¶æ€
 
-Doctor 打印当前工作区符合条件/缺失/被阻止的 Skills 的快速摘要。
+Doctor æ‰“å°å½“å‰å·¥ä½œåŒºç¬¦åˆæ¡ä»¶/ç¼ºå¤±/è¢«é˜»æ­¢çš„ Skills çš„å¿«é€Ÿæ‘˜è¦ã€‚
 
-### 12）Gateway 网关认证检查（本地 token）
+### 12ï¼‰Gateway ç½‘å…³è®¤è¯æ£€æŸ¥ï¼ˆæœ¬åœ° tokenï¼‰
 
-当本地 Gateway 网关缺少 `gateway.auth` 时，Doctor 会发出警告并提供生成 token 的选项。使用 `OpenKrab doctor --generate-gateway-token` 在自动化中强制创建 token。
+å½“æœ¬åœ° Gateway ç½‘å…³ç¼ºå°‘ `gateway.auth` æ—¶ï¼ŒDoctor ä¼šå‘å‡ºè­¦å‘Šå¹¶æä¾›ç”Ÿæˆ token çš„é€‰é¡¹ã€‚ä½¿ç”¨ `OpenKrab doctor --generate-gateway-token` åœ¨è‡ªåŠ¨åŒ–ä¸­å¼ºåˆ¶åˆ›å»º tokenã€‚
 
-### 13）Gateway 网关健康检查 + 重启
+### 13ï¼‰Gateway ç½‘å…³å¥åº·æ£€æŸ¥ + é‡å¯
 
-Doctor 运行健康检查，并在 Gateway 网关看起来不健康时提供重启选项。
+Doctor è¿è¡Œå¥åº·æ£€æŸ¥ï¼Œå¹¶åœ¨ Gateway ç½‘å…³çœ‹èµ·æ¥ä¸å¥åº·æ—¶æä¾›é‡å¯é€‰é¡¹ã€‚
 
-### 14）渠道状态警告
+### 14ï¼‰æ¸ é“çŠ¶æ€è­¦å‘Š
 
-如果 Gateway 网关健康，doctor 运行渠道状态探测并报告警告及建议的修复。
+å¦‚æžœ Gateway ç½‘å…³å¥åº·ï¼Œdoctor è¿è¡Œæ¸ é“çŠ¶æ€æŽ¢æµ‹å¹¶æŠ¥å‘Šè­¦å‘ŠåŠå»ºè®®çš„ä¿®å¤ã€‚
 
-### 15）Supervisor 配置审计 + 修复
+### 15ï¼‰Supervisor é…ç½®å®¡è®¡ + ä¿®å¤
 
-Doctor 检查已安装的 supervisor 配置（launchd/systemd/schtasks）是否有缺失或过时的默认值（例如 systemd network-online 依赖和重启延迟）。当发现不匹配时，它会推荐更新，并可以将服务文件/任务重写为当前默认值。
+Doctor æ£€æŸ¥å·²å®‰è£…çš„ supervisor é…ç½®ï¼ˆlaunchd/systemd/schtasksï¼‰æ˜¯å¦æœ‰ç¼ºå¤±æˆ–è¿‡æ—¶çš„é»˜è®¤å€¼ï¼ˆä¾‹å¦‚ systemd network-online ä¾èµ–å’Œé‡å¯å»¶è¿Ÿï¼‰ã€‚å½“å‘çŽ°ä¸åŒ¹é…æ—¶ï¼Œå®ƒä¼šæŽ¨èæ›´æ–°ï¼Œå¹¶å¯ä»¥å°†æœåŠ¡æ–‡ä»¶/ä»»åŠ¡é‡å†™ä¸ºå½“å‰é»˜è®¤å€¼ã€‚
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `OpenKrab doctor` 在重写 supervisor 配置前提示。
-- `OpenKrab doctor --yes` 接受默认修复提示。
-- `OpenKrab doctor --repair` 无需提示应用推荐的修复。
-- `OpenKrab doctor --repair --force` 覆盖自定义 supervisor 配置。
-- 你始终可以通过 `OpenKrab gateway install --force` 强制完全重写。
+- `OpenKrab doctor` åœ¨é‡å†™ supervisor é…ç½®å‰æç¤ºã€‚
+- `OpenKrab doctor --yes` æŽ¥å—é»˜è®¤ä¿®å¤æç¤ºã€‚
+- `OpenKrab doctor --repair` æ— éœ€æç¤ºåº”ç”¨æŽ¨èçš„ä¿®å¤ã€‚
+- `OpenKrab doctor --repair --force` è¦†ç›–è‡ªå®šä¹‰ supervisor é…ç½®ã€‚
+- ä½ å§‹ç»ˆå¯ä»¥é€šè¿‡ `OpenKrab gateway install --force` å¼ºåˆ¶å®Œå…¨é‡å†™ã€‚
 
-### 16）Gateway 网关运行时 + 端口诊断
+### 16ï¼‰Gateway ç½‘å…³è¿è¡Œæ—¶ + ç«¯å£è¯Šæ–­
 
-Doctor 检查服务运行时（PID、上次退出状态），并在服务已安装但实际未运行时发出警告。它还检查 Gateway 网关端口（默认 `18789`）上的端口冲突，并报告可能的原因（Gateway 网关已在运行、SSH 隧道）。
+Doctor æ£€æŸ¥æœåŠ¡è¿è¡Œæ—¶ï¼ˆPIDã€ä¸Šæ¬¡é€€å‡ºçŠ¶æ€ï¼‰ï¼Œå¹¶åœ¨æœåŠ¡å·²å®‰è£…ä½†å®žé™…æœªè¿è¡Œæ—¶å‘å‡ºè­¦å‘Šã€‚å®ƒè¿˜æ£€æŸ¥ Gateway ç½‘å…³ç«¯å£ï¼ˆé»˜è®¤ `18789`ï¼‰ä¸Šçš„ç«¯å£å†²çªï¼Œå¹¶æŠ¥å‘Šå¯èƒ½çš„åŽŸå› ï¼ˆGateway ç½‘å…³å·²åœ¨è¿è¡Œã€SSH éš§é“ï¼‰ã€‚
 
-### 17）Gateway 网关运行时最佳实践
+### 17ï¼‰Gateway ç½‘å…³è¿è¡Œæ—¶æœ€ä½³å®žè·µ
 
-当 Gateway 网关服务在 Bun 或版本管理器管理的 Node 路径（`nvm`、`fnm`、`volta`、`asdf` 等）上运行时，Doctor 会发出警告。WhatsApp + Telegram 渠道需要 Node，版本管理器路径在升级后可能会中断，因为服务不会加载你的 shell init。Doctor 会在可用时提供迁移到系统 Node 安装的选项（Homebrew/apt/choco）。
+å½“ Gateway ç½‘å…³æœåŠ¡åœ¨ Bun æˆ–ç‰ˆæœ¬ç®¡ç†å™¨ç®¡ç†çš„ Node è·¯å¾„ï¼ˆ`nvm`ã€`fnm`ã€`volta`ã€`asdf` ç­‰ï¼‰ä¸Šè¿è¡Œæ—¶ï¼ŒDoctor ä¼šå‘å‡ºè­¦å‘Šã€‚WhatsApp + Telegram æ¸ é“éœ€è¦ Nodeï¼Œç‰ˆæœ¬ç®¡ç†å™¨è·¯å¾„åœ¨å‡çº§åŽå¯èƒ½ä¼šä¸­æ–­ï¼Œå› ä¸ºæœåŠ¡ä¸ä¼šåŠ è½½ä½ çš„ shell initã€‚Doctor ä¼šåœ¨å¯ç”¨æ—¶æä¾›è¿ç§»åˆ°ç³»ç»Ÿ Node å®‰è£…çš„é€‰é¡¹ï¼ˆHomebrew/apt/chocoï¼‰ã€‚
 
-### 18）配置写入 + 向导元数据
+### 18ï¼‰é…ç½®å†™å…¥ + å‘å¯¼å…ƒæ•°æ®
 
-Doctor 持久化任何配置更改，并标记向导元数据以记录 doctor 运行。
+Doctor æŒä¹…åŒ–ä»»ä½•é…ç½®æ›´æ”¹ï¼Œå¹¶æ ‡è®°å‘å¯¼å…ƒæ•°æ®ä»¥è®°å½• doctor è¿è¡Œã€‚
 
-### 19）工作区提示（备份 + 记忆系统）
+### 19ï¼‰å·¥ä½œåŒºæç¤ºï¼ˆå¤‡ä»½ + è®°å¿†ç³»ç»Ÿï¼‰
 
-当缺失时，Doctor 建议使用工作区记忆系统，并在工作区尚未在 git 下时打印备份提示。
+å½“ç¼ºå¤±æ—¶ï¼ŒDoctor å»ºè®®ä½¿ç”¨å·¥ä½œåŒºè®°å¿†ç³»ç»Ÿï¼Œå¹¶åœ¨å·¥ä½œåŒºå°šæœªåœ¨ git ä¸‹æ—¶æ‰“å°å¤‡ä»½æç¤ºã€‚
 
-参见 [/concepts/agent-workspace](/concepts/agent-workspace) 了解工作区结构和 git 备份的完整指南（推荐私有 GitHub 或 GitLab）。
+å‚è§ [/concepts/agent-workspace](/concepts/agent-workspace) äº†è§£å·¥ä½œåŒºç»“æž„å’Œ git å¤‡ä»½çš„å®Œæ•´æŒ‡å—ï¼ˆæŽ¨èç§æœ‰ GitHub æˆ– GitLabï¼‰ã€‚
+
 

@@ -1,4 +1,4 @@
-use krabkrab::channels::allowlist_match::*;
+use openkrab::channels::allowlist_match::*;
 
 #[test]
 fn wildcard_allows() {
@@ -19,3 +19,4 @@ fn id_and_name_match() {
     assert!(m2.allowed);
     assert_eq!(m2.match_source.unwrap(), AllowlistMatchSource::Name);
 }
+

@@ -1,5 +1,5 @@
----
-summary: "Install OpenKrab — from source, pre-built binaries, Docker, and more"
+﻿---
+summary: "Install OpenKrab â€” from source, pre-built binaries, Docker, and more"
 read_when:
   - You need an install method other than the Getting Started quickstart
   - You want to deploy to a cloud platform
@@ -9,7 +9,7 @@ title: "Install"
 
 # Install
 
-Already followed [Getting Started](/start/getting-started)? You're all set — this page is for alternative install methods, platform-specific instructions, and maintenance.
+Already followed [Getting Started](/start/getting-started)? You're all set â€” this page is for alternative install methods, platform-specific instructions, and maintenance.
 
 ## System requirements
 
@@ -37,7 +37,7 @@ Building from source is the recommended way to install OpenKrab. It provides the
     cargo build --release
     ```
 
-    The binary will be at `target/release/krabkrab`.
+    The binary will be at `target/release/openkrab`.
 
     To install globally:
     ```bash
@@ -46,7 +46,7 @@ Building from source is the recommended way to install OpenKrab. It provides the
 
     Or copy the binary to your PATH:
     ```bash
-    cp target/release/krabkrab /usr/local/bin/
+    cp target/release/openkrab /usr/local/bin/
     ```
 
   </Accordion>
@@ -104,35 +104,32 @@ cargo doc --open             # Generate docs
 
 Verify everything is working:
 
-```bash
-krabkrab doctor         # check for config issues
-krabkrab status         # gateway status
-krabkrab dashboard      # open the browser UI
+```bash\nOpenKrab doctor         # check for config issues\nOpenKrab status         # gateway status\nOpenKrab dashboard      # open the browser UI
 ```
 
 If you need custom runtime paths, use:
 
-- `KRABKRAB_CONFIG_DIR` for config directory
-- `KRABKRAB_DATA_DIR` for data directory
+- `OPENKRAB_CONFIG_DIR` for config directory
+- `OPENKRAB_DATA_DIR` for data directory
 
 See [Environment vars](/help/environment) for precedence and full details.
 
-## Troubleshooting: `krabkrab` not found
+## Troubleshooting: `openkrab` not found
 
 <Accordion title="PATH diagnosis and fix">
   Quick diagnosis:
 
 ```bash
-which krabkrab
+which openkrab
 echo "$PATH"
 ```
 
-If the directory containing `krabkrab` is **not** in your `$PATH`, your shell can't find the binary.
+If the directory containing `openkrab` is **not** in your `$PATH`, your shell can't find the binary.
 
-Fix — add it to your shell startup file (`~/.zshrc` or `~/.bashrc`):
+Fix â€” add it to your shell startup file (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
-export PATH="/path/to/krabkrab:$PATH"
+export PATH="/path/to/openkrab:$PATH"
 ```
 
 Then open a new terminal (or `source ~/.zshrc` / `source ~/.bashrc`).
@@ -151,3 +148,6 @@ Then open a new terminal (or `source ~/.zshrc` / `source ~/.bashrc`).
     Remove OpenKrab completely.
   </Card>
 </CardGroup>
+
+
+

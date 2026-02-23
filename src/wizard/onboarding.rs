@@ -44,8 +44,8 @@ async fn require_risk_acknowledgement(
                 "- Use the strongest available model for any bot with tools.",
                 "",
                 "Run regularly:",
-                "  krabkrab security audit --deep",
-                "  krabkrab security audit --fix",
+                "  openkrab security audit --deep",
+                "  openkrab security audit --fix",
             ]
             .join("\n"),
             Some("Security"),
@@ -132,7 +132,7 @@ pub async fn run_onboarding_wizard(
                             value: "quickstart".to_string(),
                             label: "QuickStart".to_string(),
                             hint: Some(
-                                "Configure details later via `krabkrab configure`.".to_string(),
+                                "Configure details later via `openkrab configure`.".to_string(),
                             ),
                         },
                         WizardSelectOption {
@@ -301,7 +301,7 @@ pub async fn run_onboarding_wizard(
     }
 
     prompter
-        .outro("Onboarding complete! Run `krabkrab` to start.")
+        .outro("Onboarding complete! Run `openkrab` to start.")
         .await?;
 
     Ok(OnboardingResult {
@@ -427,3 +427,4 @@ mod tests {
         assert!(path.ends_with(".openkrab/config.yaml"));
     }
 }
+

@@ -16,7 +16,7 @@ pub struct CronJob {
 
 fn get_cron_path() -> PathBuf {
     let home = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    home.join("krabkrab").join("cron.toml")
+    home.join("openkrab").join("cron.toml")
 }
 
 pub fn cron_list_command() -> String {
@@ -24,10 +24,10 @@ pub fn cron_list_command() -> String {
 
     if !cron_path.exists() {
         return r#"No cron jobs configured.
-Run 'krabkrab cron add <schedule> <command>' to add one.
+Run 'openkrab cron add <schedule> <command>' to add one.
 
 Example:
-  krabkrab cron add "0 9 * * *" "Send daily summary"
+  openkrab cron add "0 9 * * *" "Send daily summary"
 "#
         .to_string();
     }
@@ -140,3 +140,4 @@ pub fn cron_disable_command(id: &str) -> String {
     }
     format!("Cron job not found: {}", id)
 }
+

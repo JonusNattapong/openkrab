@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 你想要可复现、可回滚的安装
-  - 你已经在使用 Nix/NixOS/Home Manager
-  - 你想要所有内容都固定并以声明式管理
-summary: 使用 Nix 声明式安装 OpenKrab
+  - ä½ æƒ³è¦å¯å¤çŽ°ã€å¯å›žæ»šçš„å®‰è£…
+  - ä½ å·²ç»åœ¨ä½¿ç”¨ Nix/NixOS/Home Manager
+  - ä½ æƒ³è¦æ‰€æœ‰å†…å®¹éƒ½å›ºå®šå¹¶ä»¥å£°æ˜Žå¼ç®¡ç†
+summary: ä½¿ç”¨ Nix å£°æ˜Žå¼å®‰è£… OpenKrab
 title: Nix
 x-i18n:
   generated_at: "2026-02-03T07:49:51Z"
@@ -14,13 +14,13 @@ x-i18n:
   workflow: 15
 ---
 
-# Nix 安装
+# Nix å®‰è£…
 
-使用 Nix 运行 OpenKrab 的推荐方式是通过 **[nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)** — 一个开箱即用的 Home Manager 模块。
+ä½¿ç”¨ Nix è¿è¡Œ OpenKrab çš„æŽ¨èæ–¹å¼æ˜¯é€šè¿‡ **[nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)** â€” ä¸€ä¸ªå¼€ç®±å³ç”¨çš„ Home Manager æ¨¡å—ã€‚
 
-## 快速开始
+## å¿«é€Ÿå¼€å§‹
 
-将此粘贴给你的 AI 智能体（Claude、Cursor 等）：
+å°†æ­¤ç²˜è´´ç»™ä½ çš„ AI æ™ºèƒ½ä½“ï¼ˆClaudeã€Cursor ç­‰ï¼‰ï¼š
 
 ```text
 I want to set up nix-OpenKrab on my Mac.
@@ -37,64 +37,65 @@ What I need you to do:
 Reference the nix-OpenKrab README for module options.
 ```
 
-> **📦 完整指南：[github.com/OpenKrab/nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)**
+> **ðŸ“¦ å®Œæ•´æŒ‡å—ï¼š[github.com/OpenKrab/nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)**
 >
-> nix-OpenKrab 仓库是 Nix 安装的权威来源。本页只是一个快速概述。
+> nix-OpenKrab ä»“åº“æ˜¯ Nix å®‰è£…çš„æƒå¨æ¥æºã€‚æœ¬é¡µåªæ˜¯ä¸€ä¸ªå¿«é€Ÿæ¦‚è¿°ã€‚
 
-## 你将获得
+## ä½ å°†èŽ·å¾—
 
-- Gateway 网关 + macOS 应用 + 工具（whisper、spotify、cameras）— 全部固定版本
-- 重启后仍能运行的 Launchd 服务
-- 带有声明式配置的插件系统
-- 即时回滚：`home-manager switch --rollback`
+- Gateway ç½‘å…³ + macOS åº”ç”¨ + å·¥å…·ï¼ˆwhisperã€spotifyã€camerasï¼‰â€” å…¨éƒ¨å›ºå®šç‰ˆæœ¬
+- é‡å¯åŽä»èƒ½è¿è¡Œçš„ Launchd æœåŠ¡
+- å¸¦æœ‰å£°æ˜Žå¼é…ç½®çš„æ’ä»¶ç³»ç»Ÿ
+- å³æ—¶å›žæ»šï¼š`home-manager switch --rollback`
 
 ---
 
-## Nix 模式运行时行为
+## Nix æ¨¡å¼è¿è¡Œæ—¶è¡Œä¸º
 
-当设置 `OpenKrab_NIX_MODE=1` 时（nix-OpenKrab 会自动设置）：
+å½“è®¾ç½® `OPENKRAB_NIX_MODE=1` æ—¶ï¼ˆnix-OpenKrab ä¼šè‡ªåŠ¨è®¾ç½®ï¼‰ï¼š
 
-OpenKrab 支持 **Nix 模式**，使配置确定性并禁用自动安装流程。
-通过导出以下环境变量启用：
+OpenKrab æ”¯æŒ **Nix æ¨¡å¼**ï¼Œä½¿é…ç½®ç¡®å®šæ€§å¹¶ç¦ç”¨è‡ªåŠ¨å®‰è£…æµç¨‹ã€‚
+é€šè¿‡å¯¼å‡ºä»¥ä¸‹çŽ¯å¢ƒå˜é‡å¯ç”¨ï¼š
 
 ```bash
-OpenKrab_NIX_MODE=1
+OPENKRAB_NIX_MODE=1
 ```
 
-在 macOS 上，GUI 应用不会自动继承 shell 环境变量。你也可以通过 defaults 启用 Nix 模式：
+åœ¨ macOS ä¸Šï¼ŒGUI åº”ç”¨ä¸ä¼šè‡ªåŠ¨ç»§æ‰¿ shell çŽ¯å¢ƒå˜é‡ã€‚ä½ ä¹Ÿå¯ä»¥é€šè¿‡ defaults å¯ç”¨ Nix æ¨¡å¼ï¼š
 
 ```bash
 defaults write bot.molt.mac OpenKrab.nixMode -bool true
 ```
 
-### 配置 + 状态路径
+### é…ç½® + çŠ¶æ€è·¯å¾„
 
-OpenKrab 从 `OpenKrab_CONFIG_PATH` 读取 JSON5 配置，并将可变数据存储在 `OpenKrab_STATE_DIR` 中。
+OpenKrab ä»Ž `OPENKRAB_CONFIG_PATH` è¯»å– JSON5 é…ç½®ï¼Œå¹¶å°†å¯å˜æ•°æ®å­˜å‚¨åœ¨ `OPENKRAB_STATE_DIR` ä¸­ã€‚
 
-- `OpenKrab_STATE_DIR`（默认：`~/.OpenKrab`）
-- `OpenKrab_CONFIG_PATH`（默认：`$OpenKrab_STATE_DIR/OpenKrab.json`）
+- `OPENKRAB_STATE_DIR`ï¼ˆé»˜è®¤ï¼š`~/.OpenKrab`ï¼‰
+- `OPENKRAB_CONFIG_PATH`ï¼ˆé»˜è®¤ï¼š`$OPENKRAB_STATE_DIR/OpenKrab.json`ï¼‰
 
-在 Nix 下运行时，将这些显式设置为 Nix 管理的位置，以便运行时状态和配置不会进入不可变存储。
+åœ¨ Nix ä¸‹è¿è¡Œæ—¶ï¼Œå°†è¿™äº›æ˜¾å¼è®¾ç½®ä¸º Nix ç®¡ç†çš„ä½ç½®ï¼Œä»¥ä¾¿è¿è¡Œæ—¶çŠ¶æ€å’Œé…ç½®ä¸ä¼šè¿›å…¥ä¸å¯å˜å­˜å‚¨ã€‚
 
-### Nix 模式下的运行时行为
+### Nix æ¨¡å¼ä¸‹çš„è¿è¡Œæ—¶è¡Œä¸º
 
-- 自动安装和自我修改流程被禁用
-- 缺失的依赖会显示 Nix 特定的修复消息
-- 存在时 UI 会显示只读 Nix 模式横幅
+- è‡ªåŠ¨å®‰è£…å’Œè‡ªæˆ‘ä¿®æ”¹æµç¨‹è¢«ç¦ç”¨
+- ç¼ºå¤±çš„ä¾èµ–ä¼šæ˜¾ç¤º Nix ç‰¹å®šçš„ä¿®å¤æ¶ˆæ¯
+- å­˜åœ¨æ—¶ UI ä¼šæ˜¾ç¤ºåªè¯» Nix æ¨¡å¼æ¨ªå¹…
 
-## 打包注意事项（macOS）
+## æ‰“åŒ…æ³¨æ„äº‹é¡¹ï¼ˆmacOSï¼‰
 
-macOS 打包流程期望在以下位置有一个稳定的 Info.plist 模板：
+macOS æ‰“åŒ…æµç¨‹æœŸæœ›åœ¨ä»¥ä¸‹ä½ç½®æœ‰ä¸€ä¸ªç¨³å®šçš„ Info.plist æ¨¡æ¿ï¼š
 
 ```
 apps/macos/Sources/OpenKrab/Resources/Info.plist
 ```
 
-[`scripts/package-mac-app.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/package-mac-app.sh) 将此模板复制到应用包中并修补动态字段（bundle ID、版本/构建号、Git SHA、Sparkle 密钥）。这使 plist 对于 SwiftPM 打包和 Nix 构建保持确定性（它们不依赖完整的 Xcode 工具链）。
+[`scripts/package-mac-app.sh`](https://github.com/OpenKrab/OpenKrab/blob/main/scripts/package-mac-app.sh) å°†æ­¤æ¨¡æ¿å¤åˆ¶åˆ°åº”ç”¨åŒ…ä¸­å¹¶ä¿®è¡¥åŠ¨æ€å­—æ®µï¼ˆbundle IDã€ç‰ˆæœ¬/æž„å»ºå·ã€Git SHAã€Sparkle å¯†é’¥ï¼‰ã€‚è¿™ä½¿ plist å¯¹äºŽ SwiftPM æ‰“åŒ…å’Œ Nix æž„å»ºä¿æŒç¡®å®šæ€§ï¼ˆå®ƒä»¬ä¸ä¾èµ–å®Œæ•´çš„ Xcode å·¥å…·é“¾ï¼‰ã€‚
 
-## 相关内容
+## ç›¸å…³å†…å®¹
 
-- [nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab) — 完整设置指南
-- [向导](/start/wizard) — 非 Nix CLI 设置
-- [Docker](/install/docker) — 容器化设置
+- [nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab) â€” å®Œæ•´è®¾ç½®æŒ‡å—
+- [å‘å¯¼](/start/wizard) â€” éž Nix CLI è®¾ç½®
+- [Docker](/install/docker) â€” å®¹å™¨åŒ–è®¾ç½®
+
 

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Model provider overview with example configs + CLI flows"
 read_when:
   - You need a provider-by-provider model setup reference
@@ -21,7 +21,7 @@ For model selection rules, see [/concepts/models](/concepts/models).
 
 - Supports generic provider rotation for selected providers.
 - Configure multiple keys via:
-  - `openkrab_LIVE_<PROVIDER>_KEY` (single live override, highest priority)
+  - `OPENKRAB_LIVE_<PROVIDER>_KEY` (single live override, highest priority)
   - `<PROVIDER>_API_KEYS` (comma or semicolon list)
   - `<PROVIDER>_API_KEY` (primary key)
   - `<PROVIDER>_API_KEY_*` (numbered list, e.g. `<PROVIDER>_API_KEY_1`)
@@ -32,15 +32,14 @@ For model selection rules, see [/concepts/models](/concepts/models).
 - When all candidate keys fail, the final error is returned from the last attempt.
 
 ## Built-in providers (pi-ai catalog)
-
-openkrab ships with the pi‑ai catalog. These providers require **no**
+\nOpenKrab ships with the piâ€‘ai catalog. These providers require **no**
 `models.providers` config; just set auth + pick a model.
 
 ### OpenAI
 
 - Provider: `openai`
 - Auth: `OPENAI_API_KEY`
-- Optional rotation: `OPENAI_API_KEYS`, `OPENAI_API_KEY_1`, `OPENAI_API_KEY_2`, plus `openkrab_LIVE_OPENAI_KEY` (single override)
+- Optional rotation: `OPENAI_API_KEYS`, `OPENAI_API_KEY_1`, `OPENAI_API_KEY_2`, plus `OPENKRAB_LIVE_OPENAI_KEY` (single override)
 - Example model: `openai/gpt-5.1-codex`
 - CLI: `openkrab onboard --auth-choice openai-api-key`
 
@@ -54,7 +53,7 @@ openkrab ships with the pi‑ai catalog. These providers require **no**
 
 - Provider: `anthropic`
 - Auth: `ANTHROPIC_API_KEY` or `claude setup-token`
-- Optional rotation: `ANTHROPIC_API_KEYS`, `ANTHROPIC_API_KEY_1`, `ANTHROPIC_API_KEY_2`, plus `openkrab_LIVE_ANTHROPIC_KEY` (single override)
+- Optional rotation: `ANTHROPIC_API_KEYS`, `ANTHROPIC_API_KEY_1`, `ANTHROPIC_API_KEY_2`, plus `OPENKRAB_LIVE_ANTHROPIC_KEY` (single override)
 - Example model: `anthropic/claude-opus-4-6`
 - CLI: `openkrab onboard --auth-choice token` (paste setup-token) or `openkrab models auth paste-token --provider anthropic`
 
@@ -94,7 +93,7 @@ openkrab ships with the pi‑ai catalog. These providers require **no**
 
 - Provider: `google`
 - Auth: `GEMINI_API_KEY`
-- Optional rotation: `GEMINI_API_KEYS`, `GEMINI_API_KEY_1`, `GEMINI_API_KEY_2`, `GOOGLE_API_KEY` fallback, and `openkrab_LIVE_GEMINI_KEY` (single override)
+- Optional rotation: `GEMINI_API_KEYS`, `GEMINI_API_KEY_1`, `GEMINI_API_KEY_2`, `GOOGLE_API_KEY` fallback, and `OPENKRAB_LIVE_GEMINI_KEY` (single override)
 - Example model: `google/gemini-3-pro-preview`
 - CLI: `openkrab onboard --auth-choice gemini-api-key`
 
@@ -137,12 +136,12 @@ openkrab ships with the pi‑ai catalog. These providers require **no**
   - OpenAI-compatible base URL: `https://api.cerebras.ai/v1`.
 - Mistral: `mistral` (`MISTRAL_API_KEY`)
 - GitHub Copilot: `github-copilot` (`COPILOT_GITHUB_TOKEN` / `GH_TOKEN` / `GITHUB_TOKEN`)
-- Hugging Face Inference: `huggingface` (`HUGGINGFACE_HUB_TOKEN` or `HF_TOKEN`) — OpenAI-compatible router; example model: `huggingface/deepseek-ai/DeepSeek-R1`; CLI: `openkrab onboard --auth-choice huggingface-api-key`. See [Hugging Face (Inference)](/providers/huggingface).
+- Hugging Face Inference: `huggingface` (`HUGGINGFACE_HUB_TOKEN` or `HF_TOKEN`) â€” OpenAI-compatible router; example model: `huggingface/deepseek-ai/DeepSeek-R1`; CLI: `openkrab onboard --auth-choice huggingface-api-key`. See [Hugging Face (Inference)](/providers/huggingface).
 
 ## Providers via `models.providers` (custom/base URL)
 
 Use `models.providers` (or `models.json`) to add **custom** providers or
-OpenAI/Anthropic‑compatible proxies.
+OpenAI/Anthropicâ€‘compatible proxies.
 
 ### Moonshot AI (Kimi)
 
@@ -204,9 +203,7 @@ Kimi Coding uses Moonshot AI's Anthropic-compatible endpoint:
 Qwen provides OAuth access to Qwen Coder + Vision via a device-code flow.
 Enable the bundled plugin, then log in:
 
-```bash
-openkrab plugins enable qwen-portal-auth
-openkrab models auth login --provider qwen-portal --set-default
+```bash\nOpenKrab plugins enable qwen-portal-auth\nOpenKrab models auth login --provider qwen-portal --set-default
 ```
 
 Model refs:
@@ -248,7 +245,7 @@ Synthetic provides Anthropic-compatible models behind the `synthetic` provider:
 
 MiniMax is configured via `models.providers` because it uses custom endpoints:
 
-- MiniMax (Anthropic‑compatible): `--auth-choice minimax-api`
+- MiniMax (Anthropicâ€‘compatible): `--auth-choice minimax-api`
 - Auth: `MINIMAX_API_KEY`
 
 See [/providers/minimax](/providers/minimax) for setup details, model options, and config snippets.
@@ -285,7 +282,7 @@ vLLM is a local (or self-hosted) OpenAI-compatible server:
 - Auth: Optional (depends on your server)
 - Default base URL: `http://127.0.0.1:8000/v1`
 
-To opt in to auto-discovery locally (any value works if your server doesn’t enforce auth):
+To opt in to auto-discovery locally (any value works if your server doesnâ€™t enforce auth):
 
 ```bash
 export VLLM_API_KEY="vllm-local"
@@ -305,7 +302,7 @@ See [/providers/vllm](/providers/vllm) for details.
 
 ### Local proxies (LM Studio, vLLM, LiteLLM, etc.)
 
-Example (OpenAI‑compatible):
+Example (OpenAIâ€‘compatible):
 
 ```json5
 {
@@ -341,7 +338,7 @@ Example (OpenAI‑compatible):
 Notes:
 
 - For custom providers, `reasoning`, `input`, `cost`, `contextWindow`, and `maxTokens` are optional.
-  When omitted, openkrab defaults to:
+  When omitted, OpenKrab defaults to:
   - `reasoning: false`
   - `input: ["text"]`
   - `cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }`
@@ -351,10 +348,9 @@ Notes:
 
 ## CLI examples
 
-```bash
-openkrab onboard --auth-choice opencode-zen
-openkrab models set opencode/claude-opus-4-6
-openkrab models list
+```bash\nOpenKrab onboard --auth-choice opencode-zen\nOpenKrab models set opencode/claude-opus-4-6\nOpenKrab models list
 ```
 
 See also: [/gateway/configuration](/gateway/configuration) for full configuration examples.
+
+

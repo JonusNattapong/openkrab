@@ -14,7 +14,7 @@ use regex::Regex;
 /// # Examples
 ///
 /// ```
-/// use krabkrab::shared::model_param_b::infer_param_b_from_id_or_name;
+/// use openkrab::shared::model_param_b::infer_param_b_from_id_or_name;
 ///
 /// assert_eq!(infer_param_b_from_id_or_name("llama-3.1-70b-instruct"), Some(70.0));
 /// assert_eq!(infer_param_b_from_id_or_name("phi-3-mini"), None);
@@ -88,3 +88,4 @@ mod tests {
         assert_eq!(infer_param_b_from_id_or_name("model-0b"), None);
     }
 }
+

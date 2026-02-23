@@ -1,4 +1,4 @@
-//! providers::gemini_cli_auth — Gemini CLI credential extractor.
+﻿//! providers::gemini_cli_auth â€” Gemini CLI credential extractor.
 //! Ported from `openkrab/extensions/google-gemini-cli-auth/oauth.ts` (Phase 15).
 //!
 //! Locates the installed `gemini` binary, finds the bundled `oauth2.js` file,
@@ -8,18 +8,18 @@
 use anyhow::{bail, Result};
 use std::path::{Path, PathBuf};
 
-// ─── Env-var keys ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Env-var keys â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const CLIENT_ID_KEYS: &[&str] = &[
-    "KRABKRAB_GEMINI_OAUTH_CLIENT_ID",
+    "OPENKRAB_GEMINI_OAUTH_CLIENT_ID",
     "GEMINI_CLI_OAUTH_CLIENT_ID",
 ];
 const CLIENT_SECRET_KEYS: &[&str] = &[
-    "KRABKRAB_GEMINI_OAUTH_CLIENT_SECRET",
+    "OPENKRAB_GEMINI_OAUTH_CLIENT_SECRET",
     "GEMINI_CLI_OAUTH_CLIENT_SECRET",
 ];
 
-// ─── Public types ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Public types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 #[derive(Debug, Clone)]
 pub struct GeminiCliCredentials {
@@ -45,7 +45,7 @@ impl GeminiTier {
     }
 }
 
-// ─── Env-var resolution ───────────────────────────────────────────────────────
+// â”€â”€â”€ Env-var resolution â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 fn resolve_env(keys: &[&str]) -> Option<String> {
     for key in keys {
@@ -59,7 +59,7 @@ fn resolve_env(keys: &[&str]) -> Option<String> {
     None
 }
 
-// ─── PATH search ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ PATH search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Find the `gemini` binary on PATH (tries common extensions on Windows).
 pub fn find_in_path(name: &str) -> Option<PathBuf> {
@@ -104,7 +104,7 @@ pub fn find_file_recursive(dir: &Path, name: &str, max_depth: usize) -> Option<P
     None
 }
 
-// ─── Credential extraction ────────────────────────────────────────────────────
+// â”€â”€â”€ Credential extraction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Regex-extract the client_id and client_secret from the content of `oauth2.js`.
 pub fn extract_credentials_from_js(content: &str) -> Option<GeminiCliCredentials> {
@@ -160,7 +160,7 @@ fn regex_find(haystack: &str, pattern: &str) -> Option<String> {
     None
 }
 
-// ─── High-level resolve ───────────────────────────────────────────────────────
+// â”€â”€â”€ High-level resolve â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Resolve Gemini CLI OAuth credentials with fallback priority:
 /// 1. Environment variable overrides
@@ -217,7 +217,7 @@ fn extract_from_installed_cli() -> Option<GeminiCliCredentials> {
     None
 }
 
-// ─── VPC-SC check ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ VPC-SC check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Check if a JSON error payload is from a VPC Service Controls policy violation.
 pub fn is_vpc_sc_affected(payload: &serde_json::Value) -> bool {
@@ -233,7 +233,7 @@ pub fn is_vpc_sc_affected(payload: &serde_json::Value) -> bool {
     false
 }
 
-// ─── Copilot-endpoint token parsing (re-export shim) ─────────────────────────
+// â”€â”€â”€ Copilot-endpoint token parsing (re-export shim) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Parse a Copilot-style semicolon-delimited token to find the `proxy-ep=` value.
 pub fn derive_api_base_url_from_token(token: &str) -> Option<String> {
@@ -322,3 +322,5 @@ mod tests {
         assert!(derive_api_base_url_from_token("").is_none());
     }
 }
+
+

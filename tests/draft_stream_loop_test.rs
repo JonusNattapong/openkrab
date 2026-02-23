@@ -1,6 +1,6 @@
 use futures::executor::block_on;
 use futures::future::BoxFuture;
-use krabkrab::channels::draft_stream_loop::*;
+use openkrab::channels::draft_stream_loop::*;
 use std::sync::{Arc, Mutex};
 
 fn make_send_counter() -> (
@@ -30,3 +30,4 @@ fn test_flush_sends_pending() {
     assert_eq!(v.len(), 1);
     assert_eq!(v[0], "hello");
 }
+

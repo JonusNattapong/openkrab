@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 安装 OpenKrab
-  - 你想从 GitHub 安装
-summary: 安装 OpenKrab（推荐安装器、全局安装或从源代码安装）
-title: 安装
+  - å®‰è£… OpenKrab
+  - ä½ æƒ³ä»Ž GitHub å®‰è£…
+summary: å®‰è£… OpenKrabï¼ˆæŽ¨èå®‰è£…å™¨ã€å…¨å±€å®‰è£…æˆ–ä»Žæºä»£ç å®‰è£…ï¼‰
+title: å®‰è£…
 x-i18n:
   generated_at: "2026-02-03T10:07:43Z"
   model: claude-opus-4-5
@@ -13,158 +13,158 @@ x-i18n:
   workflow: 15
 ---
 
-# 安装
+# å®‰è£…
 
-除非有特殊原因，否则请使用安装器。它会设置 CLI 并运行新手引导。
+é™¤éžæœ‰ç‰¹æ®ŠåŽŸå› ï¼Œå¦åˆ™è¯·ä½¿ç”¨å®‰è£…å™¨ã€‚å®ƒä¼šè®¾ç½® CLI å¹¶è¿è¡Œæ–°æ‰‹å¼•å¯¼ã€‚
 
-## 快速安装（推荐）
+## å¿«é€Ÿå®‰è£…ï¼ˆæŽ¨èï¼‰
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash
 ```
 
-Windows（PowerShell）：
+Windowsï¼ˆPowerShellï¼‰ï¼š
 
 ```powershell
 iwr -useb https://OpenKrab.ai/install.ps1 | iex
 ```
 
-下一步（如果你跳过了新手引导）：
+ä¸‹ä¸€æ­¥ï¼ˆå¦‚æžœä½ è·³è¿‡äº†æ–°æ‰‹å¼•å¯¼ï¼‰ï¼š
 
 ```bash
 OpenKrab onboard --install-daemon
 ```
 
-## 系统要求
+## ç³»ç»Ÿè¦æ±‚
 
 - **Node >=22**
-- macOS、Linux 或通过 WSL2 的 Windows
-- `pnpm` 仅在从源代码构建时需要
+- macOSã€Linux æˆ–é€šè¿‡ WSL2 çš„ Windows
+- `pnpm` ä»…åœ¨ä»Žæºä»£ç æž„å»ºæ—¶éœ€è¦
 
-## 选择安装路径
+## é€‰æ‹©å®‰è£…è·¯å¾„
 
-### 1）安装器脚本（推荐）
+### 1ï¼‰å®‰è£…å™¨è„šæœ¬ï¼ˆæŽ¨èï¼‰
 
-通过 npm 全局安装 `OpenKrab` 并运行新手引导。
+é€šè¿‡ npm å…¨å±€å®‰è£… `OpenKrab` å¹¶è¿è¡Œæ–°æ‰‹å¼•å¯¼ã€‚
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash
 ```
 
-安装器标志：
+å®‰è£…å™¨æ ‡å¿—ï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --help
 ```
 
-详情：[安装器内部原理](/install/installer)。
+è¯¦æƒ…ï¼š[å®‰è£…å™¨å†…éƒ¨åŽŸç†](/install/installer)ã€‚
 
-非交互式（跳过新手引导）：
+éžäº¤äº’å¼ï¼ˆè·³è¿‡æ–°æ‰‹å¼•å¯¼ï¼‰ï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --no-onboard
 ```
 
-### 2）全局安装（手动）
+### 2ï¼‰å…¨å±€å®‰è£…ï¼ˆæ‰‹åŠ¨ï¼‰
 
-如果你已经有 Node：
+å¦‚æžœä½ å·²ç»æœ‰ Nodeï¼š
 
 ```bash
 npm install -g OpenKrab@latest
 ```
 
-如果你全局安装了 libvips（macOS 上通过 Homebrew 安装很常见）且 `sharp` 安装失败，请强制使用预构建二进制文件：
+å¦‚æžœä½ å…¨å±€å®‰è£…äº† libvipsï¼ˆmacOS ä¸Šé€šè¿‡ Homebrew å®‰è£…å¾ˆå¸¸è§ï¼‰ä¸” `sharp` å®‰è£…å¤±è´¥ï¼Œè¯·å¼ºåˆ¶ä½¿ç”¨é¢„æž„å»ºäºŒè¿›åˆ¶æ–‡ä»¶ï¼š
 
 ```bash
 SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install -g OpenKrab@latest
 ```
 
-如果你看到 `sharp: Please add node-gyp to your dependencies`，要么安装构建工具（macOS：Xcode CLT + `npm install -g node-gyp`），要么使用上面的 `SHARP_IGNORE_GLOBAL_LIBVIPS=1` 变通方法来跳过原生构建。
+å¦‚æžœä½ çœ‹åˆ° `sharp: Please add node-gyp to your dependencies`ï¼Œè¦ä¹ˆå®‰è£…æž„å»ºå·¥å…·ï¼ˆmacOSï¼šXcode CLT + `npm install -g node-gyp`ï¼‰ï¼Œè¦ä¹ˆä½¿ç”¨ä¸Šé¢çš„ `SHARP_IGNORE_GLOBAL_LIBVIPS=1` å˜é€šæ–¹æ³•æ¥è·³è¿‡åŽŸç”Ÿæž„å»ºã€‚
 
-或使用 pnpm：
+æˆ–ä½¿ç”¨ pnpmï¼š
 
 ```bash
 pnpm add -g OpenKrab@latest
-pnpm approve-builds -g                # 批准 OpenKrab、node-llama-cpp、sharp 等
-pnpm add -g OpenKrab@latest           # 重新运行以执行 postinstall 脚本
+pnpm approve-builds -g                # æ‰¹å‡† OpenKrabã€node-llama-cppã€sharp ç­‰
+pnpm add -g OpenKrab@latest           # é‡æ–°è¿è¡Œä»¥æ‰§è¡Œ postinstall è„šæœ¬
 ```
 
-pnpm 需要显式批准带有构建脚本的包。在首次安装显示"Ignored build scripts"警告后，运行 `pnpm approve-builds -g` 并选择列出的包，然后重新运行安装以执行 postinstall 脚本。
+pnpm éœ€è¦æ˜¾å¼æ‰¹å‡†å¸¦æœ‰æž„å»ºè„šæœ¬çš„åŒ…ã€‚åœ¨é¦–æ¬¡å®‰è£…æ˜¾ç¤º"Ignored build scripts"è­¦å‘ŠåŽï¼Œè¿è¡Œ `pnpm approve-builds -g` å¹¶é€‰æ‹©åˆ—å‡ºçš„åŒ…ï¼Œç„¶åŽé‡æ–°è¿è¡Œå®‰è£…ä»¥æ‰§è¡Œ postinstall è„šæœ¬ã€‚
 
-然后：
+ç„¶åŽï¼š
 
 ```bash
 OpenKrab onboard --install-daemon
 ```
 
-### 3）从源代码（贡献者/开发）
+### 3ï¼‰ä»Žæºä»£ç ï¼ˆè´¡çŒ®è€…/å¼€å‘ï¼‰
 
 ```bash
 git clone https://github.com/OpenKrab/OpenKrab.git
 cd OpenKrab
 pnpm install
-pnpm ui:build # 首次运行时自动安装 UI 依赖
+pnpm ui:build # é¦–æ¬¡è¿è¡Œæ—¶è‡ªåŠ¨å®‰è£… UI ä¾èµ–
 pnpm build
 OpenKrab onboard --install-daemon
 ```
 
-提示：如果你还没有全局安装，请通过 `pnpm OpenKrab ...` 运行仓库命令。
+æç¤ºï¼šå¦‚æžœä½ è¿˜æ²¡æœ‰å…¨å±€å®‰è£…ï¼Œè¯·é€šè¿‡ `pnpm OpenKrab ...` è¿è¡Œä»“åº“å‘½ä»¤ã€‚
 
-### 4）其他安装选项
+### 4ï¼‰å…¶ä»–å®‰è£…é€‰é¡¹
 
-- Docker：[Docker](/install/docker)
-- Nix：[Nix](/install/nix)
-- Ansible：[Ansible](/install/ansible)
-- Bun（仅 CLI）：[Bun](/install/bun)
+- Dockerï¼š[Docker](/install/docker)
+- Nixï¼š[Nix](/install/nix)
+- Ansibleï¼š[Ansible](/install/ansible)
+- Bunï¼ˆä»… CLIï¼‰ï¼š[Bun](/install/bun)
 
-## 安装后
+## å®‰è£…åŽ
 
-- 运行新手引导：`OpenKrab onboard --install-daemon`
-- 快速检查：`OpenKrab doctor`
-- 检查 Gateway 网关健康状态：`OpenKrab status` + `OpenKrab health`
-- 打开仪表板：`OpenKrab dashboard`
+- è¿è¡Œæ–°æ‰‹å¼•å¯¼ï¼š`OpenKrab onboard --install-daemon`
+- å¿«é€Ÿæ£€æŸ¥ï¼š`OpenKrab doctor`
+- æ£€æŸ¥ Gateway ç½‘å…³å¥åº·çŠ¶æ€ï¼š`OpenKrab status` + `OpenKrab health`
+- æ‰“å¼€ä»ªè¡¨æ¿ï¼š`OpenKrab dashboard`
 
-## 安装方式：npm vs git（安装器）
+## å®‰è£…æ–¹å¼ï¼šnpm vs gitï¼ˆå®‰è£…å™¨ï¼‰
 
-安装器支持两种方式：
+å®‰è£…å™¨æ”¯æŒä¸¤ç§æ–¹å¼ï¼š
 
-- `npm`（默认）：`npm install -g OpenKrab@latest`
-- `git`：从 GitHub 克隆/构建并从源代码 checkout 运行
+- `npm`ï¼ˆé»˜è®¤ï¼‰ï¼š`npm install -g OpenKrab@latest`
+- `git`ï¼šä»Ž GitHub å…‹éš†/æž„å»ºå¹¶ä»Žæºä»£ç  checkout è¿è¡Œ
 
-### CLI 标志
+### CLI æ ‡å¿—
 
 ```bash
-# 显式 npm
+# æ˜¾å¼ npm
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --install-method npm
 
-# 从 GitHub 安装（源代码 checkout）
+# ä»Ž GitHub å®‰è£…ï¼ˆæºä»£ç  checkoutï¼‰
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --install-method git
 ```
 
-常用标志：
+å¸¸ç”¨æ ‡å¿—ï¼š
 
 - `--install-method npm|git`
-- `--git-dir <path>`（默认：`~/OpenKrab`）
-- `--no-git-update`（使用现有 checkout 时跳过 `git pull`）
-- `--no-prompt`（禁用提示；CI/自动化中必需）
-- `--dry-run`（打印将要执行的操作；不做任何更改）
-- `--no-onboard`（跳过新手引导）
+- `--git-dir <path>`ï¼ˆé»˜è®¤ï¼š`~/OpenKrab`ï¼‰
+- `--no-git-update`ï¼ˆä½¿ç”¨çŽ°æœ‰ checkout æ—¶è·³è¿‡ `git pull`ï¼‰
+- `--no-prompt`ï¼ˆç¦ç”¨æç¤ºï¼›CI/è‡ªåŠ¨åŒ–ä¸­å¿…éœ€ï¼‰
+- `--dry-run`ï¼ˆæ‰“å°å°†è¦æ‰§è¡Œçš„æ“ä½œï¼›ä¸åšä»»ä½•æ›´æ”¹ï¼‰
+- `--no-onboard`ï¼ˆè·³è¿‡æ–°æ‰‹å¼•å¯¼ï¼‰
 
-### 环境变量
+### çŽ¯å¢ƒå˜é‡
 
-等效的环境变量（对自动化有用）：
+ç­‰æ•ˆçš„çŽ¯å¢ƒå˜é‡ï¼ˆå¯¹è‡ªåŠ¨åŒ–æœ‰ç”¨ï¼‰ï¼š
 
-- `OpenKrab_INSTALL_METHOD=git|npm`
-- `OpenKrab_GIT_DIR=...`
-- `OpenKrab_GIT_UPDATE=0|1`
-- `OpenKrab_NO_PROMPT=1`
-- `OpenKrab_DRY_RUN=1`
-- `OpenKrab_NO_ONBOARD=1`
-- `SHARP_IGNORE_GLOBAL_LIBVIPS=0|1`（默认：`1`；避免 `sharp` 针对系统 libvips 构建）
+- `OPENKRAB_INSTALL_METHOD=git|npm`
+- `OPENKRAB_GIT_DIR=...`
+- `OPENKRAB_GIT_UPDATE=0|1`
+- `OPENKRAB_NO_PROMPT=1`
+- `OPENKRAB_DRY_RUN=1`
+- `OPENKRAB_NO_ONBOARD=1`
+- `SHARP_IGNORE_GLOBAL_LIBVIPS=0|1`ï¼ˆé»˜è®¤ï¼š`1`ï¼›é¿å… `sharp` é’ˆå¯¹ç³»ç»Ÿ libvips æž„å»ºï¼‰
 
-## 故障排除：找不到 `OpenKrab`（PATH）
+## æ•…éšœæŽ’é™¤ï¼šæ‰¾ä¸åˆ° `OpenKrab`ï¼ˆPATHï¼‰
 
-快速诊断：
+å¿«é€Ÿè¯Šæ–­ï¼š
 
 ```bash
 node -v
@@ -173,22 +173,23 @@ npm prefix -g
 echo "$PATH"
 ```
 
-如果 `$(npm prefix -g)/bin`（macOS/Linux）或 `$(npm prefix -g)`（Windows）**不**在 `echo "$PATH"` 的输出中，你的 shell 无法找到全局 npm 二进制文件（包括 `OpenKrab`）。
+å¦‚æžœ `$(npm prefix -g)/bin`ï¼ˆmacOS/Linuxï¼‰æˆ– `$(npm prefix -g)`ï¼ˆWindowsï¼‰**ä¸**åœ¨ `echo "$PATH"` çš„è¾“å‡ºä¸­ï¼Œä½ çš„ shell æ— æ³•æ‰¾åˆ°å…¨å±€ npm äºŒè¿›åˆ¶æ–‡ä»¶ï¼ˆåŒ…æ‹¬ `OpenKrab`ï¼‰ã€‚
 
-修复：将其添加到你的 shell 启动文件（zsh：`~/.zshrc`，bash：`~/.bashrc`）：
+ä¿®å¤ï¼šå°†å…¶æ·»åŠ åˆ°ä½ çš„ shell å¯åŠ¨æ–‡ä»¶ï¼ˆzshï¼š`~/.zshrc`ï¼Œbashï¼š`~/.bashrc`ï¼‰ï¼š
 
 ```bash
 # macOS / Linux
 export PATH="$(npm prefix -g)/bin:$PATH"
 ```
 
-在 Windows 上，将 `npm prefix -g` 的输出添加到你的 PATH。
+åœ¨ Windows ä¸Šï¼Œå°† `npm prefix -g` çš„è¾“å‡ºæ·»åŠ åˆ°ä½ çš„ PATHã€‚
 
-然后打开新终端（或在 zsh 中执行 `rehash` / 在 bash 中执行 `hash -r`）。
+ç„¶åŽæ‰“å¼€æ–°ç»ˆç«¯ï¼ˆæˆ–åœ¨ zsh ä¸­æ‰§è¡Œ `rehash` / åœ¨ bash ä¸­æ‰§è¡Œ `hash -r`ï¼‰ã€‚
 
-## 更新/卸载
+## æ›´æ–°/å¸è½½
 
-- 更新：[更新](/install/updating)
-- 迁移到新机器：[迁移](/install/migrating)
-- 卸载：[卸载](/install/uninstall)
+- æ›´æ–°ï¼š[æ›´æ–°](/install/updating)
+- è¿ç§»åˆ°æ–°æœºå™¨ï¼š[è¿ç§»](/install/migrating)
+- å¸è½½ï¼š[å¸è½½](/install/uninstall)
+
 

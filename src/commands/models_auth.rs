@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 
-const AUTH_PROFILES_PATH: &str = "krabkrab/credentials/auth-profiles.json";
+const AUTH_PROFILES_PATH: &str = "openkrab/credentials/auth-profiles.json";
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AuthProfile {
@@ -186,3 +186,4 @@ mod tests {
         assert!(result.is_err());
     }
 }
+

@@ -1,5 +1,5 @@
----
-summary: "Run multiple openkrab Gateways on one host (isolation, ports, and profiles)"
+﻿---
+summary: "Run multiple OpenKrab Gateways on one host (isolation, ports, and profiles)"
 read_when:
   - Running more than one Gateway on the same machine
   - You need isolated config/state/ports per Gateway
@@ -12,33 +12,27 @@ Most setups should use one Gateway because a single Gateway can handle multiple 
 
 ## Isolation checklist (required)
 
-- `openkrab_CONFIG_PATH` — per-instance config file
-- `openkrab_STATE_DIR` — per-instance sessions, creds, caches
-- `agents.defaults.workspace` — per-instance workspace root
-- `gateway.port` (or `--port`) — unique per instance
+- `OPENKRAB_CONFIG_PATH` â€” per-instance config file
+- `OPENKRAB_STATE_DIR` â€” per-instance sessions, creds, caches
+- `agents.defaults.workspace` â€” per-instance workspace root
+- `gateway.port` (or `--port`) â€” unique per instance
 - Derived ports (browser/canvas) must not overlap
 
 If these are shared, you will hit config races and port conflicts.
 
 ## Recommended: profiles (`--profile`)
 
-Profiles auto-scope `openkrab_STATE_DIR` + `openkrab_CONFIG_PATH` and suffix service names.
+Profiles auto-scope `OPENKRAB_STATE_DIR` + `OPENKRAB_CONFIG_PATH` and suffix service names.
 
 ```bash
-# main
-openkrab --profile main setup
-openkrab --profile main gateway --port 18789
+# main\nOpenKrab --profile main setup\nOpenKrab --profile main gateway --port 18789
 
-# rescue
-openkrab --profile rescue setup
-openkrab --profile rescue gateway --port 19001
+# rescue\nOpenKrab --profile rescue setup\nOpenKrab --profile rescue gateway --port 19001
 ```
 
 Per-profile services:
 
-```bash
-openkrab --profile main gateway install
-openkrab --profile rescue gateway install
+```bash\nOpenKrab --profile main gateway install\nOpenKrab --profile rescue gateway install
 ```
 
 ## Rescue-bot guide
@@ -58,25 +52,21 @@ Port spacing: leave at least 20 ports between base ports so the derived browser/
 
 ```bash
 # Main bot (existing or fresh, without --profile param)
-# Runs on port 18789 + Chrome CDC/Canvas/... Ports
-openkrab onboard
-openkrab gateway install
+# Runs on port 18789 + Chrome CDC/Canvas/... Ports\nOpenKrab onboard\nOpenKrab gateway install
 
-# Rescue bot (isolated profile + ports)
-openkrab --profile rescue onboard
+# Rescue bot (isolated profile + ports)\nOpenKrab --profile rescue onboard
 # Notes:
 # - workspace name will be postfixed with -rescue per default
 # - Port should be at least 18789 + 20 Ports,
 #   better choose completely different base port, like 19789,
 # - rest of the onboarding is the same as normal
 
-# To install the service (if not happened automatically during onboarding)
-openkrab --profile rescue gateway install
+# To install the service (if not happened automatically during onboarding)\nOpenKrab --profile rescue gateway install
 ```
 
 ## Port mapping (derived)
 
-Base port = `gateway.port` (or `openkrab_GATEWAY_PORT` / `--port`).
+Base port = `gateway.port` (or `OPENKRAB_GATEWAY_PORT` / `--port`).
 
 - browser control service port = base + 2 (loopback only)
 - canvas host is served on the Gateway HTTP server (same port as `gateway.port`)
@@ -94,19 +84,16 @@ If you override any of these in config or env, you must keep them unique per ins
 ## Manual env example
 
 ```bash
-openkrab_CONFIG_PATH=~/.openkrab/main.json \
-openkrab_STATE_DIR=~/.openkrab-main \
-openkrab gateway --port 18789
+OPENKRAB_CONFIG_PATH=~/.openkrab/main.json \
+OPENKRAB_STATE_DIR=~/.openkrab-main \\nOpenKrab gateway --port 18789
 
-openkrab_CONFIG_PATH=~/.openkrab/rescue.json \
-openkrab_STATE_DIR=~/.openkrab-rescue \
-openkrab gateway --port 19001
+OPENKRAB_CONFIG_PATH=~/.openkrab/rescue.json \
+OPENKRAB_STATE_DIR=~/.openkrab-rescue \\nOpenKrab gateway --port 19001
 ```
 
 ## Quick checks
 
-```bash
-openkrab --profile main status
-openkrab --profile rescue status
-openkrab --profile rescue browser status
+```bash\nOpenKrab --profile main status\nOpenKrab --profile rescue status\nOpenKrab --profile rescue browser status
 ```
+
+

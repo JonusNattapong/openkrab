@@ -1,7 +1,7 @@
----
+﻿---
 summary: "LINE Messaging API plugin setup, config, and usage"
 read_when:
-  - You want to connect openkrab to LINE
+  - You want to connect OpenKrab to LINE
   - You need LINE webhook + credential setup
   - You want LINE-specific message options
 title: LINE
@@ -9,7 +9,7 @@ title: LINE
 
 # LINE (plugin)
 
-LINE connects to openkrab via the LINE Messaging API. The plugin runs as a webhook
+LINE connects to OpenKrab via the LINE Messaging API. The plugin runs as a webhook
 receiver on the gateway and uses your channel access token + channel secret for
 authentication.
 
@@ -21,14 +21,12 @@ are not supported.
 
 Install the LINE plugin:
 
-```bash
-openkrab plugins install @openkrab/line
+```bash\nOpenKrab plugins install @openkrab/line
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/line
+```bash\nOpenKrab plugins install ./extensions/line
 ```
 
 ## Setup
@@ -44,7 +42,7 @@ openkrab plugins install ./extensions/line
 https://gateway-host/line/webhook
 ```
 
-The gateway responds to LINE’s webhook verification (GET) and inbound events (POST).
+The gateway responds to LINEâ€™s webhook verification (GET) and inbound events (POST).
 If you need a custom path, set `channels.line.webhookPath` or
 `channels.line.accounts.<id>.webhookPath` and update the URL accordingly.
 
@@ -106,9 +104,7 @@ Multiple accounts:
 Direct messages default to pairing. Unknown senders get a pairing code and their
 messages are ignored until approved.
 
-```bash
-openkrab pairing list line
-openkrab pairing approve line <CODE>
+```bash\nOpenKrab pairing list line\nOpenKrab pairing approve line <CODE>
 ```
 
 Allowlists and policies:
@@ -184,3 +180,4 @@ The LINE plugin also ships a `/card` command for Flex message presets:
   and that the gateway is reachable from LINE.
 - **Media download errors:** raise `channels.line.mediaMaxMb` if media exceeds the
   default limit.
+

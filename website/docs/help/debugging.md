@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Debugging tools: watch mode, raw model streams, and tracing reasoning leakage"
 read_when:
   - You need to inspect raw model output for reasoning leakage
@@ -60,18 +60,18 @@ Recommended flow (dev profile + dev bootstrap):
 
 ```bash
 pnpm gateway:dev
-openkrab_PROFILE=dev openkrab tui
+OPENKRAB_PROFILE=dev OpenKrab tui
 ```
 
-If you don’t have a global install yet, run the CLI via `pnpm openkrab ...`.
+If you donâ€™t have a global install yet, run the CLI via `pnpm OpenKrab ...`.
 
 What this does:
 
 1. **Profile isolation** (global `--dev`)
-   - `openkrab_PROFILE=dev`
-   - `openkrab_STATE_DIR=~/.openkrab-dev`
-   - `openkrab_CONFIG_PATH=~/.openkrab-dev/openkrab.json`
-   - `openkrab_GATEWAY_PORT=19001` (browser/canvas shift accordingly)
+   - `OPENKRAB_PROFILE=dev`
+   - `OPENKRAB_STATE_DIR=~/.openkrab-dev`
+   - `OPENKRAB_CONFIG_PATH=~/.openkrab-dev/openkrab.json`
+   - `OPENKRAB_GATEWAY_PORT=19001` (browser/canvas shift accordingly)
 
 2. **Dev bootstrap** (`gateway --dev`)
    - Writes a minimal config if missing (`gateway.mode=local`, bind loopback).
@@ -79,8 +79,8 @@ What this does:
    - Sets `agent.skipBootstrap=true` (no BOOTSTRAP.md).
    - Seeds the workspace files if missing:
      `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`.
-   - Default identity: **C3‑PO** (protocol droid).
-   - Skips channel providers in dev mode (`openkrab_SKIP_CHANNELS=1`).
+   - Default identity: **C3â€‘PO** (protocol droid).
+   - Skips channel providers in dev mode (`OPENKRAB_SKIP_CHANNELS=1`).
 
 Reset flow (fresh start):
 
@@ -92,21 +92,19 @@ Note: `--dev` is a **global** profile flag and gets eaten by some runners.
 If you need to spell it out, use the env var form:
 
 ```bash
-openkrab_PROFILE=dev openkrab gateway --dev --reset
+OPENKRAB_PROFILE=dev OpenKrab gateway --dev --reset
 ```
 
 `--reset` wipes config, credentials, sessions, and the dev workspace (using
 `trash`, not `rm`), then recreates the default dev setup.
 
-Tip: if a non‑dev gateway is already running (launchd/systemd), stop it first:
+Tip: if a nonâ€‘dev gateway is already running (launchd/systemd), stop it first:
 
-```bash
-openkrab gateway stop
+```bash\nOpenKrab gateway stop
 ```
 
 ## Raw stream logging (openkrab)
-
-openkrab can log the **raw assistant stream** before any filtering/formatting.
+\nOpenKrab can log the **raw assistant stream** before any filtering/formatting.
 This is the best way to see whether reasoning is arriving as plain text deltas
 (or as separate thinking blocks).
 
@@ -125,8 +123,8 @@ pnpm gateway:watch --raw-stream --raw-stream-path ~/.openkrab/logs/raw-stream.js
 Equivalent env vars:
 
 ```bash
-openkrab_RAW_STREAM=1
-openkrab_RAW_STREAM_PATH=~/.openkrab/logs/raw-stream.jsonl
+OPENKRAB_RAW_STREAM=1
+OPENKRAB_RAW_STREAM_PATH=~/.openkrab/logs/raw-stream.jsonl
 ```
 
 Default file:
@@ -152,7 +150,7 @@ Default file:
 
 `~/.pi-mono/logs/raw-openai-completions.jsonl`
 
-> Note: this is only emitted by processes using pi-mono’s
+> Note: this is only emitted by processes using pi-monoâ€™s
 > `openai-completions` provider.
 
 ## Safety notes
@@ -160,3 +158,5 @@ Default file:
 - Raw stream logs can include full prompts, tool output, and user data.
 - Keep logs local and delete them after debugging.
 - If you share logs, scrub secrets and PII first.
+
+

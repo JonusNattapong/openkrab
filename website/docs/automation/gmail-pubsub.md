@@ -1,5 +1,5 @@
----
-summary: "Gmail Pub/Sub push wired into openkrab webhooks via gogcli"
+﻿---
+summary: "Gmail Pub/Sub push wired into OpenKrab webhooks via gogcli"
 read_when:
   - Wiring Gmail inbox triggers to openkrab
   - Setting up Pub/Sub push for agent wake
@@ -8,13 +8,13 @@ title: "Gmail PubSub"
 
 # Gmail Pub/Sub -> openkrab
 
-Goal: Gmail watch -> Pub/Sub push -> `gog gmail watch serve` -> openkrab webhook.
+Goal: Gmail watch -> Pub/Sub push -> `gog gmail watch serve` -> OpenKrab webhook.
 
 ## Prereqs
 
 - `gcloud` installed and logged in ([install guide](https://docs.cloud.google.com/sdk/docs/install-sdk)).
 - `gog` (gogcli) installed and authorized for the Gmail account ([gogcli.sh](https://gogcli.sh/)).
-- openkrab hooks enabled (see [Webhooks](/automation/webhook)).
+- OpenKrab hooks enabled (see [Webhooks](/automation/webhook)).
 - `tailscale` logged in ([tailscale.com](https://tailscale.com/)). Supported setup uses Tailscale Funnel for the public HTTPS endpoint.
   Other tunnel services can work, but are DIY/unsupported and require manual wiring.
   Right now, Tailscale is what we support.
@@ -25,7 +25,7 @@ Example hook config (enable Gmail preset mapping):
 {
   hooks: {
     enabled: true,
-    token: "openkrab_HOOK_TOKEN",
+    token: "OPENKRAB_HOOK_TOKEN",
     path: "/hooks",
     presets: ["gmail"],
   },
@@ -39,7 +39,7 @@ that sets `deliver` + optional `channel`/`to`:
 {
   hooks: {
     enabled: true,
-    token: "openkrab_HOOK_TOKEN",
+    token: "OPENKRAB_HOOK_TOKEN",
     presets: ["gmail"],
     mappings: [
       {
@@ -82,7 +82,7 @@ To set a default model and thinking level specifically for Gmail hooks, add
 Notes:
 
 - Per-hook `model`/`thinking` in the mapping still overrides these defaults.
-- Fallback order: `hooks.gmail.model` → `agents.defaults.model.fallbacks` → primary (auth/rate-limit/timeouts).
+- Fallback order: `hooks.gmail.model` â†’ `agents.defaults.model.fallbacks` â†’ primary (auth/rate-limit/timeouts).
 - If `agents.defaults.models` is set, the Gmail model must be in the allowlist.
 - Gmail hook content is wrapped with external-content safety boundaries by default.
   To disable (dangerous), set `hooks.gmail.allowUnsafeExternalContent: true`.
@@ -92,10 +92,9 @@ under `~/.openkrab/hooks/transforms` (see [Webhooks](/automation/webhook)).
 
 ## Wizard (recommended)
 
-Use the openkrab helper to wire everything together (installs deps on macOS via brew):
+Use the OpenKrab helper to wire everything together (installs deps on macOS via brew):
 
-```bash
-openkrab webhooks gmail setup \
+```bash\nOpenKrab webhooks gmail setup \
   --account openkrab@gmail.com
 ```
 
@@ -105,7 +104,7 @@ Defaults:
 - Writes `hooks.gmail` config for `openkrab webhooks gmail run`.
 - Enables the Gmail hook preset (`hooks.presets: ["gmail"]`).
 
-Path note: when `tailscale.mode` is enabled, openkrab automatically sets
+Path note: when `tailscale.mode` is enabled, OpenKrab automatically sets
 `hooks.gmail.serve.path` to `/` and keeps the public path at
 `hooks.gmail.tailscale.path` (default `/gmail-pubsub`) because Tailscale
 strips the set-path prefix before proxying.
@@ -122,14 +121,13 @@ Gateway auto-start (recommended):
 
 - When `hooks.enabled=true` and `hooks.gmail.account` is set, the Gateway starts
   `gog gmail watch serve` on boot and auto-renews the watch.
-- Set `openkrab_SKIP_GMAIL_WATCHER=1` to opt out (useful if you run the daemon yourself).
+- Set `OPENKRAB_SKIP_GMAIL_WATCHER=1` to opt out (useful if you run the daemon yourself).
 - Do not run the manual daemon at the same time, or you will hit
   `listen tcp 127.0.0.1:8788: bind: address already in use`.
 
 Manual daemon (starts `gog gmail watch serve` + auto-renew):
 
-```bash
-openkrab webhooks gmail run
+```bash\nOpenKrab webhooks gmail run
 ```
 
 ## One-time setup
@@ -186,7 +184,7 @@ gog gmail watch serve \
   --path /gmail-pubsub \
   --token <shared> \
   --hook-url http://127.0.0.1:18789/hooks/gmail \
-  --hook-token openkrab_HOOK_TOKEN \
+  --hook-token OPENKRAB_HOOK_TOKEN \
   --include-body \
   --max-bytes 20000
 ```
@@ -194,8 +192,8 @@ gog gmail watch serve \
 Notes:
 
 - `--token` protects the push endpoint (`x-gog-token` or `?token=`).
-- `--hook-url` points to openkrab `/hooks/gmail` (mapped; isolated run + summary to main).
-- `--include-body` and `--max-bytes` control the body snippet sent to openkrab.
+- `--hook-url` points to OpenKrab `/hooks/gmail` (mapped; isolated run + summary to main).
+- `--include-body` and `--max-bytes` control the body snippet sent to OpenKrab.
 
 Recommended: `openkrab webhooks gmail run` wraps the same flow and auto-renews the watch.
 
@@ -254,3 +252,5 @@ gog gmail watch stop --account openkrab@gmail.com
 gcloud pubsub subscriptions delete gog-gmail-watch-push
 gcloud pubsub topics delete gog-gmail-watch
 ```
+
+

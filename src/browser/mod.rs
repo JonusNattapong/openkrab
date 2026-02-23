@@ -1,4 +1,4 @@
-//! Enhanced Browser automation via Chrome DevTools Protocol (CDP).
+﻿//! Enhanced Browser automation via Chrome DevTools Protocol (CDP).
 //!
 //! This module provides a robust, production-ready CDP client with:
 //! - Connection pooling and session management
@@ -891,14 +891,14 @@ fn resolve_profile(name: &str) -> Result<BrowserProfile> {
 }
 
 fn profiles_path() -> PathBuf {
-    if let Ok(custom) = std::env::var("KRABKRAB_BROWSER_PROFILES_PATH") {
+    if let Ok(custom) = std::env::var("OPENKRAB_BROWSER_PROFILES_PATH") {
         let p = custom.trim();
         if !p.is_empty() {
             return PathBuf::from(p);
         }
     }
     let base = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    base.join("krabkrab").join("browser-profiles.json")
+    base.join("openkrab").join("browser-profiles.json")
 }
 
 fn load_profiles() -> Result<HashMap<String, BrowserProfile>> {
@@ -1100,14 +1100,14 @@ mod tests {
         let tmp = tempdir().expect("tmp");
         let path = tmp.path().join("profiles.json");
         std::env::set_var(
-            "KRABKRAB_BROWSER_PROFILES_PATH",
+            "OPENKRAB_BROWSER_PROFILES_PATH",
             path.to_string_lossy().to_string(),
         );
         register_profile("default", "127.0.0.1:9222").expect("register");
         let profiles = list_profiles();
         assert!(profiles.iter().any(|p| p.name == "default"));
         assert!(remove_profile("default"));
-        std::env::remove_var("KRABKRAB_BROWSER_PROFILES_PATH");
+        std::env::remove_var("OPENKRAB_BROWSER_PROFILES_PATH");
     }
 
     #[test]
@@ -1131,3 +1131,5 @@ mod tests {
         assert!(!config.enable_network_domain);
     }
 }
+
+

@@ -1,4 +1,4 @@
----
+﻿---
 title: "Pi Development Workflow"
 ---
 
@@ -51,7 +51,7 @@ For tool call behavior, prompt for a `read` or `exec` action so you can see tool
 
 ## Clean Slate Reset
 
-State lives under the OpenKrab state directory. Default is `~/.OpenKrab`. If `OpenKrab_STATE_DIR` is set, use that directory instead.
+State lives under the OpenKrab state directory. Default is `~/.OpenKrab`. If `OPENKRAB_STATE_DIR` is set, use that directory instead.
 
 To reset everything:
 
@@ -68,4 +68,5 @@ If you only want to reset sessions, delete `agents/<agentId>/sessions/` and `age
 
 - [https://docs.OpenKrab.ai/testing](https://docs.OpenKrab.ai/testing)
 - [https://docs.OpenKrab.ai/start/getting-started](https://docs.OpenKrab.ai/start/getting-started)
+
 

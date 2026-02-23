@@ -3,8 +3,8 @@
 //! This is an example of a statically-linked plugin that demonstrates
 //! the plugin system capabilities.
 
-use krabkrab::plugin_sdk::{PluginContext, PluginDeclaration, PluginTool};
-use krabkrab::plugins::{PluginKind, PluginManifest};
+use openkrab::plugin_sdk::{PluginContext, PluginDeclaration, PluginTool};
+use openkrab::plugins::{PluginKind, PluginManifest};
 
 /// Get the plugin manifest.
 pub fn manifest() -> PluginManifest {
@@ -12,7 +12,7 @@ pub fn manifest() -> PluginManifest {
         name: "hello-plugin".to_string(),
         version: "1.0.0".to_string(),
         description: "A simple example plugin that provides a greeting tool".to_string(),
-        author: Some("krabkrab Team".to_string()),
+        author: Some("openkrab Team".to_string()),
         enabled: true,
         kind: PluginKind::Extension,
         requires: vec!["tools".to_string()],
@@ -127,3 +127,4 @@ mod tests {
         assert_eq!(result["farewell"], "Goodbye, Bob! Have a great day!");
     }
 }
+

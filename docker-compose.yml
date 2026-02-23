@@ -1,21 +1,21 @@
-# ╔══════════════════════════════════════════════════════════════════════╗
-# ║  krabkrab Docker Compose — Quick-start deployment                   ║
-# ╚══════════════════════════════════════════════════════════════════════╝
+﻿# â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+# â•‘  openkrab Docker Compose â€” Quick-start deployment                   â•‘
+# â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 services:
-  krabkrab:
+  openkrab:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         FEATURES: "default"
         PROFILE: "release"
-    image: openkrab/krabkrab:latest
-    container_name: krabkrab
+    image: openkrab/openkrab:latest
+    container_name: openkrab
     restart: unless-stopped
 
     ports:
-      - "${KRABKRAB_PORT:-4120}:4120"
+      - "${OPENKRAB_PORT:-4120}:4120"
 
     volumes:
       # Persist configuration across container recreations
@@ -29,9 +29,9 @@ services:
 
     environment:
       - RUST_LOG=${RUST_LOG:-info}
-      - KRABKRAB_GATEWAY_TOKEN=${KRABKRAB_GATEWAY_TOKEN:-}
-      - KRABKRAB_GATEWAY_HOST=${KRABKRAB_GATEWAY_HOST:-0.0.0.0}
-      - KRABKRAB_GATEWAY_PORT=4120
+      - OPENKRAB_GATEWAY_TOKEN=${OPENKRAB_GATEWAY_TOKEN:-}
+      - OPENKRAB_GATEWAY_HOST=${OPENKRAB_GATEWAY_HOST:-0.0.0.0}
+      - OPENKRAB_GATEWAY_PORT=4120
       # Provider API keys (optional)
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
@@ -67,3 +67,5 @@ volumes:
     driver: local
   krab-plugins:
     driver: local
+
+

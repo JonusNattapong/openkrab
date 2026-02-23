@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab update` (safe-ish source update + gateway auto-restart)"
 read_when:
   - You want to update a source checkout safely
@@ -8,22 +8,13 @@ title: "update"
 
 # `openkrab update`
 
-Safely update openkrab and switch between stable/beta/dev channels.
+Safely update OpenKrab and switch between stable/beta/dev channels.
 
 If you installed via **npm/pnpm** (global install, no git metadata), updates happen via the package manager flow in [Updating](/install/updating).
 
 ## Usage
 
-```bash
-openkrab update
-openkrab update status
-openkrab update wizard
-openkrab update --channel beta
-openkrab update --channel dev
-openkrab update --tag beta
-openkrab update --no-restart
-openkrab update --json
-openkrab --update
+```bash\nOpenKrab update\nOpenKrab update status\nOpenKrab update wizard\nOpenKrab update --channel beta\nOpenKrab update --channel dev\nOpenKrab update --tag beta\nOpenKrab update --no-restart\nOpenKrab update --json\nOpenKrab --update
 ```
 
 ## Options
@@ -40,10 +31,7 @@ Note: downgrades require confirmation because older versions can break configura
 
 Show the active update channel + git tag/branch/SHA (for source checkouts), plus update availability.
 
-```bash
-openkrab update status
-openkrab update status --json
-openkrab update status --timeout 10
+```bash\nOpenKrab update status\nOpenKrab update status --json\nOpenKrab update status --timeout 10
 ```
 
 Options:
@@ -59,12 +47,12 @@ offers to create one.
 
 ## What it does
 
-When you switch channels explicitly (`--channel ...`), openkrab also keeps the
+When you switch channels explicitly (`--channel ...`), OpenKrab also keeps the
 install method aligned:
 
-- `dev` → ensures a git checkout (default: `~/openkrab`, override with `openkrab_GIT_DIR`),
+- `dev` â†’ ensures a git checkout (default: `~/openkrab`, override with `OPENKRAB_GIT_DIR`),
   updates it, and installs the global CLI from that checkout.
-- `stable`/`beta` → installs from npm using the matching dist-tag.
+- `stable`/`beta` â†’ installs from npm using the matching dist-tag.
 
 ## Git checkout flow
 
@@ -83,7 +71,7 @@ High-level:
 5. Rebases onto the selected commit (dev only).
 6. Installs deps (pnpm preferred; npm fallback).
 7. Builds + builds the Control UI.
-8. Runs `openkrab doctor` as the final “safe update” check.
+8. Runs `openkrab doctor` as the final â€œsafe updateâ€ check.
 9. Syncs plugins to the active channel (dev uses bundled extensions; stable/beta uses npm) and updates npm-installed plugins.
 
 ## `--update` shorthand
@@ -96,3 +84,5 @@ High-level:
 - [Development channels](/install/development-channels)
 - [Updating](/install/updating)
 - [CLI reference](/cli)
+
+

@@ -1,5 +1,5 @@
 //! OpenAI provider — chat completion + text embeddings.
-//! Mirrors openclaw's OpenAI provider behaviour.
+//! Mirrors OpenKrab's OpenAI provider behaviour.
 
 use super::LlmProvider;
 use anyhow::Result;
@@ -177,3 +177,4 @@ mod tests {
         assert_eq!(p.name(), "openai");
     }
 }
+

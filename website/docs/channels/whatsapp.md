@@ -1,4 +1,4 @@
----
+﻿---
 summary: "WhatsApp channel support, access controls, delivery behavior, and operations"
 read_when:
   - Working on WhatsApp/web channel behavior or inbox routing
@@ -43,31 +43,26 @@ Status: production-ready via WhatsApp Web (Baileys). Gateway owns linked session
 
   <Step title="Link WhatsApp (QR)">
 
-```bash
-openkrab channels login --channel whatsapp
+```bash\nOpenKrab channels login --channel whatsapp
 ```
 
     For a specific account:
 
-```bash
-openkrab channels login --channel whatsapp --account work
+```bash\nOpenKrab channels login --channel whatsapp --account work
 ```
 
   </Step>
 
   <Step title="Start the gateway">
 
-```bash
-openkrab gateway
+```bash\nOpenKrab gateway
 ```
 
   </Step>
 
   <Step title="Approve first pairing request (if using pairing mode)">
 
-```bash
-openkrab pairing list whatsapp
-openkrab pairing approve whatsapp <CODE>
+```bash\nOpenKrab pairing list whatsapp\nOpenKrab pairing approve whatsapp <CODE>
 ```
 
     Pairing requests expire after 1 hour. Pending requests are capped at 3 per channel.
@@ -75,8 +70,7 @@ openkrab pairing approve whatsapp <CODE>
   </Step>
 </Steps>
 
-<Note>
-openkrab recommends running WhatsApp on a separate number when possible. (The channel metadata and onboarding flow are optimized for that setup, but personal-number setups are also supported.)
+<Note>\nOpenKrab recommends running WhatsApp on a separate number when possible. (The channel metadata and onboarding flow are optimized for that setup, but personal-number setups are also supported.)
 </Note>
 
 ## Deployment patterns
@@ -116,7 +110,7 @@ openkrab recommends running WhatsApp on a separate number when possible. (The ch
   </Accordion>
 
   <Accordion title="WhatsApp Web-only channel scope">
-    The messaging platform channel is WhatsApp Web-based (`Baileys`) in current openkrab channel architecture.
+    The messaging platform channel is WhatsApp Web-based (`Baileys`) in current OpenKrab channel architecture.
 
     There is no separate Twilio WhatsApp messaging channel in the built-in chat-channel registry.
 
@@ -323,7 +317,7 @@ WhatsApp supports immediate ack reactions on inbound receipt via `channels.whats
   channels: {
     whatsapp: {
       ackReaction: {
-        emoji: "👀",
+        emoji: "ðŸ‘€",
         direct: true,
         group: "mentions", // always | mentions | never
       },
@@ -379,8 +373,8 @@ Behavior notes:
     Fix:
 
     ```bash
-    openkrab channels login --channel whatsapp
-    openkrab channels status
+    OpenKrab channels login --channel whatsapp
+    OpenKrab channels status
     ```
 
   </Accordion>
@@ -391,8 +385,8 @@ Behavior notes:
     Fix:
 
     ```bash
-    openkrab doctor
-    openkrab logs --follow
+    OpenKrab doctor
+    OpenKrab logs --follow
     ```
 
     If needed, re-link with `channels login`.
@@ -442,3 +436,4 @@ High-signal WhatsApp fields:
 - [Channel routing](/channels/channel-routing)
 - [Multi-agent routing](/concepts/multi-agent)
 - [Troubleshooting](/channels/troubleshooting)
+

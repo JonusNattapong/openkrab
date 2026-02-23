@@ -1,16 +1,16 @@
 [package]
-name = "krabkrab"
+name = "openkrab"
 version = "2026.2.22"
 edition = "2021"
 authors = ["openkrab port"]
-description = "Personal AI assistant - Rust port of krabkrab"
+description = "Personal AI assistant - Rust port of openkrab"
 license = "MIT"
 
 [workspace]
-members = ["bin/krabkrab-cli"]
+members = ["bin/openkrab-cli"]
 
 [lib]
-name = "krabkrab"
+name = "openkrab"
 path = "src/lib.rs"
 
 [dependencies]
@@ -105,3 +105,4 @@ optional = true
 [dependencies.wasmtime-wasi]
 version = "18.0"
 optional = true
+

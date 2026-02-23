@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 你想在 GCP 上 24/7 运行 OpenKrab
-  - 你想要在自己的 VM 上运行生产级、常驻的 Gateway 网关
-  - 你想完全控制持久化、二进制文件和重启行为
-summary: 在 GCP Compute Engine VM（Docker）上 24/7 运行 OpenKrab Gateway 网关并持久化状态
+  - ä½ æƒ³åœ¨ GCP ä¸Š 24/7 è¿è¡Œ OpenKrab
+  - ä½ æƒ³è¦åœ¨è‡ªå·±çš„ VM ä¸Šè¿è¡Œç”Ÿäº§çº§ã€å¸¸é©»çš„ Gateway ç½‘å…³
+  - ä½ æƒ³å®Œå…¨æŽ§åˆ¶æŒä¹…åŒ–ã€äºŒè¿›åˆ¶æ–‡ä»¶å’Œé‡å¯è¡Œä¸º
+summary: åœ¨ GCP Compute Engine VMï¼ˆDockerï¼‰ä¸Š 24/7 è¿è¡Œ OpenKrab Gateway ç½‘å…³å¹¶æŒä¹…åŒ–çŠ¶æ€
 title: GCP
 x-i18n:
   generated_at: "2026-02-03T07:52:50Z"
@@ -14,119 +14,119 @@ x-i18n:
   workflow: 15
 ---
 
-# 在 GCP Compute Engine 上运行 OpenKrab（Docker，生产 VPS 指南）
+# åœ¨ GCP Compute Engine ä¸Šè¿è¡Œ OpenKrabï¼ˆDockerï¼Œç”Ÿäº§ VPS æŒ‡å—ï¼‰
 
-## 目标
+## ç›®æ ‡
 
-使用 Docker 在 GCP Compute Engine VM 上运行持久化的 OpenKrab Gateway 网关，具有持久状态、内置二进制文件和安全的重启行为。
+ä½¿ç”¨ Docker åœ¨ GCP Compute Engine VM ä¸Šè¿è¡ŒæŒä¹…åŒ–çš„ OpenKrab Gateway ç½‘å…³ï¼Œå…·æœ‰æŒä¹…çŠ¶æ€ã€å†…ç½®äºŒè¿›åˆ¶æ–‡ä»¶å’Œå®‰å…¨çš„é‡å¯è¡Œä¸ºã€‚
 
-如果你想要"OpenKrab 24/7 大约 $5-12/月"，这是在 Google Cloud 上的可靠设置。
-价格因机器类型和区域而异；选择适合你工作负载的最小 VM，如果遇到 OOM 则扩容。
+å¦‚æžœä½ æƒ³è¦"OpenKrab 24/7 å¤§çº¦ $5-12/æœˆ"ï¼Œè¿™æ˜¯åœ¨ Google Cloud ä¸Šçš„å¯é è®¾ç½®ã€‚
+ä»·æ ¼å› æœºå™¨ç±»åž‹å’ŒåŒºåŸŸè€Œå¼‚ï¼›é€‰æ‹©é€‚åˆä½ å·¥ä½œè´Ÿè½½çš„æœ€å° VMï¼Œå¦‚æžœé‡åˆ° OOM åˆ™æ‰©å®¹ã€‚
 
-## 我们在做什么（简单说明）？
+## æˆ‘ä»¬åœ¨åšä»€ä¹ˆï¼ˆç®€å•è¯´æ˜Žï¼‰ï¼Ÿ
 
-- 创建 GCP 项目并启用计费
-- 创建 Compute Engine VM
-- 安装 Docker（隔离的应用运行时）
-- 在 Docker 中启动 OpenKrab Gateway 网关
-- 在主机上持久化 `~/.OpenKrab` + `~/.OpenKrab/workspace`（重启/重建后仍保留）
-- 通过 SSH 隧道从你的笔记本电脑访问控制 UI
+- åˆ›å»º GCP é¡¹ç›®å¹¶å¯ç”¨è®¡è´¹
+- åˆ›å»º Compute Engine VM
+- å®‰è£… Dockerï¼ˆéš”ç¦»çš„åº”ç”¨è¿è¡Œæ—¶ï¼‰
+- åœ¨ Docker ä¸­å¯åŠ¨ OpenKrab Gateway ç½‘å…³
+- åœ¨ä¸»æœºä¸ŠæŒä¹…åŒ– `~/.OpenKrab` + `~/.OpenKrab/workspace`ï¼ˆé‡å¯/é‡å»ºåŽä»ä¿ç•™ï¼‰
+- é€šè¿‡ SSH éš§é“ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘è®¿é—®æŽ§åˆ¶ UI
 
-Gateway 网关可以通过以下方式访问：
+Gateway ç½‘å…³å¯ä»¥é€šè¿‡ä»¥ä¸‹æ–¹å¼è®¿é—®ï¼š
 
-- 从你的笔记本电脑进行 SSH 端口转发
-- 如果你自己管理防火墙和令牌，可以直接暴露端口
+- ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘è¿›è¡Œ SSH ç«¯å£è½¬å‘
+- å¦‚æžœä½ è‡ªå·±ç®¡ç†é˜²ç«å¢™å’Œä»¤ç‰Œï¼Œå¯ä»¥ç›´æŽ¥æš´éœ²ç«¯å£
 
-本指南使用 GCP Compute Engine 上的 Debian。
-Ubuntu 也可以；请相应地映射软件包。
-有关通用 Docker 流程，请参阅 [Docker](/install/docker)。
-
----
-
-## 快速路径（有经验的运维人员）
-
-1. 创建 GCP 项目 + 启用 Compute Engine API
-2. 创建 Compute Engine VM（e2-small，Debian 12，20GB）
-3. SSH 进入 VM
-4. 安装 Docker
-5. 克隆 OpenKrab 仓库
-6. 创建持久化主机目录
-7. 配置 `.env` 和 `docker-compose.yml`
-8. 内置所需二进制文件、构建并启动
+æœ¬æŒ‡å—ä½¿ç”¨ GCP Compute Engine ä¸Šçš„ Debianã€‚
+Ubuntu ä¹Ÿå¯ä»¥ï¼›è¯·ç›¸åº”åœ°æ˜ å°„è½¯ä»¶åŒ…ã€‚
+æœ‰å…³é€šç”¨ Docker æµç¨‹ï¼Œè¯·å‚é˜… [Docker](/install/docker)ã€‚
 
 ---
 
-## 你需要什么
+## å¿«é€Ÿè·¯å¾„ï¼ˆæœ‰ç»éªŒçš„è¿ç»´äººå‘˜ï¼‰
 
-- GCP 账户（e2-micro 符合免费层条件）
-- 已安装 gcloud CLI（或使用 Cloud Console）
-- 从你的笔记本电脑 SSH 访问
-- 对 SSH + 复制/粘贴有基本了解
-- 约 20-30 分钟
-- Docker 和 Docker Compose
-- 模型认证凭证
-- 可选的提供商凭证
+1. åˆ›å»º GCP é¡¹ç›® + å¯ç”¨ Compute Engine API
+2. åˆ›å»º Compute Engine VMï¼ˆe2-smallï¼ŒDebian 12ï¼Œ20GBï¼‰
+3. SSH è¿›å…¥ VM
+4. å®‰è£… Docker
+5. å…‹éš† OpenKrab ä»“åº“
+6. åˆ›å»ºæŒä¹…åŒ–ä¸»æœºç›®å½•
+7. é…ç½® `.env` å’Œ `docker-compose.yml`
+8. å†…ç½®æ‰€éœ€äºŒè¿›åˆ¶æ–‡ä»¶ã€æž„å»ºå¹¶å¯åŠ¨
+
+---
+
+## ä½ éœ€è¦ä»€ä¹ˆ
+
+- GCP è´¦æˆ·ï¼ˆe2-micro ç¬¦åˆå…è´¹å±‚æ¡ä»¶ï¼‰
+- å·²å®‰è£… gcloud CLIï¼ˆæˆ–ä½¿ç”¨ Cloud Consoleï¼‰
+- ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘ SSH è®¿é—®
+- å¯¹ SSH + å¤åˆ¶/ç²˜è´´æœ‰åŸºæœ¬äº†è§£
+- çº¦ 20-30 åˆ†é’Ÿ
+- Docker å’Œ Docker Compose
+- æ¨¡åž‹è®¤è¯å‡­è¯
+- å¯é€‰çš„æä¾›å•†å‡­è¯
   - WhatsApp QR
   - Telegram bot token
   - Gmail OAuth
 
 ---
 
-## 1) 安装 gcloud CLI（或使用 Console）
+## 1) å®‰è£… gcloud CLIï¼ˆæˆ–ä½¿ç”¨ Consoleï¼‰
 
-**选项 A：gcloud CLI**（推荐用于自动化）
+**é€‰é¡¹ Aï¼šgcloud CLI**ï¼ˆæŽ¨èç”¨äºŽè‡ªåŠ¨åŒ–ï¼‰
 
-从 https://cloud.google.com/sdk/docs/install 安装
+ä»Ž https://cloud.google.com/sdk/docs/install å®‰è£…
 
-初始化并认证：
+åˆå§‹åŒ–å¹¶è®¤è¯ï¼š
 
 ```bash
 gcloud init
 gcloud auth login
 ```
 
-**选项 B：Cloud Console**
+**é€‰é¡¹ Bï¼šCloud Console**
 
-所有步骤都可以通过 https://console.cloud.google.com 的 Web UI 完成
+æ‰€æœ‰æ­¥éª¤éƒ½å¯ä»¥é€šè¿‡ https://console.cloud.google.com çš„ Web UI å®Œæˆ
 
 ---
 
-## 2) 创建 GCP 项目
+## 2) åˆ›å»º GCP é¡¹ç›®
 
-**CLI：**
+**CLIï¼š**
 
 ```bash
 gcloud projects create my-OpenKrab-project --name="OpenKrab Gateway"
 gcloud config set project my-OpenKrab-project
 ```
 
-在 https://console.cloud.google.com/billing 启用计费（Compute Engine 必需）。
+åœ¨ https://console.cloud.google.com/billing å¯ç”¨è®¡è´¹ï¼ˆCompute Engine å¿…éœ€ï¼‰ã€‚
 
-启用 Compute Engine API：
+å¯ç”¨ Compute Engine APIï¼š
 
 ```bash
 gcloud services enable compute.googleapis.com
 ```
 
-**Console：**
+**Consoleï¼š**
 
-1. 转到 IAM & Admin > Create Project
-2. 命名并创建
-3. 为项目启用计费
-4. 导航到 APIs & Services > Enable APIs > 搜索 "Compute Engine API" > Enable
+1. è½¬åˆ° IAM & Admin > Create Project
+2. å‘½åå¹¶åˆ›å»º
+3. ä¸ºé¡¹ç›®å¯ç”¨è®¡è´¹
+4. å¯¼èˆªåˆ° APIs & Services > Enable APIs > æœç´¢ "Compute Engine API" > Enable
 
 ---
 
-## 3) 创建 VM
+## 3) åˆ›å»º VM
 
-**机器类型：**
+**æœºå™¨ç±»åž‹ï¼š**
 
-| 类型     | 配置                    | 成本       | 说明           |
+| ç±»åž‹     | é…ç½®                    | æˆæœ¬       | è¯´æ˜Ž           |
 | -------- | ----------------------- | ---------- | -------------- |
-| e2-small | 2 vCPU，2GB RAM         | ~$12/月    | 推荐           |
-| e2-micro | 2 vCPU（共享），1GB RAM | 符合免费层 | 负载下可能 OOM |
+| e2-small | 2 vCPUï¼Œ2GB RAM         | ~$12/æœˆ    | æŽ¨è           |
+| e2-micro | 2 vCPUï¼ˆå…±äº«ï¼‰ï¼Œ1GB RAM | ç¬¦åˆå…è´¹å±‚ | è´Ÿè½½ä¸‹å¯èƒ½ OOM |
 
-**CLI：**
+**CLIï¼š**
 
 ```bash
 gcloud compute instances create OpenKrab-gateway \
@@ -137,34 +137,34 @@ gcloud compute instances create OpenKrab-gateway \
   --image-project=debian-cloud
 ```
 
-**Console：**
+**Consoleï¼š**
 
-1. 转到 Compute Engine > VM instances > Create instance
-2. Name：`OpenKrab-gateway`
-3. Region：`us-central1`，Zone：`us-central1-a`
-4. Machine type：`e2-small`
-5. Boot disk：Debian 12，20GB
+1. è½¬åˆ° Compute Engine > VM instances > Create instance
+2. Nameï¼š`OpenKrab-gateway`
+3. Regionï¼š`us-central1`ï¼ŒZoneï¼š`us-central1-a`
+4. Machine typeï¼š`e2-small`
+5. Boot diskï¼šDebian 12ï¼Œ20GB
 6. Create
 
 ---
 
-## 4) SSH 进入 VM
+## 4) SSH è¿›å…¥ VM
 
-**CLI：**
+**CLIï¼š**
 
 ```bash
 gcloud compute ssh OpenKrab-gateway --zone=us-central1-a
 ```
 
-**Console：**
+**Consoleï¼š**
 
-在 Compute Engine 仪表板中点击 VM 旁边的"SSH"按钮。
+åœ¨ Compute Engine ä»ªè¡¨æ¿ä¸­ç‚¹å‡» VM æ—è¾¹çš„"SSH"æŒ‰é’®ã€‚
 
-注意：VM 创建后 SSH 密钥传播可能需要 1-2 分钟。如果连接被拒绝，请等待并重试。
+æ³¨æ„ï¼šVM åˆ›å»ºåŽ SSH å¯†é’¥ä¼ æ’­å¯èƒ½éœ€è¦ 1-2 åˆ†é’Ÿã€‚å¦‚æžœè¿žæŽ¥è¢«æ‹’ç»ï¼Œè¯·ç­‰å¾…å¹¶é‡è¯•ã€‚
 
 ---
 
-## 5) 安装 Docker（在 VM 上）
+## 5) å®‰è£… Dockerï¼ˆåœ¨ VM ä¸Šï¼‰
 
 ```bash
 sudo apt-get update
@@ -173,19 +173,19 @@ curl -fsSL https://get.docker.com | sudo sh
 sudo usermod -aG docker $USER
 ```
 
-注销并重新登录以使组更改生效：
+æ³¨é”€å¹¶é‡æ–°ç™»å½•ä»¥ä½¿ç»„æ›´æ”¹ç”Ÿæ•ˆï¼š
 
 ```bash
 exit
 ```
 
-然后重新 SSH 登录：
+ç„¶åŽé‡æ–° SSH ç™»å½•ï¼š
 
 ```bash
 gcloud compute ssh OpenKrab-gateway --zone=us-central1-a
 ```
 
-验证：
+éªŒè¯ï¼š
 
 ```bash
 docker --version
@@ -194,21 +194,21 @@ docker compose version
 
 ---
 
-## 6) 克隆 OpenKrab 仓库
+## 6) å…‹éš† OpenKrab ä»“åº“
 
 ```bash
 git clone https://github.com/OpenKrab/OpenKrab.git
 cd OpenKrab
 ```
 
-本指南假设你将构建自定义镜像以保证二进制文件持久化。
+æœ¬æŒ‡å—å‡è®¾ä½ å°†æž„å»ºè‡ªå®šä¹‰é•œåƒä»¥ä¿è¯äºŒè¿›åˆ¶æ–‡ä»¶æŒä¹…åŒ–ã€‚
 
 ---
 
-## 7) 创建持久化主机目录
+## 7) åˆ›å»ºæŒä¹…åŒ–ä¸»æœºç›®å½•
 
-Docker 容器是临时的。
-所有长期状态必须存在于主机上。
+Docker å®¹å™¨æ˜¯ä¸´æ—¶çš„ã€‚
+æ‰€æœ‰é•¿æœŸçŠ¶æ€å¿…é¡»å­˜åœ¨äºŽä¸»æœºä¸Šã€‚
 
 ```bash
 mkdir -p ~/.OpenKrab
@@ -217,41 +217,41 @@ mkdir -p ~/.OpenKrab/workspace
 
 ---
 
-## 8) 配置环境变量
+## 8) é…ç½®çŽ¯å¢ƒå˜é‡
 
-在仓库根目录创建 `.env`。
+åœ¨ä»“åº“æ ¹ç›®å½•åˆ›å»º `.env`ã€‚
 
 ```bash
-OpenKrab_IMAGE=OpenKrab:latest
-OpenKrab_GATEWAY_TOKEN=change-me-now
-OpenKrab_GATEWAY_BIND=lan
-OpenKrab_GATEWAY_PORT=18789
+OPENKRAB_IMAGE=OpenKrab:latest
+OPENKRAB_GATEWAY_TOKEN=change-me-now
+OPENKRAB_GATEWAY_BIND=lan
+OPENKRAB_GATEWAY_PORT=18789
 
-OpenKrab_CONFIG_DIR=/home/$USER/.OpenKrab
-OpenKrab_WORKSPACE_DIR=/home/$USER/.OpenKrab/workspace
+OPENKRAB_CONFIG_DIR=/home/$USER/.OpenKrab
+OPENKRAB_WORKSPACE_DIR=/home/$USER/.OpenKrab/workspace
 
 GOG_KEYRING_PASSWORD=change-me-now
 XDG_CONFIG_HOME=/home/node/.OpenKrab
 ```
 
-生成强密钥：
+ç”Ÿæˆå¼ºå¯†é’¥ï¼š
 
 ```bash
 openssl rand -hex 32
 ```
 
-**不要提交此文件。**
+**ä¸è¦æäº¤æ­¤æ–‡ä»¶ã€‚**
 
 ---
 
-## 9) Docker Compose 配置
+## 9) Docker Compose é…ç½®
 
-创建或更新 `docker-compose.yml`。
+åˆ›å»ºæˆ–æ›´æ–° `docker-compose.yml`ã€‚
 
 ```yaml
 services:
   OpenKrab-gateway:
-    image: ${OpenKrab_IMAGE}
+    image: ${OPENKRAB_IMAGE}
     build: .
     restart: unless-stopped
     env_file:
@@ -260,22 +260,22 @@ services:
       - HOME=/home/node
       - NODE_ENV=production
       - TERM=xterm-256color
-      - OpenKrab_GATEWAY_BIND=${OpenKrab_GATEWAY_BIND}
-      - OpenKrab_GATEWAY_PORT=${OpenKrab_GATEWAY_PORT}
-      - OpenKrab_GATEWAY_TOKEN=${OpenKrab_GATEWAY_TOKEN}
+      - OPENKRAB_GATEWAY_BIND=${OPENKRAB_GATEWAY_BIND}
+      - OPENKRAB_GATEWAY_PORT=${OPENKRAB_GATEWAY_PORT}
+      - OPENKRAB_GATEWAY_TOKEN=${OPENKRAB_GATEWAY_TOKEN}
       - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD}
       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
       - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     volumes:
-      - ${OpenKrab_CONFIG_DIR}:/home/node/.OpenKrab
-      - ${OpenKrab_WORKSPACE_DIR}:/home/node/.OpenKrab/workspace
+      - ${OPENKRAB_CONFIG_DIR}:/home/node/.OpenKrab
+      - ${OPENKRAB_WORKSPACE_DIR}:/home/node/.OpenKrab/workspace
     ports:
-      # 推荐：在 VM 上保持 Gateway 网关仅绑定 loopback；通过 SSH 隧道访问。
-      # 要公开暴露，移除 `127.0.0.1:` 前缀并相应配置防火墙。
-      - "127.0.0.1:${OpenKrab_GATEWAY_PORT}:18789"
+      # æŽ¨èï¼šåœ¨ VM ä¸Šä¿æŒ Gateway ç½‘å…³ä»…ç»‘å®š loopbackï¼›é€šè¿‡ SSH éš§é“è®¿é—®ã€‚
+      # è¦å…¬å¼€æš´éœ²ï¼Œç§»é™¤ `127.0.0.1:` å‰ç¼€å¹¶ç›¸åº”é…ç½®é˜²ç«å¢™ã€‚
+      - "127.0.0.1:${OPENKRAB_GATEWAY_PORT}:18789"
 
-      # 可选：仅当你针对此 VM 运行 iOS/Android 节点并需要 Canvas 主机时。
-      # 如果你公开暴露此端口，请阅读 /gateway/security 并相应配置防火墙。
+      # å¯é€‰ï¼šä»…å½“ä½ é’ˆå¯¹æ­¤ VM è¿è¡Œ iOS/Android èŠ‚ç‚¹å¹¶éœ€è¦ Canvas ä¸»æœºæ—¶ã€‚
+      # å¦‚æžœä½ å…¬å¼€æš´éœ²æ­¤ç«¯å£ï¼Œè¯·é˜…è¯» /gateway/security å¹¶ç›¸åº”é…ç½®é˜²ç«å¢™ã€‚
       # - "18793:18793"
     command:
       [
@@ -283,56 +283,56 @@ services:
         "dist/index.js",
         "gateway",
         "--bind",
-        "${OpenKrab_GATEWAY_BIND}",
+        "${OPENKRAB_GATEWAY_BIND}",
         "--port",
-        "${OpenKrab_GATEWAY_PORT}",
+        "${OPENKRAB_GATEWAY_PORT}",
       ]
 ```
 
 ---
 
-## 10) 将所需二进制文件内置到镜像中（关键）
+## 10) å°†æ‰€éœ€äºŒè¿›åˆ¶æ–‡ä»¶å†…ç½®åˆ°é•œåƒä¸­ï¼ˆå…³é”®ï¼‰
 
-在运行中的容器内安装二进制文件是一个陷阱。
-任何在运行时安装的内容在重启后都会丢失。
+åœ¨è¿è¡Œä¸­çš„å®¹å™¨å†…å®‰è£…äºŒè¿›åˆ¶æ–‡ä»¶æ˜¯ä¸€ä¸ªé™·é˜±ã€‚
+ä»»ä½•åœ¨è¿è¡Œæ—¶å®‰è£…çš„å†…å®¹åœ¨é‡å¯åŽéƒ½ä¼šä¸¢å¤±ã€‚
 
-所有 Skills 所需的外部二进制文件必须在镜像构建时安装。
+æ‰€æœ‰ Skills æ‰€éœ€çš„å¤–éƒ¨äºŒè¿›åˆ¶æ–‡ä»¶å¿…é¡»åœ¨é•œåƒæž„å»ºæ—¶å®‰è£…ã€‚
 
-以下示例仅显示三个常见的二进制文件：
+ä»¥ä¸‹ç¤ºä¾‹ä»…æ˜¾ç¤ºä¸‰ä¸ªå¸¸è§çš„äºŒè¿›åˆ¶æ–‡ä»¶ï¼š
 
-- `gog` 用于 Gmail 访问
-- `goplaces` 用于 Google Places
-- `wacli` 用于 WhatsApp
+- `gog` ç”¨äºŽ Gmail è®¿é—®
+- `goplaces` ç”¨äºŽ Google Places
+- `wacli` ç”¨äºŽ WhatsApp
 
-这些是示例，不是完整列表。
-你可以使用相同的模式安装任意数量的二进制文件。
+è¿™äº›æ˜¯ç¤ºä¾‹ï¼Œä¸æ˜¯å®Œæ•´åˆ—è¡¨ã€‚
+ä½ å¯ä»¥ä½¿ç”¨ç›¸åŒçš„æ¨¡å¼å®‰è£…ä»»æ„æ•°é‡çš„äºŒè¿›åˆ¶æ–‡ä»¶ã€‚
 
-如果你以后添加依赖额外二进制文件的新 Skills，你必须：
+å¦‚æžœä½ ä»¥åŽæ·»åŠ ä¾èµ–é¢å¤–äºŒè¿›åˆ¶æ–‡ä»¶çš„æ–° Skillsï¼Œä½ å¿…é¡»ï¼š
 
-1. 更新 Dockerfile
-2. 重建镜像
-3. 重启容器
+1. æ›´æ–° Dockerfile
+2. é‡å»ºé•œåƒ
+3. é‡å¯å®¹å™¨
 
-**示例 Dockerfile**
+**ç¤ºä¾‹ Dockerfile**
 
 ```dockerfile
 FROM node:22-bookworm
 
 RUN apt-get update && apt-get install -y socat && rm -rf /var/lib/apt/lists/*
 
-# 示例二进制文件 1：Gmail CLI
+# ç¤ºä¾‹äºŒè¿›åˆ¶æ–‡ä»¶ 1ï¼šGmail CLI
 RUN curl -L https://github.com/steipete/gog/releases/latest/download/gog_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/gog
 
-# 示例二进制文件 2：Google Places CLI
+# ç¤ºä¾‹äºŒè¿›åˆ¶æ–‡ä»¶ 2ï¼šGoogle Places CLI
 RUN curl -L https://github.com/steipete/goplaces/releases/latest/download/goplaces_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/goplaces
 
-# 示例二进制文件 3：WhatsApp CLI
+# ç¤ºä¾‹äºŒè¿›åˆ¶æ–‡ä»¶ 3ï¼šWhatsApp CLI
 RUN curl -L https://github.com/steipete/wacli/releases/latest/download/wacli_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/wacli
 
-# 使用相同的模式在下面添加更多二进制文件
+# ä½¿ç”¨ç›¸åŒçš„æ¨¡å¼åœ¨ä¸‹é¢æ·»åŠ æ›´å¤šäºŒè¿›åˆ¶æ–‡ä»¶
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
@@ -354,14 +354,14 @@ CMD ["node","dist/index.js"]
 
 ---
 
-## 11) 构建并启动
+## 11) æž„å»ºå¹¶å¯åŠ¨
 
 ```bash
 docker compose build
 docker compose up -d OpenKrab-gateway
 ```
 
-验证二进制文件：
+éªŒè¯äºŒè¿›åˆ¶æ–‡ä»¶ï¼š
 
 ```bash
 docker compose exec OpenKrab-gateway which gog
@@ -369,7 +369,7 @@ docker compose exec OpenKrab-gateway which goplaces
 docker compose exec OpenKrab-gateway which wacli
 ```
 
-预期输出：
+é¢„æœŸè¾“å‡ºï¼š
 
 ```
 /usr/local/bin/gog
@@ -379,13 +379,13 @@ docker compose exec OpenKrab-gateway which wacli
 
 ---
 
-## 12) 验证 Gateway 网关
+## 12) éªŒè¯ Gateway ç½‘å…³
 
 ```bash
 docker compose logs -f OpenKrab-gateway
 ```
 
-成功：
+æˆåŠŸï¼š
 
 ```
 [gateway] listening on ws://0.0.0.0:18789
@@ -393,45 +393,45 @@ docker compose logs -f OpenKrab-gateway
 
 ---
 
-## 13) 从你的笔记本电脑访问
+## 13) ä»Žä½ çš„ç¬”è®°æœ¬ç”µè„‘è®¿é—®
 
-创建 SSH 隧道以转发 Gateway 网关端口：
+åˆ›å»º SSH éš§é“ä»¥è½¬å‘ Gateway ç½‘å…³ç«¯å£ï¼š
 
 ```bash
 gcloud compute ssh OpenKrab-gateway --zone=us-central1-a -- -L 18789:127.0.0.1:18789
 ```
 
-在浏览器中打开：
+åœ¨æµè§ˆå™¨ä¸­æ‰“å¼€ï¼š
 
 `http://127.0.0.1:18789/`
 
-粘贴你的 Gateway 网关令牌。
+ç²˜è´´ä½ çš„ Gateway ç½‘å…³ä»¤ç‰Œã€‚
 
 ---
 
-## 什么持久化在哪里（真实来源）
+## ä»€ä¹ˆæŒä¹…åŒ–åœ¨å“ªé‡Œï¼ˆçœŸå®žæ¥æºï¼‰
 
-OpenKrab 在 Docker 中运行，但 Docker 不是真实来源。
-所有长期状态必须在重启、重建和重启后仍然存在。
+OpenKrab åœ¨ Docker ä¸­è¿è¡Œï¼Œä½† Docker ä¸æ˜¯çœŸå®žæ¥æºã€‚
+æ‰€æœ‰é•¿æœŸçŠ¶æ€å¿…é¡»åœ¨é‡å¯ã€é‡å»ºå’Œé‡å¯åŽä»ç„¶å­˜åœ¨ã€‚
 
-| 组件             | 位置                              | 持久化机制    | 说明                        |
+| ç»„ä»¶             | ä½ç½®                              | æŒä¹…åŒ–æœºåˆ¶    | è¯´æ˜Ž                        |
 | ---------------- | --------------------------------- | ------------- | --------------------------- |
-| Gateway 网关配置 | `/home/node/.OpenKrab/`           | 主机卷挂载    | 包括 `OpenKrab.json`、令牌  |
-| 模型认证配置文件 | `/home/node/.OpenKrab/`           | 主机卷挂载    | OAuth 令牌、API 密钥        |
-| Skill 配置       | `/home/node/.OpenKrab/skills/`    | 主机卷挂载    | Skill 级别状态              |
-| 智能体工作区     | `/home/node/.OpenKrab/workspace/` | 主机卷挂载    | 代码和智能体产物            |
-| WhatsApp 会话    | `/home/node/.OpenKrab/`           | 主机卷挂载    | 保留 QR 登录                |
-| Gmail 密钥环     | `/home/node/.OpenKrab/`           | 主机卷 + 密码 | 需要 `GOG_KEYRING_PASSWORD` |
-| 外部二进制文件   | `/usr/local/bin/`                 | Docker 镜像   | 必须在构建时内置            |
-| Node 运行时      | 容器文件系统                      | Docker 镜像   | 每次镜像构建时重建          |
-| OS 包            | 容器文件系统                      | Docker 镜像   | 不要在运行时安装            |
-| Docker 容器      | 临时                              | 可重启        | 可以安全销毁                |
+| Gateway ç½‘å…³é…ç½® | `/home/node/.OpenKrab/`           | ä¸»æœºå·æŒ‚è½½    | åŒ…æ‹¬ `OpenKrab.json`ã€ä»¤ç‰Œ  |
+| æ¨¡åž‹è®¤è¯é…ç½®æ–‡ä»¶ | `/home/node/.OpenKrab/`           | ä¸»æœºå·æŒ‚è½½    | OAuth ä»¤ç‰Œã€API å¯†é’¥        |
+| Skill é…ç½®       | `/home/node/.OpenKrab/skills/`    | ä¸»æœºå·æŒ‚è½½    | Skill çº§åˆ«çŠ¶æ€              |
+| æ™ºèƒ½ä½“å·¥ä½œåŒº     | `/home/node/.OpenKrab/workspace/` | ä¸»æœºå·æŒ‚è½½    | ä»£ç å’Œæ™ºèƒ½ä½“äº§ç‰©            |
+| WhatsApp ä¼šè¯    | `/home/node/.OpenKrab/`           | ä¸»æœºå·æŒ‚è½½    | ä¿ç•™ QR ç™»å½•                |
+| Gmail å¯†é’¥çŽ¯     | `/home/node/.OpenKrab/`           | ä¸»æœºå· + å¯†ç  | éœ€è¦ `GOG_KEYRING_PASSWORD` |
+| å¤–éƒ¨äºŒè¿›åˆ¶æ–‡ä»¶   | `/usr/local/bin/`                 | Docker é•œåƒ   | å¿…é¡»åœ¨æž„å»ºæ—¶å†…ç½®            |
+| Node è¿è¡Œæ—¶      | å®¹å™¨æ–‡ä»¶ç³»ç»Ÿ                      | Docker é•œåƒ   | æ¯æ¬¡é•œåƒæž„å»ºæ—¶é‡å»º          |
+| OS åŒ…            | å®¹å™¨æ–‡ä»¶ç³»ç»Ÿ                      | Docker é•œåƒ   | ä¸è¦åœ¨è¿è¡Œæ—¶å®‰è£…            |
+| Docker å®¹å™¨      | ä¸´æ—¶                              | å¯é‡å¯        | å¯ä»¥å®‰å…¨é”€æ¯                |
 
 ---
 
-## 更新
+## æ›´æ–°
 
-在 VM 上更新 OpenKrab：
+åœ¨ VM ä¸Šæ›´æ–° OpenKrabï¼š
 
 ```bash
 cd ~/OpenKrab
@@ -442,70 +442,71 @@ docker compose up -d
 
 ---
 
-## 故障排除
+## æ•…éšœæŽ’é™¤
 
-**SSH 连接被拒绝**
+**SSH è¿žæŽ¥è¢«æ‹’ç»**
 
-VM 创建后 SSH 密钥传播可能需要 1-2 分钟。等待并重试。
+VM åˆ›å»ºåŽ SSH å¯†é’¥ä¼ æ’­å¯èƒ½éœ€è¦ 1-2 åˆ†é’Ÿã€‚ç­‰å¾…å¹¶é‡è¯•ã€‚
 
-**OS Login 问题**
+**OS Login é—®é¢˜**
 
-检查你的 OS Login 配置文件：
+æ£€æŸ¥ä½ çš„ OS Login é…ç½®æ–‡ä»¶ï¼š
 
 ```bash
 gcloud compute os-login describe-profile
 ```
 
-确保你的账户具有所需的 IAM 权限（Compute OS Login 或 Compute OS Admin Login）。
+ç¡®ä¿ä½ çš„è´¦æˆ·å…·æœ‰æ‰€éœ€çš„ IAM æƒé™ï¼ˆCompute OS Login æˆ– Compute OS Admin Loginï¼‰ã€‚
 
-**内存不足（OOM）**
+**å†…å­˜ä¸è¶³ï¼ˆOOMï¼‰**
 
-如果使用 e2-micro 并遇到 OOM，升级到 e2-small 或 e2-medium：
+å¦‚æžœä½¿ç”¨ e2-micro å¹¶é‡åˆ° OOMï¼Œå‡çº§åˆ° e2-small æˆ– e2-mediumï¼š
 
 ```bash
-# 首先停止 VM
+# é¦–å…ˆåœæ­¢ VM
 gcloud compute instances stop OpenKrab-gateway --zone=us-central1-a
 
-# 更改机器类型
+# æ›´æ”¹æœºå™¨ç±»åž‹
 gcloud compute instances set-machine-type OpenKrab-gateway \
   --zone=us-central1-a \
   --machine-type=e2-small
 
-# 启动 VM
+# å¯åŠ¨ VM
 gcloud compute instances start OpenKrab-gateway --zone=us-central1-a
 ```
 
 ---
 
-## 服务账户（安全最佳实践）
+## æœåŠ¡è´¦æˆ·ï¼ˆå®‰å…¨æœ€ä½³å®žè·µï¼‰
 
-对于个人使用，你的默认用户账户就可以。
+å¯¹äºŽä¸ªäººä½¿ç”¨ï¼Œä½ çš„é»˜è®¤ç”¨æˆ·è´¦æˆ·å°±å¯ä»¥ã€‚
 
-对于自动化或 CI/CD 管道，创建具有最小权限的专用服务账户：
+å¯¹äºŽè‡ªåŠ¨åŒ–æˆ– CI/CD ç®¡é“ï¼Œåˆ›å»ºå…·æœ‰æœ€å°æƒé™çš„ä¸“ç”¨æœåŠ¡è´¦æˆ·ï¼š
 
-1. 创建服务账户：
+1. åˆ›å»ºæœåŠ¡è´¦æˆ·ï¼š
 
    ```bash
    gcloud iam service-accounts create OpenKrab-deploy \
      --display-name="OpenKrab Deployment"
    ```
 
-2. 授予 Compute Instance Admin 角色（或更窄的自定义角色）：
+2. æŽˆäºˆ Compute Instance Admin è§’è‰²ï¼ˆæˆ–æ›´çª„çš„è‡ªå®šä¹‰è§’è‰²ï¼‰ï¼š
    ```bash
    gcloud projects add-iam-policy-binding my-OpenKrab-project \
      --member="serviceAccount:OpenKrab-deploy@my-OpenKrab-project.iam.gserviceaccount.com" \
      --role="roles/compute.instanceAdmin.v1"
    ```
 
-避免为自动化使用 Owner 角色。使用最小权限原则。
+é¿å…ä¸ºè‡ªåŠ¨åŒ–ä½¿ç”¨ Owner è§’è‰²ã€‚ä½¿ç”¨æœ€å°æƒé™åŽŸåˆ™ã€‚
 
-参阅 https://cloud.google.com/iam/docs/understanding-roles 了解 IAM 角色详情。
+å‚é˜… https://cloud.google.com/iam/docs/understanding-roles äº†è§£ IAM è§’è‰²è¯¦æƒ…ã€‚
 
 ---
 
-## 下一步
+## ä¸‹ä¸€æ­¥
 
-- 设置消息渠道：[渠道](/channels)
-- 将本地设备配对为节点：[节点](/nodes)
-- 配置 Gateway 网关：[Gateway 网关配置](/gateway/configuration)
+- è®¾ç½®æ¶ˆæ¯æ¸ é“ï¼š[æ¸ é“](/channels)
+- å°†æœ¬åœ°è®¾å¤‡é…å¯¹ä¸ºèŠ‚ç‚¹ï¼š[èŠ‚ç‚¹](/nodes)
+- é…ç½® Gateway ç½‘å…³ï¼š[Gateway ç½‘å…³é…ç½®](/gateway/configuration)
+
 

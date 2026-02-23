@@ -1,6 +1,6 @@
-//! Config validation — port of `openkrab/src/config/validation.ts` (Phase 1-4 schema validation)
+﻿//! Config validation â€” port of `openkrab/src/config/validation.ts` (Phase 1-4 schema validation)
 
-use crate::openkrab_config::OpenKrabConfig;
+use crate::OPENKRAB_CONFIG::OpenKrabConfig;
 use anyhow::Result;
 use serde_json::Value;
 
@@ -96,7 +96,7 @@ pub fn validate_config_schema(config: &OpenKrabConfig) -> ValidationResult<()> {
 
 /// Validate channels configuration
 fn validate_channels_config(
-    channels: &crate::openkrab_config::ChannelsConfig,
+    channels: &crate::OPENKRAB_CONFIG::ChannelsConfig,
     errors: &mut Vec<ValidationError>,
 ) {
     // Validate Telegram accounts (Option<TelegramConfig>)
@@ -138,7 +138,7 @@ fn validate_channels_config(
     // Validate HashMap-based channels
     let channel_types: &[(
         &str,
-        &std::collections::HashMap<String, crate::openkrab_config::ChannelConfig>,
+        &std::collections::HashMap<String, crate::OPENKRAB_CONFIG::ChannelConfig>,
     )] = &[
         ("slack", &channels.slack),
         ("whatsapp", &channels.whatsapp),
@@ -169,7 +169,7 @@ fn validate_channels_config(
 
 /// Validate models configuration
 fn validate_models_config(
-    models: &crate::openkrab_config::ModelsConfig,
+    models: &crate::OPENKRAB_CONFIG::ModelsConfig,
     errors: &mut Vec<ValidationError>,
 ) {
     if let Some(providers) = &models.providers {
@@ -257,7 +257,7 @@ pub fn format_validation_errors(errors: &[ValidationError]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openkrab_config::*;
+    use crate::OPENKRAB_CONFIG::*;
 
     #[test]
     fn validate_valid_config() {
@@ -382,3 +382,4 @@ mod tests {
         assert!(formatted.contains("must be > 0"));
     }
 }
+

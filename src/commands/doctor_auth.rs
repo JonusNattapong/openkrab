@@ -104,7 +104,7 @@ pub fn note_auth_profile_health(cfg: &AppConfig) -> Vec<String> {
     for id in cfg.auth.profiles.keys() {
         if id == "anthropic:default" {
             warnings.push(format!(
-                "Legacy profile ID '{}' found. Run 'krabkrab doctor' to migrate.",
+                "Legacy profile ID '{}' found. Run 'openkrab doctor' to migrate.",
                 id
             ));
         }
@@ -165,3 +165,4 @@ mod tests {
         assert_eq!(result.unwrap().get("openai").unwrap().len(), 1);
     }
 }
+

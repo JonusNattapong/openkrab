@@ -1,4 +1,4 @@
----
+﻿---
 description: Deploy OpenKrab on Fly.io
 title: Fly.io
 x-i18n:
@@ -10,25 +10,25 @@ x-i18n:
   workflow: 15
 ---
 
-# Fly.io 部署
+# Fly.io éƒ¨ç½²
 
-**目标：** OpenKrab Gateway 网关运行在 [Fly.io](https://fly.io) 机器上，具有持久存储、自动 HTTPS 和 Discord/渠道访问。
+**ç›®æ ‡ï¼š** OpenKrab Gateway ç½‘å…³è¿è¡Œåœ¨ [Fly.io](https://fly.io) æœºå™¨ä¸Šï¼Œå…·æœ‰æŒä¹…å­˜å‚¨ã€è‡ªåŠ¨ HTTPS å’Œ Discord/æ¸ é“è®¿é—®ã€‚
 
-## 你需要什么
+## ä½ éœ€è¦ä»€ä¹ˆ
 
-- 已安装 [flyctl CLI](https://fly.io/docs/hands-on/install-flyctl/)
-- Fly.io 账户（免费套餐可用）
-- 模型认证：Anthropic API 密钥（或其他提供商密钥）
-- 渠道凭证：Discord bot token、Telegram token 等
+- å·²å®‰è£… [flyctl CLI](https://fly.io/docs/hands-on/install-flyctl/)
+- Fly.io è´¦æˆ·ï¼ˆå…è´¹å¥—é¤å¯ç”¨ï¼‰
+- æ¨¡åž‹è®¤è¯ï¼šAnthropic API å¯†é’¥ï¼ˆæˆ–å…¶ä»–æä¾›å•†å¯†é’¥ï¼‰
+- æ¸ é“å‡­è¯ï¼šDiscord bot tokenã€Telegram token ç­‰
 
-## 初学者快速路径
+## åˆå­¦è€…å¿«é€Ÿè·¯å¾„
 
-1. 克隆仓库 → 自定义 `fly.toml`
-2. 创建应用 + 卷 → 设置密钥
-3. 使用 `fly deploy` 部署
-4. SSH 进入创建配置或使用 Control UI
+1. å…‹éš†ä»“åº“ â†’ è‡ªå®šä¹‰ `fly.toml`
+2. åˆ›å»ºåº”ç”¨ + å· â†’ è®¾ç½®å¯†é’¥
+3. ä½¿ç”¨ `fly deploy` éƒ¨ç½²
+4. SSH è¿›å…¥åˆ›å»ºé…ç½®æˆ–ä½¿ç”¨ Control UI
 
-## 1）创建 Fly 应用
+## 1ï¼‰åˆ›å»º Fly åº”ç”¨
 
 ```bash
 # Clone the repo
@@ -39,16 +39,16 @@ cd OpenKrab
 fly apps create my-OpenKrab
 
 # Create a persistent volume (1GB is usually enough)
-fly volumes create OpenKrab_data --size 1 --region iad
+fly volumes create OPENKRAB_DATA --size 1 --region iad
 ```
 
-**提示：** 选择离你近的区域。常见选项：`lhr`（伦敦）、`iad`（弗吉尼亚）、`sjc`（圣何塞）。
+**æç¤ºï¼š** é€‰æ‹©ç¦»ä½ è¿‘çš„åŒºåŸŸã€‚å¸¸è§é€‰é¡¹ï¼š`lhr`ï¼ˆä¼¦æ•¦ï¼‰ã€`iad`ï¼ˆå¼—å‰å°¼äºšï¼‰ã€`sjc`ï¼ˆåœ£ä½•å¡žï¼‰ã€‚
 
-## 2）配置 fly.toml
+## 2ï¼‰é…ç½® fly.toml
 
-编辑 `fly.toml` 以匹配你的应用名称和需求。
+ç¼–è¾‘ `fly.toml` ä»¥åŒ¹é…ä½ çš„åº”ç”¨åç§°å’Œéœ€æ±‚ã€‚
 
-**安全注意事项：** 默认配置暴露公共 URL。对于没有公共 IP 的加固部署，参见[私有部署](#私有部署加固)或使用 `fly.private.toml`。
+**å®‰å…¨æ³¨æ„äº‹é¡¹ï¼š** é»˜è®¤é…ç½®æš´éœ²å…¬å…± URLã€‚å¯¹äºŽæ²¡æœ‰å…¬å…± IP çš„åŠ å›ºéƒ¨ç½²ï¼Œå‚è§[ç§æœ‰éƒ¨ç½²](#ç§æœ‰éƒ¨ç½²åŠ å›º)æˆ–ä½¿ç”¨ `fly.private.toml`ã€‚
 
 ```toml
 app = "my-OpenKrab"  # Your app name
@@ -59,8 +59,8 @@ primary_region = "iad"
 
 [env]
   NODE_ENV = "production"
-  OpenKrab_PREFER_PNPM = "1"
-  OpenKrab_STATE_DIR = "/data"
+  OPENKRAB_PREFER_PNPM = "1"
+  OPENKRAB_STATE_DIR = "/data"
   NODE_OPTIONS = "--max-old-space-size=1536"
 
 [processes]
@@ -79,25 +79,25 @@ primary_region = "iad"
   memory = "2048mb"
 
 [mounts]
-  source = "OpenKrab_data"
+  source = "OPENKRAB_DATA"
   destination = "/data"
 ```
 
-**关键设置：**
+**å…³é”®è®¾ç½®ï¼š**
 
-| 设置                           | 原因                                                                      |
+| è®¾ç½®                           | åŽŸå›                                                                       |
 | ------------------------------ | ------------------------------------------------------------------------- |
-| `--bind lan`                   | 绑定到 `0.0.0.0` 以便 Fly 的代理可以访问 Gateway 网关                     |
-| `--allow-unconfigured`         | 无需配置文件启动（你稍后会创建一个）                                      |
-| `internal_port = 3000`         | 必须与 `--port 3000`（或 `OpenKrab_GATEWAY_PORT`）匹配以进行 Fly 健康检查 |
-| `memory = "2048mb"`            | 512MB 太小；推荐 2GB                                                      |
-| `OpenKrab_STATE_DIR = "/data"` | 在卷上持久化状态                                                          |
+| `--bind lan`                   | ç»‘å®šåˆ° `0.0.0.0` ä»¥ä¾¿ Fly çš„ä»£ç†å¯ä»¥è®¿é—® Gateway ç½‘å…³                     |
+| `--allow-unconfigured`         | æ— éœ€é…ç½®æ–‡ä»¶å¯åŠ¨ï¼ˆä½ ç¨åŽä¼šåˆ›å»ºä¸€ä¸ªï¼‰                                      |
+| `internal_port = 3000`         | å¿…é¡»ä¸Ž `--port 3000`ï¼ˆæˆ– `OPENKRAB_GATEWAY_PORT`ï¼‰åŒ¹é…ä»¥è¿›è¡Œ Fly å¥åº·æ£€æŸ¥ |
+| `memory = "2048mb"`            | 512MB å¤ªå°ï¼›æŽ¨è 2GB                                                      |
+| `OPENKRAB_STATE_DIR = "/data"` | åœ¨å·ä¸ŠæŒä¹…åŒ–çŠ¶æ€                                                          |
 
-## 3）设置密钥
+## 3ï¼‰è®¾ç½®å¯†é’¥
 
 ```bash
 # Required: Gateway token (for non-loopback binding)
-fly secrets set OpenKrab_GATEWAY_TOKEN=$(openssl rand -hex 32)
+fly secrets set OPENKRAB_GATEWAY_TOKEN=$(openssl rand -hex 32)
 
 # Model provider API keys
 fly secrets set ANTHROPIC_API_KEY=sk-ant-...
@@ -110,43 +110,43 @@ fly secrets set GOOGLE_API_KEY=...
 fly secrets set DISCORD_BOT_TOKEN=MTQ...
 ```
 
-**注意事项：**
+**æ³¨æ„äº‹é¡¹ï¼š**
 
-- 非 loopback 绑定（`--bind lan`）出于安全需要 `OpenKrab_GATEWAY_TOKEN`。
-- 像对待密码一样对待这些 token。
-- **优先使用环境变量而不是配置文件**来存储所有 API 密钥和 token。这可以避免密钥出现在 `OpenKrab.json` 中，防止意外暴露或记录。
+- éž loopback ç»‘å®šï¼ˆ`--bind lan`ï¼‰å‡ºäºŽå®‰å…¨éœ€è¦ `OPENKRAB_GATEWAY_TOKEN`ã€‚
+- åƒå¯¹å¾…å¯†ç ä¸€æ ·å¯¹å¾…è¿™äº› tokenã€‚
+- **ä¼˜å…ˆä½¿ç”¨çŽ¯å¢ƒå˜é‡è€Œä¸æ˜¯é…ç½®æ–‡ä»¶**æ¥å­˜å‚¨æ‰€æœ‰ API å¯†é’¥å’Œ tokenã€‚è¿™å¯ä»¥é¿å…å¯†é’¥å‡ºçŽ°åœ¨ `OpenKrab.json` ä¸­ï¼Œé˜²æ­¢æ„å¤–æš´éœ²æˆ–è®°å½•ã€‚
 
-## 4）部署
+## 4ï¼‰éƒ¨ç½²
 
 ```bash
 fly deploy
 ```
 
-首次部署构建 Docker 镜像（约 2-3 分钟）。后续部署更快。
+é¦–æ¬¡éƒ¨ç½²æž„å»º Docker é•œåƒï¼ˆçº¦ 2-3 åˆ†é’Ÿï¼‰ã€‚åŽç»­éƒ¨ç½²æ›´å¿«ã€‚
 
-部署后验证：
+éƒ¨ç½²åŽéªŒè¯ï¼š
 
 ```bash
 fly status
 fly logs
 ```
 
-你应该看到：
+ä½ åº”è¯¥çœ‹åˆ°ï¼š
 
 ```
 [gateway] listening on ws://0.0.0.0:3000 (PID xxx)
 [discord] logged in to discord as xxx
 ```
 
-## 5）创建配置文件
+## 5ï¼‰åˆ›å»ºé…ç½®æ–‡ä»¶
 
-SSH 进入机器创建正确的配置：
+SSH è¿›å…¥æœºå™¨åˆ›å»ºæ­£ç¡®çš„é…ç½®ï¼š
 
 ```bash
 fly ssh console
 ```
 
-创建配置目录和文件：
+åˆ›å»ºé…ç½®ç›®å½•å’Œæ–‡ä»¶ï¼š
 
 ```bash
 mkdir -p /data
@@ -202,110 +202,110 @@ cat > /data/OpenKrab.json << 'EOF'
 EOF
 ```
 
-**注意：** 使用 `OpenKrab_STATE_DIR=/data` 时，配置路径是 `/data/OpenKrab.json`。
+**æ³¨æ„ï¼š** ä½¿ç”¨ `OPENKRAB_STATE_DIR=/data` æ—¶ï¼Œé…ç½®è·¯å¾„æ˜¯ `/data/OpenKrab.json`ã€‚
 
-**注意：** Discord token 可以来自：
+**æ³¨æ„ï¼š** Discord token å¯ä»¥æ¥è‡ªï¼š
 
-- 环境变量：`DISCORD_BOT_TOKEN`（推荐用于密钥）
-- 配置文件：`channels.discord.token`
+- çŽ¯å¢ƒå˜é‡ï¼š`DISCORD_BOT_TOKEN`ï¼ˆæŽ¨èç”¨äºŽå¯†é’¥ï¼‰
+- é…ç½®æ–‡ä»¶ï¼š`channels.discord.token`
 
-如果使用环境变量，无需将 token 添加到配置中。Gateway 网关会自动读取 `DISCORD_BOT_TOKEN`。
+å¦‚æžœä½¿ç”¨çŽ¯å¢ƒå˜é‡ï¼Œæ— éœ€å°† token æ·»åŠ åˆ°é…ç½®ä¸­ã€‚Gateway ç½‘å…³ä¼šè‡ªåŠ¨è¯»å– `DISCORD_BOT_TOKEN`ã€‚
 
-重启以应用：
+é‡å¯ä»¥åº”ç”¨ï¼š
 
 ```bash
 exit
 fly machine restart <machine-id>
 ```
 
-## 6）访问 Gateway 网关
+## 6ï¼‰è®¿é—® Gateway ç½‘å…³
 
 ### Control UI
 
-在浏览器中打开：
+åœ¨æµè§ˆå™¨ä¸­æ‰“å¼€ï¼š
 
 ```bash
 fly open
 ```
 
-或访问 `https://my-OpenKrab.fly.dev/`
+æˆ–è®¿é—® `https://my-OpenKrab.fly.dev/`
 
-粘贴你的 Gateway 网关 token（来自 `OpenKrab_GATEWAY_TOKEN` 的那个）进行认证。
+ç²˜è´´ä½ çš„ Gateway ç½‘å…³ tokenï¼ˆæ¥è‡ª `OPENKRAB_GATEWAY_TOKEN` çš„é‚£ä¸ªï¼‰è¿›è¡Œè®¤è¯ã€‚
 
-### 日志
+### æ—¥å¿—
 
 ```bash
 fly logs              # Live logs
 fly logs --no-tail    # Recent logs
 ```
 
-### SSH 控制台
+### SSH æŽ§åˆ¶å°
 
 ```bash
 fly ssh console
 ```
 
-## 故障排除
+## æ•…éšœæŽ’é™¤
 
 ### "App is not listening on expected address"
 
-Gateway 网关绑定到 `127.0.0.1` 而不是 `0.0.0.0`。
+Gateway ç½‘å…³ç»‘å®šåˆ° `127.0.0.1` è€Œä¸æ˜¯ `0.0.0.0`ã€‚
 
-**修复：** 在 `fly.toml` 中的进程命令添加 `--bind lan`。
+**ä¿®å¤ï¼š** åœ¨ `fly.toml` ä¸­çš„è¿›ç¨‹å‘½ä»¤æ·»åŠ  `--bind lan`ã€‚
 
-### 健康检查失败 / 连接被拒绝
+### å¥åº·æ£€æŸ¥å¤±è´¥ / è¿žæŽ¥è¢«æ‹’ç»
 
-Fly 无法在配置的端口上访问 Gateway 网关。
+Fly æ— æ³•åœ¨é…ç½®çš„ç«¯å£ä¸Šè®¿é—® Gateway ç½‘å…³ã€‚
 
-**修复：** 确保 `internal_port` 与 Gateway 网关端口匹配（设置 `--port 3000` 或 `OpenKrab_GATEWAY_PORT=3000`）。
+**ä¿®å¤ï¼š** ç¡®ä¿ `internal_port` ä¸Ž Gateway ç½‘å…³ç«¯å£åŒ¹é…ï¼ˆè®¾ç½® `--port 3000` æˆ– `OPENKRAB_GATEWAY_PORT=3000`ï¼‰ã€‚
 
-### OOM / 内存问题
+### OOM / å†…å­˜é—®é¢˜
 
-容器持续重启或被终止。迹象：`SIGABRT`、`v8::internal::Runtime_AllocateInYoungGeneration` 或静默重启。
+å®¹å™¨æŒç»­é‡å¯æˆ–è¢«ç»ˆæ­¢ã€‚è¿¹è±¡ï¼š`SIGABRT`ã€`v8::internal::Runtime_AllocateInYoungGeneration` æˆ–é™é»˜é‡å¯ã€‚
 
-**修复：** 在 `fly.toml` 中增加内存：
+**ä¿®å¤ï¼š** åœ¨ `fly.toml` ä¸­å¢žåŠ å†…å­˜ï¼š
 
 ```toml
 [[vm]]
   memory = "2048mb"
 ```
 
-或更新现有机器：
+æˆ–æ›´æ–°çŽ°æœ‰æœºå™¨ï¼š
 
 ```bash
 fly machine update <machine-id> --vm-memory 2048 -y
 ```
 
-**注意：** 512MB 太小。1GB 可能可以工作但在负载或详细日志记录下可能 OOM。**推荐 2GB。**
+**æ³¨æ„ï¼š** 512MB å¤ªå°ã€‚1GB å¯èƒ½å¯ä»¥å·¥ä½œä½†åœ¨è´Ÿè½½æˆ–è¯¦ç»†æ—¥å¿—è®°å½•ä¸‹å¯èƒ½ OOMã€‚**æŽ¨è 2GBã€‚**
 
-### Gateway 网关锁问题
+### Gateway ç½‘å…³é”é—®é¢˜
 
-Gateway 网关拒绝启动并显示"already running"错误。
+Gateway ç½‘å…³æ‹’ç»å¯åŠ¨å¹¶æ˜¾ç¤º"already running"é”™è¯¯ã€‚
 
-这发生在容器重启但 PID 锁文件在卷上持久存在时。
+è¿™å‘ç”Ÿåœ¨å®¹å™¨é‡å¯ä½† PID é”æ–‡ä»¶åœ¨å·ä¸ŠæŒä¹…å­˜åœ¨æ—¶ã€‚
 
-**修复：** 删除锁文件：
+**ä¿®å¤ï¼š** åˆ é™¤é”æ–‡ä»¶ï¼š
 
 ```bash
 fly ssh console --command "rm -f /data/gateway.*.lock"
 fly machine restart <machine-id>
 ```
 
-锁文件在 `/data/gateway.*.lock`（不在子目录中）。
+é”æ–‡ä»¶åœ¨ `/data/gateway.*.lock`ï¼ˆä¸åœ¨å­ç›®å½•ä¸­ï¼‰ã€‚
 
-### 配置未被读取
+### é…ç½®æœªè¢«è¯»å–
 
-如果使用 `--allow-unconfigured`，Gateway 网关会创建最小配置。你在 `/data/OpenKrab.json` 的自定义配置应该在重启时被读取。
+å¦‚æžœä½¿ç”¨ `--allow-unconfigured`ï¼ŒGateway ç½‘å…³ä¼šåˆ›å»ºæœ€å°é…ç½®ã€‚ä½ åœ¨ `/data/OpenKrab.json` çš„è‡ªå®šä¹‰é…ç½®åº”è¯¥åœ¨é‡å¯æ—¶è¢«è¯»å–ã€‚
 
-验证配置是否存在：
+éªŒè¯é…ç½®æ˜¯å¦å­˜åœ¨ï¼š
 
 ```bash
 fly ssh console --command "cat /data/OpenKrab.json"
 ```
 
-### 通过 SSH 写入配置
+### é€šè¿‡ SSH å†™å…¥é…ç½®
 
-`fly ssh console -C` 命令不支持 shell 重定向。要写入配置文件：
+`fly ssh console -C` å‘½ä»¤ä¸æ”¯æŒ shell é‡å®šå‘ã€‚è¦å†™å…¥é…ç½®æ–‡ä»¶ï¼š
 
 ```bash
 # Use echo + tee (pipe from local to remote)
@@ -316,19 +316,19 @@ fly sftp shell
 > put /local/path/config.json /data/OpenKrab.json
 ```
 
-**注意：** 如果文件已存在，`fly sftp` 可能会失败。先删除：
+**æ³¨æ„ï¼š** å¦‚æžœæ–‡ä»¶å·²å­˜åœ¨ï¼Œ`fly sftp` å¯èƒ½ä¼šå¤±è´¥ã€‚å…ˆåˆ é™¤ï¼š
 
 ```bash
 fly ssh console --command "rm /data/OpenKrab.json"
 ```
 
-### 状态未持久化
+### çŠ¶æ€æœªæŒä¹…åŒ–
 
-如果重启后丢失凭证或会话，状态目录正在写入容器文件系统。
+å¦‚æžœé‡å¯åŽä¸¢å¤±å‡­è¯æˆ–ä¼šè¯ï¼ŒçŠ¶æ€ç›®å½•æ­£åœ¨å†™å…¥å®¹å™¨æ–‡ä»¶ç³»ç»Ÿã€‚
 
-**修复：** 确保 `fly.toml` 中设置了 `OpenKrab_STATE_DIR=/data` 并重新部署。
+**ä¿®å¤ï¼š** ç¡®ä¿ `fly.toml` ä¸­è®¾ç½®äº† `OPENKRAB_STATE_DIR=/data` å¹¶é‡æ–°éƒ¨ç½²ã€‚
 
-## 更新
+## æ›´æ–°
 
 ```bash
 # Pull latest changes
@@ -342,9 +342,9 @@ fly status
 fly logs
 ```
 
-### 更新机器命令
+### æ›´æ–°æœºå™¨å‘½ä»¤
 
-如果你需要更改启动命令而无需完全重新部署：
+å¦‚æžœä½ éœ€è¦æ›´æ”¹å¯åŠ¨å‘½ä»¤è€Œæ— éœ€å®Œå…¨é‡æ–°éƒ¨ç½²ï¼š
 
 ```bash
 # Get machine ID
@@ -357,31 +357,31 @@ fly machine update <machine-id> --command "node dist/index.js gateway --port 300
 fly machine update <machine-id> --vm-memory 2048 --command "node dist/index.js gateway --port 3000 --bind lan" -y
 ```
 
-**注意：** `fly deploy` 后，机器命令可能会重置为 `fly.toml` 中的内容。如果你进行了手动更改，请在部署后重新应用它们。
+**æ³¨æ„ï¼š** `fly deploy` åŽï¼Œæœºå™¨å‘½ä»¤å¯èƒ½ä¼šé‡ç½®ä¸º `fly.toml` ä¸­çš„å†…å®¹ã€‚å¦‚æžœä½ è¿›è¡Œäº†æ‰‹åŠ¨æ›´æ”¹ï¼Œè¯·åœ¨éƒ¨ç½²åŽé‡æ–°åº”ç”¨å®ƒä»¬ã€‚
 
-## 私有部署（加固）
+## ç§æœ‰éƒ¨ç½²ï¼ˆåŠ å›ºï¼‰
 
-默认情况下，Fly 分配公共 IP，使你的 Gateway 网关可通过 `https://your-app.fly.dev` 访问。这很方便，但意味着你的部署可被互联网扫描器（Shodan、Censys 等）发现。
+é»˜è®¤æƒ…å†µä¸‹ï¼ŒFly åˆ†é…å…¬å…± IPï¼Œä½¿ä½ çš„ Gateway ç½‘å…³å¯é€šè¿‡ `https://your-app.fly.dev` è®¿é—®ã€‚è¿™å¾ˆæ–¹ä¾¿ï¼Œä½†æ„å‘³ç€ä½ çš„éƒ¨ç½²å¯è¢«äº’è”ç½‘æ‰«æå™¨ï¼ˆShodanã€Censys ç­‰ï¼‰å‘çŽ°ã€‚
 
-对于**无公共暴露**的加固部署，使用私有模板。
+å¯¹äºŽ**æ— å…¬å…±æš´éœ²**çš„åŠ å›ºéƒ¨ç½²ï¼Œä½¿ç”¨ç§æœ‰æ¨¡æ¿ã€‚
 
-### 何时使用私有部署
+### ä½•æ—¶ä½¿ç”¨ç§æœ‰éƒ¨ç½²
 
-- 你只进行**出站**调用/消息（无入站 webhooks）
-- 你使用 **ngrok 或 Tailscale** 隧道处理任何 webhook 回调
-- 你通过 **SSH、代理或 WireGuard** 而不是浏览器访问 Gateway 网关
-- 你希望部署**对互联网扫描器隐藏**
+- ä½ åªè¿›è¡Œ**å‡ºç«™**è°ƒç”¨/æ¶ˆæ¯ï¼ˆæ— å…¥ç«™ webhooksï¼‰
+- ä½ ä½¿ç”¨ **ngrok æˆ– Tailscale** éš§é“å¤„ç†ä»»ä½• webhook å›žè°ƒ
+- ä½ é€šè¿‡ **SSHã€ä»£ç†æˆ– WireGuard** è€Œä¸æ˜¯æµè§ˆå™¨è®¿é—® Gateway ç½‘å…³
+- ä½ å¸Œæœ›éƒ¨ç½²**å¯¹äº’è”ç½‘æ‰«æå™¨éšè—**
 
-### 设置
+### è®¾ç½®
 
-使用 `fly.private.toml` 替代标准配置：
+ä½¿ç”¨ `fly.private.toml` æ›¿ä»£æ ‡å‡†é…ç½®ï¼š
 
 ```bash
 # Deploy with private config
 fly deploy -c fly.private.toml
 ```
 
-或转换现有部署：
+æˆ–è½¬æ¢çŽ°æœ‰éƒ¨ç½²ï¼š
 
 ```bash
 # List current IPs
@@ -399,18 +399,18 @@ fly deploy -c fly.private.toml
 fly ips allocate-v6 --private -a my-OpenKrab
 ```
 
-此后，`fly ips list` 应该只显示 `private` 类型的 IP：
+æ­¤åŽï¼Œ`fly ips list` åº”è¯¥åªæ˜¾ç¤º `private` ç±»åž‹çš„ IPï¼š
 
 ```
 VERSION  IP                   TYPE             REGION
 v6       fdaa:x:x:x:x::x      private          global
 ```
 
-### 访问私有部署
+### è®¿é—®ç§æœ‰éƒ¨ç½²
 
-由于没有公共 URL，使用以下方法之一：
+ç”±äºŽæ²¡æœ‰å…¬å…± URLï¼Œä½¿ç”¨ä»¥ä¸‹æ–¹æ³•ä¹‹ä¸€ï¼š
 
-**选项 1：本地代理（最简单）**
+**é€‰é¡¹ 1ï¼šæœ¬åœ°ä»£ç†ï¼ˆæœ€ç®€å•ï¼‰**
 
 ```bash
 # Forward local port 3000 to the app
@@ -419,7 +419,7 @@ fly proxy 3000:3000 -a my-OpenKrab
 # Then open http://localhost:3000 in browser
 ```
 
-**选项 2：WireGuard VPN**
+**é€‰é¡¹ 2ï¼šWireGuard VPN**
 
 ```bash
 # Create WireGuard config (one-time)
@@ -429,21 +429,21 @@ fly wireguard create
 # Example: http://[fdaa:x:x:x:x::x]:3000
 ```
 
-**选项 3：仅 SSH**
+**é€‰é¡¹ 3ï¼šä»… SSH**
 
 ```bash
 fly ssh console -a my-OpenKrab
 ```
 
-### 私有部署的 Webhooks
+### ç§æœ‰éƒ¨ç½²çš„ Webhooks
 
-如果你需要 webhook 回调（Twilio、Telnyx 等）而不暴露公共：
+å¦‚æžœä½ éœ€è¦ webhook å›žè°ƒï¼ˆTwilioã€Telnyx ç­‰ï¼‰è€Œä¸æš´éœ²å…¬å…±ï¼š
 
-1. **ngrok 隧道** - 在容器内或作为 sidecar 运行 ngrok
-2. **Tailscale Funnel** - 通过 Tailscale 暴露特定路径
-3. **仅出站** - 某些提供商（Twilio）对于出站呼叫无需 webhooks 也能正常工作
+1. **ngrok éš§é“** - åœ¨å®¹å™¨å†…æˆ–ä½œä¸º sidecar è¿è¡Œ ngrok
+2. **Tailscale Funnel** - é€šè¿‡ Tailscale æš´éœ²ç‰¹å®šè·¯å¾„
+3. **ä»…å‡ºç«™** - æŸäº›æä¾›å•†ï¼ˆTwilioï¼‰å¯¹äºŽå‡ºç«™å‘¼å«æ— éœ€ webhooks ä¹Ÿèƒ½æ­£å¸¸å·¥ä½œ
 
-使用 ngrok 的示例语音通话配置：
+ä½¿ç”¨ ngrok çš„ç¤ºä¾‹è¯­éŸ³é€šè¯é…ç½®ï¼š
 
 ```json
 {
@@ -461,31 +461,32 @@ fly ssh console -a my-OpenKrab
 }
 ```
 
-ngrok 隧道在容器内运行并提供公共 webhook URL，而不暴露 Fly 应用本身。
+ngrok éš§é“åœ¨å®¹å™¨å†…è¿è¡Œå¹¶æä¾›å…¬å…± webhook URLï¼Œè€Œä¸æš´éœ² Fly åº”ç”¨æœ¬èº«ã€‚
 
-### 安全优势
+### å®‰å…¨ä¼˜åŠ¿
 
-| 方面            | 公共   | 私有     |
+| æ–¹é¢            | å…¬å…±   | ç§æœ‰     |
 | --------------- | ------ | -------- |
-| 互联网扫描器    | 可发现 | 隐藏     |
-| 直接攻击        | 可能   | 被阻止   |
-| Control UI 访问 | 浏览器 | 代理/VPN |
-| Webhook 投递    | 直接   | 通过隧道 |
+| äº’è”ç½‘æ‰«æå™¨    | å¯å‘çŽ° | éšè—     |
+| ç›´æŽ¥æ”»å‡»        | å¯èƒ½   | è¢«é˜»æ­¢   |
+| Control UI è®¿é—® | æµè§ˆå™¨ | ä»£ç†/VPN |
+| Webhook æŠ•é€’    | ç›´æŽ¥   | é€šè¿‡éš§é“ |
 
-## 注意事项
+## æ³¨æ„äº‹é¡¹
 
-- Fly.io 使用 **x86 架构**（非 ARM）
-- Dockerfile 兼容两种架构
-- 对于 WhatsApp/Telegram 新手引导，使用 `fly ssh console`
-- 持久数据位于 `/data` 卷上
-- Signal 需要 Java + signal-cli；使用自定义镜像并保持内存在 2GB+。
+- Fly.io ä½¿ç”¨ **x86 æž¶æž„**ï¼ˆéž ARMï¼‰
+- Dockerfile å…¼å®¹ä¸¤ç§æž¶æž„
+- å¯¹äºŽ WhatsApp/Telegram æ–°æ‰‹å¼•å¯¼ï¼Œä½¿ç”¨ `fly ssh console`
+- æŒä¹…æ•°æ®ä½äºŽ `/data` å·ä¸Š
+- Signal éœ€è¦ Java + signal-cliï¼›ä½¿ç”¨è‡ªå®šä¹‰é•œåƒå¹¶ä¿æŒå†…å­˜åœ¨ 2GB+ã€‚
 
-## 成本
+## æˆæœ¬
 
-使用推荐配置（`shared-cpu-2x`，2GB RAM）：
+ä½¿ç”¨æŽ¨èé…ç½®ï¼ˆ`shared-cpu-2x`ï¼Œ2GB RAMï¼‰ï¼š
 
-- 根据使用情况约 $10-15/月
-- 免费套餐包含一些配额
+- æ ¹æ®ä½¿ç”¨æƒ…å†µçº¦ $10-15/æœˆ
+- å…è´¹å¥—é¤åŒ…å«ä¸€äº›é…é¢
 
-详情参见 [Fly.io 定价](https://fly.io/docs/about/pricing/)。
+è¯¦æƒ…å‚è§ [Fly.io å®šä»·](https://fly.io/docs/about/pricing/)ã€‚
+
 

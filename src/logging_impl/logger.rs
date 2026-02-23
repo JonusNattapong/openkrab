@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use tracing::{debug, error, info, trace, warn};
 
-const LOG_PREFIX: &str = "krabkrab";
+const LOG_PREFIX: &str = "openkrab";
 const LOG_SUFFIX: &str = ".log";
 const MAX_LOG_AGE_MS: i64 = 24 * 60 * 60 * 1000;
 
@@ -282,3 +282,4 @@ mod tests {
         assert!(state.override_settings.read().unwrap().is_none());
     }
 }
+

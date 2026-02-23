@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail, Result};
+﻿use anyhow::{anyhow, bail, Result};
 use base64::Engine;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
@@ -419,9 +419,9 @@ impl Default for VoiceWakeConfig {
     fn default() -> Self {
         Self {
             enabled: true,
-            wake_phrase: "hey krabkrab".to_string(),
+            wake_phrase: "hey openkrab".to_string(),
             alternative_wake_phrases: vec![
-                "krabkrab".to_string(),
+                "openkrab".to_string(),
                 "hey crab".to_string(),
                 "okay krab".to_string(),
             ],
@@ -747,7 +747,7 @@ pub fn detect_wake_or_talk_with_config(
 
     // Check for sleep commands when awake
     if is_awake {
-        let sleep_phrases = ["go to sleep", "sleep now", "goodbye", "bye krabkrab"];
+        let sleep_phrases = ["go to sleep", "sleep now", "goodbye", "bye openkrab"];
         for phrase in &sleep_phrases {
             if normalized.contains(phrase) {
                 return VoiceDecision {
@@ -1467,7 +1467,7 @@ impl WakeWordDetector {
     }
 
     pub fn detect_from_audio(&mut self, samples: &[i16], sample_rate: u32) -> bool {
-        // Preprocessing skipped — detect_from_audio works on immutable samples
+        // Preprocessing skipped â€” detect_from_audio works on immutable samples
 
         let rms = calculate_rms(samples);
         self.energy_history.push_back(rms);
@@ -1760,7 +1760,7 @@ impl BeepGenerator {
     fn play_wav(&self, wav_data: &[u8]) -> Result<()> {
         use std::process::Command;
         let mut temp_path = std::env::temp_dir();
-        temp_path.push("krabkrab_beep.wav");
+        temp_path.push("OPENKRAB_BEEP.wav");
         std::fs::write(&temp_path, wav_data)?;
         Command::new("afplay").arg(&temp_path).status()?;
         let _ = std::fs::remove_file(temp_path);
@@ -1771,7 +1771,7 @@ impl BeepGenerator {
     fn play_wav(&self, wav_data: &[u8]) -> Result<()> {
         use std::process::Command;
         let mut temp_path = std::env::temp_dir();
-        temp_path.push("krabkrab_beep.wav");
+        temp_path.push("OPENKRAB_BEEP.wav");
         std::fs::write(&temp_path, wav_data)?;
         let result = Command::new("ffplay")
             .args(["-nodisp", "-autoexit", "-loglevel", "quiet"])
@@ -1875,10 +1875,10 @@ mod tests {
 
     #[test]
     fn wake_detection_works() {
-        let d = detect_wake_or_talk("hey krabkrab what time is it", "hey krabkrab", false);
+        let d = detect_wake_or_talk("hey openkrab what time is it", "hey openkrab", false);
         assert_eq!(d.action, VoiceAction::Wake);
 
-        let d2 = detect_wake_or_talk("tell me weather", "hey krabkrab", true);
+        let d2 = detect_wake_or_talk("tell me weather", "hey openkrab", true);
         assert_eq!(d2.action, VoiceAction::Talk);
     }
 
@@ -1918,7 +1918,7 @@ mod tests {
     fn voice_mode_controller_wake() {
         let controller = create_voice_controller();
 
-        let decision = controller.process_audio("hey krabkrab open the door");
+        let decision = controller.process_audio("hey openkrab open the door");
         assert_eq!(decision.action, VoiceAction::Wake);
         assert!(controller.get_state() == VoiceSessionState::Listening);
 
@@ -1940,14 +1940,14 @@ mod tests {
     fn alternative_wake_phrases() {
         let config = VoiceWakeConfig {
             enabled: true,
-            wake_phrase: "hey krabkrab".to_string(),
-            alternative_wake_phrases: vec!["krabkrab".to_string()],
+            wake_phrase: "hey openkrab".to_string(),
+            alternative_wake_phrases: vec!["openkrab".to_string()],
             ..Default::default()
         };
 
         let decision = detect_wake_or_talk_with_config(
-            "krabkrab what's up",
-            "hey krabkrab",
+            "openkrab what's up",
+            "hey openkrab",
             false,
             Some(&config),
         );
@@ -1969,13 +1969,13 @@ mod tests {
 
     #[test]
     fn quick_detect_function() {
-        assert!(quick_detect("hey krabkrab hello", "hey krabkrab"));
-        assert!(!quick_detect("hello world", "hey krabkrab"));
+        assert!(quick_detect("hey openkrab hello", "hey openkrab"));
+        assert!(!quick_detect("hello world", "hey openkrab"));
     }
 
     #[test]
     fn similarity_calculation() {
-        let sim = calculate_similarity("hey krabkrab", "hey krab");
+        let sim = calculate_similarity("hey openkrab", "hey krab");
         assert!(sim > 0.5);
 
         let sim2 = calculate_similarity("hello world", "goodbye");
@@ -2156,7 +2156,7 @@ mod tests {
 
     #[test]
     fn voice_decision_has_confidence() {
-        let decision = detect_wake_or_talk("hey krabkrab hello", "hey krabkrab", false);
+        let decision = detect_wake_or_talk("hey openkrab hello", "hey openkrab", false);
         assert!(decision.confidence > 0.0);
     }
 
@@ -2282,3 +2282,5 @@ mod tests {
         }
     }
 }
+
+

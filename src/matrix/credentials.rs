@@ -63,7 +63,7 @@ impl MatrixResolvedConfig {
 /// Get path for Matrix auth storage.
 pub fn get_matrix_auth_path(account_id: Option<&str>) -> PathBuf {
     let home = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    let mut path = home.join("krabkrab").join("matrix");
+    let mut path = home.join("openkrab").join("matrix");
 
     if let Some(account) = account_id {
         path.push(format!("auth_{}.json", account));
@@ -150,3 +150,4 @@ mod tests {
         assert!(path.to_string_lossy().contains("matrix/auth_account1.json"));
     }
 }
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Timezone handling for agents, envelopes, and prompts"
 read_when:
   - You need to understand how timestamps are normalized for the model
@@ -7,8 +7,7 @@ title: "Timezones"
 ---
 
 # Timezones
-
-openkrab standardizes timestamps so the model sees a **single reference time**.
+\nOpenKrab standardizes timestamps so the model sees a **single reference time**.
 
 ## Message envelopes (local by default)
 
@@ -73,7 +72,7 @@ Raw provider fields are preserved.
 ## User timezone for the system prompt
 
 Set `agents.defaults.userTimezone` to tell the model the user's local time zone. If it is
-unset, openkrab resolves the **host timezone at runtime** (no config write).
+unset, OpenKrab resolves the **host timezone at runtime** (no config write).
 
 ```json5
 {
@@ -89,3 +88,4 @@ The system prompt includes:
 You can control the prompt format with `agents.defaults.timeFormat` (`auto` | `12` | `24`).
 
 See [Date & Time](/date-time) for the full behavior and examples.
+

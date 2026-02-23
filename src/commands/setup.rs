@@ -13,13 +13,13 @@ pub struct SetupOptions {
 
 /// Run setup command.
 pub fn setup_command(opts: SetupOptions) -> String {
-    let mut lines = vec!["🦀 krabkrab Setup".to_string(), String::new()];
+    let mut lines = vec!["🦀 openkrab Setup".to_string(), String::new()];
 
     // Check directories
     lines.push("Checking directories...".to_string());
     let config_dir = dirs::config_dir()
-        .map(|d| d.join("krabkrab"))
-        .unwrap_or_else(|| PathBuf::from(".krabkrab"));
+        .map(|d| d.join("openkrab"))
+        .unwrap_or_else(|| PathBuf::from(".openkrab"));
 
     if !opts.skip_config {
         match std::fs::create_dir_all(&config_dir) {
@@ -30,8 +30,8 @@ pub fn setup_command(opts: SetupOptions) -> String {
 
     // Check data directory
     let data_dir = dirs::data_dir()
-        .map(|d| d.join("krabkrab"))
-        .unwrap_or_else(|| PathBuf::from(".krabkrab-data"));
+        .map(|d| d.join("openkrab"))
+        .unwrap_or_else(|| PathBuf::from(".openkrab-data"));
 
     match std::fs::create_dir_all(&data_dir) {
         Ok(_) => lines.push(format!("  ✓ Data directory: {}", data_dir.display())),
@@ -60,7 +60,8 @@ pub fn setup_command(opts: SetupOptions) -> String {
 
     lines.push(String::new());
     lines.push("Setup complete!".to_string());
-    lines.push("Run 'krabkrab onboard' to configure your assistant.".to_string());
+    lines.push("Run 'openkrab onboard' to configure your assistant.".to_string());
 
     lines.join("\n")
 }
+

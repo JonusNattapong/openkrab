@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab hooks` (agent hooks)"
 read_when:
   - You want to manage agent hooks
@@ -17,8 +17,7 @@ Related:
 
 ## List All Hooks
 
-```bash
-openkrab hooks list
+```bash\nOpenKrab hooks list
 ```
 
 List all discovered hooks from workspace, managed, and bundled directories.
@@ -35,32 +34,29 @@ List all discovered hooks from workspace, managed, and bundled directories.
 Hooks (4/4 ready)
 
 Ready:
-  🚀 boot-md ✓ - Run BOOT.md on gateway startup
-  📎 bootstrap-extra-files ✓ - Inject extra workspace bootstrap files during agent bootstrap
-  📝 command-logger ✓ - Log all command events to a centralized audit file
-  💾 session-memory ✓ - Save session context to memory when /new command is issued
+  ðŸš€ boot-md âœ“ - Run BOOT.md on gateway startup
+  ðŸ“Ž bootstrap-extra-files âœ“ - Inject extra workspace bootstrap files during agent bootstrap
+  ðŸ“ command-logger âœ“ - Log all command events to a centralized audit file
+  ðŸ’¾ session-memory âœ“ - Save session context to memory when /new command is issued
 ```
 
 **Example (verbose):**
 
-```bash
-openkrab hooks list --verbose
+```bash\nOpenKrab hooks list --verbose
 ```
 
 Shows missing requirements for ineligible hooks.
 
 **Example (JSON):**
 
-```bash
-openkrab hooks list --json
+```bash\nOpenKrab hooks list --json
 ```
 
 Returns structured JSON for programmatic use.
 
 ## Get Hook Information
 
-```bash
-openkrab hooks info <name>
+```bash\nOpenKrab hooks info <name>
 ```
 
 Show detailed information about a specific hook.
@@ -75,14 +71,13 @@ Show detailed information about a specific hook.
 
 **Example:**
 
-```bash
-openkrab hooks info session-memory
+```bash\nOpenKrab hooks info session-memory
 ```
 
 **Output:**
 
 ```
-💾 session-memory ✓ Ready
+ðŸ’¾ session-memory âœ“ Ready
 
 Save session context to memory when /new command is issued
 
@@ -94,13 +89,12 @@ Details:
   Events: command:new
 
 Requirements:
-  Config: ✓ workspace.dir
+  Config: âœ“ workspace.dir
 ```
 
 ## Check Hooks Eligibility
 
-```bash
-openkrab hooks check
+```bash\nOpenKrab hooks check
 ```
 
 Show summary of hook eligibility status (how many are ready vs. not ready).
@@ -121,14 +115,13 @@ Not ready: 0
 
 ## Enable a Hook
 
-```bash
-openkrab hooks enable <name>
+```bash\nOpenKrab hooks enable <name>
 ```
 
 Enable a specific hook by adding it to your config (`~/.openkrab/config.json`).
 
 **Note:** Hooks managed by plugins show `plugin:<id>` in `openkrab hooks list` and
-can’t be enabled/disabled here. Enable/disable the plugin instead.
+canâ€™t be enabled/disabled here. Enable/disable the plugin instead.
 
 **Arguments:**
 
@@ -136,14 +129,13 @@ can’t be enabled/disabled here. Enable/disable the plugin instead.
 
 **Example:**
 
-```bash
-openkrab hooks enable session-memory
+```bash\nOpenKrab hooks enable session-memory
 ```
 
 **Output:**
 
 ```
-✓ Enabled hook: 💾 session-memory
+âœ“ Enabled hook: ðŸ’¾ session-memory
 ```
 
 **What it does:**
@@ -158,8 +150,7 @@ openkrab hooks enable session-memory
 
 ## Disable a Hook
 
-```bash
-openkrab hooks disable <name>
+```bash\nOpenKrab hooks disable <name>
 ```
 
 Disable a specific hook by updating your config.
@@ -170,14 +161,13 @@ Disable a specific hook by updating your config.
 
 **Example:**
 
-```bash
-openkrab hooks disable command-logger
+```bash\nOpenKrab hooks disable command-logger
 ```
 
 **Output:**
 
 ```
-⏸ Disabled hook: 📝 command-logger
+â¸ Disabled hook: ðŸ“ command-logger
 ```
 
 **After disabling:**
@@ -186,9 +176,7 @@ openkrab hooks disable command-logger
 
 ## Install Hooks
 
-```bash
-openkrab hooks install <path-or-spec>
-openkrab hooks install <npm-spec> --pin
+```bash\nOpenKrab hooks install <path-or-spec>\nOpenKrab hooks install <npm-spec> --pin
 ```
 
 Install a hook pack from a local folder/archive or npm.
@@ -212,24 +200,18 @@ specs are rejected. Dependency installs run with `--ignore-scripts` for safety.
 **Examples:**
 
 ```bash
-# Local directory
-openkrab hooks install ./my-hook-pack
+# Local directory\nOpenKrab hooks install ./my-hook-pack
 
-# Local archive
-openkrab hooks install ./my-hook-pack.zip
+# Local archive\nOpenKrab hooks install ./my-hook-pack.zip
 
-# NPM package
-openkrab hooks install @openkrab/my-hook-pack
+# NPM package\nOpenKrab hooks install @openkrab/my-hook-pack
 
-# Link a local directory without copying
-openkrab hooks install -l ./my-hook-pack
+# Link a local directory without copying\nOpenKrab hooks install -l ./my-hook-pack
 ```
 
 ## Update Hooks
 
-```bash
-openkrab hooks update <id>
-openkrab hooks update --all
+```bash\nOpenKrab hooks update <id>\nOpenKrab hooks update --all
 ```
 
 Update installed hook packs (npm installs only).
@@ -239,8 +221,7 @@ Update installed hook packs (npm installs only).
 - `--all`: Update all tracked hook packs
 - `--dry-run`: Show what would change without writing
 
-When a stored integrity hash exists and the fetched artifact hash changes,
-openkrab prints a warning and asks for confirmation before proceeding. Use
+When a stored integrity hash exists and the fetched artifact hash changes,\nOpenKrab prints a warning and asks for confirmation before proceeding. Use
 global `--yes` to bypass prompts in CI/non-interactive runs.
 
 ## Bundled Hooks
@@ -251,8 +232,7 @@ Saves session context to memory when you issue `/new`.
 
 **Enable:**
 
-```bash
-openkrab hooks enable session-memory
+```bash\nOpenKrab hooks enable session-memory
 ```
 
 **Output:** `~/.openkrab/workspace/memory/YYYY-MM-DD-slug.md`
@@ -265,8 +245,7 @@ Injects additional bootstrap files (for example monorepo-local `AGENTS.md` / `TO
 
 **Enable:**
 
-```bash
-openkrab hooks enable bootstrap-extra-files
+```bash\nOpenKrab hooks enable bootstrap-extra-files
 ```
 
 **See:** [bootstrap-extra-files documentation](/automation/hooks#bootstrap-extra-files)
@@ -277,8 +256,7 @@ Logs all command events to a centralized audit file.
 
 **Enable:**
 
-```bash
-openkrab hooks enable command-logger
+```bash\nOpenKrab hooks enable command-logger
 ```
 
 **Output:** `~/.openkrab/logs/commands.log`
@@ -306,8 +284,8 @@ Runs `BOOT.md` when the gateway starts (after channels start).
 
 **Enable**:
 
-```bash
-openkrab hooks enable boot-md
+```bash\nOpenKrab hooks enable boot-md
 ```
 
 **See:** [boot-md documentation](/automation/hooks#boot-md)
+

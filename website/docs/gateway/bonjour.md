@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Bonjour/mDNS discovery + debugging (Gateway beacons, clients, and common failure modes)"
 read_when:
   - Debugging Bonjour discovery issues on macOS/iOS
@@ -7,27 +7,25 @@ title: "Bonjour Discovery"
 ---
 
 # Bonjour / mDNS discovery
-
-openkrab uses Bonjour (mDNS / DNS‑SD) as a **LAN‑only convenience** to discover
-an active Gateway (WebSocket endpoint). It is best‑effort and does **not** replace SSH or
+\nOpenKrab uses Bonjour (mDNS / DNSâ€‘SD) as a **LANâ€‘only convenience** to discover
+an active Gateway (WebSocket endpoint). It is bestâ€‘effort and does **not** replace SSH or
 Tailnet-based connectivity.
 
-## Wide‑area Bonjour (Unicast DNS‑SD) over Tailscale
+## Wideâ€‘area Bonjour (Unicast DNSâ€‘SD) over Tailscale
 
-If the node and gateway are on different networks, multicast mDNS won’t cross the
-boundary. You can keep the same discovery UX by switching to **unicast DNS‑SD**
-("Wide‑Area Bonjour") over Tailscale.
+If the node and gateway are on different networks, multicast mDNS wonâ€™t cross the
+boundary. You can keep the same discovery UX by switching to **unicast DNSâ€‘SD**
+("Wideâ€‘Area Bonjour") over Tailscale.
 
-High‑level steps:
+Highâ€‘level steps:
 
 1. Run a DNS server on the gateway host (reachable over Tailnet).
-2. Publish DNS‑SD records for `_openkrab-gw._tcp` under a dedicated zone
+2. Publish DNSâ€‘SD records for `_openkrab-gw._tcp` under a dedicated zone
    (example: `openkrab.internal.`).
 3. Configure Tailscale **split DNS** so your chosen domain resolves via that
    DNS server for clients (including iOS).
-
-openkrab supports any discovery domain; `openkrab.internal.` is just an example.
-iOS/Android nodes browse both `local.` and your configured wide‑area domain.
+\nOpenKrab supports any discovery domain; `openkrab.internal.` is just an example.
+iOS/Android nodes browse both `local.` and your configured wideâ€‘area domain.
 
 ### Gateway config (recommended)
 
@@ -38,21 +36,20 @@ iOS/Android nodes browse both `local.` and your configured wide‑area domain.
 }
 ```
 
-### One‑time DNS server setup (gateway host)
+### Oneâ€‘time DNS server setup (gateway host)
 
-```bash
-openkrab dns setup --apply
+```bash\nOpenKrab dns setup --apply
 ```
 
 This installs CoreDNS and configures it to:
 
-- listen on port 53 only on the gateway’s Tailscale interfaces
+- listen on port 53 only on the gatewayâ€™s Tailscale interfaces
 - serve your chosen domain (example: `openkrab.internal.`) from `~/.openkrab/dns/<domain>.db`
 
-Validate from a tailnet‑connected machine:
+Validate from a tailnetâ€‘connected machine:
 
 ```bash
-dns-sd -B _openkrab-gw._tcp openkrab.internal.
+dns-sd -B _openkrab-gw._tcp OpenKrab.internal.
 dig @<TAILNET_IPV4> -p 53 _openkrab-gw._tcp.openkrab.internal PTR +short
 ```
 
@@ -60,7 +57,7 @@ dig @<TAILNET_IPV4> -p 53 _openkrab-gw._tcp.openkrab.internal PTR +short
 
 In the Tailscale admin console:
 
-- Add a nameserver pointing at the gateway’s tailnet IP (UDP/TCP 53).
+- Add a nameserver pointing at the gatewayâ€™s tailnet IP (UDP/TCP 53).
 - Add split DNS so your discovery domain uses that nameserver.
 
 Once clients accept tailnet DNS, iOS nodes can browse
@@ -71,7 +68,7 @@ Once clients accept tailnet DNS, iOS nodes can browse
 The Gateway WS port (default `18789`) binds to loopback by default. For LAN/tailnet
 access, bind explicitly and keep auth enabled.
 
-For tailnet‑only setups:
+For tailnetâ€‘only setups:
 
 - Set `gateway.bind: "tailnet"` in `~/.openkrab/openkrab.json`.
 - Restart the Gateway (or restart the macOS menubar app).
@@ -82,11 +79,11 @@ Only the Gateway advertises `_openkrab-gw._tcp`.
 
 ## Service types
 
-- `_openkrab-gw._tcp` — gateway transport beacon (used by macOS/iOS/Android nodes).
+- `_openkrab-gw._tcp` â€” gateway transport beacon (used by macOS/iOS/Android nodes).
 
-## TXT keys (non‑secret hints)
+## TXT keys (nonâ€‘secret hints)
 
-The Gateway advertises small non‑secret hints to make UI flows convenient:
+The Gateway advertises small nonâ€‘secret hints to make UI flows convenient:
 
 - `role=gateway`
 - `displayName=<friendly name>`
@@ -109,7 +106,7 @@ Security notes:
 
 ## Debugging on macOS
 
-Useful built‑in tools:
+Useful builtâ€‘in tools:
 
 - Browse instances:
 
@@ -123,7 +120,7 @@ Useful built‑in tools:
   dns-sd -L "<instance>" _openkrab-gw._tcp local.
   ```
 
-If browsing works but resolving fails, you’re usually hitting a LAN policy or
+If browsing works but resolving fails, youâ€™re usually hitting a LAN policy or
 mDNS resolver issue.
 
 ## Debugging in Gateway logs
@@ -141,15 +138,15 @@ The iOS node uses `NWBrowser` to discover `_openkrab-gw._tcp`.
 
 To capture logs:
 
-- Settings → Gateway → Advanced → **Discovery Debug Logs**
-- Settings → Gateway → Advanced → **Discovery Logs** → reproduce → **Copy**
+- Settings â†’ Gateway â†’ Advanced â†’ **Discovery Debug Logs**
+- Settings â†’ Gateway â†’ Advanced â†’ **Discovery Logs** â†’ reproduce â†’ **Copy**
 
-The log includes browser state transitions and result‑set changes.
+The log includes browser state transitions and resultâ€‘set changes.
 
 ## Common failure modes
 
-- **Bonjour doesn’t cross networks**: use Tailnet or SSH.
-- **Multicast blocked**: some Wi‑Fi networks disable mDNS.
+- **Bonjour doesnâ€™t cross networks**: use Tailnet or SSH.
+- **Multicast blocked**: some Wiâ€‘Fi networks disable mDNS.
 - **Sleep / interface churn**: macOS may temporarily drop mDNS results; retry.
 - **Browse works but resolve fails**: keep machine names simple (avoid emojis or
   punctuation), then restart the Gateway. The service instance name derives from
@@ -157,7 +154,7 @@ The log includes browser state transitions and result‑set changes.
 
 ## Escaped instance names (`\032`)
 
-Bonjour/DNS‑SD often escapes bytes in service instance names as decimal `\DDD`
+Bonjour/DNSâ€‘SD often escapes bytes in service instance names as decimal `\DDD`
 sequences (e.g. spaces become `\032`).
 
 - This is normal at the protocol level.
@@ -165,13 +162,15 @@ sequences (e.g. spaces become `\032`).
 
 ## Disabling / configuration
 
-- `openkrab_DISABLE_BONJOUR=1` disables advertising (legacy: `openkrab_DISABLE_BONJOUR`).
+- `OPENKRAB_DISABLE_BONJOUR=1` disables advertising (legacy: `OPENKRAB_DISABLE_BONJOUR`).
 - `gateway.bind` in `~/.openkrab/openkrab.json` controls the Gateway bind mode.
-- `openkrab_SSH_PORT` overrides the SSH port advertised in TXT (legacy: `openkrab_SSH_PORT`).
-- `openkrab_TAILNET_DNS` publishes a MagicDNS hint in TXT (legacy: `openkrab_TAILNET_DNS`).
-- `openkrab_CLI_PATH` overrides the advertised CLI path (legacy: `openkrab_CLI_PATH`).
+- `OPENKRAB_SSH_PORT` overrides the SSH port advertised in TXT (legacy: `OPENKRAB_SSH_PORT`).
+- `OPENKRAB_TAILNET_DNS` publishes a MagicDNS hint in TXT (legacy: `OPENKRAB_TAILNET_DNS`).
+- `OPENKRAB_CLI_PATH` overrides the advertised CLI path (legacy: `OPENKRAB_CLI_PATH`).
 
 ## Related docs
 
 - Discovery policy and transport selection: [Discovery](/gateway/discovery)
 - Node pairing + approvals: [Gateway pairing](/gateway/pairing)
+
+

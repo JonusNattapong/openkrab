@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 fn get_log_path() -> PathBuf {
     let home = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    home.join("krabkrab").join("logs")
+    home.join("openkrab").join("logs")
 }
 
 pub fn logs_tail_command(lines: Option<usize>, follow: bool, json: bool) -> String {
@@ -15,7 +15,7 @@ pub fn logs_tail_command(lines: Option<usize>, follow: bool, json: bool) -> Stri
 
     if !log_file.exists() {
         return format!(
-            "Log file not found: {}\nRun 'krabkrab gateway start' to create logs.",
+            "Log file not found: {}\nRun 'openkrab gateway start' to create logs.",
             log_file.display()
         );
     }
@@ -97,3 +97,4 @@ pub fn logs_tail_command(lines: Option<usize>, follow: bool, json: bool) -> Stri
         }
     }
 }
+

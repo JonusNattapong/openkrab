@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab doctor` (health checks + guided repairs)"
 read_when:
   - You have connectivity/auth issues and want guided fixes
@@ -17,10 +17,7 @@ Related:
 
 ## Examples
 
-```bash
-openkrab doctor
-openkrab doctor --repair
-openkrab doctor --deep
+```bash\nOpenKrab doctor\nOpenKrab doctor --repair\nOpenKrab doctor --deep
 ```
 
 Notes:
@@ -30,12 +27,14 @@ Notes:
 
 ## macOS: `launchctl` env overrides
 
-If you previously ran `launchctl setenv openkrab_GATEWAY_TOKEN ...` (or `...PASSWORD`), that value overrides your config file and can cause persistent “unauthorized” errors.
+If you previously ran `launchctl setenv OPENKRAB_GATEWAY_TOKEN ...` (or `...PASSWORD`), that value overrides your config file and can cause persistent â€œunauthorizedâ€ errors.
 
 ```bash
-launchctl getenv openkrab_GATEWAY_TOKEN
-launchctl getenv openkrab_GATEWAY_PASSWORD
+launchctl getenv OPENKRAB_GATEWAY_TOKEN
+launchctl getenv OPENKRAB_GATEWAY_PASSWORD
 
-launchctl unsetenv openkrab_GATEWAY_TOKEN
-launchctl unsetenv openkrab_GATEWAY_PASSWORD
+launchctl unsetenv OPENKRAB_GATEWAY_TOKEN
+launchctl unsetenv OPENKRAB_GATEWAY_PASSWORD
 ```
+
+

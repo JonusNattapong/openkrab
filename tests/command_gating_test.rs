@@ -1,4 +1,4 @@
-use krabkrab::channels::command_gating::*;
+use openkrab::channels::command_gating::*;
 
 #[test]
 fn basic_authorization() {
@@ -37,3 +37,4 @@ fn control_gate_blocking() {
     assert!(!out.command_authorized);
     assert!(out.should_block);
 }
+

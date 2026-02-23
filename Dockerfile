@@ -1,9 +1,9 @@
-# ╔══════════════════════════════════════════════════════════════════════╗
-# ║  krabkrab — Multi-stage Docker Build                                ║
-# ║  Produces a minimal (~80 MB) container with the compiled binary.    ║
-# ╚══════════════════════════════════════════════════════════════════════╝
+﻿# â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+# â•‘  openkrab â€” Multi-stage Docker Build                                â•‘
+# â•‘  Produces a minimal (~80 MB) container with the compiled binary.    â•‘
+# â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-# ── Stage 1: Builder ─────────────────────────────────────────────────
+# â”€â”€ Stage 1: Builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 FROM rust:1.83-bookworm AS builder
 
 # Build arguments
@@ -22,11 +22,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Cache dependency compilation:
 # Copy manifests first so deps are cached unless Cargo.toml changes
 COPY Cargo.toml Cargo.lock ./
-COPY bin/krabkrab-cli/Cargo.toml bin/krabkrab-cli/Cargo.toml
+COPY bin/openkrab-cli/Cargo.toml bin/openkrab-cli/Cargo.toml
 
 # Create stub source so cargo can resolve deps
 RUN mkdir -p src && echo "pub fn stub() {}" > src/lib.rs && \
-    mkdir -p bin/krabkrab-cli/src && echo "fn main() {}" > bin/krabkrab-cli/src/main.rs
+    mkdir -p bin/openkrab-cli/src && echo "fn main() {}" > bin/openkrab-cli/src/main.rs
 
 # Download and compile dependencies only (cached layer)
 RUN cargo build --workspace --${PROFILE} --features "${FEATURES}" 2>/dev/null || true
@@ -38,19 +38,19 @@ COPY tests/ tests/
 COPY examples/ examples/
 
 # Touch source files to invalidate the stub build
-RUN touch src/lib.rs bin/krabkrab-cli/src/main.rs
+RUN touch src/lib.rs bin/openkrab-cli/src/main.rs
 
 # Build the real binary
 RUN cargo build --workspace --${PROFILE} --features "${FEATURES}" && \
-    cp target/${PROFILE}/krabkrab-cli /build/krabkrab-cli-bin 2>/dev/null || \
-    cp target/release/krabkrab-cli /build/krabkrab-cli-bin
+    cp target/${PROFILE}/openkrab-cli /build/openkrab-cli-bin 2>/dev/null || \
+    cp target/release/openkrab-cli /build/openkrab-cli-bin
 
-# ── Stage 2: Runtime ─────────────────────────────────────────────────
+# â”€â”€ Stage 2: Runtime â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 FROM debian:bookworm-slim AS runtime
 
 # Labels
-LABEL org.opencontainers.image.title="krabkrab"
-LABEL org.opencontainers.image.description="Personal AI assistant — Rust edition"
+LABEL org.opencontainers.image.title="openkrab"
+LABEL org.opencontainers.image.description="Personal AI assistant â€” Rust edition"
 LABEL org.opencontainers.image.source="https://github.com/openkrab/openkrab"
 LABEL org.opencontainers.image.licenses="MIT"
 
@@ -71,16 +71,16 @@ RUN mkdir -p /data/config /data/memory /data/logs /data/plugins && \
     chown -R krab:krab /data
 
 # Copy binary from builder
-COPY --from=builder /build/krabkrab-cli-bin /usr/local/bin/krabkrab
+COPY --from=builder /build/openkrab-cli-bin /usr/local/bin/openkrab
 
 # Use non-root user
 USER krab
 WORKDIR /home/krab
 
 # Environment
-ENV KRABKRAB_DATA_DIR="/data"
-ENV KRABKRAB_CONFIG_DIR="/data/config"
-ENV KRABKRAB_LOG_DIR="/data/logs"
+ENV OPENKRAB_DATA_DIR="/data"
+ENV OPENKRAB_CONFIG_DIR="/data/config"
+ENV OPENKRAB_LOG_DIR="/data/logs"
 ENV RUST_LOG="info"
 ENV RUST_BACKTRACE="1"
 
@@ -93,4 +93,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 # Use tini for proper PID 1 signal handling
 ENTRYPOINT ["tini", "--"]
-CMD ["krabkrab", "gateway", "start"]
+CMD ["openkrab", "gateway", "start"]
+
+

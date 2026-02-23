@@ -1,8 +1,8 @@
----
+﻿---
 summary: "CLI reference for `openkrab status` (diagnostics, probes, usage snapshots)"
 read_when:
   - You want a quick diagnosis of channel health + recent session recipients
-  - You want a pasteable “all” status for debugging
+  - You want a pasteable â€œallâ€ status for debugging
 title: "status"
 ---
 
@@ -10,11 +10,7 @@ title: "status"
 
 Diagnostics for channels + sessions.
 
-```bash
-openkrab status
-openkrab status --all
-openkrab status --deep
-openkrab status --usage
+```bash\nOpenKrab status\nOpenKrab status --all\nOpenKrab status --deep\nOpenKrab status --usage
 ```
 
 Notes:
@@ -24,3 +20,4 @@ Notes:
 - Overview includes Gateway + node host service install/runtime status when available.
 - Overview includes update channel + git SHA (for source checkouts).
 - Update info surfaces in the Overview; if an update is available, status prints a hint to run `openkrab update` (see [Updating](/install/updating)).
+

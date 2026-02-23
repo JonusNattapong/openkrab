@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Message flow, sessions, queueing, and reasoning visibility"
 read_when:
   - Explaining how inbound messages become replies
@@ -9,7 +9,7 @@ title: "Messages"
 
 # Messages
 
-This page ties together how openkrab handles inbound messages, sessions, queueing,
+This page ties together how OpenKrab handles inbound messages, sessions, queueing,
 streaming, and reasoning visibility.
 
 ## Message flow (high level)
@@ -32,7 +32,7 @@ See [Configuration](/gateway/configuration) for full schema.
 
 ## Inbound dedupe
 
-Channels can redeliver the same message after reconnects. openkrab keeps a
+Channels can redeliver the same message after reconnects. OpenKrab keeps a
 short-lived cache keyed by channel/account/peer/session/message id so duplicate
 deliveries do not trigger another agent run.
 
@@ -80,8 +80,7 @@ gateway-backed session transcript, so they are the source of truth.
 Details: [Session management](/concepts/session).
 
 ## Inbound bodies and history context
-
-openkrab separates the **prompt body** from the **command body**:
+\nOpenKrab separates the **prompt body** from the **command body**:
 
 - `Body`: prompt text sent to the agent. This may include channel envelopes and
   optional history wrappers.
@@ -135,8 +134,7 @@ Key settings:
 Details: [Streaming + chunking](/concepts/streaming).
 
 ## Reasoning visibility and tokens
-
-openkrab can expose or hide model reasoning:
+\nOpenKrab can expose or hide model reasoning:
 
 - `/reasoning on|off|stream` controls visibility.
 - Reasoning content still counts toward token usage when produced by the model.
@@ -152,3 +150,4 @@ Outbound message formatting is centralized in `messages`:
 - Reply threading via `replyToMode` and per-channel defaults
 
 Details: [Configuration](/gateway/configuration#messages) and channel docs.
+

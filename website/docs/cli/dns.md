@@ -1,8 +1,8 @@
----
+﻿---
 summary: "CLI reference for `openkrab dns` (wide-area discovery helpers)"
 read_when:
   - You want wide-area discovery (DNS-SD) via Tailscale + CoreDNS
-  - You’re setting up split DNS for a custom discovery domain (example: openkrab.internal)
+  - Youâ€™re setting up split DNS for a custom discovery domain (example: OpenKrab.internal)
 title: "dns"
 ---
 
@@ -17,7 +17,6 @@ Related:
 
 ## Setup
 
-```bash
-openkrab dns setup
-openkrab dns setup --apply
+```bash\nOpenKrab dns setup\nOpenKrab dns setup --apply
 ```
+

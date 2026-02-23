@@ -1,7 +1,7 @@
-use krabkrab::config::{validate_config, AppConfig};
-use krabkrab::memory::MemoryConfig;
-use krabkrab::utils::{is_truthy_env, safe_json_parse, truncate_text};
-use krabkrab::version::resolve_version;
+use openkrab::config::{validate_config, AppConfig};
+use openkrab::memory::MemoryConfig;
+use openkrab::utils::{is_truthy_env, safe_json_parse, truncate_text};
+use openkrab::version::resolve_version;
 
 #[test]
 fn utils_truthy_env_parity() {
@@ -48,3 +48,4 @@ fn memory_supported_provider_list_parity() {
     assert!(providers.contains(&"ollama"));
     assert!(!providers.contains(&"minimax"));
 }
+

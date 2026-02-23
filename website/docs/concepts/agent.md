@@ -1,17 +1,15 @@
----
+﻿---
 summary: "Agent runtime (embedded pi-mono), workspace contract, and session bootstrap"
 read_when:
   - Changing agent runtime, workspace bootstrap, or session behavior
 title: "Agent Runtime"
 ---
 
-# Agent Runtime 🤖
-
-openkrab runs a single embedded agent runtime derived from **pi-mono**.
+# Agent Runtime ðŸ¤–
+\nOpenKrab runs a single embedded agent runtime derived from **pi-mono**.
 
 ## Workspace (required)
-
-openkrab uses a single agent workspace directory (`agents.defaults.workspace`) as the agent’s **only** working directory (`cwd`) for tools and context.
+\nOpenKrab uses a single agent workspace directory (`agents.defaults.workspace`) as the agentâ€™s **only** working directory (`cwd`) for tools and context.
 
 Recommended: use `openkrab setup` to create `~/.openkrab/openkrab.json` if missing and initialize the workspace files.
 
@@ -23,20 +21,20 @@ per-session workspaces under `agents.defaults.sandbox.workspaceRoot` (see
 
 ## Bootstrap files (injected)
 
-Inside `agents.defaults.workspace`, openkrab expects these user-editable files:
+Inside `agents.defaults.workspace`, OpenKrab expects these user-editable files:
 
-- `AGENTS.md` — operating instructions + “memory”
-- `SOUL.md` — persona, boundaries, tone
-- `TOOLS.md` — user-maintained tool notes (e.g. `imsg`, `sag`, conventions)
-- `BOOTSTRAP.md` — one-time first-run ritual (deleted after completion)
-- `IDENTITY.md` — agent name/vibe/emoji
-- `USER.md` — user profile + preferred address
+- `AGENTS.md` â€” operating instructions + â€œmemoryâ€
+- `SOUL.md` â€” persona, boundaries, tone
+- `TOOLS.md` â€” user-maintained tool notes (e.g. `imsg`, `sag`, conventions)
+- `BOOTSTRAP.md` â€” one-time first-run ritual (deleted after completion)
+- `IDENTITY.md` â€” agent name/vibe/emoji
+- `USER.md` â€” user profile + preferred address
 
-On the first turn of a new session, openkrab injects the contents of these files directly into the agent context.
+On the first turn of a new session, OpenKrab injects the contents of these files directly into the agent context.
 
 Blank files are skipped. Large files are trimmed and truncated with a marker so prompts stay lean (read the file for full content).
 
-If a file is missing, openkrab injects a single “missing file” marker line (and `openkrab setup` will create a safe default template).
+If a file is missing, OpenKrab injects a single â€œmissing fileâ€ marker line (and `openkrab setup` will create a safe default template).
 
 `BOOTSTRAP.md` is only created for a **brand new workspace** (no other bootstrap files present). If you delete it after completing the ritual, it should not be recreated on later restarts.
 
@@ -50,12 +48,11 @@ To disable bootstrap file creation entirely (for pre-seeded workspaces), set:
 
 Core tools (read/exec/edit/write and related system tools) are always available,
 subject to tool policy. `apply_patch` is optional and gated by
-`tools.exec.applyPatch`. `TOOLS.md` does **not** control which tools exist; it’s
+`tools.exec.applyPatch`. `TOOLS.md` does **not** control which tools exist; itâ€™s
 guidance for how _you_ want them used.
 
 ## Skills
-
-openkrab loads skills from three locations (workspace wins on name conflict):
+\nOpenKrab loads skills from three locations (workspace wins on name conflict):
 
 - Bundled (shipped with the install)
 - Managed/local: `~/.openkrab/skills`
@@ -64,8 +61,7 @@ openkrab loads skills from three locations (workspace wins on name conflict):
 Skills can be gated by config/env (see `skills` in [Gateway configuration](/gateway/configuration)).
 
 ## pi-mono integration
-
-openkrab reuses pieces of the pi-mono codebase (models/tools), but **session management, discovery, and tool wiring are openkrab-owned**.
+\nOpenKrab reuses pieces of the pi-mono codebase (models/tools), but **session management, discovery, and tool wiring are openkrab-owned**.
 
 - No pi-coding agent runtime.
 - No `~/.pi/agent` or `<workspace>/.pi` settings are consulted.
@@ -76,7 +72,7 @@ Session transcripts are stored as JSONL at:
 
 - `~/.openkrab/agents/<agentId>/sessions/<SessionId>.jsonl`
 
-The session ID is stable and chosen by openkrab.
+The session ID is stable and chosen by OpenKrab.
 Legacy Pi/Tau session folders are **not** read.
 
 ## Steering while streaming
@@ -95,7 +91,7 @@ Block streaming sends completed assistant blocks as soon as they finish; it is
 **off by default** (`agents.defaults.blockStreamingDefault: "off"`).
 Tune the boundary via `agents.defaults.blockStreamingBreak` (`text_end` vs `message_end`; defaults to text_end).
 Control soft block chunking with `agents.defaults.blockStreamingChunk` (defaults to
-800–1200 chars; prefers paragraph breaks, then newlines; sentences last).
+800â€“1200 chars; prefers paragraph breaks, then newlines; sentences last).
 Coalesce streamed chunks with `agents.defaults.blockStreamingCoalesce` to reduce
 single-line spam (idle-based merging before send). Non-Telegram channels require
 explicit `*.blockStreaming: true` to enable block replies.
@@ -109,7 +105,7 @@ Model refs in config (for example `agents.defaults.model` and `agents.defaults.m
 
 - Use `provider/model` when configuring models.
 - If the model ID itself contains `/` (OpenRouter-style), include the provider prefix (example: `openrouter/moonshotai/kimi-k2`).
-- If you omit the provider, openkrab treats the input as an alias or a model for the **default provider** (only works when there is no `/` in the model ID).
+- If you omit the provider, OpenKrab treats the input as an alias or a model for the **default provider** (only works when there is no `/` in the model ID).
 
 ## Configuration (minimal)
 
@@ -120,4 +116,5 @@ At minimum, set:
 
 ---
 
-_Next: [Group Chats](/channels/group-messages)_ 🦞
+_Next: [Group Chats](/channels/group-messages)_ ðŸ¦ž
+

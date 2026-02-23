@@ -1,7 +1,7 @@
-//! plugin_sdk — Developer-facing Plugin SDK types and helpers.
+﻿//! plugin_sdk â€” Developer-facing Plugin SDK types and helpers.
 //! Ported from `openkrab/src/plugin-sdk/` (Phase 10).
 //!
-//! This module exposes the stable API surface that external krabkrab plugins
+//! This module exposes the stable API surface that external openkrab plugins
 //! use to integrate with the core runtime: hooks, tools, providers, routes.
 
 use anyhow::Result;
@@ -10,10 +10,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Native plugin ABI symbol names.
-pub const ABI_MANIFEST_SYMBOL: &[u8] = b"krabkrab_plugin_manifest_json\0";
-pub const ABI_DECLARATION_SYMBOL: &[u8] = b"krabkrab_plugin_declaration_json\0";
+pub const ABI_MANIFEST_SYMBOL: &[u8] = b"OPENKRAB_PLUGIN_MANIFEST_JSON\0";
+pub const ABI_DECLARATION_SYMBOL: &[u8] = b"OPENKRAB_PLUGIN_DECLARATION_JSON\0";
 
-// ─── Plugin context ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Plugin context â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Context passed to every plugin callback.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,7 +48,7 @@ impl PluginContext {
     }
 }
 
-// ─── Plugin tool ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Plugin tool â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// A tool that a plugin registers so the agent can call it.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -108,7 +108,7 @@ pub trait PluginToolHandler: Send + Sync {
         -> Result<serde_json::Value>;
 }
 
-// ─── Plugin route ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Plugin route â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// An HTTP route registered by a plugin.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -138,7 +138,7 @@ impl PluginRoute {
     }
 }
 
-// ─── Plugin service ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Plugin service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// A long-running background service provided by a plugin.
 #[async_trait]
@@ -148,7 +148,7 @@ pub trait PluginService: Send + Sync {
     async fn stop(&self) -> Result<()>;
 }
 
-// ─── Plugin declaration ───────────────────────────────────────────────────────
+// â”€â”€â”€ Plugin declaration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Full declaration of a plugin's capabilities.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -186,7 +186,7 @@ impl PluginDeclaration {
     }
 }
 
-// ─── SDK helpers ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ SDK helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Build a standard tool-call result JSON.
 pub fn tool_result(output: impl Into<String>) -> serde_json::Value {
@@ -265,3 +265,5 @@ mod tests {
         assert!(require_string_arg(&args, "missing").is_err());
     }
 }
+
+

@@ -1,6 +1,6 @@
----
+﻿---
 title: CI Pipeline
-description: How the openkrab CI pipeline works
+description: How the OpenKrab CI pipeline works
 ---
 
 # CI Pipeline
@@ -48,3 +48,4 @@ pnpm test           # vitest tests
 pnpm check:docs     # docs format + lint + broken links
 pnpm release:check  # validate npm pack
 ```
+

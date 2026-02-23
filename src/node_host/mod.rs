@@ -515,7 +515,7 @@ fn location_get(payload: &Value) -> Result<Value> {
 
 fn node_artifacts_dir(node_id: &str) -> Result<PathBuf> {
     let base = dirs::config_dir().ok_or_else(|| anyhow::anyhow!("config directory unavailable"))?;
-    let dir = base.join("krabkrab").join("node-artifacts").join(node_id);
+    let dir = base.join("openkrab").join("node-artifacts").join(node_id);
     fs::create_dir_all(&dir)?;
     Ok(dir)
 }
@@ -564,3 +564,4 @@ mod tests {
         assert!(list["count"].as_u64().unwrap() >= 1);
     }
 }
+

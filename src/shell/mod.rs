@@ -19,7 +19,7 @@ pub async fn run_interactive_shell(config: ShellConfig) -> anyhow::Result<()> {
         .await
         .with_context(|| format!("failed to connect to gateway websocket: {ws_url}"))?;
 
-    println!("krabkrab Shell");
+    println!("openkrab Shell");
     println!("==============");
     println!("URL: {ws_url}");
     println!("Session: {}", config.session);
@@ -189,3 +189,4 @@ mod tests {
         assert!(err.to_string().contains("unsupported url scheme"));
     }
 }
+

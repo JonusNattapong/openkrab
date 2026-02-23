@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Gateway runtime on macOS (external launchd service)"
 read_when:
   - Packaging OpenKrab.app
@@ -11,7 +11,7 @@ title: "Gateway on macOS"
 
 OpenKrab.app no longer bundles Node/Bun or the Gateway runtime. The macOS app
 expects an **external** `OpenKrab` CLI install, does not spawn the Gateway as a
-child process, and manages a per‑user launchd service to keep the Gateway
+child process, and manages a perâ€‘user launchd service to keep the Gateway
 running (or attaches to an existing local Gateway if one is already running).
 
 ## Install the CLI (required for local mode)
@@ -22,7 +22,7 @@ You need Node 22+ on the Mac, then install `OpenKrab` globally:
 npm install -g OpenKrab@<version>
 ```
 
-The macOS app’s **Install CLI** button runs the same flow via npm/pnpm (bun not recommended for Gateway runtime).
+The macOS appâ€™s **Install CLI** button runs the same flow via npm/pnpm (bun not recommended for Gateway runtime).
 
 ## Launchd (Gateway as LaunchAgent)
 
@@ -30,7 +30,7 @@ Label:
 
 - `bot.molt.gateway` (or `bot.molt.<profile>`; legacy `com.OpenKrab.*` may remain)
 
-Plist location (per‑user):
+Plist location (perâ€‘user):
 
 - `~/Library/LaunchAgents/bot.molt.gateway.plist`
   (or `~/Library/LaunchAgents/bot.molt.<profile>.plist`)
@@ -42,7 +42,7 @@ Manager:
 
 Behavior:
 
-- “OpenKrab Active” enables/disables the LaunchAgent.
+- â€œOpenKrab Activeâ€ enables/disables the LaunchAgent.
 - App quit does **not** stop the gateway (launchd keeps it alive).
 - If a Gateway is already running on the configured port, the app attaches to
   it instead of starting a new one.
@@ -53,7 +53,7 @@ Logging:
 
 ## Version compatibility
 
-The macOS app checks the gateway version against its own version. If they’re
+The macOS app checks the gateway version against its own version. If theyâ€™re
 incompatible, update the global CLI to match the app version.
 
 ## Smoke check
@@ -61,8 +61,8 @@ incompatible, update the global CLI to match the app version.
 ```bash
 OpenKrab --version
 
-OpenKrab_SKIP_CHANNELS=1 \
-OpenKrab_SKIP_CANVAS_HOST=1 \
+OPENKRAB_SKIP_CHANNELS=1 \
+OPENKRAB_SKIP_CANVAS_HOST=1 \
 OpenKrab gateway --port 18999 --bind loopback
 ```
 
@@ -71,4 +71,5 @@ Then:
 ```bash
 OpenKrab gateway call health --url ws://127.0.0.1:18999 --timeout 3000
 ```
+
 

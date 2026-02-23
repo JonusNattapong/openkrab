@@ -1,4 +1,4 @@
-//! plugin_loader — Dynamic plugin loading from filesystem.
+﻿//! plugin_loader â€” Dynamic plugin loading from filesystem.
 //!
 //! Provides functionality to:
 //! - Discover plugins from a directory
@@ -22,7 +22,7 @@ use std::sync::{Arc, Mutex};
 use tokio::sync::Mutex as AsyncMutex;
 use tracing::{debug, error, info, warn};
 
-// ─── Plugin loader configuration ──────────────────────────────────────────────
+// â”€â”€â”€ Plugin loader configuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Configuration for the plugin loader.
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ impl Default for PluginLoaderConfig {
             plugin_dirs: vec![
                 PathBuf::from("./plugins"),
                 dirs::home_dir()
-                    .map(|h| h.join(".krabkrab/plugins"))
+                    .map(|h| h.join(".openkrab/plugins"))
                     .unwrap_or_else(|| PathBuf::from("./plugins")),
             ],
             hot_reload: false,
@@ -70,7 +70,7 @@ impl Default for PluginLoaderConfig {
     }
 }
 
-// ─── Loaded plugin ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Loaded plugin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// A loaded plugin with its instance and metadata.
 #[derive(Debug)]
@@ -94,7 +94,7 @@ pub enum PluginInstance {
     Static,
 }
 
-// ─── Plugin loader ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Plugin loader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Dynamic plugin loader.
 pub struct PluginLoader {
@@ -176,7 +176,7 @@ impl PluginLoader {
 
     /// Try to load a plugin manifest from a directory.
     fn try_load_manifest(&self, dir: &Path) -> Result<Option<DiscoveredPlugin>> {
-        let manifest_paths = ["plugin.json", "manifest.json", "krabkrab.json"];
+        let manifest_paths = ["plugin.json", "manifest.json", "openkrab.json"];
 
         for manifest_name in &manifest_paths {
             let manifest_path = dir.join(manifest_name);
@@ -637,7 +637,7 @@ unsafe fn read_json_symbol<T: serde::de::DeserializeOwned>(
     Ok(parsed)
 }
 
-// ─── Discovered plugin ────────────────────────────────────────────────────────
+// â”€â”€â”€ Discovered plugin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// A discovered plugin on the filesystem.
 #[derive(Debug, Clone)]
@@ -648,7 +648,7 @@ pub struct DiscoveredPlugin {
     pub plugin_dir: Option<PathBuf>,
 }
 
-// ─── Load summaries ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Load summaries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Summary of plugin loading operation.
 #[derive(Debug, Default)]
@@ -666,7 +666,7 @@ pub struct InitSummary {
     pub errors: Vec<(String, String)>,
 }
 
-// ─── Plugin manager ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Plugin manager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// High-level plugin manager that combines registry and loader.
 pub struct PluginManager {
@@ -696,7 +696,7 @@ impl PluginManager {
 
     /// Create loader config from app plugins config.
     pub fn config_from_plugins_config(
-        cfg: Option<&crate::openkrab_config::PluginsConfig>,
+        cfg: Option<&crate::OPENKRAB_CONFIG::PluginsConfig>,
     ) -> PluginLoaderConfig {
         let mut out = PluginLoaderConfig::default();
         if let Some(c) = cfg {
@@ -719,7 +719,7 @@ impl PluginManager {
 
     /// Bootstrap plugin manager from configuration and keep it globally alive.
     pub async fn bootstrap_from_config(
-        cfg: Option<&crate::openkrab_config::PluginsConfig>,
+        cfg: Option<&crate::OPENKRAB_CONFIG::PluginsConfig>,
     ) -> Result<Option<PluginBootstrapSummary>> {
         let Some(plugin_cfg) = cfg else {
             return Ok(None);
@@ -885,3 +885,5 @@ mod tests {
         assert_eq!(manager.registry().len(), 1);
     }
 }
+
+

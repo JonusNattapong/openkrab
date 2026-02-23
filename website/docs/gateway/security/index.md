@@ -1,11 +1,11 @@
----
+﻿---
 summary: "Security considerations and threat model for running an AI gateway with shell access"
 read_when:
   - Adding features that widen access or automation
 title: "Security"
 ---
 
-# Security 🔒
+# Security ðŸ”’
 
 ## Quick check: `openkrab security audit`
 
@@ -13,16 +13,11 @@ See also: [Formal Verification (Security Models)](/security/formal-verification/
 
 Run this regularly (especially after changing config or exposing network surfaces):
 
-```bash
-openkrab security audit
-openkrab security audit --deep
-openkrab security audit --fix
-openkrab security audit --json
+```bash\nOpenKrab security audit\nOpenKrab security audit --deep\nOpenKrab security audit --fix\nOpenKrab security audit --json
 ```
 
 It flags common footguns (Gateway auth exposure, browser control exposure, elevated allowlists, filesystem permissions).
-
-openkrab is both a product and an experiment: you’re wiring frontier-model behavior into real messaging surfaces and real tools. **There is no “perfectly secure” setup.** The goal is to be deliberate about:
+\nOpenKrab is both a product and an experiment: youâ€™re wiring frontier-model behavior into real messaging surfaces and real tools. **There is no â€œperfectly secureâ€ setup.** The goal is to be deliberate about:
 
 - who can talk to your bot
 - where the bot is allowed to act
@@ -73,13 +68,13 @@ If more than one person can DM your bot:
 - **Tool blast radius** (elevated tools + open rooms): could prompt injection turn into shell/file/network actions?
 - **Network exposure** (Gateway bind/auth, Tailscale Serve/Funnel, weak/short auth tokens).
 - **Browser control exposure** (remote nodes, relay ports, remote CDP endpoints).
-- **Local disk hygiene** (permissions, symlinks, config includes, “synced folder” paths).
+- **Local disk hygiene** (permissions, symlinks, config includes, â€œsynced folderâ€ paths).
 - **Plugins** (extensions exist without an explicit allowlist).
 - **Policy drift/misconfig** (sandbox docker settings configured but sandbox mode off; ineffective `gateway.nodes.denyCommands` patterns; global `tools.profile="minimal"` overridden by per-agent profiles; extension plugin tools reachable under permissive tool policy).
 - **Runtime expectation drift** (for example `tools.exec.host="sandbox"` while sandbox mode is off, which runs directly on the gateway host).
 - **Model hygiene** (warn when configured models look legacy; not a hard block).
 
-If you run `--deep`, openkrab also attempts a best-effort live Gateway probe.
+If you run `--deep`, OpenKrab also attempts a best-effort live Gateway probe.
 
 ## Credential storage map
 
@@ -97,7 +92,7 @@ Use this when auditing access or deciding what to back up:
 
 When the audit prints findings, treat this as a priority order:
 
-1. **Anything “open” + tools enabled**: lock down DMs/groups first (pairing/allowlists), then tighten tool policy/sandboxing.
+1. **Anything â€œopenâ€ + tools enabled**: lock down DMs/groups first (pairing/allowlists), then tighten tool policy/sandboxing.
 2. **Public network exposure** (LAN bind, Funnel, missing auth): fix immediately.
 3. **Browser control remote exposure**: treat it like operator access (tailnet-only, pair nodes deliberately, avoid public exposure).
 4. **Permissions**: make sure state/config/credentials/auth are not group/world-readable.
@@ -110,7 +105,7 @@ High-signal `checkId` values you will most likely see in real deployments (not e
 
 | `checkId`                                     | Severity      | Why it matters                                                          | Primary fix key/path                                          | Auto-fix |
 | --------------------------------------------- | ------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------- | -------- |
-| `fs.state_dir.perms_world_writable`           | critical      | Other users/processes can modify full openkrab state                    | filesystem perms on `~/.openkrab`                             | yes      |
+| `fs.state_dir.perms_world_writable`           | critical      | Other users/processes can modify full OpenKrab state                    | filesystem perms on `~/.openkrab`                             | yes      |
 | `fs.config.perms_writable`                    | critical      | Others can change auth/tool policy/config                               | filesystem perms on `~/.openkrab/openkrab.json`               | yes      |
 | `fs.config.perms_world_readable`              | critical      | Config can expose tokens/settings                                       | filesystem perms on config file                               | yes      |
 | `gateway.bind_no_auth`                        | critical      | Remote bind without shared secret                                       | `gateway.bind`, `gateway.auth.*`                              | no       |
@@ -136,7 +131,7 @@ High-signal `checkId` values you will most likely see in real deployments (not e
 The Control UI needs a **secure context** (HTTPS or localhost) to generate device
 identity. If you enable `gateway.controlUi.allowInsecureAuth`, the UI falls back
 to **token-only auth** and skips device pairing when device identity is omitted. This is a security
-downgrade—prefer HTTPS (Tailscale Serve) or open the UI on `127.0.0.1`.
+downgradeâ€”prefer HTTPS (Tailscale Serve) or open the UI on `127.0.0.1`.
 
 For break-glass scenarios only, `gateway.controlUi.dangerouslyDisableDeviceAuth`
 disables device identity checks entirely. This is a severe security downgrade;
@@ -156,14 +151,13 @@ gateway:
     - "127.0.0.1" # if your proxy runs on localhost
   auth:
     mode: password
-    password: ${openkrab_GATEWAY_PASSWORD}
+    password: ${OPENKRAB_GATEWAY_PASSWORD}
 ```
 
 When `trustedProxies` is configured, the Gateway will use `X-Forwarded-For` headers to determine the real client IP for local client detection. Make sure your proxy overwrites (not appends to) incoming `X-Forwarded-For` headers to prevent spoofing.
 
 ## Local session logs live on disk
-
-openkrab stores session transcripts on disk under `~/.openkrab/agents/<agentId>/sessions/*.jsonl`.
+\nOpenKrab stores session transcripts on disk under `~/.openkrab/agents/<agentId>/sessions/*.jsonl`.
 This is required for session continuity and (optionally) session memory indexing, but it also means
 **any process/user with filesystem access can read those logs**. Treat disk access as the trust
 boundary and lock down permissions on `~/.openkrab` (see the audit section below). If you need
@@ -174,12 +168,11 @@ stronger isolation between agents, run them under separate OS users or separate 
 If a macOS node is paired, the Gateway can invoke `system.run` on that node. This is **remote code execution** on the Mac:
 
 - Requires node pairing (approval + token).
-- Controlled on the Mac via **Settings → Exec approvals** (security + ask + allowlist).
-- If you don’t want remote execution, set security to **deny** and remove node pairing for that Mac.
+- Controlled on the Mac via **Settings â†’ Exec approvals** (security + ask + allowlist).
+- If you donâ€™t want remote execution, set security to **deny** and remove node pairing for that Mac.
 
 ## Dynamic skills (watcher / remote nodes)
-
-openkrab can refresh the skills list mid-session:
+\nOpenKrab can refresh the skills list mid-session:
 
 - **Skills watcher**: changes to `SKILL.md` can update the skills snapshot on the next agent turn.
 - **Remote nodes**: connecting a macOS node can make macOS-only skills eligible (based on bin probing).
@@ -203,11 +196,11 @@ People who message you can:
 
 ## Core concept: access control before intelligence
 
-Most failures here are not fancy exploits — they’re “someone messaged the bot and the bot did what they asked.”
+Most failures here are not fancy exploits â€” theyâ€™re â€œsomeone messaged the bot and the bot did what they asked.â€
 
-openkrab’s stance:
+openkrabâ€™s stance:
 
-- **Identity first:** decide who can talk to the bot (DM pairing / allowlists / explicit “open”).
+- **Identity first:** decide who can talk to the bot (DM pairing / allowlists / explicit â€œopenâ€).
 - **Scope next:** decide where the bot is allowed to act (group allowlists + mention gating, tools, sandboxing, device permissions).
 - **Model last:** assume the model can be manipulated; design so manipulation has limited blast radius.
 
@@ -249,8 +242,8 @@ Plugins run **in-process** with the Gateway. Treat them as trusted code:
 - Review plugin config before enabling.
 - Restart the Gateway after plugin changes.
 - If you install plugins from npm (`openkrab plugins install <npm-spec>`), treat it like running untrusted code:
-  - The install path is `~/.openkrab/extensions/<pluginId>/` (or `$openkrab_STATE_DIR/extensions/<pluginId>/`).
-  - openkrab uses `npm pack` and then runs `npm install --omit=dev` in that directory (npm lifecycle scripts can execute code during install).
+  - The install path is `~/.openkrab/extensions/<pluginId>/` (or `$OPENKRAB_STATE_DIR/extensions/<pluginId>/`).
+  - OpenKrab uses `npm pack` and then runs `npm install --omit=dev` in that directory (npm lifecycle scripts can execute code during install).
   - Prefer pinned, exact versions (`@scope/pkg@1.2.3`), and inspect the unpacked code on disk before enabling.
 
 Details: [Plugins](/tools/plugin)
@@ -259,23 +252,21 @@ Details: [Plugins](/tools/plugin)
 
 All current DM-capable channels support a DM policy (`dmPolicy` or `*.dm.policy`) that gates inbound DMs **before** the message is processed:
 
-- `pairing` (default): unknown senders receive a short pairing code and the bot ignores their message until approved. Codes expire after 1 hour; repeated DMs won’t resend a code until a new request is created. Pending requests are capped at **3 per channel** by default.
+- `pairing` (default): unknown senders receive a short pairing code and the bot ignores their message until approved. Codes expire after 1 hour; repeated DMs wonâ€™t resend a code until a new request is created. Pending requests are capped at **3 per channel** by default.
 - `allowlist`: unknown senders are blocked (no pairing handshake).
 - `open`: allow anyone to DM (public). **Requires** the channel allowlist to include `"*"` (explicit opt-in).
 - `disabled`: ignore inbound DMs entirely.
 
 Approve via CLI:
 
-```bash
-openkrab pairing list <channel>
-openkrab pairing approve <channel> <code>
+```bash\nOpenKrab pairing list <channel>\nOpenKrab pairing approve <channel> <code>
 ```
 
 Details + files on disk: [Pairing](/channels/pairing)
 
 ## DM session isolation (multi-user mode)
 
-By default, openkrab routes **all DMs into the main session** so your assistant has continuity across devices and channels. If **multiple people** can DM the bot (open DMs or a multi-person allowlist), consider isolating DM sessions:
+By default, OpenKrab routes **all DMs into the main session** so your assistant has continuity across devices and channels. If **multiple people** can DM the bot (open DMs or a multi-person allowlist), consider isolating DM sessions:
 
 ```json5
 {
@@ -294,9 +285,8 @@ Treat the snippet above as **secure DM mode**:
 
 If you run multiple accounts on the same channel, use `per-account-channel-peer` instead. If the same person contacts you on multiple channels, use `session.identityLinks` to collapse those DM sessions into one canonical identity. See [Session Management](/concepts/session) and [Configuration](/gateway/configuration).
 
-## Allowlists (DM + groups) — terminology
-
-openkrab has two separate “who can trigger me?” layers:
+## Allowlists (DM + groups) â€” terminology
+\nOpenKrab has two separate â€œwho can trigger me?â€ layers:
 
 - **DM allowlist** (`allowFrom` / `channels.discord.allowFrom` / `channels.slack.allowFrom`; legacy: `channels.discord.dm.allowFrom`, `channels.slack.dm.allowFrom`): who is allowed to talk to the bot in direct messages.
   - When `dmPolicy="pairing"`, approvals are written to `~/.openkrab/credentials/<channel>-allowFrom.json` (merged with config allowlists).
@@ -313,28 +303,27 @@ Details: [Configuration](/gateway/configuration) and [Groups](/channels/groups)
 
 ## Prompt injection (what it is, why it matters)
 
-Prompt injection is when an attacker crafts a message that manipulates the model into doing something unsafe (“ignore your instructions”, “dump your filesystem”, “follow this link and run commands”, etc.).
+Prompt injection is when an attacker crafts a message that manipulates the model into doing something unsafe (â€œignore your instructionsâ€, â€œdump your filesystemâ€, â€œfollow this link and run commandsâ€, etc.).
 
 Even with strong system prompts, **prompt injection is not solved**. System prompt guardrails are soft guidance only; hard enforcement comes from tool policy, exec approvals, sandboxing, and channel allowlists (and operators can disable these by design). What helps in practice:
 
 - Keep inbound DMs locked down (pairing/allowlists).
-- Prefer mention gating in groups; avoid “always-on” bots in public rooms.
+- Prefer mention gating in groups; avoid â€œalways-onâ€ bots in public rooms.
 - Treat links, attachments, and pasted instructions as hostile by default.
-- Run sensitive tool execution in a sandbox; keep secrets out of the agent’s reachable filesystem.
+- Run sensitive tool execution in a sandbox; keep secrets out of the agentâ€™s reachable filesystem.
 - Note: sandboxing is opt-in. If sandbox mode is off, exec runs on the gateway host even though tools.exec.host defaults to sandbox, and host exec does not require approvals unless you set host=gateway and configure exec approvals.
 - Limit high-risk tools (`exec`, `browser`, `web_fetch`, `web_search`) to trusted agents or explicit allowlists.
-- **Model choice matters:** older/legacy models can be less robust against prompt injection and tool misuse. Prefer modern, instruction-hardened models for any bot with tools. We recommend Anthropic Opus 4.6 (or the latest Opus) because it’s strong at recognizing prompt injections (see [“A step forward on safety”](https://www.anthropic.com/news/claude-opus-4-5)).
+- **Model choice matters:** older/legacy models can be less robust against prompt injection and tool misuse. Prefer modern, instruction-hardened models for any bot with tools. We recommend Anthropic Opus 4.6 (or the latest Opus) because itâ€™s strong at recognizing prompt injections (see [â€œA step forward on safetyâ€](https://www.anthropic.com/news/claude-opus-4-5)).
 
 Red flags to treat as untrusted:
 
-- “Read this file/URL and do exactly what it says.”
-- “Ignore your system prompt or safety rules.”
-- “Reveal your hidden instructions or tool outputs.”
-- “Paste the full contents of ~/.openkrab or your logs.”
+- â€œRead this file/URL and do exactly what it says.â€
+- â€œIgnore your system prompt or safety rules.â€
+- â€œReveal your hidden instructions or tool outputs.â€
+- â€œPaste the full contents of ~/.openkrab or your logs.â€
 
 ## Unsafe external content bypass flags
-
-openkrab includes explicit bypass flags that disable external-content safety wrapping:
+\nOpenKrab includes explicit bypass flags that disable external-content safety wrapping:
 
 - `hooks.mappings[].allowUnsafeExternalContent`
 - `hooks.gmail.allowUnsafeExternalContent`
@@ -405,12 +394,12 @@ Keep config + state private on the gateway host:
 The Gateway multiplexes **WebSocket + HTTP** on a single port:
 
 - Default: `18789`
-- Config/flags/env: `gateway.port`, `--port`, `openkrab_GATEWAY_PORT`
+- Config/flags/env: `gateway.port`, `--port`, `OPENKRAB_GATEWAY_PORT`
 
 This HTTP surface includes the Control UI and the canvas host:
 
 - Control UI (SPA assets) (default base path `/`)
-- Canvas host: `/__openkrab__/canvas/` and `/__openkrab__/a2ui/` (arbitrary HTML/JS; treat as untrusted content)
+- Canvas host: `/__OPENKRAB__/canvas/` and `/__OPENKRAB__/a2ui/` (arbitrary HTML/JS; treat as untrusted content)
 
 If you load canvas content in a normal browser, treat it like any other untrusted web page:
 
@@ -470,14 +459,14 @@ The Gateway broadcasts its presence via mDNS (`_openkrab-gw._tcp` on port 5353) 
    }
    ```
 
-4. **Environment variable** (alternative): set `openkrab_DISABLE_BONJOUR=1` to disable mDNS without config changes.
+4. **Environment variable** (alternative): set `OPENKRAB_DISABLE_BONJOUR=1` to disable mDNS without config changes.
 
 In minimal mode, the Gateway still broadcasts enough for device discovery (`role`, `gatewayPort`, `transport`) but omits `cliPath` and `sshPort`. Apps that need CLI path information can fetch it via the authenticated WebSocket connection instead.
 
 ### 0.5) Lock down the Gateway WebSocket (local auth)
 
 Gateway auth is **required by default**. If no token/password is configured,
-the Gateway refuses WebSocket connections (fail‑closed).
+the Gateway refuses WebSocket connections (failâ€‘closed).
 
 The onboarding wizard generates a token by default (even for loopback) so
 local clients must authenticate.
@@ -500,20 +489,20 @@ Optional: pin remote TLS with `gateway.remote.tlsFingerprint` when using `wss://
 
 Local device pairing:
 
-- Device pairing is auto‑approved for **local** connects (loopback or the
-  gateway host’s own tailnet address) to keep same‑host clients smooth.
+- Device pairing is autoâ€‘approved for **local** connects (loopback or the
+  gateway hostâ€™s own tailnet address) to keep sameâ€‘host clients smooth.
 - Other tailnet peers are **not** treated as local; they still need pairing
   approval.
 
 Auth modes:
 
 - `gateway.auth.mode: "token"`: shared bearer token (recommended for most setups).
-- `gateway.auth.mode: "password"`: password auth (prefer setting via env: `openkrab_GATEWAY_PASSWORD`).
+- `gateway.auth.mode: "password"`: password auth (prefer setting via env: `OPENKRAB_GATEWAY_PASSWORD`).
 - `gateway.auth.mode: "trusted-proxy"`: trust an identity-aware reverse proxy to authenticate users and pass identity via headers (see [Trusted Proxy Auth](/gateway/trusted-proxy-auth)).
 
 Rotation checklist (token/password):
 
-1. Generate/set a new secret (`gateway.auth.token` or `openkrab_GATEWAY_PASSWORD`).
+1. Generate/set a new secret (`gateway.auth.token` or `OPENKRAB_GATEWAY_PASSWORD`).
 2. Restart the Gateway (or restart the macOS app if it supervises the Gateway).
 3. Update any remote clients (`gateway.remote.token` / `.password` on machines that call into the Gateway).
 4. Verify you can no longer connect with the old credentials.
@@ -522,7 +511,7 @@ Rotation checklist (token/password):
 
 When `gateway.auth.allowTailscale` is `true` (default for Serve), openkrab
 accepts Tailscale Serve identity headers (`tailscale-user-login`) as
-authentication. openkrab verifies the identity by resolving the
+authentication. OpenKrab verifies the identity by resolving the
 `x-forwarded-for` address through the local Tailscale daemon (`tailscale whois`)
 and matching it to the header. This only triggers for requests that hit loopback
 and include `x-forwarded-for`, `x-forwarded-proto`, and `x-forwarded-host` as
@@ -535,7 +524,7 @@ you terminate TLS or proxy in front of the gateway, disable
 Trusted proxies:
 
 - If you terminate TLS in front of the Gateway, set `gateway.trustedProxies` to your proxy IPs.
-- openkrab will trust `x-forwarded-for` (or `x-real-ip`) from those IPs to determine the client IP for local pairing checks and HTTP auth/local checks.
+- OpenKrab will trust `x-forwarded-for` (or `x-real-ip`) from those IPs to determine the client IP for local pairing checks and HTTP auth/local checks.
 - Ensure your proxy **overwrites** `x-forwarded-for` and blocks direct access to the Gateway port.
 
 See [Tailscale](/gateway/tailscale) and [Web overview](/web).
@@ -549,16 +538,16 @@ Treat node pairing like admin access.
 Recommended pattern:
 
 - Keep the Gateway and node host on the same tailnet (Tailscale).
-- Pair the node intentionally; disable browser proxy routing if you don’t need it.
+- Pair the node intentionally; disable browser proxy routing if you donâ€™t need it.
 
 Avoid:
 
 - Exposing relay/control ports over LAN or public Internet.
 - Tailscale Funnel for browser control endpoints (public exposure).
 
-### 0.7) Secrets on disk (what’s sensitive)
+### 0.7) Secrets on disk (whatâ€™s sensitive)
 
-Assume anything under `~/.openkrab/` (or `$openkrab_STATE_DIR/`) may contain secrets or private data:
+Assume anything under `~/.openkrab/` (or `$OPENKRAB_STATE_DIR/`) may contain secrets or private data:
 
 - `openkrab.json`: config may include tokens (gateway, remote gateway), provider settings, and allowlists.
 - `credentials/**`: channel credentials (example: WhatsApp creds), pairing allowlists, legacy OAuth imports.
@@ -585,7 +574,7 @@ Recommendations:
 - Keep tool summary redaction on (`logging.redactSensitive: "tools"`; default).
 - Add custom patterns for your environment via `logging.redactPatterns` (tokens, hostnames, internal URLs).
 - When sharing diagnostics, prefer `openkrab status --all` (pasteable, secrets redacted) over raw logs.
-- Prune old session transcripts and log files if you don’t need long retention.
+- Prune old session transcripts and log files if you donâ€™t need long retention.
 
 Details: [Logging](/gateway/logging)
 
@@ -644,7 +633,7 @@ Additional hardening options:
 
 ### 5) Secure baseline (copy/paste)
 
-One “safe default” config that keeps the Gateway private, requires DM pairing, and avoids always-on group bots:
+One â€œsafe defaultâ€ config that keeps the Gateway private, requires DM pairing, and avoids always-on group bots:
 
 ```json5
 {
@@ -663,7 +652,7 @@ One “safe default” config that keeps the Gateway private, requires DM pairin
 }
 ```
 
-If you want “safer by default” tool execution too, add a sandbox + deny dangerous tools for any non-owner agent (example below under “Per-agent access profiles”).
+If you want â€œsafer by defaultâ€ tool execution too, add a sandbox + deny dangerous tools for any non-owner agent (example below under â€œPer-agent access profilesâ€).
 
 Built-in baseline for chat-driven agent turns: non-owner senders cannot use the `cron` or `gateway` tools.
 
@@ -686,7 +675,7 @@ Also consider agent workspace access inside the sandbox:
 - `agents.defaults.sandbox.workspaceAccess: "ro"` mounts the agent workspace read-only at `/agent` (disables `write`/`edit`/`apply_patch`)
 - `agents.defaults.sandbox.workspaceAccess: "rw"` mounts the agent workspace read/write at `/workspace`
 
-Important: `tools.elevated` is the global baseline escape hatch that runs exec on the host. Keep `tools.elevated.allowFrom` tight and don’t enable it for strangers. You can further restrict elevated per agent via `agents.list[].tools.elevated`. See [Elevated Mode](/tools/elevated).
+Important: `tools.elevated` is the global baseline escape hatch that runs exec on the host. Keep `tools.elevated.allowFrom` tight and donâ€™t enable it for strangers. You can further restrict elevated per agent via `agents.list[].tools.elevated`. See [Elevated Mode](/tools/elevated).
 
 ## Browser control risks
 
@@ -699,11 +688,11 @@ access those accounts and data. Treat browser profiles as **sensitive state**:
 - Keep host browser control disabled for sandboxed agents unless you trust them.
 - Treat browser downloads as untrusted input; prefer an isolated downloads directory.
 - Disable browser sync/password managers in the agent profile if possible (reduces blast radius).
-- For remote gateways, assume “browser control” is equivalent to “operator access” to whatever that profile can reach.
+- For remote gateways, assume â€œbrowser controlâ€ is equivalent to â€œoperator accessâ€ to whatever that profile can reach.
 - Keep the Gateway and node hosts tailnet-only; avoid exposing relay/control ports to LAN or public Internet.
-- The Chrome extension relay’s CDP endpoint is auth-gated; only openkrab clients can connect.
-- Disable browser proxy routing when you don’t need it (`gateway.nodes.browser.mode="off"`).
-- Chrome extension relay mode is **not** “safer”; it can take over your existing Chrome tabs. Assume it can act as you in whatever that tab/profile can reach.
+- The Chrome extension relayâ€™s CDP endpoint is auth-gated; only OpenKrab clients can connect.
+- Disable browser proxy routing when you donâ€™t need it (`gateway.nodes.browser.mode="off"`).
+- Chrome extension relay mode is **not** â€œsaferâ€; it can take over your existing Chrome tabs. Assume it can act as you in whatever that tab/profile can reach.
 
 ## Per-agent access profiles (multi-agent)
 
@@ -772,7 +761,7 @@ Common use cases:
           scope: "agent",
           workspaceAccess: "none",
         },
-        // Session tools can reveal sensitive data from transcripts. By default openkrab limits these tools
+        // Session tools can reveal sensitive data from transcripts. By default OpenKrab limits these tools
         // to the current session + spawned subagent sessions, but you can clamp further if needed.
         // See `tools.sessions.visibility` in the configuration reference.
         tools: {
@@ -834,7 +823,7 @@ If your AI does something bad:
 
 ### Rotate (assume compromise if secrets leaked)
 
-1. Rotate Gateway auth (`gateway.auth.token` / `openkrab_GATEWAY_PASSWORD`) and restart.
+1. Rotate Gateway auth (`gateway.auth.token` / `OPENKRAB_GATEWAY_PASSWORD`) and restart.
 2. Rotate remote client secrets (`gateway.remote.token` / `.password`) on any machine that can call the Gateway.
 3. Rotate provider/API credentials (WhatsApp creds, Slack/Discord tokens, model/API keys in `auth-profiles.json`).
 
@@ -847,7 +836,7 @@ If your AI does something bad:
 
 ### Collect for a report
 
-- Timestamp, gateway host OS + openkrab version
+- Timestamp, gateway host OS + OpenKrab version
 - The session transcript(s) + a short log tail (after redacting)
 - What the attacker sent + what the agent did
 - Whether the Gateway was exposed beyond loopback (LAN/Tailscale Funnel/Serve)
@@ -878,7 +867,7 @@ If it fails, there are new candidates not yet in the baseline.
 
 5. If you need new excludes, add them to `.detect-secrets.cfg` and regenerate the
    baseline with matching `--exclude-files` / `--exclude-lines` flags (the config
-   file is reference-only; detect-secrets doesn’t read it automatically).
+   file is reference-only; detect-secrets doesnâ€™t read it automatically).
 
 Commit the updated `.secrets.baseline` once it reflects the intended state.
 
@@ -889,3 +878,5 @@ Found a vulnerability in openkrab? Please report responsibly:
 1. Email: [security@openkrab.ai](mailto:security@openkrab.ai)
 2. Don't post publicly until fixed
 3. We'll credit you (unless you prefer anonymity)
+
+

@@ -1,4 +1,4 @@
-# 🤖 Agent Development Guide
+﻿# ðŸ¤– Agent Development Guide
 
 Complete guide for developing and extending AI agents in OpenKrab.
 
@@ -55,10 +55,10 @@ async fn main() -> Result<()> {
 ### Configuration File
 
 ```toml
-# ~/.config/krabkrab/agents/research.toml
+# ~/.config/openkrab/agents/research.toml
 [agent]
 name = "ResearchBot"
-emoji = "🔬"
+emoji = "ðŸ”¬"
 personality = "A meticulous research assistant"
 system_prompt = "Always cite sources and verify facts."
 
@@ -80,28 +80,28 @@ let agent = Agent::load("research").await?;
 ## Agent Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│           Agent Runtime                 │
-├─────────────────────────────────────────┤
-│  Identity  │  Provider  │  Memory      │
-│  ├ name    │  ├ type    │  ├ vector    │
-│  ├ emoji   │  ├ model   │  ├ text FTS  │
-│  ├ personality         │  ├ hybrid     │
-│  └ system_prompt       │  └ temporal   │
-├─────────────────────────────────────────┤
-│           Tool Registry                 │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐  │
-│  │  bash   │ │  read   │ │  write  │  │
-│  └─────────┘ └─────────┘ └─────────┘  │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐  │
-│  │web_search│ │web_fetch│ │memory_* │  │
-│  └─────────┘ └─────────┘ └─────────┘  │
-├─────────────────────────────────────────┤
-│           Hook System                   │
-│  BeforeAgent → BeforeTool → AfterTool   │
-│       ↓           ↓           ↓         │
-│  BeforeLLM → AfterLLM → BeforeReply     │
-└─────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚           Agent Runtime                 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  Identity  â”‚  Provider  â”‚  Memory      â”‚
+â”‚  â”œ name    â”‚  â”œ type    â”‚  â”œ vector    â”‚
+â”‚  â”œ emoji   â”‚  â”œ model   â”‚  â”œ text FTS  â”‚
+â”‚  â”œ personality         â”‚  â”œ hybrid     â”‚
+â”‚  â”” system_prompt       â”‚  â”” temporal   â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚           Tool Registry                 â”‚
+â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
+â”‚  â”‚  bash   â”‚ â”‚  read   â”‚ â”‚  write  â”‚  â”‚
+â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚
+â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
+â”‚  â”‚web_searchâ”‚ â”‚web_fetchâ”‚ â”‚memory_* â”‚  â”‚
+â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚           Hook System                   â”‚
+â”‚  BeforeAgent â†’ BeforeTool â†’ AfterTool   â”‚
+â”‚       â†“           â†“           â†“         â”‚
+â”‚  BeforeLLM â†’ AfterLLM â†’ BeforeReply     â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ---
@@ -116,7 +116,7 @@ use openkrab::agents::{Agent, AgentConfig, AgentIdentity};
 let config = AgentConfig {
     identity: AgentIdentity {
         name: "CodeAssistant".to_string(),
-        emoji: "💻".to_string(),
+        emoji: "ðŸ’»".to_string(),
         personality: "An expert programmer focused on clean code.".to_string(),
         system_prompt: Some(
             "Use bash_pty for interactive debugging. Explain your reasoning.".to_string()
@@ -381,17 +381,17 @@ impl AsyncAgentHook for DataEnrichmentHook {
 ### Hybrid Memory Architecture
 
 ```
-┌─────────────────────────────────────┐
-│         Memory Manager              │
-├─────────────────────────────────────┤
-│  Vector Store    │  Text Store      │
-│  ├ Embeddings    │  ├ Full-text     │
-│  ├ Similarity    │  ├ BM25          │
-│  └ ANN Search    │  └ Hybrid        │
-├─────────────────────────────────────┤
-│  MMR Reranking  │ Temporal Decay   │
-│  Diverse results │ Older = lower    │
-└─────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚         Memory Manager              â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  Vector Store    â”‚  Text Store      â”‚
+â”‚  â”œ Embeddings    â”‚  â”œ Full-text     â”‚
+â”‚  â”œ Similarity    â”‚  â”œ BM25          â”‚
+â”‚  â”” ANN Search    â”‚  â”” Hybrid        â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  MMR Reranking  â”‚ Temporal Decay   â”‚
+â”‚  Diverse results â”‚ Older = lower    â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### Using Memory
@@ -459,17 +459,17 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 export GEMINI_API_KEY="..."
 
 # Agent Defaults
-export KRABKRAB_AGENT_NAME="MyBot"
-export KRABKRAB_AGENT_EMOJI="🤖"
-export KRABKRAB_LOG_LEVEL="info"
+export OPENKRAB_AGENT_NAME="MyBot"
+export OPENKRAB_AGENT_EMOJI="ðŸ¤–"
+export OPENKRAB_LOG_LEVEL="info"
 
 # Memory
-export KRABKRAB_MEMORY_PROVIDER="openai"
-export KRABKRAB_MEMORY_MODEL="text-embedding-3-small"
+export OPENKRAB_MEMORY_PROVIDER="openai"
+export OPENKRAB_MEMORY_MODEL="text-embedding-3-small"
 
 # Safety
-export KRABKRAB_SANDBOX_MODE="strict"
-export KRABKRAB_BASH_ALLOWLIST="/usr/bin,/bin"
+export OPENKRAB_SANDBOX_MODE="strict"
+export OPENKRAB_BASH_ALLOWLIST="/usr/bin,/bin"
 ```
 
 ### Complete Agent Config
@@ -477,7 +477,7 @@ export KRABKRAB_BASH_ALLOWLIST="/usr/bin,/bin"
 ```toml
 [agent]
 name = "ResearchAssistant"
-emoji = "🔬"
+emoji = "ðŸ”¬"
 personality = "A thorough research assistant focused on accuracy"
 system_prompt = """
 You are a research assistant. Always:
@@ -632,7 +632,7 @@ async fn expensive_lookup(query: String) -> Result<String> {
 let research_agent = Agent::from_config(AgentConfig {
     identity: AgentIdentity {
         name: "ResearchBot".to_string(),
-        emoji: "🔬".to_string(),
+        emoji: "ðŸ”¬".to_string(),
         personality: "A meticulous research assistant.".to_string(),
         system_prompt: Some(
             "Always cite sources. Use web_search and web_fetch.".to_string()
@@ -656,7 +656,7 @@ let research_agent = Agent::from_config(AgentConfig {
 let code_agent = Agent::from_config(AgentConfig {
     identity: AgentIdentity {
         name: "CodeBot".to_string(),
-        emoji: "💻".to_string(),
+        emoji: "ðŸ’»".to_string(),
         personality: "An expert programmer.".to_string(),
         system_prompt: Some(
             "Use bash_pty for debugging. Explain complex code.".to_string()
@@ -684,7 +684,7 @@ let code_agent = Agent::from_config(AgentConfig {
 let personal_agent = Agent::from_config(AgentConfig {
     identity: AgentIdentity {
         name: "Assistant".to_string(),
-        emoji: "🤖".to_string(),
+        emoji: "ðŸ¤–".to_string(),
         personality: "A helpful and friendly assistant.".to_string(),
         system_prompt: Some(
             "Remember user preferences. Be concise but helpful.".to_string()
@@ -714,4 +714,6 @@ Contributions welcome! See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ---
 
-**🦀 Happy Agent Building!**
+**ðŸ¦€ Happy Agent Building!**
+
+

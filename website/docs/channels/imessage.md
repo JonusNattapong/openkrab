@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Legacy iMessage support via imsg (JSON-RPC over stdio). New setups should use BlueBubbles."
 read_when:
   - Setting up iMessage support
@@ -60,17 +60,14 @@ imsg rpc --help
 
       <Step title="Start gateway">
 
-```bash
-openkrab gateway
+```bash\nOpenKrab gateway
 ```
 
       </Step>
 
       <Step title="Approve first DM pairing (default dmPolicy)">
 
-```bash
-openkrab pairing list imessage
-openkrab pairing approve imessage <CODE>
+```bash\nOpenKrab pairing list imessage\nOpenKrab pairing approve imessage <CODE>
 ```
 
         Pairing requests expire after 1 hour.
@@ -80,7 +77,7 @@ openkrab pairing approve imessage <CODE>
   </Tab>
 
   <Tab title="Remote Mac over SSH">
-    openkrab only requires a stdio-compatible `cliPath`, so you can point `cliPath` at a wrapper script that SSHes to a remote Mac and runs `imsg`.
+    OpenKrab only requires a stdio-compatible `cliPath`, so you can point `cliPath` at a wrapper script that SSHes to a remote Mac and runs `imsg`.
 
 ```bash
 #!/usr/bin/env bash
@@ -106,9 +103,9 @@ exec ssh -T gateway-host imsg "$@"
 }
 ```
 
-    If `remoteHost` is not set, openkrab attempts to auto-detect it by parsing the SSH wrapper script.
+    If `remoteHost` is not set, OpenKrab attempts to auto-detect it by parsing the SSH wrapper script.
     `remoteHost` must be `host` or `user@host` (no spaces or SSH options).
-    openkrab uses strict host-key checking for SCP, so the relay host key must already exist in `~/.ssh/known_hosts`.
+    OpenKrab uses strict host-key checking for SCP, so the relay host key must already exist in `~/.ssh/known_hosts`.
     Attachment paths are validated against allowed roots (`attachmentRoots` / `remoteAttachmentRoots`).
 
   </Tab>
@@ -178,7 +175,7 @@ imsg send <handle> "test"
     Group-ish thread behavior:
 
     Some multi-participant iMessage threads can arrive with `is_group=false`.
-    If that `chat_id` is explicitly configured under `channels.imessage.groups`, openkrab treats it as group traffic (group gating + group session isolation).
+    If that `chat_id` is explicitly configured under `channels.imessage.groups`, OpenKrab treats it as group traffic (group gating + group session isolation).
 
   </Tab>
 </Tabs>
@@ -194,7 +191,7 @@ imsg send <handle> "test"
     1. Create/sign in a dedicated macOS user.
     2. Sign into Messages with the bot Apple ID in that user.
     3. Install `imsg` in that user.
-    4. Create SSH wrapper so openkrab can run `imsg` in that user context.
+    4. Create SSH wrapper so OpenKrab can run `imsg` in that user context.
     5. Point `channels.imessage.accounts.<id>.cliPath` and `.dbPath` to that user profile.
 
     First run may require GUI approvals (Automation + Full Disk Access) in that bot user session.
@@ -307,8 +304,7 @@ Disable:
     Validate the binary and RPC support:
 
 ```bash
-imsg rpc --help
-openkrab channels status --probe
+imsg rpc --help\nOpenKrab channels status --probe
 ```
 
     If probe reports RPC unsupported, update `imsg`.
@@ -364,3 +360,4 @@ imsg send <handle> "test"
 - [Gateway configuration](/gateway/configuration)
 - [Pairing](/channels/pairing)
 - [BlueBubbles](/channels/bluebubbles)
+

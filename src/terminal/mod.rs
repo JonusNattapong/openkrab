@@ -2,7 +2,7 @@
 //! Ported from `openkrab/src/terminal/` (Phase 8).
 //!
 //! Provides a minimal, zero-dependency terminal formatting layer for
-//! the krabkrab-cli output.
+//! the openkrab-cli output.
 
 // ─── ANSI colours ─────────────────────────────────────────────────────────────
 
@@ -282,10 +282,10 @@ mod tests {
     #[test]
     fn table_render() {
         let mut t = Table::new(vec!["Name", "Status"]);
-        t.add_row(vec!["krabkrab", "running"]);
+        t.add_row(vec!["openkrab", "running"]);
         t.add_row(vec!["memory", "ok"]);
         let rendered = t.render();
-        assert!(rendered.contains("krabkrab"));
+        assert!(rendered.contains("openkrab"));
         assert!(rendered.contains("running"));
         assert!(rendered.contains("Name"));
     }
@@ -313,3 +313,4 @@ mod tests {
         assert!(s.contains("connected"));
     }
 }
+

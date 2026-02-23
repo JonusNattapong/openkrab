@@ -1,27 +1,27 @@
----
-summary: "Run openkrab Gateway 24/7 on a cheap Hetzner VPS (Docker) with durable state and baked-in binaries"
+﻿---
+summary: "Run OpenKrab Gateway 24/7 on a cheap Hetzner VPS (Docker) with durable state and baked-in binaries"
 read_when:
-  - You want openkrab running 24/7 on a cloud VPS (not your laptop)
+  - You want OpenKrab running 24/7 on a cloud VPS (not your laptop)
   - You want a production-grade, always-on Gateway on your own VPS
   - You want full control over persistence, binaries, and restart behavior
-  - You are running openkrab in Docker on Hetzner or a similar provider
+  - You are running OpenKrab in Docker on Hetzner or a similar provider
 title: "Hetzner"
 ---
 
-# openkrab on Hetzner (Docker, Production VPS Guide)
+# OpenKrab on Hetzner (Docker, Production VPS Guide)
 
 ## Goal
 
-Run a persistent openkrab Gateway on a Hetzner VPS using Docker, with durable state, baked-in binaries, and safe restart behavior.
+Run a persistent OpenKrab Gateway on a Hetzner VPS using Docker, with durable state, baked-in binaries, and safe restart behavior.
 
-If you want “openkrab 24/7 for ~$5”, this is the simplest reliable setup.
+If you want â€œopenkrab 24/7 for ~$5â€, this is the simplest reliable setup.
 Hetzner pricing changes; pick the smallest Debian/Ubuntu VPS and scale up if you hit OOMs.
 
 ## What are we doing (simple terms)?
 
 - Rent a small Linux server (Hetzner VPS)
 - Install Docker (isolated app runtime)
-- Start the openkrab Gateway in Docker
+- Start the OpenKrab Gateway in Docker
 - Persist `~/.openkrab` + `~/.openkrab/workspace` on the host (survives restarts/rebuilds)
 - Access the Control UI from your laptop via an SSH tunnel
 
@@ -40,7 +40,7 @@ For the generic Docker flow, see [Docker](/install/docker).
 
 1. Provision Hetzner VPS
 2. Install Docker
-3. Clone openkrab repository
+3. Clone OpenKrab repository
 4. Create persistent host directories
 5. Configure `.env` and `docker-compose.yml`
 6. Bake required binaries into the image
@@ -96,7 +96,7 @@ docker compose version
 
 ---
 
-## 3) Clone the openkrab repository
+## 3) Clone the OpenKrab repository
 
 ```bash
 git clone https://github.com/openkrab/openkrab.git
@@ -126,13 +126,13 @@ chown -R 1000:1000 /root/.openkrab
 Create `.env` in the repository root.
 
 ```bash
-openkrab_IMAGE=openkrab:latest
-openkrab_GATEWAY_TOKEN=change-me-now
-openkrab_GATEWAY_BIND=lan
-openkrab_GATEWAY_PORT=18789
+OPENKRAB_IMAGE=openkrab:latest
+OPENKRAB_GATEWAY_TOKEN=change-me-now
+OPENKRAB_GATEWAY_BIND=lan
+OPENKRAB_GATEWAY_PORT=18789
 
-openkrab_CONFIG_DIR=/root/.openkrab
-openkrab_WORKSPACE_DIR=/root/.openkrab/workspace
+OPENKRAB_CONFIG_DIR=/root/.openkrab
+OPENKRAB_WORKSPACE_DIR=/root/.openkrab/workspace
 
 GOG_KEYRING_PASSWORD=change-me-now
 XDG_CONFIG_HOME=/home/node/.openkrab
@@ -155,7 +155,7 @@ Create or update `docker-compose.yml`.
 ```yaml
 services:
   openkrab-gateway:
-    image: ${openkrab_IMAGE}
+    image: ${OPENKRAB_IMAGE}
     build: .
     restart: unless-stopped
     env_file:
@@ -164,28 +164,28 @@ services:
       - HOME=/home/node
       - NODE_ENV=production
       - TERM=xterm-256color
-      - openkrab_GATEWAY_BIND=${openkrab_GATEWAY_BIND}
-      - openkrab_GATEWAY_PORT=${openkrab_GATEWAY_PORT}
-      - openkrab_GATEWAY_TOKEN=${openkrab_GATEWAY_TOKEN}
+      - OPENKRAB_GATEWAY_BIND=${OPENKRAB_GATEWAY_BIND}
+      - OPENKRAB_GATEWAY_PORT=${OPENKRAB_GATEWAY_PORT}
+      - OPENKRAB_GATEWAY_TOKEN=${OPENKRAB_GATEWAY_TOKEN}
       - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD}
       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
       - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     volumes:
-      - ${openkrab_CONFIG_DIR}:/home/node/.openkrab
-      - ${openkrab_WORKSPACE_DIR}:/home/node/.openkrab/workspace
+      - ${OPENKRAB_CONFIG_DIR}:/home/node/.openkrab
+      - ${OPENKRAB_WORKSPACE_DIR}:/home/node/.openkrab/workspace
     ports:
       # Recommended: keep the Gateway loopback-only on the VPS; access via SSH tunnel.
       # To expose it publicly, remove the `127.0.0.1:` prefix and firewall accordingly.
-      - "127.0.0.1:${openkrab_GATEWAY_PORT}:18789"
+      - "127.0.0.1:${OPENKRAB_GATEWAY_PORT}:18789"
     command:
       [
         "node",
         "dist/index.js",
         "gateway",
         "--bind",
-        "${openkrab_GATEWAY_BIND}",
+        "${OPENKRAB_GATEWAY_BIND}",
         "--port",
-        "${openkrab_GATEWAY_PORT}",
+        "${OPENKRAB_GATEWAY_PORT}",
         "--allow-unconfigured",
       ]
 ```
@@ -309,8 +309,7 @@ Paste your gateway token.
 ---
 
 ## What persists where (source of truth)
-
-openkrab runs in Docker, but Docker is not the source of truth.
+\nOpenKrab runs in Docker, but Docker is not the source of truth.
 All long-lived state must survive restarts, rebuilds, and reboots.
 
 | Component           | Location                          | Persistence mechanism  | Notes                            |
@@ -346,3 +345,5 @@ For teams preferring infrastructure-as-code workflows, a community-maintained Te
 This approach complements the Docker setup above with reproducible deployments, version-controlled infrastructure, and automated disaster recovery.
 
 > **Note:** Community-maintained. For issues or contributions, see the repository links above.
+
+

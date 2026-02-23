@@ -1,4 +1,4 @@
-use krabkrab::channels::sender_identity::*;
+use openkrab::channels::sender_identity::*;
 
 #[test]
 fn test_validate_missing_identity_in_group() {
@@ -41,3 +41,4 @@ fn test_validate_username_constraints() {
         .any(|s| s.contains("should not include \"@\"")));
     assert!(issues.iter().any(|s| s.contains("whitespace")));
 }
+

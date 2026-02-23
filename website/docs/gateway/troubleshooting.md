@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Deep troubleshooting runbook for gateway, channels, automation, nodes, and browser"
 read_when:
   - The troubleshooting hub pointed you here for deeper diagnosis
@@ -15,12 +15,7 @@ Start at [/help/troubleshooting](/help/troubleshooting) if you want the fast tri
 
 Run these first, in this order:
 
-```bash
-openkrab status
-openkrab gateway status
-openkrab logs --follow
-openkrab doctor
-openkrab channels status --probe
+```bash\nOpenKrab status\nOpenKrab gateway status\nOpenKrab logs --follow\nOpenKrab doctor\nOpenKrab channels status --probe
 ```
 
 Expected healthy signals:
@@ -33,12 +28,7 @@ Expected healthy signals:
 
 If channels are up but nothing answers, check routing and policy before reconnecting anything.
 
-```bash
-openkrab status
-openkrab channels status --probe
-openkrab pairing list <channel>
-openkrab config get channels
-openkrab logs --follow
+```bash\nOpenKrab status\nOpenKrab channels status --probe\nOpenKrab pairing list <channel>\nOpenKrab config get channels\nOpenKrab logs --follow
 ```
 
 Look for:
@@ -49,9 +39,9 @@ Look for:
 
 Common signatures:
 
-- `drop guild message (mention required` → group message ignored until mention.
-- `pairing request` → sender needs approval.
-- `blocked` / `allowlist` → sender/channel was filtered by policy.
+- `drop guild message (mention required` â†’ group message ignored until mention.
+- `pairing request` â†’ sender needs approval.
+- `blocked` / `allowlist` â†’ sender/channel was filtered by policy.
 
 Related:
 
@@ -63,12 +53,7 @@ Related:
 
 When dashboard/control UI will not connect, validate URL, auth mode, and secure context assumptions.
 
-```bash
-openkrab gateway status
-openkrab status
-openkrab logs --follow
-openkrab doctor
-openkrab gateway status --json
+```bash\nOpenKrab gateway status\nOpenKrab status\nOpenKrab logs --follow\nOpenKrab doctor\nOpenKrab gateway status --json
 ```
 
 Look for:
@@ -79,9 +64,9 @@ Look for:
 
 Common signatures:
 
-- `device identity required` → non-secure context or missing device auth.
-- `unauthorized` / reconnect loop → token/password mismatch.
-- `gateway connect failed:` → wrong host/port/url target.
+- `device identity required` â†’ non-secure context or missing device auth.
+- `unauthorized` / reconnect loop â†’ token/password mismatch.
+- `gateway connect failed:` â†’ wrong host/port/url target.
 
 Related:
 
@@ -93,12 +78,7 @@ Related:
 
 Use this when service is installed but process does not stay up.
 
-```bash
-openkrab gateway status
-openkrab status
-openkrab logs --follow
-openkrab doctor
-openkrab gateway status --deep
+```bash\nOpenKrab gateway status\nOpenKrab status\nOpenKrab logs --follow\nOpenKrab doctor\nOpenKrab gateway status --deep
 ```
 
 Look for:
@@ -109,9 +89,9 @@ Look for:
 
 Common signatures:
 
-- `Gateway start blocked: set gateway.mode=local` → local gateway mode is not enabled. Fix: set `gateway.mode="local"` in your config (or run `openkrab configure`). If you are running openkrab via Podman using the dedicated `openkrab` user, the config lives at `~openkrab/.openkrab/openkrab.json`.
-- `refusing to bind gateway ... without auth` → non-loopback bind without token/password.
-- `another gateway instance is already listening` / `EADDRINUSE` → port conflict.
+- `Gateway start blocked: set gateway.mode=local` â†’ local gateway mode is not enabled. Fix: set `gateway.mode="local"` in your config (or run `openkrab configure`). If you are running OpenKrab via Podman using the dedicated `openkrab` user, the config lives at `~openkrab/.openkrab/openkrab.json`.
+- `refusing to bind gateway ... without auth` â†’ non-loopback bind without token/password.
+- `another gateway instance is already listening` / `EADDRINUSE` â†’ port conflict.
 
 Related:
 
@@ -123,12 +103,7 @@ Related:
 
 If channel state is connected but message flow is dead, focus on policy, permissions, and channel specific delivery rules.
 
-```bash
-openkrab channels status --probe
-openkrab pairing list <channel>
-openkrab status --deep
-openkrab logs --follow
-openkrab config get channels
+```bash\nOpenKrab channels status --probe\nOpenKrab pairing list <channel>\nOpenKrab status --deep\nOpenKrab logs --follow\nOpenKrab config get channels
 ```
 
 Look for:
@@ -139,9 +114,9 @@ Look for:
 
 Common signatures:
 
-- `mention required` → message ignored by group mention policy.
-- `pairing` / pending approval traces → sender is not approved.
-- `missing_scope`, `not_in_channel`, `Forbidden`, `401/403` → channel auth/permissions issue.
+- `mention required` â†’ message ignored by group mention policy.
+- `pairing` / pending approval traces â†’ sender is not approved.
+- `missing_scope`, `not_in_channel`, `Forbidden`, `401/403` â†’ channel auth/permissions issue.
 
 Related:
 
@@ -154,12 +129,7 @@ Related:
 
 If cron or heartbeat did not run or did not deliver, verify scheduler state first, then delivery target.
 
-```bash
-openkrab cron status
-openkrab cron list
-openkrab cron runs --id <jobId> --limit 20
-openkrab system heartbeat last
-openkrab logs --follow
+```bash\nOpenKrab cron status\nOpenKrab cron list\nOpenKrab cron runs --id <jobId> --limit 20\nOpenKrab system heartbeat last\nOpenKrab logs --follow
 ```
 
 Look for:
@@ -170,10 +140,10 @@ Look for:
 
 Common signatures:
 
-- `cron: scheduler disabled; jobs will not run automatically` → cron disabled.
-- `cron: timer tick failed` → scheduler tick failed; check file/log/runtime errors.
-- `heartbeat skipped` with `reason=quiet-hours` → outside active hours window.
-- `heartbeat: unknown accountId` → invalid account id for heartbeat delivery target.
+- `cron: scheduler disabled; jobs will not run automatically` â†’ cron disabled.
+- `cron: timer tick failed` â†’ scheduler tick failed; check file/log/runtime errors.
+- `heartbeat skipped` with `reason=quiet-hours` â†’ outside active hours window.
+- `heartbeat: unknown accountId` â†’ invalid account id for heartbeat delivery target.
 
 Related:
 
@@ -185,12 +155,7 @@ Related:
 
 If a node is paired but tools fail, isolate foreground, permission, and approval state.
 
-```bash
-openkrab nodes status
-openkrab nodes describe --node <idOrNameOrIp>
-openkrab approvals get --node <idOrNameOrIp>
-openkrab logs --follow
-openkrab status
+```bash\nOpenKrab nodes status\nOpenKrab nodes describe --node <idOrNameOrIp>\nOpenKrab approvals get --node <idOrNameOrIp>\nOpenKrab logs --follow\nOpenKrab status
 ```
 
 Look for:
@@ -201,10 +166,10 @@ Look for:
 
 Common signatures:
 
-- `NODE_BACKGROUND_UNAVAILABLE` → node app must be in foreground.
-- `*_PERMISSION_REQUIRED` / `LOCATION_PERMISSION_REQUIRED` → missing OS permission.
-- `SYSTEM_RUN_DENIED: approval required` → exec approval pending.
-- `SYSTEM_RUN_DENIED: allowlist miss` → command blocked by allowlist.
+- `NODE_BACKGROUND_UNAVAILABLE` â†’ node app must be in foreground.
+- `*_PERMISSION_REQUIRED` / `LOCATION_PERMISSION_REQUIRED` â†’ missing OS permission.
+- `SYSTEM_RUN_DENIED: approval required` â†’ exec approval pending.
+- `SYSTEM_RUN_DENIED: allowlist miss` â†’ command blocked by allowlist.
 
 Related:
 
@@ -216,12 +181,7 @@ Related:
 
 Use this when browser tool actions fail even though the gateway itself is healthy.
 
-```bash
-openkrab browser status
-openkrab browser start --browser-profile openkrab
-openkrab browser profiles
-openkrab logs --follow
-openkrab doctor
+```bash\nOpenKrab browser status\nOpenKrab browser start --browser-profile openkrab\nOpenKrab browser profiles\nOpenKrab logs --follow\nOpenKrab doctor
 ```
 
 Look for:
@@ -232,10 +192,10 @@ Look for:
 
 Common signatures:
 
-- `Failed to start Chrome CDP on port` → browser process failed to launch.
-- `browser.executablePath not found` → configured path is invalid.
-- `Chrome extension relay is running, but no tab is connected` → extension relay not attached.
-- `Browser attachOnly is enabled ... not reachable` → attach-only profile has no reachable target.
+- `Failed to start Chrome CDP on port` â†’ browser process failed to launch.
+- `browser.executablePath not found` â†’ configured path is invalid.
+- `Chrome extension relay is running, but no tab is connected` â†’ extension relay not attached.
+- `Browser attachOnly is enabled ... not reachable` â†’ attach-only profile has no reachable target.
 
 Related:
 
@@ -249,11 +209,7 @@ Most post-upgrade breakage is config drift or stricter defaults now being enforc
 
 ### 1) Auth and URL override behavior changed
 
-```bash
-openkrab gateway status
-openkrab config get gateway.mode
-openkrab config get gateway.remote.url
-openkrab config get gateway.auth.mode
+```bash\nOpenKrab gateway status\nOpenKrab config get gateway.mode\nOpenKrab config get gateway.remote.url\nOpenKrab config get gateway.auth.mode
 ```
 
 What to check:
@@ -263,16 +219,12 @@ What to check:
 
 Common signatures:
 
-- `gateway connect failed:` → wrong URL target.
-- `unauthorized` → endpoint reachable but wrong auth.
+- `gateway connect failed:` â†’ wrong URL target.
+- `unauthorized` â†’ endpoint reachable but wrong auth.
 
 ### 2) Bind and auth guardrails are stricter
 
-```bash
-openkrab config get gateway.bind
-openkrab config get gateway.auth.token
-openkrab gateway status
-openkrab logs --follow
+```bash\nOpenKrab config get gateway.bind\nOpenKrab config get gateway.auth.token\nOpenKrab gateway status\nOpenKrab logs --follow
 ```
 
 What to check:
@@ -282,16 +234,12 @@ What to check:
 
 Common signatures:
 
-- `refusing to bind gateway ... without auth` → bind+auth mismatch.
-- `RPC probe: failed` while runtime is running → gateway alive but inaccessible with current auth/url.
+- `refusing to bind gateway ... without auth` â†’ bind+auth mismatch.
+- `RPC probe: failed` while runtime is running â†’ gateway alive but inaccessible with current auth/url.
 
 ### 3) Pairing and device identity state changed
 
-```bash
-openkrab devices list
-openkrab pairing list <channel>
-openkrab logs --follow
-openkrab doctor
+```bash\nOpenKrab devices list\nOpenKrab pairing list <channel>\nOpenKrab logs --follow\nOpenKrab doctor
 ```
 
 What to check:
@@ -301,14 +249,12 @@ What to check:
 
 Common signatures:
 
-- `device identity required` → device auth not satisfied.
-- `pairing required` → sender/device must be approved.
+- `device identity required` â†’ device auth not satisfied.
+- `pairing required` â†’ sender/device must be approved.
 
 If the service config and runtime still disagree after checks, reinstall service metadata from the same profile/state directory:
 
-```bash
-openkrab gateway install --force
-openkrab gateway restart
+```bash\nOpenKrab gateway install --force\nOpenKrab gateway restart
 ```
 
 Related:
@@ -316,3 +262,4 @@ Related:
 - [/gateway/pairing](/gateway/pairing)
 - [/gateway/authentication](/gateway/authentication)
 - [/gateway/background-process](/gateway/background-process)
+

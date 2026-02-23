@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 你看到错误并想要修复路径
-  - 安装程序显示“成功”但 CLI 不工作
-summary: 故障排除中心：症状 → 检查 → 修复
-title: 故障排除
+  - ä½ çœ‹åˆ°é”™è¯¯å¹¶æƒ³è¦ä¿®å¤è·¯å¾„
+  - å®‰è£…ç¨‹åºæ˜¾ç¤ºâ€œæˆåŠŸâ€ä½† CLI ä¸å·¥ä½œ
+summary: æ•…éšœæŽ’é™¤ä¸­å¿ƒï¼šç—‡çŠ¶ â†’ æ£€æŸ¥ â†’ ä¿®å¤
+title: æ•…éšœæŽ’é™¤
 x-i18n:
   generated_at: "2026-02-03T07:49:14Z"
   model: claude-opus-4-5
@@ -13,11 +13,11 @@ x-i18n:
   workflow: 15
 ---
 
-# 故障排除
+# æ•…éšœæŽ’é™¤
 
-## 最初的六十秒
+## æœ€åˆçš„å…­åç§’
 
-按顺序运行这些命令：
+æŒ‰é¡ºåºè¿è¡Œè¿™äº›å‘½ä»¤ï¼š
 
 ```bash
 OpenKrab status
@@ -27,79 +27,80 @@ OpenKrab logs --follow
 OpenKrab doctor
 ```
 
-如果 Gateway 网关可达，进行深度探测：
+å¦‚æžœ Gateway ç½‘å…³å¯è¾¾ï¼Œè¿›è¡Œæ·±åº¦æŽ¢æµ‹ï¼š
 
 ```bash
 OpenKrab status --deep
 ```
 
-## 常见的“它坏了”情况
+## å¸¸è§çš„â€œå®ƒåäº†â€æƒ…å†µ
 
 ### `OpenKrab: command not found`
 
-几乎总是 Node/npm PATH 问题。从这里开始：
+å‡ ä¹Žæ€»æ˜¯ Node/npm PATH é—®é¢˜ã€‚ä»Žè¿™é‡Œå¼€å§‹ï¼š
 
-- [安装（Node/npm PATH 安装完整性检查）](/install#nodejs--npm-path-sanity)
+- [å®‰è£…ï¼ˆNode/npm PATH å®‰è£…å®Œæ•´æ€§æ£€æŸ¥ï¼‰](/install#nodejs--npm-path-sanity)
 
-### 安装程序失败（或你需要完整日志）
+### å®‰è£…ç¨‹åºå¤±è´¥ï¼ˆæˆ–ä½ éœ€è¦å®Œæ•´æ—¥å¿—ï¼‰
 
-以详细模式重新运行安装程序以查看完整跟踪和 npm 输出：
+ä»¥è¯¦ç»†æ¨¡å¼é‡æ–°è¿è¡Œå®‰è£…ç¨‹åºä»¥æŸ¥çœ‹å®Œæ•´è·Ÿè¸ªå’Œ npm è¾“å‡ºï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --verbose
 ```
 
-对于 beta 安装：
+å¯¹äºŽ beta å®‰è£…ï¼š
 
 ```bash
 curl -fsSL https://OpenKrab.ai/install.sh | bash -s -- --beta --verbose
 ```
 
-你也可以设置 `OpenKrab_VERBOSE=1` 代替标志。
+ä½ ä¹Ÿå¯ä»¥è®¾ç½® `OPENKRAB_VERBOSE=1` ä»£æ›¿æ ‡å¿—ã€‚
 
-### Gateway 网关“unauthorized”、无法连接或持续重连
+### Gateway ç½‘å…³â€œunauthorizedâ€ã€æ— æ³•è¿žæŽ¥æˆ–æŒç»­é‡è¿ž
 
-- [Gateway 网关故障排除](/gateway/troubleshooting)
-- [Gateway 网关认证](/gateway/authentication)
+- [Gateway ç½‘å…³æ•…éšœæŽ’é™¤](/gateway/troubleshooting)
+- [Gateway ç½‘å…³è®¤è¯](/gateway/authentication)
 
-### 控制 UI 在 HTTP 上失败（需要设备身份）
+### æŽ§åˆ¶ UI åœ¨ HTTP ä¸Šå¤±è´¥ï¼ˆéœ€è¦è®¾å¤‡èº«ä»½ï¼‰
 
-- [Gateway 网关故障排除](/gateway/troubleshooting)
-- [控制 UI](/web/control-ui#insecure-http)
+- [Gateway ç½‘å…³æ•…éšœæŽ’é™¤](/gateway/troubleshooting)
+- [æŽ§åˆ¶ UI](/web/control-ui#insecure-http)
 
-### `docs.OpenKrab.ai` 显示 SSL 错误（Comcast/Xfinity）
+### `docs.OpenKrab.ai` æ˜¾ç¤º SSL é”™è¯¯ï¼ˆComcast/Xfinityï¼‰
 
-一些 Comcast/Xfinity 连接通过 Xfinity Advanced Security 阻止 `docs.OpenKrab.ai`。
-禁用 Advanced Security 或将 `docs.OpenKrab.ai` 添加到允许列表，然后重试。
+ä¸€äº› Comcast/Xfinity è¿žæŽ¥é€šè¿‡ Xfinity Advanced Security é˜»æ­¢ `docs.OpenKrab.ai`ã€‚
+ç¦ç”¨ Advanced Security æˆ–å°† `docs.OpenKrab.ai` æ·»åŠ åˆ°å…è®¸åˆ—è¡¨ï¼Œç„¶åŽé‡è¯•ã€‚
 
-- Xfinity Advanced Security 帮助：https://www.xfinity.com/support/articles/using-xfinity-xfi-advanced-security
-- 快速检查：尝试移动热点或 VPN 以确认这是 ISP 级别的过滤
+- Xfinity Advanced Security å¸®åŠ©ï¼šhttps://www.xfinity.com/support/articles/using-xfinity-xfi-advanced-security
+- å¿«é€Ÿæ£€æŸ¥ï¼šå°è¯•ç§»åŠ¨çƒ­ç‚¹æˆ– VPN ä»¥ç¡®è®¤è¿™æ˜¯ ISP çº§åˆ«çš„è¿‡æ»¤
 
-### 服务显示运行中，但 RPC 探测失败
+### æœåŠ¡æ˜¾ç¤ºè¿è¡Œä¸­ï¼Œä½† RPC æŽ¢æµ‹å¤±è´¥
 
-- [Gateway 网关故障排除](/gateway/troubleshooting)
-- [后台进程/服务](/gateway/background-process)
+- [Gateway ç½‘å…³æ•…éšœæŽ’é™¤](/gateway/troubleshooting)
+- [åŽå°è¿›ç¨‹/æœåŠ¡](/gateway/background-process)
 
-### 模型/认证失败（速率限制、账单、“all models failed”）
+### æ¨¡åž‹/è®¤è¯å¤±è´¥ï¼ˆé€ŸçŽ‡é™åˆ¶ã€è´¦å•ã€â€œall models failedâ€ï¼‰
 
-- [模型](/cli/models)
-- [OAuth / 认证概念](/concepts/oauth)
+- [æ¨¡åž‹](/cli/models)
+- [OAuth / è®¤è¯æ¦‚å¿µ](/concepts/oauth)
 
-### `/model` 显示 `model not allowed`
+### `/model` æ˜¾ç¤º `model not allowed`
 
-这通常意味着 `agents.defaults.models` 配置为允许列表。当它非空时，只能选择那些提供商/模型键。
+è¿™é€šå¸¸æ„å‘³ç€ `agents.defaults.models` é…ç½®ä¸ºå…è®¸åˆ—è¡¨ã€‚å½“å®ƒéžç©ºæ—¶ï¼Œåªèƒ½é€‰æ‹©é‚£äº›æä¾›å•†/æ¨¡åž‹é”®ã€‚
 
-- 检查允许列表：`OpenKrab config get agents.defaults.models`
-- 添加你想要的模型（或清除允许列表）然后重试 `/model`
-- 使用 `/models` 浏览允许的提供商/模型
+- æ£€æŸ¥å…è®¸åˆ—è¡¨ï¼š`OpenKrab config get agents.defaults.models`
+- æ·»åŠ ä½ æƒ³è¦çš„æ¨¡åž‹ï¼ˆæˆ–æ¸…é™¤å…è®¸åˆ—è¡¨ï¼‰ç„¶åŽé‡è¯• `/model`
+- ä½¿ç”¨ `/models` æµè§ˆå…è®¸çš„æä¾›å•†/æ¨¡åž‹
 
-### 提交问题时
+### æäº¤é—®é¢˜æ—¶
 
-粘贴一份安全报告：
+ç²˜è´´ä¸€ä»½å®‰å…¨æŠ¥å‘Šï¼š
 
 ```bash
 OpenKrab status --all
 ```
 
-如果可以的话，包含来自 `OpenKrab logs --follow` 的相关日志尾部。
+å¦‚æžœå¯ä»¥çš„è¯ï¼ŒåŒ…å«æ¥è‡ª `OpenKrab logs --follow` çš„ç›¸å…³æ—¥å¿—å°¾éƒ¨ã€‚
+
 

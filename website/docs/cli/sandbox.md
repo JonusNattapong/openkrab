@@ -1,4 +1,4 @@
----
+﻿---
 title: Sandbox CLI
 summary: "Manage sandbox containers and inspect effective sandbox policy"
 read_when: "You are managing sandbox containers or debugging sandbox/tool-policy behavior."
@@ -10,8 +10,7 @@ status: active
 Manage Docker-based sandbox containers for isolated agent execution.
 
 ## Overview
-
-openkrab can run agents in isolated Docker containers for security. The `sandbox` commands help you manage these containers, especially after updates or configuration changes.
+\nOpenKrab can run agents in isolated Docker containers for security. The `sandbox` commands help you manage these containers, especially after updates or configuration changes.
 
 ## Commands
 
@@ -19,21 +18,14 @@ openkrab can run agents in isolated Docker containers for security. The `sandbox
 
 Inspect the **effective** sandbox mode/scope/workspace access, sandbox tool policy, and elevated gates (with fix-it config key paths).
 
-```bash
-openkrab sandbox explain
-openkrab sandbox explain --session agent:main:main
-openkrab sandbox explain --agent work
-openkrab sandbox explain --json
+```bash\nOpenKrab sandbox explain\nOpenKrab sandbox explain --session agent:main:main\nOpenKrab sandbox explain --agent work\nOpenKrab sandbox explain --json
 ```
 
 ### `openkrab sandbox list`
 
 List all sandbox containers with their status and configuration.
 
-```bash
-openkrab sandbox list
-openkrab sandbox list --browser  # List only browser containers
-openkrab sandbox list --json     # JSON output
+```bash\nOpenKrab sandbox list\nOpenKrab sandbox list --browser  # List only browser containers\nOpenKrab sandbox list --json     # JSON output
 ```
 
 **Output includes:**
@@ -48,12 +40,7 @@ openkrab sandbox list --json     # JSON output
 
 Remove sandbox containers to force recreation with updated images/config.
 
-```bash
-openkrab sandbox recreate --all                # Recreate all containers
-openkrab sandbox recreate --session main       # Specific session
-openkrab sandbox recreate --agent mybot        # Specific agent
-openkrab sandbox recreate --browser            # Only browser containers
-openkrab sandbox recreate --all --force        # Skip confirmation
+```bash\nOpenKrab sandbox recreate --all                # Recreate all containers\nOpenKrab sandbox recreate --session main       # Specific session\nOpenKrab sandbox recreate --agent mybot        # Specific agent\nOpenKrab sandbox recreate --browser            # Only browser containers\nOpenKrab sandbox recreate --all --force        # Skip confirmation
 ```
 
 **Options:**
@@ -78,8 +65,7 @@ docker tag openkrab-sandbox:latest openkrab-sandbox:bookworm-slim
 # Update config to use new image
 # Edit config: agents.defaults.sandbox.docker.image (or agents.list[].sandbox.docker.image)
 
-# Recreate containers
-openkrab sandbox recreate --all
+# Recreate containers\nOpenKrab sandbox recreate --all
 ```
 
 ### After changing sandbox configuration
@@ -87,23 +73,19 @@ openkrab sandbox recreate --all
 ```bash
 # Edit config: agents.defaults.sandbox.* (or agents.list[].sandbox.*)
 
-# Recreate to apply new config
-openkrab sandbox recreate --all
+# Recreate to apply new config\nOpenKrab sandbox recreate --all
 ```
 
 ### After changing setupCommand
 
-```bash
-openkrab sandbox recreate --all
-# or just one agent:
-openkrab sandbox recreate --agent family
+```bash\nOpenKrab sandbox recreate --all
+# or just one agent:\nOpenKrab sandbox recreate --agent family
 ```
 
 ### For a specific agent only
 
 ```bash
-# Update only one agent's containers
-openkrab sandbox recreate --agent alfred
+# Update only one agent's containers\nOpenKrab sandbox recreate --agent alfred
 ```
 
 ## Why is this needed?
@@ -117,7 +99,7 @@ openkrab sandbox recreate --agent alfred
 **Solution:** Use `openkrab sandbox recreate` to force removal of old containers. They'll be recreated automatically with current settings when next needed.
 
 Tip: prefer `openkrab sandbox recreate` over manual `docker rm`. It uses the
-Gateway’s container naming and avoids mismatches when scope/session keys change.
+Gatewayâ€™s container naming and avoids mismatches when scope/session keys change.
 
 ## Configuration
 
@@ -150,3 +132,4 @@ Sandbox settings live in `~/.openkrab/openkrab.json` under `agents.defaults.sand
 - [Sandbox Documentation](/gateway/sandboxing)
 - [Agent Configuration](/concepts/agent-workspace)
 - [Doctor Command](/gateway/doctor) - Check sandbox setup
+

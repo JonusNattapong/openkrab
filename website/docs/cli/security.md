@@ -1,8 +1,8 @@
----
+﻿---
 summary: "CLI reference for `openkrab security` (audit and fix common security footguns)"
 read_when:
   - You want to run a quick security audit on config/state
-  - You want to apply safe “fix” suggestions (chmod, tighten defaults)
+  - You want to apply safe â€œfixâ€ suggestions (chmod, tighten defaults)
 title: "security"
 ---
 
@@ -16,11 +16,7 @@ Related:
 
 ## Audit
 
-```bash
-openkrab security audit
-openkrab security audit --deep
-openkrab security audit --fix
-openkrab security audit --json
+```bash\nOpenKrab security audit\nOpenKrab security audit --deep\nOpenKrab security audit --fix\nOpenKrab security audit --json
 ```
 
 The audit warns when multiple DM senders share the main session and recommends **secure DM mode**: `session.dmScope="per-channel-peer"` (or `per-account-channel-peer` for multi-account channels) for shared inboxes.
@@ -34,15 +30,12 @@ It warns when `gateway.auth.mode="none"` leaves Gateway HTTP APIs reachable with
 
 Use `--json` for CI/policy checks:
 
-```bash
-openkrab security audit --json | jq '.summary'
-openkrab security audit --deep --json | jq '.findings[] | select(.severity=="critical") | .checkId'
+```bash\nOpenKrab security audit --json | jq '.summary'\nOpenKrab security audit --deep --json | jq '.findings[] | select(.severity=="critical") | .checkId'
 ```
 
 If `--fix` and `--json` are combined, output includes both fix actions and final report:
 
-```bash
-openkrab security audit --fix --json | jq '{fix: .fix.ok, summary: .report.summary}'
+```bash\nOpenKrab security audit --fix --json | jq '{fix: .fix.ok, summary: .report.summary}'
 ```
 
 ## What `--fix` changes
@@ -59,3 +52,4 @@ openkrab security audit --fix --json | jq '{fix: .fix.ok, summary: .report.summa
 - disable tools (`gateway`, `cron`, `exec`, etc.)
 - change gateway bind/auth/network exposure choices
 - remove or rewrite plugins/skills
+

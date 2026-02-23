@@ -21,7 +21,7 @@ OpenKrab integrates with familiar messaging channels (**Telegram, Slack, Discord
 - **Single-binary deployment** across supported platforms
 - **Compile-time memory safety guarantees**
 
-OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/openclaw/openclaw) (TypeScript/Node.js), extended with additional runtime capabilities.
+OpenKrab is a Rust implementation inspired by [OpenKrab](https://github.com/OpenKrab/OpenKrab) (TypeScript/Node.js), extended with additional runtime capabilities.
 
 [Features](#-features) · [Quick Start](#-quick-start) · [Architecture](#-architecture) · [Channels](#-channels) · [Providers](#-providers)
 
@@ -29,7 +29,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 
 ## 📊 Benchmark Snapshot (OpenKrab vs Others)
 
-| Metric | OpenClaw | NanoBot | PicoClaw | OpenKrab | ZeroClaw |
+| Metric | OpenKrab | NanoBot | PicoClaw | OpenKrab | ZeroClaw |
 |--------|----------|---------|----------|-------------|----------|
 | **Language** | TypeScript | Python | Go | **Rust** | Rust |
 | **RAM** | >1GB | >100MB | <10MB | **~50MB** | <5MB |
@@ -77,7 +77,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 
 ### 🎙️ Voice System
 
-- **Voice wake mode** — "Hey KrabKrab" activation
+- **Voice wake mode** — "Hey openkrab" activation
 - **Talk mode** — Continuous conversation with auto-sleep
 - **VAD** — Voice Activity Detection
 - **Spectral analysis** — FFT, spectral features
@@ -135,8 +135,8 @@ cd openkrab
 # Build optimized release binary
 cargo build --release
 
-# Binary location: target/release/krabkrab
-./target/release/krabkrab --help
+# Binary location: target/release/openkrab
+./target/release/openkrab --help
 ```
 
 ### Pre-built Binaries
@@ -153,44 +153,44 @@ Download from [GitHub Releases](https://github.com/openkrab/openkrab/releases) f
 
 ```bash
 # Start the gateway server
-krabkrab gateway --port 18789
+openkrab gateway --port 18789
 
 # Configure your AI provider
-krabkrab config set providers.openai.api_key "sk-..."
+openkrab config set providers.openai.api_key "sk-..."
 
 # Send messages
-krabkrab telegram --to @username --text "Hello from OpenKrab!"
-krabkrab discord --to 123456789 --text "Hello from OpenKrab!"
-krabkrab whatsapp --to +1234567890 --text "Hello from OpenKrab!"
+openkrab telegram --to @username --text "Hello from OpenKrab!"
+openkrab discord --to 123456789 --text "Hello from OpenKrab!"
+openkrab whatsapp --to +1234567890 --text "Hello from OpenKrab!"
 
 # Talk to your AI assistant
-krabkrab ask "What's on my calendar today?"
-krabkrab ask "Summarize my recent emails"
+openkrab ask "What's on my calendar today?"
+openkrab ask "Summarize my recent emails"
 
 # Voice commands
-krabkrab voice wake
-krabkrab voice speak "Hello World"
-krabkrab voice status
+openkrab voice wake
+openkrab voice speak "Hello World"
+openkrab voice status
 
 # Plugin management
-krabkrab plugin list
-krabkrab plugin load ./plugins/my-plugin
+openkrab plugin list
+openkrab plugin load ./plugins/my-plugin
 
 # Check system status
-krabkrab status
-krabkrab doctor
+openkrab status
+openkrab doctor
 
 # Interactive configuration
-krabkrab configure
+openkrab configure
 
 # Memory operations (AI knowledge base)
-krabkrab memory sync --path ./docs
-krabkrab memory search "machine learning concepts"
-krabkrab memory index --recursive ./knowledge-base
+openkrab memory sync --path ./docs
+openkrab memory search "machine learning concepts"
+openkrab memory index --recursive ./knowledge-base
 
 # Browser automation
-krabkrab browser open https://example.com
-krabkrab browser screenshot
+openkrab browser open https://example.com
+openkrab browser screenshot
 ```
 
 ---
@@ -294,24 +294,24 @@ flowchart TB
 
 ```bash
 # Voice control
-krabkrab voice wake                    # Force wake
-krabkrab voice sleep                   # Force sleep
-krabkrab voice status                  # Show voice status
-krabkrab voice speak "Hello"           # TTS output
-krabkrab voice beep wake               # Play wake beep
+openkrab voice wake                    # Force wake
+openkrab voice sleep                   # Force sleep
+openkrab voice status                  # Show voice status
+openkrab voice speak "Hello"           # TTS output
+openkrab voice beep wake               # Play wake beep
 
 # Audio analysis
-krabkrab voice analyze_audio file.wav  # Analyze audio file
-krabkrab voice detect "hey krabkrab"   # Detect wake phrase
-krabkrab voice vad file.wav            # Voice activity detection
-krabkrab voice spectral file.wav       # Spectral analysis
+openkrab voice analyze_audio file.wav  # Analyze audio file
+openkrab voice detect "hey openkrab"   # Detect wake phrase
+openkrab voice vad file.wav            # Voice activity detection
+openkrab voice spectral file.wav       # Spectral analysis
 
 # Microphone
-krabkrab voice mic_list                # List microphones
-krabkrab voice mic_start [device]      # Start capture
-krabkrab voice mic_stop                # Stop capture
-krabkrab voice mic_read                # Read audio buffer
-krabkrab voice mic_status              # Check mic status
+openkrab voice mic_list                # List microphones
+openkrab voice mic_start [device]      # Start capture
+openkrab voice mic_stop                # Stop capture
+openkrab voice mic_read                # Read audio buffer
+openkrab voice mic_status              # Check mic status
 ```
 
 ---
@@ -322,16 +322,16 @@ krabkrab voice mic_status              # Check mic status
 
 ```bash
 # List loaded plugins
-krabkrab plugin list
+openkrab plugin list
 
 # Load a plugin
-krabkrab plugin load ./plugins/my-plugin
+openkrab plugin load ./plugins/my-plugin
 
 # Unload a plugin
-krabkrab plugin unload my-plugin
+openkrab plugin unload my-plugin
 
 # Enable hot reload (development)
-krabkrab plugin watch ./plugins
+openkrab plugin watch ./plugins
 ```
 
 ### Creating Plugins
@@ -372,17 +372,17 @@ Create `plugin.json`:
 
 ```bash
 # Browser control
-krabkrab browser open https://example.com
-krabkrab browser tabs
-krabkrab browser navigate https://example.com
-krabkrab browser click "#button"
-krabkrab browser type "#input" "Hello World"
-krabkrab browser screenshot
-krabkrab browser snapshot
+openkrab browser open https://example.com
+openkrab browser tabs
+openkrab browser navigate https://example.com
+openkrab browser click "#button"
+openkrab browser type "#input" "Hello World"
+openkrab browser screenshot
+openkrab browser snapshot
 
 # Profile management
-krabkrab browser profiles
-krabkrab browser create-profile --name my-profile
+openkrab browser profiles
+openkrab browser create-profile --name my-profile
 ```
 
 ---
@@ -393,7 +393,7 @@ krabkrab browser create-profile --name my-profile
 |--------|-------|
 | **Total Lines** | ~60,000+ lines of Rust |
 | **Test Coverage** | 450+ tests, 0 failures |
-| **Porting Parity** | 100% Feature Parity with OpenClaw |
+| **Porting Parity** | 100% Feature Parity with OpenKrab |
 | **Channels** | 18 messaging platforms |
 | **AI Providers** | 7+ LLM providers |
 | **Core Modules** | 62 Rust modules |
@@ -442,17 +442,17 @@ cargo run -- ask "Hello world"
 
 ---
 
-## 🔄 Migration from OpenClaw
+## 🔄 Migration from OpenKrab
 
 1. **Config format**: JSON → TOML (better for humans)
-2. **Config location**: `~/.clawdbot/` → `~/.config/krabkrab/`
-3. **Binary name**: `openclaw` → `krabkrab`
+2. **Config location**: `~/.openkrab/` → `~/.config/openkrab/`
+3. **Binary name**: `OpenKrab` → `openkrab`
 4. **Most connectors**: Compatible with same tokens/webhooks
 
 Migration tool:
 
 ```bash
-krabkrab migrate --from-openclaw ~/.clawdbot/config.json
+openkrab migrate --from-OpenKrab ~/.openkrab/config.json
 ```
 
 See [Migration Guide](docs/install/migrating.md) for detailed instructions.
@@ -461,7 +461,7 @@ See [Migration Guide](docs/install/migrating.md) for detailed instructions.
 
 ## 📚 Documentation
 
-- [Migration Guide](docs/install/migrating.md) — Migrating from OpenClaw
+- [Migration Guide](docs/install/migrating.md) — Migrating from OpenKrab
 - [PORTING.md](PORTING.md) — Detailed porting status
 - [AGENT.md](AGENT.md) — Agent development guide
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
@@ -488,11 +488,11 @@ See [Migration Guide](docs/install/migrating.md) for detailed instructions.
 
 **OpenKrab** was built for **Molty**, a space lobster AI assistant.
 
-This is a complete Rust port of [OpenClaw](https://github.com/openclaw/openclaw), originally created by Peter Steinberger and the community.
+This is a complete Rust port of [OpenKrab](https://github.com/OpenKrab/OpenKrab), originally created by Peter Steinberger and the community.
 
-- Website: [openclaw.ai](https://openclaw.ai)
-- Twitter: [@openclaw](https://x.com/openclaw)
-- Original: [github.com/openclaw/openclaw](https://github.com/openclaw/openclaw)
+- Website: [OpenKrab.ai](https://OpenKrab.ai)
+- Twitter: [@OpenKrab](https://x.com/OpenKrab)
+- Original: [github.com/OpenKrab/OpenKrab](https://github.com/OpenKrab/OpenKrab)
 
 ---
 
@@ -505,3 +505,5 @@ MIT License — see [LICENSE](LICENSE)
 <p align="center">
   <strong>Built with Rust</strong>
 </p>
+
+

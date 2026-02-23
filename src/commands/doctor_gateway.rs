@@ -177,7 +177,7 @@ mod tests {
                     "account_id": "default",
                     "healthy": false,
                     "error": "Token expired",
-                    "fix": "Run 'krabkrab auth refresh slack'"
+                    "fix": "Run 'openkrab auth refresh slack'"
                 },
                 {
                     "name": "telegram",
@@ -194,3 +194,4 @@ mod tests {
         assert!(issues[0].fix.is_some());
     }
 }
+

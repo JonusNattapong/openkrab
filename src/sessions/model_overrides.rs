@@ -1,4 +1,4 @@
-//! Ported from `openclaw/src/sessions/model-overrides.ts`
+//! Ported from `OpenKrab/src/sessions/model-overrides.ts`
 
 use super::Session;
 use chrono::Utc;
@@ -128,3 +128,4 @@ mod tests {
         assert!(session.model_override.is_none());
     }
 }
+

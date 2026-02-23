@@ -1,4 +1,4 @@
-//! Ported from `openclaw/src/sessions/session-key-utils.ts`
+//! Ported from `OpenKrab/src/sessions/session-key-utils.ts`
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParsedAgentSessionKey {
@@ -241,3 +241,4 @@ mod tests {
         );
     }
 }
+

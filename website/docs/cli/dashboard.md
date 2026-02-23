@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab dashboard` (open the Control UI)"
 read_when:
   - You want to open the Control UI with your current token
@@ -10,7 +10,6 @@ title: "dashboard"
 
 Open the Control UI using your current auth.
 
-```bash
-openkrab dashboard
-openkrab dashboard --no-open
+```bash\nOpenKrab dashboard\nOpenKrab dashboard --no-open
 ```
+

@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 你希望以最快的方式从安装到运行一个可用的 Gateway 网关
-summary: 安装 OpenKrab，完成 Gateway 网关新手引导，并配对你的第一个渠道。
-title: 快速开始
+  - ä½ å¸Œæœ›ä»¥æœ€å¿«çš„æ–¹å¼ä»Žå®‰è£…åˆ°è¿è¡Œä¸€ä¸ªå¯ç”¨çš„ Gateway ç½‘å…³
+summary: å®‰è£… OpenKrabï¼Œå®Œæˆ Gateway ç½‘å…³æ–°æ‰‹å¼•å¯¼ï¼Œå¹¶é…å¯¹ä½ çš„ç¬¬ä¸€ä¸ªæ¸ é“ã€‚
+title: å¿«é€Ÿå¼€å§‹
 x-i18n:
   generated_at: "2026-02-04T17:53:21Z"
   model: claude-opus-4-5
@@ -13,10 +13,10 @@ x-i18n:
 ---
 
 <Note>
-OpenKrab 需要 Node 22 或更新版本。
+OpenKrab éœ€è¦ Node 22 æˆ–æ›´æ–°ç‰ˆæœ¬ã€‚
 </Note>
 
-## 安装
+## å®‰è£…
 
 <Tabs>
   <Tab title="npm">
@@ -31,59 +31,60 @@ OpenKrab 需要 Node 22 或更新版本。
   </Tab>
 </Tabs>
 
-## 新手引导并运行 Gateway 网关
+## æ–°æ‰‹å¼•å¯¼å¹¶è¿è¡Œ Gateway ç½‘å…³
 
 <Steps>
-  <Step title="新手引导并安装服务">
+  <Step title="æ–°æ‰‹å¼•å¯¼å¹¶å®‰è£…æœåŠ¡">
     ```bash
     OpenKrab onboard --install-daemon
     ```
   </Step>
-  <Step title="配对 WhatsApp">
+  <Step title="é…å¯¹ WhatsApp">
     ```bash
     OpenKrab channels login
     ```
   </Step>
-  <Step title="启动 Gateway 网关">
+  <Step title="å¯åŠ¨ Gateway ç½‘å…³">
     ```bash
     OpenKrab gateway --port 18789
     ```
   </Step>
 </Steps>
 
-完成新手引导后，Gateway 网关将通过用户服务运行。你也可以使用 `OpenKrab gateway` 手动启动。
+å®Œæˆæ–°æ‰‹å¼•å¯¼åŽï¼ŒGateway ç½‘å…³å°†é€šè¿‡ç”¨æˆ·æœåŠ¡è¿è¡Œã€‚ä½ ä¹Ÿå¯ä»¥ä½¿ç”¨ `OpenKrab gateway` æ‰‹åŠ¨å¯åŠ¨ã€‚
 
 <Info>
-之后在 npm 安装和 git 安装之间切换非常简单。安装另一种方式后，运行
-`OpenKrab doctor` 即可更新 Gateway 网关服务入口点。
+ä¹‹åŽåœ¨ npm å®‰è£…å’Œ git å®‰è£…ä¹‹é—´åˆ‡æ¢éžå¸¸ç®€å•ã€‚å®‰è£…å¦ä¸€ç§æ–¹å¼åŽï¼Œè¿è¡Œ
+`OpenKrab doctor` å³å¯æ›´æ–° Gateway ç½‘å…³æœåŠ¡å…¥å£ç‚¹ã€‚
 </Info>
 
-## 从源码安装（开发）
+## ä»Žæºç å®‰è£…ï¼ˆå¼€å‘ï¼‰
 
 ```bash
 git clone https://github.com/OpenKrab/OpenKrab.git
 cd OpenKrab
 pnpm install
-pnpm ui:build # 首次运行时会自动安装 UI 依赖
+pnpm ui:build # é¦–æ¬¡è¿è¡Œæ—¶ä¼šè‡ªåŠ¨å®‰è£… UI ä¾èµ–
 pnpm build
 OpenKrab onboard --install-daemon
 ```
 
-如果你还没有全局安装，可以在仓库目录中通过 `pnpm OpenKrab ...` 运行新手引导。
+å¦‚æžœä½ è¿˜æ²¡æœ‰å…¨å±€å®‰è£…ï¼Œå¯ä»¥åœ¨ä»“åº“ç›®å½•ä¸­é€šè¿‡ `pnpm OpenKrab ...` è¿è¡Œæ–°æ‰‹å¼•å¯¼ã€‚
 
-## 多实例快速开始（可选）
+## å¤šå®žä¾‹å¿«é€Ÿå¼€å§‹ï¼ˆå¯é€‰ï¼‰
 
 ```bash
-OpenKrab_CONFIG_PATH=~/.OpenKrab/a.json \
-OpenKrab_STATE_DIR=~/.OpenKrab-a \
+OPENKRAB_CONFIG_PATH=~/.OpenKrab/a.json \
+OPENKRAB_STATE_DIR=~/.OpenKrab-a \
 OpenKrab gateway --port 19001
 ```
 
-## 发送测试消息
+## å‘é€æµ‹è¯•æ¶ˆæ¯
 
-需要一个正在运行的 Gateway 网关。
+éœ€è¦ä¸€ä¸ªæ­£åœ¨è¿è¡Œçš„ Gateway ç½‘å…³ã€‚
 
 ```bash
 OpenKrab message send --target +15555550123 --message "Hello from OpenKrab"
 ```
+
 

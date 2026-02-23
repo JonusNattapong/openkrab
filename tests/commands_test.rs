@@ -1,6 +1,6 @@
-use krabkrab::commands::configure::ConfigureInput;
-use krabkrab::commands::status::get_status_summary;
-use krabkrab::commands::{
+use openkrab::commands::configure::ConfigureInput;
+use openkrab::commands::status::get_status_summary;
+use openkrab::commands::{
     browser_command, configure_command, daemon_command, devices_command, directory_command,
     discord_send_dry_run_command, dns_command, docs_command, exec_approvals_command, hooks_command,
     models_auth_add_command, models_auth_get_command, models_auth_list_command,
@@ -124,3 +124,4 @@ fn added_admin_commands_return_expected_markers() {
     assert!(devices_command("list").contains("devices:"));
     assert!(daemon_command("status").contains("daemon: running="));
 }
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Expose an OpenAI-compatible /v1/chat/completions HTTP endpoint from the Gateway"
 read_when:
   - Integrating tools that expect OpenAI Chat Completions
@@ -7,7 +7,7 @@ title: "OpenAI Chat Completions"
 
 # OpenAI Chat Completions (HTTP)
 
-openkrab’s Gateway can serve a small OpenAI-compatible Chat Completions endpoint.
+openkrabâ€™s Gateway can serve a small OpenAI-compatible Chat Completions endpoint.
 
 This endpoint is **disabled by default**. Enable it in config first.
 
@@ -24,8 +24,8 @@ Uses the Gateway auth configuration. Send a bearer token:
 
 Notes:
 
-- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `openkrab_GATEWAY_TOKEN`).
-- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `openkrab_GATEWAY_PASSWORD`).
+- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `OPENKRAB_GATEWAY_TOKEN`).
+- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `OPENKRAB_GATEWAY_PASSWORD`).
 - If `gateway.auth.rateLimit` is configured and too many auth failures occur, the endpoint returns `429` with `Retry-After`.
 
 ## Choosing an agent
@@ -35,7 +35,7 @@ No custom headers required: encode the agent id in the OpenAI `model` field:
 - `model: "openkrab:<agentId>"` (example: `"openkrab:main"`, `"openkrab:beta"`)
 - `model: "agent:<agentId>"` (alias)
 
-Or target a specific openkrab agent by header:
+Or target a specific OpenKrab agent by header:
 
 - `x-openkrab-agent-id: <agentId>` (default: `main`)
 
@@ -117,3 +117,5 @@ curl -N http://127.0.0.1:18789/v1/chat/completions \
     "messages": [{"role":"user","content":"hi"}]
   }'
 ```
+
+

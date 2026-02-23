@@ -1,4 +1,4 @@
-use krabkrab::logging;
+use openkrab::logging;
 
 #[test]
 fn init_and_log() {
@@ -6,3 +6,4 @@ fn init_and_log() {
     logging::log_example();
     assert!(true);
 }
+

@@ -1,8 +1,8 @@
----
+﻿---
 summary: "CLI reference for `openkrab cron` (schedule and run background jobs)"
 read_when:
   - You want scheduled jobs and wakeups
-  - You’re debugging cron execution and logs
+  - Youâ€™re debugging cron execution and logs
 title: "cron"
 ---
 
@@ -21,24 +21,22 @@ output internal. `--deliver` remains as a deprecated alias for `--announce`.
 
 Note: one-shot (`--at`) jobs delete after success by default. Use `--keep-after-run` to keep them.
 
-Note: recurring jobs now use exponential retry backoff after consecutive errors (30s → 1m → 5m → 15m → 60m), then return to normal schedule after the next successful run.
+Note: recurring jobs now use exponential retry backoff after consecutive errors (30s â†’ 1m â†’ 5m â†’ 15m â†’ 60m), then return to normal schedule after the next successful run.
 
 ## Common edits
 
 Update delivery settings without changing the message:
 
-```bash
-openkrab cron edit <job-id> --announce --channel telegram --to "123456789"
+```bash\nOpenKrab cron edit <job-id> --announce --channel telegram --to "123456789"
 ```
 
 Disable delivery for an isolated job:
 
-```bash
-openkrab cron edit <job-id> --no-deliver
+```bash\nOpenKrab cron edit <job-id> --no-deliver
 ```
 
 Announce to a specific channel:
 
-```bash
-openkrab cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
+```bash\nOpenKrab cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
 ```
+

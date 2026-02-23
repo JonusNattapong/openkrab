@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 运行或调试 Gateway 网关进程时
-summary: Gateway 网关服务、生命周期和运维的运行手册
-title: Gateway 网关运行手册
+  - è¿è¡Œæˆ–è°ƒè¯• Gateway ç½‘å…³è¿›ç¨‹æ—¶
+summary: Gateway ç½‘å…³æœåŠ¡ã€ç”Ÿå‘½å‘¨æœŸå’Œè¿ç»´çš„è¿è¡Œæ‰‹å†Œ
+title: Gateway ç½‘å…³è¿è¡Œæ‰‹å†Œ
 x-i18n:
   generated_at: "2026-02-03T07:50:03Z"
   model: claude-opus-4-5
@@ -12,212 +12,212 @@ x-i18n:
   workflow: 15
 ---
 
-# Gateway 网关服务运行手册
+# Gateway ç½‘å…³æœåŠ¡è¿è¡Œæ‰‹å†Œ
 
-最后更新：2025-12-09
+æœ€åŽæ›´æ–°ï¼š2025-12-09
 
-## 是什么
+## æ˜¯ä»€ä¹ˆ
 
-- 拥有单一 Baileys/Telegram 连接和控制/事件平面的常驻进程。
-- 替代旧版 `gateway` 命令。CLI 入口点：`OpenKrab gateway`。
-- 运行直到停止；出现致命错误时以非零退出码退出，以便 supervisor 重启它。
+- æ‹¥æœ‰å•ä¸€ Baileys/Telegram è¿žæŽ¥å’ŒæŽ§åˆ¶/äº‹ä»¶å¹³é¢çš„å¸¸é©»è¿›ç¨‹ã€‚
+- æ›¿ä»£æ—§ç‰ˆ `gateway` å‘½ä»¤ã€‚CLI å…¥å£ç‚¹ï¼š`OpenKrab gateway`ã€‚
+- è¿è¡Œç›´åˆ°åœæ­¢ï¼›å‡ºçŽ°è‡´å‘½é”™è¯¯æ—¶ä»¥éžé›¶é€€å‡ºç é€€å‡ºï¼Œä»¥ä¾¿ supervisor é‡å¯å®ƒã€‚
 
-## 如何运行（本地）
+## å¦‚ä½•è¿è¡Œï¼ˆæœ¬åœ°ï¼‰
 
 ```bash
 OpenKrab gateway --port 18789
-# 在 stdio 中获取完整的调试/追踪日志：
+# åœ¨ stdio ä¸­èŽ·å–å®Œæ•´çš„è°ƒè¯•/è¿½è¸ªæ—¥å¿—ï¼š
 OpenKrab gateway --port 18789 --verbose
-# 如果端口被占用，终止监听器然后启动：
+# å¦‚æžœç«¯å£è¢«å ç”¨ï¼Œç»ˆæ­¢ç›‘å¬å™¨ç„¶åŽå¯åŠ¨ï¼š
 OpenKrab gateway --force
-# 开发循环（TS 更改时自动重载）：
+# å¼€å‘å¾ªçŽ¯ï¼ˆTS æ›´æ”¹æ—¶è‡ªåŠ¨é‡è½½ï¼‰ï¼š
 pnpm gateway:watch
 ```
 
-- 配置热重载监视 `~/.OpenKrab/OpenKrab.json`（或 `OpenKrab_CONFIG_PATH`）。
-  - 默认模式：`gateway.reload.mode="hybrid"`（热应用安全更改，关键更改时重启）。
-  - 热重载在需要时通过 **SIGUSR1** 使用进程内重启。
-  - 使用 `gateway.reload.mode="off"` 禁用。
-- 将 WebSocket 控制平面绑定到 `127.0.0.1:<port>`（默认 18789）。
-- 同一端口也提供 HTTP 服务（控制界面、hooks、A2UI）。单端口多路复用。
-  - OpenAI Chat Completions（HTTP）：[`/v1/chat/completions`](/gateway/openai-http-api)。
-  - OpenResponses（HTTP）：[`/v1/responses`](/gateway/openresponses-http-api)。
-  - Tools Invoke（HTTP）：[`/tools/invoke`](/gateway/tools-invoke-http-api)。
-- 默认在 `canvasHost.port`（默认 `18793`）上启动 Canvas 文件服务器，从 `~/.OpenKrab/workspace/canvas` 提供 `http://<gateway-host>:18793/__OpenKrab__/canvas/`。使用 `canvasHost.enabled=false` 或 `OpenKrab_SKIP_CANVAS_HOST=1` 禁用。
-- 输出日志到 stdout；使用 launchd/systemd 保持运行并轮转日志。
-- 故障排除时传递 `--verbose` 以将调试日志（握手、请求/响应、事件）从日志文件镜像到 stdio。
-- `--force` 使用 `lsof` 查找所选端口上的监听器，发送 SIGTERM，记录它终止了什么，然后启动 Gateway 网关（如果缺少 `lsof` 则快速失败）。
-- 如果你在 supervisor（launchd/systemd/mac 应用子进程模式）下运行，stop/restart 通常发送 **SIGTERM**；旧版本可能将其显示为 `pnpm` `ELIFECYCLE` 退出码 **143**（SIGTERM），这是正常关闭，不是崩溃。
-- **SIGUSR1** 在授权时触发进程内重启（Gateway 网关工具/配置应用/更新，或启用 `commands.restart` 以进行手动重启）。
-- 默认需要 Gateway 网关认证：设置 `gateway.auth.token`（或 `OpenKrab_GATEWAY_TOKEN`）或 `gateway.auth.password`。客户端必须发送 `connect.params.auth.token/password`，除非使用 Tailscale Serve 身份。
-- 向导现在默认生成令牌，即使在 loopback 上也是如此。
-- 端口优先级：`--port` > `OpenKrab_GATEWAY_PORT` > `gateway.port` > 默认 `18789`。
+- é…ç½®çƒ­é‡è½½ç›‘è§† `~/.OpenKrab/OpenKrab.json`ï¼ˆæˆ– `OPENKRAB_CONFIG_PATH`ï¼‰ã€‚
+  - é»˜è®¤æ¨¡å¼ï¼š`gateway.reload.mode="hybrid"`ï¼ˆçƒ­åº”ç”¨å®‰å…¨æ›´æ”¹ï¼Œå…³é”®æ›´æ”¹æ—¶é‡å¯ï¼‰ã€‚
+  - çƒ­é‡è½½åœ¨éœ€è¦æ—¶é€šè¿‡ **SIGUSR1** ä½¿ç”¨è¿›ç¨‹å†…é‡å¯ã€‚
+  - ä½¿ç”¨ `gateway.reload.mode="off"` ç¦ç”¨ã€‚
+- å°† WebSocket æŽ§åˆ¶å¹³é¢ç»‘å®šåˆ° `127.0.0.1:<port>`ï¼ˆé»˜è®¤ 18789ï¼‰ã€‚
+- åŒä¸€ç«¯å£ä¹Ÿæä¾› HTTP æœåŠ¡ï¼ˆæŽ§åˆ¶ç•Œé¢ã€hooksã€A2UIï¼‰ã€‚å•ç«¯å£å¤šè·¯å¤ç”¨ã€‚
+  - OpenAI Chat Completionsï¼ˆHTTPï¼‰ï¼š[`/v1/chat/completions`](/gateway/openai-http-api)ã€‚
+  - OpenResponsesï¼ˆHTTPï¼‰ï¼š[`/v1/responses`](/gateway/openresponses-http-api)ã€‚
+  - Tools Invokeï¼ˆHTTPï¼‰ï¼š[`/tools/invoke`](/gateway/tools-invoke-http-api)ã€‚
+- é»˜è®¤åœ¨ `canvasHost.port`ï¼ˆé»˜è®¤ `18793`ï¼‰ä¸Šå¯åŠ¨ Canvas æ–‡ä»¶æœåŠ¡å™¨ï¼Œä»Ž `~/.OpenKrab/workspace/canvas` æä¾› `http://<gateway-host>:18793/__OPENKRAB__/canvas/`ã€‚ä½¿ç”¨ `canvasHost.enabled=false` æˆ– `OPENKRAB_SKIP_CANVAS_HOST=1` ç¦ç”¨ã€‚
+- è¾“å‡ºæ—¥å¿—åˆ° stdoutï¼›ä½¿ç”¨ launchd/systemd ä¿æŒè¿è¡Œå¹¶è½®è½¬æ—¥å¿—ã€‚
+- æ•…éšœæŽ’é™¤æ—¶ä¼ é€’ `--verbose` ä»¥å°†è°ƒè¯•æ—¥å¿—ï¼ˆæ¡æ‰‹ã€è¯·æ±‚/å“åº”ã€äº‹ä»¶ï¼‰ä»Žæ—¥å¿—æ–‡ä»¶é•œåƒåˆ° stdioã€‚
+- `--force` ä½¿ç”¨ `lsof` æŸ¥æ‰¾æ‰€é€‰ç«¯å£ä¸Šçš„ç›‘å¬å™¨ï¼Œå‘é€ SIGTERMï¼Œè®°å½•å®ƒç»ˆæ­¢äº†ä»€ä¹ˆï¼Œç„¶åŽå¯åŠ¨ Gateway ç½‘å…³ï¼ˆå¦‚æžœç¼ºå°‘ `lsof` åˆ™å¿«é€Ÿå¤±è´¥ï¼‰ã€‚
+- å¦‚æžœä½ åœ¨ supervisorï¼ˆlaunchd/systemd/mac åº”ç”¨å­è¿›ç¨‹æ¨¡å¼ï¼‰ä¸‹è¿è¡Œï¼Œstop/restart é€šå¸¸å‘é€ **SIGTERM**ï¼›æ—§ç‰ˆæœ¬å¯èƒ½å°†å…¶æ˜¾ç¤ºä¸º `pnpm` `ELIFECYCLE` é€€å‡ºç  **143**ï¼ˆSIGTERMï¼‰ï¼Œè¿™æ˜¯æ­£å¸¸å…³é—­ï¼Œä¸æ˜¯å´©æºƒã€‚
+- **SIGUSR1** åœ¨æŽˆæƒæ—¶è§¦å‘è¿›ç¨‹å†…é‡å¯ï¼ˆGateway ç½‘å…³å·¥å…·/é…ç½®åº”ç”¨/æ›´æ–°ï¼Œæˆ–å¯ç”¨ `commands.restart` ä»¥è¿›è¡Œæ‰‹åŠ¨é‡å¯ï¼‰ã€‚
+- é»˜è®¤éœ€è¦ Gateway ç½‘å…³è®¤è¯ï¼šè®¾ç½® `gateway.auth.token`ï¼ˆæˆ– `OPENKRAB_GATEWAY_TOKEN`ï¼‰æˆ– `gateway.auth.password`ã€‚å®¢æˆ·ç«¯å¿…é¡»å‘é€ `connect.params.auth.token/password`ï¼Œé™¤éžä½¿ç”¨ Tailscale Serve èº«ä»½ã€‚
+- å‘å¯¼çŽ°åœ¨é»˜è®¤ç”Ÿæˆä»¤ç‰Œï¼Œå³ä½¿åœ¨ loopback ä¸Šä¹Ÿæ˜¯å¦‚æ­¤ã€‚
+- ç«¯å£ä¼˜å…ˆçº§ï¼š`--port` > `OPENKRAB_GATEWAY_PORT` > `gateway.port` > é»˜è®¤ `18789`ã€‚
 
-## 远程访问
+## è¿œç¨‹è®¿é—®
 
-- 首选 Tailscale/VPN；否则使用 SSH 隧道：
+- é¦–é€‰ Tailscale/VPNï¼›å¦åˆ™ä½¿ç”¨ SSH éš§é“ï¼š
   ```bash
   ssh -N -L 18789:127.0.0.1:18789 user@host
   ```
-- 然后客户端通过隧道连接到 `ws://127.0.0.1:18789`。
-- 如果配置了令牌，即使通过隧道，客户端也必须在 `connect.params.auth.token` 中包含它。
+- ç„¶åŽå®¢æˆ·ç«¯é€šè¿‡éš§é“è¿žæŽ¥åˆ° `ws://127.0.0.1:18789`ã€‚
+- å¦‚æžœé…ç½®äº†ä»¤ç‰Œï¼Œå³ä½¿é€šè¿‡éš§é“ï¼Œå®¢æˆ·ç«¯ä¹Ÿå¿…é¡»åœ¨ `connect.params.auth.token` ä¸­åŒ…å«å®ƒã€‚
 
-## 多个 Gateway 网关（同一主机）
+## å¤šä¸ª Gateway ç½‘å…³ï¼ˆåŒä¸€ä¸»æœºï¼‰
 
-通常不需要：一个 Gateway 网关可以服务多个消息渠道和智能体。仅在需要冗余或严格隔离（例如：救援机器人）时使用多个 Gateway 网关。
+é€šå¸¸ä¸éœ€è¦ï¼šä¸€ä¸ª Gateway ç½‘å…³å¯ä»¥æœåŠ¡å¤šä¸ªæ¶ˆæ¯æ¸ é“å’Œæ™ºèƒ½ä½“ã€‚ä»…åœ¨éœ€è¦å†—ä½™æˆ–ä¸¥æ ¼éš”ç¦»ï¼ˆä¾‹å¦‚ï¼šæ•‘æ´æœºå™¨äººï¼‰æ—¶ä½¿ç”¨å¤šä¸ª Gateway ç½‘å…³ã€‚
 
-如果你隔离状态 + 配置并使用唯一端口，则支持。完整指南：[多个 Gateway 网关](/gateway/multiple-gateways)。
+å¦‚æžœä½ éš”ç¦»çŠ¶æ€ + é…ç½®å¹¶ä½¿ç”¨å”¯ä¸€ç«¯å£ï¼Œåˆ™æ”¯æŒã€‚å®Œæ•´æŒ‡å—ï¼š[å¤šä¸ª Gateway ç½‘å…³](/gateway/multiple-gateways)ã€‚
 
-服务名称是配置文件感知的：
+æœåŠ¡åç§°æ˜¯é…ç½®æ–‡ä»¶æ„ŸçŸ¥çš„ï¼š
 
-- macOS：`bot.molt.<profile>`（旧版 `com.OpenKrab.*` 可能仍然存在）
-- Linux：`OpenKrab-gateway-<profile>.service`
-- Windows：`OpenKrab Gateway (<profile>)`
+- macOSï¼š`bot.molt.<profile>`ï¼ˆæ—§ç‰ˆ `com.OpenKrab.*` å¯èƒ½ä»ç„¶å­˜åœ¨ï¼‰
+- Linuxï¼š`OpenKrab-gateway-<profile>.service`
+- Windowsï¼š`OpenKrab Gateway (<profile>)`
 
-安装元数据嵌入在服务配置中：
+å®‰è£…å…ƒæ•°æ®åµŒå…¥åœ¨æœåŠ¡é…ç½®ä¸­ï¼š
 
-- `OpenKrab_SERVICE_MARKER=OpenKrab`
-- `OpenKrab_SERVICE_KIND=gateway`
-- `OpenKrab_SERVICE_VERSION=<version>`
+- `OPENKRAB_SERVICE_MARKER=OpenKrab`
+- `OPENKRAB_SERVICE_KIND=gateway`
+- `OPENKRAB_SERVICE_VERSION=<version>`
 
-救援机器人模式：保持第二个 Gateway 网关隔离，使用自己的配置文件、状态目录、工作区和基础端口间隔。完整指南：[救援机器人指南](/gateway/multiple-gateways#rescue-bot-guide)。
+æ•‘æ´æœºå™¨äººæ¨¡å¼ï¼šä¿æŒç¬¬äºŒä¸ª Gateway ç½‘å…³éš”ç¦»ï¼Œä½¿ç”¨è‡ªå·±çš„é…ç½®æ–‡ä»¶ã€çŠ¶æ€ç›®å½•ã€å·¥ä½œåŒºå’ŒåŸºç¡€ç«¯å£é—´éš”ã€‚å®Œæ•´æŒ‡å—ï¼š[æ•‘æ´æœºå™¨äººæŒ‡å—](/gateway/multiple-gateways#rescue-bot-guide)ã€‚
 
-### Dev 配置文件（`--dev`）
+### Dev é…ç½®æ–‡ä»¶ï¼ˆ`--dev`ï¼‰
 
-快速路径：运行完全隔离的 dev 实例（配置/状态/工作区）而不触及你的主设置。
+å¿«é€Ÿè·¯å¾„ï¼šè¿è¡Œå®Œå…¨éš”ç¦»çš„ dev å®žä¾‹ï¼ˆé…ç½®/çŠ¶æ€/å·¥ä½œåŒºï¼‰è€Œä¸è§¦åŠä½ çš„ä¸»è®¾ç½®ã€‚
 
 ```bash
 OpenKrab --dev setup
 OpenKrab --dev gateway --allow-unconfigured
-# 然后定位到 dev 实例：
+# ç„¶åŽå®šä½åˆ° dev å®žä¾‹ï¼š
 OpenKrab --dev status
 OpenKrab --dev health
 ```
 
-默认值（可通过 env/flags/config 覆盖）：
+é»˜è®¤å€¼ï¼ˆå¯é€šè¿‡ env/flags/config è¦†ç›–ï¼‰ï¼š
 
-- `OpenKrab_STATE_DIR=~/.OpenKrab-dev`
-- `OpenKrab_CONFIG_PATH=~/.OpenKrab-dev/OpenKrab.json`
-- `OpenKrab_GATEWAY_PORT=19001`（Gateway 网关 WS + HTTP）
-- 浏览器控制服务端口 = `19003`（派生：`gateway.port+2`，仅 loopback）
-- `canvasHost.port=19005`（派生：`gateway.port+4`）
-- 当你在 `--dev` 下运行 `setup`/`onboard` 时，`agents.defaults.workspace` 默认变为 `~/.OpenKrab/workspace-dev`。
+- `OPENKRAB_STATE_DIR=~/.OpenKrab-dev`
+- `OPENKRAB_CONFIG_PATH=~/.OpenKrab-dev/OpenKrab.json`
+- `OPENKRAB_GATEWAY_PORT=19001`ï¼ˆGateway ç½‘å…³ WS + HTTPï¼‰
+- æµè§ˆå™¨æŽ§åˆ¶æœåŠ¡ç«¯å£ = `19003`ï¼ˆæ´¾ç”Ÿï¼š`gateway.port+2`ï¼Œä»… loopbackï¼‰
+- `canvasHost.port=19005`ï¼ˆæ´¾ç”Ÿï¼š`gateway.port+4`ï¼‰
+- å½“ä½ åœ¨ `--dev` ä¸‹è¿è¡Œ `setup`/`onboard` æ—¶ï¼Œ`agents.defaults.workspace` é»˜è®¤å˜ä¸º `~/.OpenKrab/workspace-dev`ã€‚
 
-派生端口（经验法则）：
+æ´¾ç”Ÿç«¯å£ï¼ˆç»éªŒæ³•åˆ™ï¼‰ï¼š
 
-- 基础端口 = `gateway.port`（或 `OpenKrab_GATEWAY_PORT` / `--port`）
-- 浏览器控制服务端口 = 基础 + 2（仅 loopback）
-- `canvasHost.port = 基础 + 4`（或 `OpenKrab_CANVAS_HOST_PORT` / 配置覆盖）
-- 浏览器配置文件 CDP 端口从 `browser.controlPort + 9 .. + 108` 自动分配（按配置文件持久化）。
+- åŸºç¡€ç«¯å£ = `gateway.port`ï¼ˆæˆ– `OPENKRAB_GATEWAY_PORT` / `--port`ï¼‰
+- æµè§ˆå™¨æŽ§åˆ¶æœåŠ¡ç«¯å£ = åŸºç¡€ + 2ï¼ˆä»… loopbackï¼‰
+- `canvasHost.port = åŸºç¡€ + 4`ï¼ˆæˆ– `OPENKRAB_CANVAS_HOST_PORT` / é…ç½®è¦†ç›–ï¼‰
+- æµè§ˆå™¨é…ç½®æ–‡ä»¶ CDP ç«¯å£ä»Ž `browser.controlPort + 9 .. + 108` è‡ªåŠ¨åˆ†é…ï¼ˆæŒ‰é…ç½®æ–‡ä»¶æŒä¹…åŒ–ï¼‰ã€‚
 
-每个实例的检查清单：
+æ¯ä¸ªå®žä¾‹çš„æ£€æŸ¥æ¸…å•ï¼š
 
-- 唯一的 `gateway.port`
-- 唯一的 `OpenKrab_CONFIG_PATH`
-- 唯一的 `OpenKrab_STATE_DIR`
-- 唯一的 `agents.defaults.workspace`
-- 单独的 WhatsApp 号码（如果使用 WA）
+- å”¯ä¸€çš„ `gateway.port`
+- å”¯ä¸€çš„ `OPENKRAB_CONFIG_PATH`
+- å”¯ä¸€çš„ `OPENKRAB_STATE_DIR`
+- å”¯ä¸€çš„ `agents.defaults.workspace`
+- å•ç‹¬çš„ WhatsApp å·ç ï¼ˆå¦‚æžœä½¿ç”¨ WAï¼‰
 
-按配置文件安装服务：
+æŒ‰é…ç½®æ–‡ä»¶å®‰è£…æœåŠ¡ï¼š
 
 ```bash
 OpenKrab --profile main gateway install
 OpenKrab --profile rescue gateway install
 ```
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```bash
-OpenKrab_CONFIG_PATH=~/.OpenKrab/a.json OpenKrab_STATE_DIR=~/.OpenKrab-a OpenKrab gateway --port 19001
-OpenKrab_CONFIG_PATH=~/.OpenKrab/b.json OpenKrab_STATE_DIR=~/.OpenKrab-b OpenKrab gateway --port 19002
+OPENKRAB_CONFIG_PATH=~/.OpenKrab/a.json OPENKRAB_STATE_DIR=~/.OpenKrab-a OpenKrab gateway --port 19001
+OPENKRAB_CONFIG_PATH=~/.OpenKrab/b.json OPENKRAB_STATE_DIR=~/.OpenKrab-b OpenKrab gateway --port 19002
 ```
 
-## 协议（运维视角）
+## åè®®ï¼ˆè¿ç»´è§†è§’ï¼‰
 
-- 完整文档：[Gateway 网关协议](/gateway/protocol) 和 [Bridge 协议（旧版）](/gateway/bridge-protocol)。
-- 客户端必须发送的第一帧：`req {type:"req", id, method:"connect", params:{minProtocol,maxProtocol,client:{id,displayName?,version,platform,deviceFamily?,modelIdentifier?,mode,instanceId?}, caps, auth?, locale?, userAgent? } }`。
-- Gateway 网关回复 `res {type:"res", id, ok:true, payload:hello-ok }`（或 `ok:false` 带错误，然后关闭）。
-- 握手后：
-  - 请求：`{type:"req", id, method, params}` → `{type:"res", id, ok, payload|error}`
-  - 事件：`{type:"event", event, payload, seq?, stateVersion?}`
-- 结构化 presence 条目：`{host, ip, version, platform?, deviceFamily?, modelIdentifier?, mode, lastInputSeconds?, ts, reason?, tags?[], instanceId? }`（对于 WS 客户端，`instanceId` 来自 `connect.client.instanceId`）。
-- `agent` 响应是两阶段的：首先 `res` 确认 `{runId,status:"accepted"}`，然后在运行完成后发送最终 `res` `{runId,status:"ok"|"error",summary}`；流式输出作为 `event:"agent"` 到达。
+- å®Œæ•´æ–‡æ¡£ï¼š[Gateway ç½‘å…³åè®®](/gateway/protocol) å’Œ [Bridge åè®®ï¼ˆæ—§ç‰ˆï¼‰](/gateway/bridge-protocol)ã€‚
+- å®¢æˆ·ç«¯å¿…é¡»å‘é€çš„ç¬¬ä¸€å¸§ï¼š`req {type:"req", id, method:"connect", params:{minProtocol,maxProtocol,client:{id,displayName?,version,platform,deviceFamily?,modelIdentifier?,mode,instanceId?}, caps, auth?, locale?, userAgent? } }`ã€‚
+- Gateway ç½‘å…³å›žå¤ `res {type:"res", id, ok:true, payload:hello-ok }`ï¼ˆæˆ– `ok:false` å¸¦é”™è¯¯ï¼Œç„¶åŽå…³é—­ï¼‰ã€‚
+- æ¡æ‰‹åŽï¼š
+  - è¯·æ±‚ï¼š`{type:"req", id, method, params}` â†’ `{type:"res", id, ok, payload|error}`
+  - äº‹ä»¶ï¼š`{type:"event", event, payload, seq?, stateVersion?}`
+- ç»“æž„åŒ– presence æ¡ç›®ï¼š`{host, ip, version, platform?, deviceFamily?, modelIdentifier?, mode, lastInputSeconds?, ts, reason?, tags?[], instanceId? }`ï¼ˆå¯¹äºŽ WS å®¢æˆ·ç«¯ï¼Œ`instanceId` æ¥è‡ª `connect.client.instanceId`ï¼‰ã€‚
+- `agent` å“åº”æ˜¯ä¸¤é˜¶æ®µçš„ï¼šé¦–å…ˆ `res` ç¡®è®¤ `{runId,status:"accepted"}`ï¼Œç„¶åŽåœ¨è¿è¡Œå®ŒæˆåŽå‘é€æœ€ç»ˆ `res` `{runId,status:"ok"|"error",summary}`ï¼›æµå¼è¾“å‡ºä½œä¸º `event:"agent"` åˆ°è¾¾ã€‚
 
-## 方法（初始集）
+## æ–¹æ³•ï¼ˆåˆå§‹é›†ï¼‰
 
-- `health` — 完整健康快照（与 `OpenKrab health --json` 形状相同）。
-- `status` — 简短摘要。
-- `system-presence` — 当前 presence 列表。
-- `system-event` — 发布 presence/系统注释（结构化）。
-- `send` — 通过活跃渠道发送消息。
-- `agent` — 运行智能体轮次（在同一连接上流回事件）。
-- `node.list` — 列出已配对 + 当前连接的节点（包括 `caps`、`deviceFamily`、`modelIdentifier`、`paired`、`connected` 和广播的 `commands`）。
-- `node.describe` — 描述节点（能力 + 支持的 `node.invoke` 命令；适用于已配对节点和当前连接的未配对节点）。
-- `node.invoke` — 在节点上调用命令（例如 `canvas.*`、`camera.*`）。
-- `node.pair.*` — 配对生命周期（`request`、`list`、`approve`、`reject`、`verify`）。
+- `health` â€” å®Œæ•´å¥åº·å¿«ç…§ï¼ˆä¸Ž `OpenKrab health --json` å½¢çŠ¶ç›¸åŒï¼‰ã€‚
+- `status` â€” ç®€çŸ­æ‘˜è¦ã€‚
+- `system-presence` â€” å½“å‰ presence åˆ—è¡¨ã€‚
+- `system-event` â€” å‘å¸ƒ presence/ç³»ç»Ÿæ³¨é‡Šï¼ˆç»“æž„åŒ–ï¼‰ã€‚
+- `send` â€” é€šè¿‡æ´»è·ƒæ¸ é“å‘é€æ¶ˆæ¯ã€‚
+- `agent` â€” è¿è¡Œæ™ºèƒ½ä½“è½®æ¬¡ï¼ˆåœ¨åŒä¸€è¿žæŽ¥ä¸Šæµå›žäº‹ä»¶ï¼‰ã€‚
+- `node.list` â€” åˆ—å‡ºå·²é…å¯¹ + å½“å‰è¿žæŽ¥çš„èŠ‚ç‚¹ï¼ˆåŒ…æ‹¬ `caps`ã€`deviceFamily`ã€`modelIdentifier`ã€`paired`ã€`connected` å’Œå¹¿æ’­çš„ `commands`ï¼‰ã€‚
+- `node.describe` â€” æè¿°èŠ‚ç‚¹ï¼ˆèƒ½åŠ› + æ”¯æŒçš„ `node.invoke` å‘½ä»¤ï¼›é€‚ç”¨äºŽå·²é…å¯¹èŠ‚ç‚¹å’Œå½“å‰è¿žæŽ¥çš„æœªé…å¯¹èŠ‚ç‚¹ï¼‰ã€‚
+- `node.invoke` â€” åœ¨èŠ‚ç‚¹ä¸Šè°ƒç”¨å‘½ä»¤ï¼ˆä¾‹å¦‚ `canvas.*`ã€`camera.*`ï¼‰ã€‚
+- `node.pair.*` â€” é…å¯¹ç”Ÿå‘½å‘¨æœŸï¼ˆ`request`ã€`list`ã€`approve`ã€`reject`ã€`verify`ï¼‰ã€‚
 
-另见：[Presence](/concepts/presence) 了解 presence 如何产生/去重以及为什么稳定的 `client.instanceId` 很重要。
+å¦è§ï¼š[Presence](/concepts/presence) äº†è§£ presence å¦‚ä½•äº§ç”Ÿ/åŽ»é‡ä»¥åŠä¸ºä»€ä¹ˆç¨³å®šçš„ `client.instanceId` å¾ˆé‡è¦ã€‚
 
-## 事件
+## äº‹ä»¶
 
-- `agent` — 来自智能体运行的流式工具/输出事件（带 seq 标记）。
-- `presence` — presence 更新（带 stateVersion 的增量）推送到所有连接的客户端。
-- `tick` — 定期保活/无操作以确认活跃。
-- `shutdown` — Gateway 网关正在退出；payload 包括 `reason` 和可选的 `restartExpectedMs`。客户端应重新连接。
+- `agent` â€” æ¥è‡ªæ™ºèƒ½ä½“è¿è¡Œçš„æµå¼å·¥å…·/è¾“å‡ºäº‹ä»¶ï¼ˆå¸¦ seq æ ‡è®°ï¼‰ã€‚
+- `presence` â€” presence æ›´æ–°ï¼ˆå¸¦ stateVersion çš„å¢žé‡ï¼‰æŽ¨é€åˆ°æ‰€æœ‰è¿žæŽ¥çš„å®¢æˆ·ç«¯ã€‚
+- `tick` â€” å®šæœŸä¿æ´»/æ— æ“ä½œä»¥ç¡®è®¤æ´»è·ƒã€‚
+- `shutdown` â€” Gateway ç½‘å…³æ­£åœ¨é€€å‡ºï¼›payload åŒ…æ‹¬ `reason` å’Œå¯é€‰çš„ `restartExpectedMs`ã€‚å®¢æˆ·ç«¯åº”é‡æ–°è¿žæŽ¥ã€‚
 
-## WebChat 集成
+## WebChat é›†æˆ
 
-- WebChat 是原生 SwiftUI UI，直接与 Gateway 网关 WebSocket 通信以获取历史记录、发送、中止和事件。
-- 远程使用通过相同的 SSH/Tailscale 隧道；如果配置了 Gateway 网关令牌，客户端在 `connect` 期间包含它。
-- macOS 应用通过单个 WS 连接（共享连接）；它从初始快照填充 presence 并监听 `presence` 事件以更新 UI。
+- WebChat æ˜¯åŽŸç”Ÿ SwiftUI UIï¼Œç›´æŽ¥ä¸Ž Gateway ç½‘å…³ WebSocket é€šä¿¡ä»¥èŽ·å–åŽ†å²è®°å½•ã€å‘é€ã€ä¸­æ­¢å’Œäº‹ä»¶ã€‚
+- è¿œç¨‹ä½¿ç”¨é€šè¿‡ç›¸åŒçš„ SSH/Tailscale éš§é“ï¼›å¦‚æžœé…ç½®äº† Gateway ç½‘å…³ä»¤ç‰Œï¼Œå®¢æˆ·ç«¯åœ¨ `connect` æœŸé—´åŒ…å«å®ƒã€‚
+- macOS åº”ç”¨é€šè¿‡å•ä¸ª WS è¿žæŽ¥ï¼ˆå…±äº«è¿žæŽ¥ï¼‰ï¼›å®ƒä»Žåˆå§‹å¿«ç…§å¡«å…… presence å¹¶ç›‘å¬ `presence` äº‹ä»¶ä»¥æ›´æ–° UIã€‚
 
-## 类型和验证
+## ç±»åž‹å’ŒéªŒè¯
 
-- 服务器使用 AJV 根据从协议定义发出的 JSON Schema 验证每个入站帧。
-- 客户端（TS/Swift）消费生成的类型（TS 直接使用；Swift 通过仓库的生成器）。
-- 协议定义是真实来源；使用以下命令重新生成 schema/模型：
+- æœåŠ¡å™¨ä½¿ç”¨ AJV æ ¹æ®ä»Žåè®®å®šä¹‰å‘å‡ºçš„ JSON Schema éªŒè¯æ¯ä¸ªå…¥ç«™å¸§ã€‚
+- å®¢æˆ·ç«¯ï¼ˆTS/Swiftï¼‰æ¶ˆè´¹ç”Ÿæˆçš„ç±»åž‹ï¼ˆTS ç›´æŽ¥ä½¿ç”¨ï¼›Swift é€šè¿‡ä»“åº“çš„ç”Ÿæˆå™¨ï¼‰ã€‚
+- åè®®å®šä¹‰æ˜¯çœŸå®žæ¥æºï¼›ä½¿ç”¨ä»¥ä¸‹å‘½ä»¤é‡æ–°ç”Ÿæˆ schema/æ¨¡åž‹ï¼š
   - `pnpm protocol:gen`
   - `pnpm protocol:gen:swift`
 
-## 连接快照
+## è¿žæŽ¥å¿«ç…§
 
-- `hello-ok` 包含带有 `presence`、`health`、`stateVersion` 和 `uptimeMs` 的 `snapshot`，以及 `policy {maxPayload,maxBufferedBytes,tickIntervalMs}`，这样客户端无需额外请求即可立即渲染。
-- `health`/`system-presence` 仍可用于手动刷新，但在连接时不是必需的。
+- `hello-ok` åŒ…å«å¸¦æœ‰ `presence`ã€`health`ã€`stateVersion` å’Œ `uptimeMs` çš„ `snapshot`ï¼Œä»¥åŠ `policy {maxPayload,maxBufferedBytes,tickIntervalMs}`ï¼Œè¿™æ ·å®¢æˆ·ç«¯æ— éœ€é¢å¤–è¯·æ±‚å³å¯ç«‹å³æ¸²æŸ“ã€‚
+- `health`/`system-presence` ä»å¯ç”¨äºŽæ‰‹åŠ¨åˆ·æ–°ï¼Œä½†åœ¨è¿žæŽ¥æ—¶ä¸æ˜¯å¿…éœ€çš„ã€‚
 
-## 错误码（res.error 形状）
+## é”™è¯¯ç ï¼ˆres.error å½¢çŠ¶ï¼‰
 
-- 错误使用 `{ code, message, details?, retryable?, retryAfterMs? }`。
-- 标准码：
-  - `NOT_LINKED` — WhatsApp 未认证。
-  - `AGENT_TIMEOUT` — 智能体未在配置的截止时间内响应。
-  - `INVALID_REQUEST` — schema/参数验证失败。
-  - `UNAVAILABLE` — Gateway 网关正在关闭或依赖项不可用。
+- é”™è¯¯ä½¿ç”¨ `{ code, message, details?, retryable?, retryAfterMs? }`ã€‚
+- æ ‡å‡†ç ï¼š
+  - `NOT_LINKED` â€” WhatsApp æœªè®¤è¯ã€‚
+  - `AGENT_TIMEOUT` â€” æ™ºèƒ½ä½“æœªåœ¨é…ç½®çš„æˆªæ­¢æ—¶é—´å†…å“åº”ã€‚
+  - `INVALID_REQUEST` â€” schema/å‚æ•°éªŒè¯å¤±è´¥ã€‚
+  - `UNAVAILABLE` â€” Gateway ç½‘å…³æ­£åœ¨å…³é—­æˆ–ä¾èµ–é¡¹ä¸å¯ç”¨ã€‚
 
-## 保活行为
+## ä¿æ´»è¡Œä¸º
 
-- `tick` 事件（或 WS ping/pong）定期发出，以便客户端知道即使没有流量时 Gateway 网关也是活跃的。
-- 发送/智能体确认保持为单独的响应；不要为发送重载 tick。
+- `tick` äº‹ä»¶ï¼ˆæˆ– WS ping/pongï¼‰å®šæœŸå‘å‡ºï¼Œä»¥ä¾¿å®¢æˆ·ç«¯çŸ¥é“å³ä½¿æ²¡æœ‰æµé‡æ—¶ Gateway ç½‘å…³ä¹Ÿæ˜¯æ´»è·ƒçš„ã€‚
+- å‘é€/æ™ºèƒ½ä½“ç¡®è®¤ä¿æŒä¸ºå•ç‹¬çš„å“åº”ï¼›ä¸è¦ä¸ºå‘é€é‡è½½ tickã€‚
 
-## 重放 / 间隙
+## é‡æ”¾ / é—´éš™
 
-- 事件不会重放。客户端检测 seq 间隙，应在继续之前刷新（`health` + `system-presence`）。WebChat 和 macOS 客户端现在会在间隙时自动刷新。
+- äº‹ä»¶ä¸ä¼šé‡æ”¾ã€‚å®¢æˆ·ç«¯æ£€æµ‹ seq é—´éš™ï¼Œåº”åœ¨ç»§ç»­ä¹‹å‰åˆ·æ–°ï¼ˆ`health` + `system-presence`ï¼‰ã€‚WebChat å’Œ macOS å®¢æˆ·ç«¯çŽ°åœ¨ä¼šåœ¨é—´éš™æ—¶è‡ªåŠ¨åˆ·æ–°ã€‚
 
-## 监管（macOS 示例）
+## ç›‘ç®¡ï¼ˆmacOS ç¤ºä¾‹ï¼‰
 
-- 使用 launchd 保持服务存活：
-  - Program：`OpenKrab` 的路径
-  - Arguments：`gateway`
-  - KeepAlive：true
-  - StandardOut/Err：文件路径或 `syslog`
-- 失败时，launchd 重启；致命的配置错误应保持退出，以便运维人员注意到。
-- LaunchAgents 是按用户的，需要已登录的会话；对于无头设置，使用自定义 LaunchDaemon（未随附）。
-  - `OpenKrab gateway install` 写入 `~/Library/LaunchAgents/bot.molt.gateway.plist`
-    （或 `bot.molt.<profile>.plist`；旧版 `com.OpenKrab.*` 会被清理）。
-  - `OpenKrab doctor` 审计 LaunchAgent 配置，可以将其更新为当前默认值。
+- ä½¿ç”¨ launchd ä¿æŒæœåŠ¡å­˜æ´»ï¼š
+  - Programï¼š`OpenKrab` çš„è·¯å¾„
+  - Argumentsï¼š`gateway`
+  - KeepAliveï¼štrue
+  - StandardOut/Errï¼šæ–‡ä»¶è·¯å¾„æˆ– `syslog`
+- å¤±è´¥æ—¶ï¼Œlaunchd é‡å¯ï¼›è‡´å‘½çš„é…ç½®é”™è¯¯åº”ä¿æŒé€€å‡ºï¼Œä»¥ä¾¿è¿ç»´äººå‘˜æ³¨æ„åˆ°ã€‚
+- LaunchAgents æ˜¯æŒ‰ç”¨æˆ·çš„ï¼Œéœ€è¦å·²ç™»å½•çš„ä¼šè¯ï¼›å¯¹äºŽæ— å¤´è®¾ç½®ï¼Œä½¿ç”¨è‡ªå®šä¹‰ LaunchDaemonï¼ˆæœªéšé™„ï¼‰ã€‚
+  - `OpenKrab gateway install` å†™å…¥ `~/Library/LaunchAgents/bot.molt.gateway.plist`
+    ï¼ˆæˆ– `bot.molt.<profile>.plist`ï¼›æ—§ç‰ˆ `com.OpenKrab.*` ä¼šè¢«æ¸…ç†ï¼‰ã€‚
+  - `OpenKrab doctor` å®¡è®¡ LaunchAgent é…ç½®ï¼Œå¯ä»¥å°†å…¶æ›´æ–°ä¸ºå½“å‰é»˜è®¤å€¼ã€‚
 
-## Gateway 网关服务管理（CLI）
+## Gateway ç½‘å…³æœåŠ¡ç®¡ç†ï¼ˆCLIï¼‰
 
-使用 Gateway 网关 CLI 进行 install/start/stop/restart/status：
+ä½¿ç”¨ Gateway ç½‘å…³ CLI è¿›è¡Œ install/start/stop/restart/statusï¼š
 
 ```bash
 OpenKrab gateway status
@@ -227,41 +227,41 @@ OpenKrab gateway restart
 OpenKrab logs --follow
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `gateway status` 默认使用服务解析的端口/配置探测 Gateway 网关 RPC（使用 `--url` 覆盖）。
-- `gateway status --deep` 添加系统级扫描（LaunchDaemons/系统单元）。
-- `gateway status --no-probe` 跳过 RPC 探测（在网络故障时有用）。
-- `gateway status --json` 对脚本是稳定的。
-- `gateway status` 将 **supervisor 运行时**（launchd/systemd 运行中）与 **RPC 可达性**（WS 连接 + status RPC）分开报告。
-- `gateway status` 打印配置路径 + 探测目标以避免"localhost vs LAN 绑定"混淆和配置文件不匹配。
-- `gateway status` 在服务看起来正在运行但端口已关闭时包含最后一行 Gateway 网关错误。
-- `logs` 通过 RPC 尾随 Gateway 网关文件日志（无需手动 `tail`/`grep`）。
-- 如果检测到其他类似 Gateway 网关的服务，CLI 会发出警告，除非它们是 OpenKrab 配置文件服务。
-  我们仍然建议大多数设置**每台机器一个 Gateway 网关**；使用隔离的配置文件/端口进行冗余或救援机器人。参见[多个 Gateway 网关](/gateway/multiple-gateways)。
-  - 清理：`OpenKrab gateway uninstall`（当前服务）和 `OpenKrab doctor`（旧版迁移）。
-- `gateway install` 在已安装时是无操作的；使用 `OpenKrab gateway install --force` 重新安装（配置文件/env/路径更改）。
+- `gateway status` é»˜è®¤ä½¿ç”¨æœåŠ¡è§£æžçš„ç«¯å£/é…ç½®æŽ¢æµ‹ Gateway ç½‘å…³ RPCï¼ˆä½¿ç”¨ `--url` è¦†ç›–ï¼‰ã€‚
+- `gateway status --deep` æ·»åŠ ç³»ç»Ÿçº§æ‰«æï¼ˆLaunchDaemons/ç³»ç»Ÿå•å…ƒï¼‰ã€‚
+- `gateway status --no-probe` è·³è¿‡ RPC æŽ¢æµ‹ï¼ˆåœ¨ç½‘ç»œæ•…éšœæ—¶æœ‰ç”¨ï¼‰ã€‚
+- `gateway status --json` å¯¹è„šæœ¬æ˜¯ç¨³å®šçš„ã€‚
+- `gateway status` å°† **supervisor è¿è¡Œæ—¶**ï¼ˆlaunchd/systemd è¿è¡Œä¸­ï¼‰ä¸Ž **RPC å¯è¾¾æ€§**ï¼ˆWS è¿žæŽ¥ + status RPCï¼‰åˆ†å¼€æŠ¥å‘Šã€‚
+- `gateway status` æ‰“å°é…ç½®è·¯å¾„ + æŽ¢æµ‹ç›®æ ‡ä»¥é¿å…"localhost vs LAN ç»‘å®š"æ··æ·†å’Œé…ç½®æ–‡ä»¶ä¸åŒ¹é…ã€‚
+- `gateway status` åœ¨æœåŠ¡çœ‹èµ·æ¥æ­£åœ¨è¿è¡Œä½†ç«¯å£å·²å…³é—­æ—¶åŒ…å«æœ€åŽä¸€è¡Œ Gateway ç½‘å…³é”™è¯¯ã€‚
+- `logs` é€šè¿‡ RPC å°¾éš Gateway ç½‘å…³æ–‡ä»¶æ—¥å¿—ï¼ˆæ— éœ€æ‰‹åŠ¨ `tail`/`grep`ï¼‰ã€‚
+- å¦‚æžœæ£€æµ‹åˆ°å…¶ä»–ç±»ä¼¼ Gateway ç½‘å…³çš„æœåŠ¡ï¼ŒCLI ä¼šå‘å‡ºè­¦å‘Šï¼Œé™¤éžå®ƒä»¬æ˜¯ OpenKrab é…ç½®æ–‡ä»¶æœåŠ¡ã€‚
+  æˆ‘ä»¬ä»ç„¶å»ºè®®å¤§å¤šæ•°è®¾ç½®**æ¯å°æœºå™¨ä¸€ä¸ª Gateway ç½‘å…³**ï¼›ä½¿ç”¨éš”ç¦»çš„é…ç½®æ–‡ä»¶/ç«¯å£è¿›è¡Œå†—ä½™æˆ–æ•‘æ´æœºå™¨äººã€‚å‚è§[å¤šä¸ª Gateway ç½‘å…³](/gateway/multiple-gateways)ã€‚
+  - æ¸…ç†ï¼š`OpenKrab gateway uninstall`ï¼ˆå½“å‰æœåŠ¡ï¼‰å’Œ `OpenKrab doctor`ï¼ˆæ—§ç‰ˆè¿ç§»ï¼‰ã€‚
+- `gateway install` åœ¨å·²å®‰è£…æ—¶æ˜¯æ— æ“ä½œçš„ï¼›ä½¿ç”¨ `OpenKrab gateway install --force` é‡æ–°å®‰è£…ï¼ˆé…ç½®æ–‡ä»¶/env/è·¯å¾„æ›´æ”¹ï¼‰ã€‚
 
-捆绑的 mac 应用：
+æ†ç»‘çš„ mac åº”ç”¨ï¼š
 
-- OpenKrab.app 可以捆绑基于 Node 的 Gateway 网关中继并安装标记为
-  `bot.molt.gateway`（或 `bot.molt.<profile>`；旧版 `com.OpenKrab.*` 标签仍能干净卸载）的按用户 LaunchAgent。
-- 要干净地停止它，使用 `OpenKrab gateway stop`（或 `launchctl bootout gui/$UID/bot.molt.gateway`）。
-- 要重启，使用 `OpenKrab gateway restart`（或 `launchctl kickstart -k gui/$UID/bot.molt.gateway`）。
-  - `launchctl` 仅在 LaunchAgent 已安装时有效；否则先使用 `OpenKrab gateway install`。
-  - 运行命名配置文件时，将标签替换为 `bot.molt.<profile>`。
+- OpenKrab.app å¯ä»¥æ†ç»‘åŸºäºŽ Node çš„ Gateway ç½‘å…³ä¸­ç»§å¹¶å®‰è£…æ ‡è®°ä¸º
+  `bot.molt.gateway`ï¼ˆæˆ– `bot.molt.<profile>`ï¼›æ—§ç‰ˆ `com.OpenKrab.*` æ ‡ç­¾ä»èƒ½å¹²å‡€å¸è½½ï¼‰çš„æŒ‰ç”¨æˆ· LaunchAgentã€‚
+- è¦å¹²å‡€åœ°åœæ­¢å®ƒï¼Œä½¿ç”¨ `OpenKrab gateway stop`ï¼ˆæˆ– `launchctl bootout gui/$UID/bot.molt.gateway`ï¼‰ã€‚
+- è¦é‡å¯ï¼Œä½¿ç”¨ `OpenKrab gateway restart`ï¼ˆæˆ– `launchctl kickstart -k gui/$UID/bot.molt.gateway`ï¼‰ã€‚
+  - `launchctl` ä»…åœ¨ LaunchAgent å·²å®‰è£…æ—¶æœ‰æ•ˆï¼›å¦åˆ™å…ˆä½¿ç”¨ `OpenKrab gateway install`ã€‚
+  - è¿è¡Œå‘½åé…ç½®æ–‡ä»¶æ—¶ï¼Œå°†æ ‡ç­¾æ›¿æ¢ä¸º `bot.molt.<profile>`ã€‚
 
-## 监管（systemd 用户单元）
+## ç›‘ç®¡ï¼ˆsystemd ç”¨æˆ·å•å…ƒï¼‰
 
-OpenKrab 在 Linux/WSL2 上默认安装 **systemd 用户服务**。我们
-建议单用户机器使用用户服务（更简单的 env，按用户配置）。
-对于多用户或常驻服务器使用**系统服务**（无需 lingering，
-共享监管）。
+OpenKrab åœ¨ Linux/WSL2 ä¸Šé»˜è®¤å®‰è£… **systemd ç”¨æˆ·æœåŠ¡**ã€‚æˆ‘ä»¬
+å»ºè®®å•ç”¨æˆ·æœºå™¨ä½¿ç”¨ç”¨æˆ·æœåŠ¡ï¼ˆæ›´ç®€å•çš„ envï¼ŒæŒ‰ç”¨æˆ·é…ç½®ï¼‰ã€‚
+å¯¹äºŽå¤šç”¨æˆ·æˆ–å¸¸é©»æœåŠ¡å™¨ä½¿ç”¨**ç³»ç»ŸæœåŠ¡**ï¼ˆæ— éœ€ lingeringï¼Œ
+å…±äº«ç›‘ç®¡ï¼‰ã€‚
 
-`OpenKrab gateway install` 写入用户单元。`OpenKrab doctor` 审计
-单元并可以将其更新以匹配当前推荐的默认值。
+`OpenKrab gateway install` å†™å…¥ç”¨æˆ·å•å…ƒã€‚`OpenKrab doctor` å®¡è®¡
+å•å…ƒå¹¶å¯ä»¥å°†å…¶æ›´æ–°ä»¥åŒ¹é…å½“å‰æŽ¨èçš„é»˜è®¤å€¼ã€‚
 
-创建 `~/.config/systemd/user/OpenKrab-gateway[-<profile>].service`：
+åˆ›å»º `~/.config/systemd/user/OpenKrab-gateway[-<profile>].service`ï¼š
 
 ```
 [Unit]
@@ -273,64 +273,65 @@ Wants=network-online.target
 ExecStart=/usr/local/bin/OpenKrab gateway --port 18789
 Restart=always
 RestartSec=5
-Environment=OpenKrab_GATEWAY_TOKEN=
+Environment=OPENKRAB_GATEWAY_TOKEN=
 WorkingDirectory=/home/youruser
 
 [Install]
 WantedBy=default.target
 ```
 
-启用 lingering（必需，以便用户服务在登出/空闲后继续存活）：
+å¯ç”¨ lingeringï¼ˆå¿…éœ€ï¼Œä»¥ä¾¿ç”¨æˆ·æœåŠ¡åœ¨ç™»å‡º/ç©ºé—²åŽç»§ç»­å­˜æ´»ï¼‰ï¼š
 
 ```
 sudo loginctl enable-linger youruser
 ```
 
-新手引导在 Linux/WSL2 上运行此命令（可能提示输入 sudo；写入 `/var/lib/systemd/linger`）。
-然后启用服务：
+æ–°æ‰‹å¼•å¯¼åœ¨ Linux/WSL2 ä¸Šè¿è¡Œæ­¤å‘½ä»¤ï¼ˆå¯èƒ½æç¤ºè¾“å…¥ sudoï¼›å†™å…¥ `/var/lib/systemd/linger`ï¼‰ã€‚
+ç„¶åŽå¯ç”¨æœåŠ¡ï¼š
 
 ```
 systemctl --user enable --now OpenKrab-gateway[-<profile>].service
 ```
 
-**替代方案（系统服务）** - 对于常驻或多用户服务器，你可以
-安装 systemd **系统**单元而不是用户单元（无需 lingering）。
-创建 `/etc/systemd/system/OpenKrab-gateway[-<profile>].service`（复制上面的单元，
-切换 `WantedBy=multi-user.target`，设置 `User=` + `WorkingDirectory=`），然后：
+**æ›¿ä»£æ–¹æ¡ˆï¼ˆç³»ç»ŸæœåŠ¡ï¼‰** - å¯¹äºŽå¸¸é©»æˆ–å¤šç”¨æˆ·æœåŠ¡å™¨ï¼Œä½ å¯ä»¥
+å®‰è£… systemd **ç³»ç»Ÿ**å•å…ƒè€Œä¸æ˜¯ç”¨æˆ·å•å…ƒï¼ˆæ— éœ€ lingeringï¼‰ã€‚
+åˆ›å»º `/etc/systemd/system/OpenKrab-gateway[-<profile>].service`ï¼ˆå¤åˆ¶ä¸Šé¢çš„å•å…ƒï¼Œ
+åˆ‡æ¢ `WantedBy=multi-user.target`ï¼Œè®¾ç½® `User=` + `WorkingDirectory=`ï¼‰ï¼Œç„¶åŽï¼š
 
 ```
 sudo systemctl daemon-reload
 sudo systemctl enable --now OpenKrab-gateway[-<profile>].service
 ```
 
-## Windows（WSL2）
+## Windowsï¼ˆWSL2ï¼‰
 
-Windows 安装应使用 **WSL2** 并遵循上面的 Linux systemd 部分。
+Windows å®‰è£…åº”ä½¿ç”¨ **WSL2** å¹¶éµå¾ªä¸Šé¢çš„ Linux systemd éƒ¨åˆ†ã€‚
 
-## 运维检查
+## è¿ç»´æ£€æŸ¥
 
-- 存活检查：打开 WS 并发送 `req:connect` → 期望收到带有 `payload.type="hello-ok"`（带快照）的 `res`。
-- 就绪检查：调用 `health` → 期望 `ok: true` 并在 `linkChannel` 中有已关联的渠道（适用时）。
-- 调试：订阅 `tick` 和 `presence` 事件；确保 `status` 显示已关联/认证时间；presence 条目显示 Gateway 网关主机和已连接的客户端。
+- å­˜æ´»æ£€æŸ¥ï¼šæ‰“å¼€ WS å¹¶å‘é€ `req:connect` â†’ æœŸæœ›æ”¶åˆ°å¸¦æœ‰ `payload.type="hello-ok"`ï¼ˆå¸¦å¿«ç…§ï¼‰çš„ `res`ã€‚
+- å°±ç»ªæ£€æŸ¥ï¼šè°ƒç”¨ `health` â†’ æœŸæœ› `ok: true` å¹¶åœ¨ `linkChannel` ä¸­æœ‰å·²å…³è”çš„æ¸ é“ï¼ˆé€‚ç”¨æ—¶ï¼‰ã€‚
+- è°ƒè¯•ï¼šè®¢é˜… `tick` å’Œ `presence` äº‹ä»¶ï¼›ç¡®ä¿ `status` æ˜¾ç¤ºå·²å…³è”/è®¤è¯æ—¶é—´ï¼›presence æ¡ç›®æ˜¾ç¤º Gateway ç½‘å…³ä¸»æœºå’Œå·²è¿žæŽ¥çš„å®¢æˆ·ç«¯ã€‚
 
-## 安全保证
+## å®‰å…¨ä¿è¯
 
-- 默认假设每台主机一个 Gateway 网关；如果你运行多个配置文件，隔离端口/状态并定位到正确的实例。
-- 不会回退到直接 Baileys 连接；如果 Gateway 网关关闭，发送会快速失败。
-- 非 connect 的第一帧或格式错误的 JSON 会被拒绝并关闭 socket。
-- 优雅关闭：关闭前发出 `shutdown` 事件；客户端必须处理关闭 + 重新连接。
+- é»˜è®¤å‡è®¾æ¯å°ä¸»æœºä¸€ä¸ª Gateway ç½‘å…³ï¼›å¦‚æžœä½ è¿è¡Œå¤šä¸ªé…ç½®æ–‡ä»¶ï¼Œéš”ç¦»ç«¯å£/çŠ¶æ€å¹¶å®šä½åˆ°æ­£ç¡®çš„å®žä¾‹ã€‚
+- ä¸ä¼šå›žé€€åˆ°ç›´æŽ¥ Baileys è¿žæŽ¥ï¼›å¦‚æžœ Gateway ç½‘å…³å…³é—­ï¼Œå‘é€ä¼šå¿«é€Ÿå¤±è´¥ã€‚
+- éž connect çš„ç¬¬ä¸€å¸§æˆ–æ ¼å¼é”™è¯¯çš„ JSON ä¼šè¢«æ‹’ç»å¹¶å…³é—­ socketã€‚
+- ä¼˜é›…å…³é—­ï¼šå…³é—­å‰å‘å‡º `shutdown` äº‹ä»¶ï¼›å®¢æˆ·ç«¯å¿…é¡»å¤„ç†å…³é—­ + é‡æ–°è¿žæŽ¥ã€‚
 
-## CLI 辅助工具
+## CLI è¾…åŠ©å·¥å…·
 
-- `OpenKrab gateway health|status` — 通过 Gateway 网关 WS 请求 health/status。
-- `OpenKrab message send --target <num> --message "hi" [--media ...]` — 通过 Gateway 网关发送（对 WhatsApp 是幂等的）。
-- `OpenKrab agent --message "hi" --to <num>` — 运行智能体轮次（默认等待最终结果）。
-- `OpenKrab gateway call <method> --params '{"k":"v"}'` — 用于调试的原始方法调用器。
-- `OpenKrab gateway stop|restart` — 停止/重启受监管的 Gateway 网关服务（launchd/systemd）。
-- Gateway 网关辅助子命令假设 `--url` 上有运行中的 Gateway 网关；它们不再自动生成一个。
+- `OpenKrab gateway health|status` â€” é€šè¿‡ Gateway ç½‘å…³ WS è¯·æ±‚ health/statusã€‚
+- `OpenKrab message send --target <num> --message "hi" [--media ...]` â€” é€šè¿‡ Gateway ç½‘å…³å‘é€ï¼ˆå¯¹ WhatsApp æ˜¯å¹‚ç­‰çš„ï¼‰ã€‚
+- `OpenKrab agent --message "hi" --to <num>` â€” è¿è¡Œæ™ºèƒ½ä½“è½®æ¬¡ï¼ˆé»˜è®¤ç­‰å¾…æœ€ç»ˆç»“æžœï¼‰ã€‚
+- `OpenKrab gateway call <method> --params '{"k":"v"}'` â€” ç”¨äºŽè°ƒè¯•çš„åŽŸå§‹æ–¹æ³•è°ƒç”¨å™¨ã€‚
+- `OpenKrab gateway stop|restart` â€” åœæ­¢/é‡å¯å—ç›‘ç®¡çš„ Gateway ç½‘å…³æœåŠ¡ï¼ˆlaunchd/systemdï¼‰ã€‚
+- Gateway ç½‘å…³è¾…åŠ©å­å‘½ä»¤å‡è®¾ `--url` ä¸Šæœ‰è¿è¡Œä¸­çš„ Gateway ç½‘å…³ï¼›å®ƒä»¬ä¸å†è‡ªåŠ¨ç”Ÿæˆä¸€ä¸ªã€‚
 
-## 迁移指南
+## è¿ç§»æŒ‡å—
 
-- 淘汰 `OpenKrab gateway` 和旧版 TCP 控制端口的使用。
-- 更新客户端以使用带有强制 connect 和结构化 presence 的 WS 协议。
+- æ·˜æ±° `OpenKrab gateway` å’Œæ—§ç‰ˆ TCP æŽ§åˆ¶ç«¯å£çš„ä½¿ç”¨ã€‚
+- æ›´æ–°å®¢æˆ·ç«¯ä»¥ä½¿ç”¨å¸¦æœ‰å¼ºåˆ¶ connect å’Œç»“æž„åŒ– presence çš„ WS åè®®ã€‚
+
 

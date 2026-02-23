@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Zalo personal account support via zca-cli (QR login), capabilities, and configuration"
 read_when:
   - Setting up Zalo Personal for openkrab
@@ -53,7 +53,7 @@ The Gateway machine must have the `zca` binary available in `PATH`.
 
 - Uses `zca listen` to receive inbound messages.
 - Uses `zca msg ...` to send replies (text/media/link).
-- Designed for “personal account” use cases where Zalo Bot API is not available.
+- Designed for â€œpersonal accountâ€ use cases where Zalo Bot API is not available.
 
 ## Naming
 
@@ -63,10 +63,7 @@ Channel id is `zalouser` to make it explicit this automates a **personal Zalo us
 
 Use the directory CLI to discover peers/groups and their IDs:
 
-```bash
-openkrab directory self --channel zalouser
-openkrab directory peers list --channel zalouser --query "name"
-openkrab directory groups list --channel zalouser --query "work"
+```bash\nOpenKrab directory self --channel zalouser\nOpenKrab directory peers list --channel zalouser --query "name"\nOpenKrab directory groups list --channel zalouser --query "work"
 ```
 
 ## Limits
@@ -92,7 +89,7 @@ Approve via:
   - `channels.zalouser.groups` (keys are group IDs or names)
 - Block all groups: `channels.zalouser.groupPolicy = "disabled"`.
 - The configure wizard can prompt for group allowlists.
-- On startup, openkrab resolves group/user names in allowlists to IDs and logs the mapping; unresolved entries are kept as typed.
+- On startup, OpenKrab resolves group/user names in allowlists to IDs and logs the mapping; unresolved entries are kept as typed.
 
 Example:
 
@@ -132,9 +129,10 @@ Accounts map to zca profiles. Example:
 
 **`zca` not found:**
 
-- Install zca-cli and ensure it’s on `PATH` for the Gateway process.
+- Install zca-cli and ensure itâ€™s on `PATH` for the Gateway process.
 
-**Login doesn’t stick:**
+**Login doesnâ€™t stick:**
 
 - `openkrab channels status --probe`
-- Re-login: `openkrab channels logout --channel zalouser && openkrab channels login --channel zalouser`
+- Re-login: `openkrab channels logout --channel zalouser && OpenKrab channels login --channel zalouser`
+

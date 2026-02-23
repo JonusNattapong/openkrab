@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Nodes: pairing, capabilities, permissions, and CLI helpers for canvas/camera/screen/system"
 read_when:
   - Pairing iOS/Android nodes to a gateway
@@ -13,11 +13,11 @@ A **node** is a companion device (macOS/iOS/Android/headless) that connects to t
 
 Legacy transport: [Bridge protocol](/gateway/bridge-protocol) (TCP JSONL; deprecated/removed for current nodes).
 
-macOS can also run in **node mode**: the menubar app connects to the Gateway’s WS server and exposes its local canvas/camera commands as a node (so `OpenKrab nodes …` works against this Mac).
+macOS can also run in **node mode**: the menubar app connects to the Gatewayâ€™s WS server and exposes its local canvas/camera commands as a node (so `OpenKrab nodes â€¦` works against this Mac).
 
 Notes:
 
-- Nodes are **peripherals**, not gateways. They don’t run the gateway service.
+- Nodes are **peripherals**, not gateways. They donâ€™t run the gateway service.
 - Telegram/WhatsApp/etc. messages land on the **gateway**, not on nodes.
 - Troubleshooting runbook: [/nodes/troubleshooting](/nodes/troubleshooting)
 
@@ -75,14 +75,14 @@ Example (node host -> gateway host):
 ssh -N -L 18790:127.0.0.1:18789 user@gateway-host
 
 # Terminal B: export the gateway token and connect through the tunnel
-export OpenKrab_GATEWAY_TOKEN="<gateway-token>"
+export OPENKRAB_GATEWAY_TOKEN="<gateway-token>"
 OpenKrab node run --host 127.0.0.1 --port 18790 --display-name "Build Node"
 ```
 
 Notes:
 
 - The token is `gateway.auth.token` from the gateway config (`~/.OpenKrab/OpenKrab.json` on the gateway host).
-- `OpenKrab node run` reads `OpenKrab_GATEWAY_TOKEN` for auth.
+- `OpenKrab node run` reads `OPENKRAB_GATEWAY_TOKEN` for auth.
 
 ### Start a node host (service)
 
@@ -150,7 +150,7 @@ Low-level (raw RPC):
 OpenKrab nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
 ```
 
-Higher-level helpers exist for the common “give the agent a MEDIA attachment” workflows.
+Higher-level helpers exist for the common â€œgive the agent a MEDIA attachmentâ€ workflows.
 
 ## Screenshots (canvas snapshots)
 
@@ -243,7 +243,7 @@ OpenKrab nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 1
 Notes:
 
 - Location is **off by default**.
-- “Always” requires system permission; background fetch is best-effort.
+- â€œAlwaysâ€ requires system permission; background fetch is best-effort.
 - The response includes lat/lon, accuracy (meters), and timestamp.
 
 ## SMS (Android nodes)
@@ -280,7 +280,7 @@ Notes:
 - `system.run` supports `--cwd`, `--env KEY=VAL`, `--command-timeout`, and `--needs-screen-recording`.
 - `system.notify` supports `--priority <passive|active|timeSensitive>` and `--delivery <system|overlay|auto>`.
 - Node hosts ignore `PATH` overrides. If you need extra PATH entries, configure the node host service environment (or install tools in standard locations) instead of passing `PATH` via `--env`.
-- On macOS node mode, `system.run` is gated by exec approvals in the macOS app (Settings → Exec approvals).
+- On macOS node mode, `system.run` is gated by exec approvals in the macOS app (Settings â†’ Exec approvals).
   Ask/allowlist/full behave the same as the headless node host; denied prompts return `SYSTEM_RUN_DENIED`.
 - On headless node host, `system.run` is gated by exec approvals (`~/.OpenKrab/exec-approvals.json`).
 
@@ -332,12 +332,13 @@ Notes:
 - Exec approvals are enforced locally via `~/.OpenKrab/exec-approvals.json`
   (see [Exec approvals](/tools/exec-approvals)).
 - On macOS, the headless node host prefers the companion app exec host when reachable and falls
-  back to local execution if the app is unavailable. Set `OpenKrab_NODE_EXEC_HOST=app` to require
-  the app, or `OpenKrab_NODE_EXEC_FALLBACK=0` to disable fallback.
+  back to local execution if the app is unavailable. Set `OPENKRAB_NODE_EXEC_HOST=app` to require
+  the app, or `OPENKRAB_NODE_EXEC_FALLBACK=0` to disable fallback.
 - Add `--tls` / `--tls-fingerprint` when the Gateway WS uses TLS.
 
 ## Mac node mode
 
-- The macOS menubar app connects to the Gateway WS server as a node (so `OpenKrab nodes …` works against this Mac).
+- The macOS menubar app connects to the Gateway WS server as a node (so `OpenKrab nodes â€¦` works against this Mac).
 - In remote mode, the app opens an SSH tunnel for the Gateway port and connects to `localhost`.
+
 

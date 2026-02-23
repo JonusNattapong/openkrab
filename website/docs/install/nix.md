@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Install OpenKrab declaratively with Nix"
 read_when:
   - You want reproducible, rollback-able installs
@@ -9,7 +9,7 @@ title: "Nix"
 
 # Nix Installation
 
-The recommended way to run OpenKrab with Nix is via **[nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)** — a batteries-included Home Manager module.
+The recommended way to run OpenKrab with Nix is via **[nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)** â€” a batteries-included Home Manager module.
 
 ## Quick Start
 
@@ -30,13 +30,13 @@ What I need you to do:
 Reference the nix-OpenKrab README for module options.
 ```
 
-> **📦 Full guide: [github.com/OpenKrab/nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)**
+> **ðŸ“¦ Full guide: [github.com/OpenKrab/nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab)**
 >
 > The nix-OpenKrab repo is the source of truth for Nix installation. This page is just a quick overview.
 
 ## What you get
 
-- Gateway + macOS app + tools (whisper, spotify, cameras) — all pinned
+- Gateway + macOS app + tools (whisper, spotify, cameras) â€” all pinned
 - Launchd service that survives reboots
 - Plugin system with declarative config
 - Instant rollback: `home-manager switch --rollback`
@@ -45,13 +45,13 @@ Reference the nix-OpenKrab README for module options.
 
 ## Nix Mode Runtime Behavior
 
-When `OpenKrab_NIX_MODE=1` is set (automatic with nix-OpenKrab):
+When `OPENKRAB_NIX_MODE=1` is set (automatic with nix-OpenKrab):
 
 OpenKrab supports a **Nix mode** that makes configuration deterministic and disables auto-install flows.
 Enable it by exporting:
 
 ```bash
-OpenKrab_NIX_MODE=1
+OPENKRAB_NIX_MODE=1
 ```
 
 On macOS, the GUI app does not automatically inherit shell env vars. You can
@@ -63,12 +63,12 @@ defaults write bot.molt.mac OpenKrab.nixMode -bool true
 
 ### Config + state paths
 
-OpenKrab reads JSON5 config from `OpenKrab_CONFIG_PATH` and stores mutable data in `OpenKrab_STATE_DIR`.
-When needed, you can also set `OpenKrab_HOME` to control the base home directory used for internal path resolution.
+OpenKrab reads JSON5 config from `OPENKRAB_CONFIG_PATH` and stores mutable data in `OPENKRAB_STATE_DIR`.
+When needed, you can also set `OPENKRAB_HOME` to control the base home directory used for internal path resolution.
 
-- `OpenKrab_HOME` (default precedence: `HOME` / `USERPROFILE` / `os.homedir()`)
-- `OpenKrab_STATE_DIR` (default: `~/.OpenKrab`)
-- `OpenKrab_CONFIG_PATH` (default: `$OpenKrab_STATE_DIR/OpenKrab.json`)
+- `OPENKRAB_HOME` (default precedence: `HOME` / `USERPROFILE` / `os.homedir()`)
+- `OPENKRAB_STATE_DIR` (default: `~/.OpenKrab`)
+- `OPENKRAB_CONFIG_PATH` (default: `$OPENKRAB_STATE_DIR/OpenKrab.json`)
 
 When running under Nix, set these explicitly to Nix-managed locations so runtime state and config
 stay out of the immutable store.
@@ -93,7 +93,8 @@ packaging and Nix builds (which do not rely on a full Xcode toolchain).
 
 ## Related
 
-- [nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab) — full setup guide
-- [Wizard](/start/wizard) — non-Nix CLI setup
-- [Docker](/install/docker) — containerized setup
+- [nix-OpenKrab](https://github.com/OpenKrab/nix-OpenKrab) â€” full setup guide
+- [Wizard](/start/wizard) â€” non-Nix CLI setup
+- [Docker](/install/docker) â€” containerized setup
+
 

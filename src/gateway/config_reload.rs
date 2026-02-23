@@ -1,5 +1,5 @@
 //! config_reload — Gateway config hot-reload.
-//! Ported from `openclaw/src/gateway/config-reload.ts`.
+//! Ported from `OpenKrab/src/gateway/config-reload.ts`.
 //!
 //! Watches config files for changes and builds a reload plan that determines
 //! which parts of the gateway need to be restarted vs hot-reloaded.
@@ -547,3 +547,4 @@ mod tests {
         assert!(plan.restart_heartbeat);
     }
 }
+

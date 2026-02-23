@@ -1,8 +1,8 @@
----
+﻿---
 summary: "CLI reference for `openkrab memory` (status/index/search)"
 read_when:
   - You want to index or search semantic memory
-  - You’re debugging memory availability or indexing
+  - Youâ€™re debugging memory availability or indexing
 title: "memory"
 ---
 
@@ -18,16 +18,7 @@ Related:
 
 ## Examples
 
-```bash
-openkrab memory status
-openkrab memory status --deep
-openkrab memory status --deep --index
-openkrab memory status --deep --index --verbose
-openkrab memory index
-openkrab memory index --verbose
-openkrab memory search "release checklist"
-openkrab memory status --agent main
-openkrab memory index --agent main --verbose
+```bash\nOpenKrab memory status\nOpenKrab memory status --deep\nOpenKrab memory status --deep --index\nOpenKrab memory status --deep --index --verbose\nOpenKrab memory index\nOpenKrab memory index --verbose\nOpenKrab memory search "release checklist"\nOpenKrab memory status --agent main\nOpenKrab memory index --agent main --verbose
 ```
 
 ## Options
@@ -43,3 +34,4 @@ Notes:
 - `memory status --deep --index` runs a reindex if the store is dirty.
 - `memory index --verbose` prints per-phase details (provider, model, sources, batch activity).
 - `memory status` includes any extra paths configured via `memorySearch.extraPaths`.
+

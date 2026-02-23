@@ -143,7 +143,7 @@ fn agent_management(theme: &ColorfulTheme) -> Result<()> {
         0 => {
             println!();
             println!("🤖 Your Agents:");
-            println!("  [active]   krabkrab-main");
+            println!("  [active]   openkrab-main");
             println!("  [idle]     developer-agent");
             println!("  [idle]     research-agent");
         }
@@ -159,7 +159,7 @@ fn agent_management(theme: &ColorfulTheme) -> Result<()> {
         }
         2 => {
             println!();
-            println!("🤖 Agent: krabkrab-main");
+            println!("🤖 Agent: openkrab-main");
             println!("  Status:    active");
             println!("  Model:     gpt-4");
             println!("  Provider:  openai");
@@ -177,7 +177,7 @@ fn agent_management(theme: &ColorfulTheme) -> Result<()> {
                 .interact_text()?;
             let agent: String = Input::with_theme(theme)
                 .with_prompt("Assign to agent")
-                .default("krabkrab-main".to_string())
+                .default("openkrab-main".to_string())
                 .interact_text()?;
             println!("✅ Task assigned to {}!", agent);
         }
@@ -257,7 +257,7 @@ fn activity_log(theme: &ColorfulTheme) -> Result<()> {
 
     println!();
     println!("Recent activities:");
-    println!("  10:32  🤖 Agent 'krabkrab-main' started");
+    println!("  10:32  🤖 Agent 'openkrab-main' started");
     println!("  10:30  ✅ Task 'Setup CI/CD' moved to Done");
     println!("  10:28  📝 Task 'Review PR #123' created");
     println!("  10:25  🔐 User authenticated via Telegram");
@@ -302,3 +302,4 @@ fn organization(theme: &ColorfulTheme) -> Result<()> {
 
     Ok(())
 }
+

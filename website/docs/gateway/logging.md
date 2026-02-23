@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Logging surfaces, file logs, WS log styles, and console formatting"
 read_when:
   - Changing logging output or formats
@@ -9,8 +9,7 @@ title: "Logging"
 # Logging
 
 For a user-facing overview (CLI + Control UI + config), see [/logging](/logging).
-
-openkrab has two log “surfaces”:
+\nOpenKrab has two log â€œsurfacesâ€:
 
 - **Console output** (what you see in the terminal / Debug UI).
 - **File logs** (JSON lines) written by the gateway logger.
@@ -28,8 +27,7 @@ The file format is one JSON object per line.
 The Control UI Logs tab tails this file via the gateway (`logs.tail`).
 CLI can do the same:
 
-```bash
-openkrab logs --follow
+```bash\nOpenKrab logs --follow
 ```
 
 **Verbose vs. log levels**
@@ -52,7 +50,7 @@ You can tune console verbosity independently via:
 
 ## Tool summary redaction
 
-Verbose tool summaries (e.g. `🛠️ Exec: ...`) can mask sensitive tokens before they hit the
+Verbose tool summaries (e.g. `ðŸ› ï¸ Exec: ...`) can mask sensitive tokens before they hit the
 console stream. This is **tools-only** and does not alter file logs.
 
 - `logging.redactSensitive`: `off` | `tools` (default: `tools`)
@@ -65,7 +63,7 @@ console stream. This is **tools-only** and does not alter file logs.
 
 The gateway prints WebSocket protocol logs in two modes:
 
-- **Normal mode (no `--verbose`)**: only “interesting” RPC results are printed:
+- **Normal mode (no `--verbose`)**: only â€œinterestingâ€ RPC results are printed:
   - errors (`ok=false`)
   - slow calls (default threshold: `>= 50ms`)
   - parse errors
@@ -83,14 +81,11 @@ The gateway prints WebSocket protocol logs in two modes:
 Examples:
 
 ```bash
-# optimized (only errors/slow)
-openkrab gateway
+# optimized (only errors/slow)\nOpenKrab gateway
 
-# show all WS traffic (paired)
-openkrab gateway --verbose --ws-log compact
+# show all WS traffic (paired)\nOpenKrab gateway --verbose --ws-log compact
 
-# show all WS traffic (full meta)
-openkrab gateway --verbose --ws-log full
+# show all WS traffic (full meta)\nOpenKrab gateway --verbose --ws-log full
 ```
 
 ## Console formatting (subsystem logging)
@@ -111,3 +106,4 @@ Behavior:
 - **WhatsApp message bodies** are logged at `debug` (use `--verbose` to see them)
 
 This keeps existing file logs stable while making interactive output scannable.
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Twitch chat bot configuration and setup"
 read_when:
   - Setting up Twitch chat integration for openkrab
@@ -7,7 +7,7 @@ title: "Twitch"
 
 # Twitch (plugin)
 
-Twitch chat support via IRC connection. openkrab connects as a Twitch user (bot account) to receive and send messages in channels.
+Twitch chat support via IRC connection. OpenKrab connects as a Twitch user (bot account) to receive and send messages in channels.
 
 ## Plugin required
 
@@ -15,14 +15,12 @@ Twitch ships as a plugin and is not bundled with the core install.
 
 Install via CLI (npm registry):
 
-```bash
-openkrab plugins install @openkrab/twitch
+```bash\nOpenKrab plugins install @openkrab/twitch
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/twitch
+```bash\nOpenKrab plugins install ./extensions/twitch
 ```
 
 Details: [Plugins](/tools/plugin)
@@ -36,12 +34,12 @@ Details: [Plugins](/tools/plugin)
    - Copy the **Client ID** and **Access Token**
 3. Find your Twitch user ID: [https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/](https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/)
 4. Configure the token:
-   - Env: `openkrab_TWITCH_ACCESS_TOKEN=...` (default account only)
+   - Env: `OPENKRAB_TWITCH_ACCESS_TOKEN=...` (default account only)
    - Or config: `channels.twitch.accessToken`
    - If both are set, config takes precedence (env fallback is default-account only).
 5. Start the gateway.
 
-**⚠️ Important:** Add access control (`allowFrom` or `allowedRoles`) to prevent unauthorized users from triggering the bot. `requireMention` defaults to `true`.
+**âš ï¸ Important:** Add access control (`allowFrom` or `allowedRoles`) to prevent unauthorized users from triggering the bot. `requireMention` defaults to `true`.
 
 Minimal config:
 
@@ -51,7 +49,7 @@ Minimal config:
     twitch: {
       enabled: true,
       username: "openkrab", // Bot's Twitch account
-      accessToken: "oauth:abc123...", // OAuth Access Token (or use openkrab_TWITCH_ACCESS_TOKEN env var)
+      accessToken: "oauth:abc123...", // OAuth Access Token (or use OPENKRAB_TWITCH_ACCESS_TOKEN env var)
       clientId: "xyz789...", // Client ID from Token Generator
       channel: "vevisk", // Which Twitch channel's chat to join (required)
       allowFrom: ["123456789"], // (recommended) Your Twitch user ID only - get it from https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
@@ -84,7 +82,7 @@ No manual app registration needed. Tokens expire after several hours.
 **Env var (default account only):**
 
 ```bash
-openkrab_TWITCH_ACCESS_TOKEN=oauth:abc123...
+OPENKRAB_TWITCH_ACCESS_TOKEN=oauth:abc123...
 ```
 
 **Or config:**
@@ -250,9 +248,7 @@ By default, `requireMention` is `true`. To disable and respond to all messages:
 
 First, run diagnostic commands:
 
-```bash
-openkrab doctor
-openkrab channels status --probe
+```bash\nOpenKrab doctor\nOpenKrab channels status --probe
 ```
 
 ### Bot doesn't respond to messages
@@ -377,3 +373,5 @@ Example:
 - **500 characters** per message (auto-chunked at word boundaries)
 - Markdown is stripped before chunking
 - No rate limiting (uses Twitch's built-in rate limits)
+
+

@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 你需要一个适合初学者的日志概述
-  - 你想配置日志级别或格式
-  - 你正在故障排除并需要快速找到日志
-summary: 日志概述：文件日志、控制台输出、CLI 跟踪和控制 UI
-title: 日志
+  - ä½ éœ€è¦ä¸€ä¸ªé€‚åˆåˆå­¦è€…çš„æ—¥å¿—æ¦‚è¿°
+  - ä½ æƒ³é…ç½®æ—¥å¿—çº§åˆ«æˆ–æ ¼å¼
+  - ä½ æ­£åœ¨æ•…éšœæŽ’é™¤å¹¶éœ€è¦å¿«é€Ÿæ‰¾åˆ°æ—¥å¿—
+summary: æ—¥å¿—æ¦‚è¿°ï¼šæ–‡ä»¶æ—¥å¿—ã€æŽ§åˆ¶å°è¾“å‡ºã€CLI è·Ÿè¸ªå’ŒæŽ§åˆ¶ UI
+title: æ—¥å¿—
 x-i18n:
   generated_at: "2026-02-03T07:50:52Z"
   model: claude-opus-4-5
@@ -14,24 +14,24 @@ x-i18n:
   workflow: 15
 ---
 
-# 日志
+# æ—¥å¿—
 
-OpenKrab 在两个地方记录日志：
+OpenKrab åœ¨ä¸¤ä¸ªåœ°æ–¹è®°å½•æ—¥å¿—ï¼š
 
-- **文件日志**（JSON 行）由 Gateway 网关写入。
-- **控制台输出**显示在终端和控制 UI 中。
+- **æ–‡ä»¶æ—¥å¿—**ï¼ˆJSON è¡Œï¼‰ç”± Gateway ç½‘å…³å†™å…¥ã€‚
+- **æŽ§åˆ¶å°è¾“å‡º**æ˜¾ç¤ºåœ¨ç»ˆç«¯å’ŒæŽ§åˆ¶ UI ä¸­ã€‚
 
-本页说明日志存放位置、如何读取日志以及如何配置日志级别和格式。
+æœ¬é¡µè¯´æ˜Žæ—¥å¿—å­˜æ”¾ä½ç½®ã€å¦‚ä½•è¯»å–æ—¥å¿—ä»¥åŠå¦‚ä½•é…ç½®æ—¥å¿—çº§åˆ«å’Œæ ¼å¼ã€‚
 
-## 日志存放位置
+## æ—¥å¿—å­˜æ”¾ä½ç½®
 
-默认情况下，Gateway 网关在以下位置写入滚动日志文件：
+é»˜è®¤æƒ…å†µä¸‹ï¼ŒGateway ç½‘å…³åœ¨ä»¥ä¸‹ä½ç½®å†™å…¥æ»šåŠ¨æ—¥å¿—æ–‡ä»¶ï¼š
 
 `/tmp/OpenKrab/OpenKrab-YYYY-MM-DD.log`
 
-日期使用 Gateway 网关主机的本地时区。
+æ—¥æœŸä½¿ç”¨ Gateway ç½‘å…³ä¸»æœºçš„æœ¬åœ°æ—¶åŒºã€‚
 
-你可以在 `~/.OpenKrab/OpenKrab.json` 中覆盖此设置：
+ä½ å¯ä»¥åœ¨ `~/.OpenKrab/OpenKrab.json` ä¸­è¦†ç›–æ­¤è®¾ç½®ï¼š
 
 ```json
 {
@@ -41,69 +41,69 @@ OpenKrab 在两个地方记录日志：
 }
 ```
 
-## 如何读取日志
+## å¦‚ä½•è¯»å–æ—¥å¿—
 
-### CLI：实时跟踪（推荐）
+### CLIï¼šå®žæ—¶è·Ÿè¸ªï¼ˆæŽ¨èï¼‰
 
-使用 CLI 通过 RPC 跟踪 Gateway 网关日志文件：
+ä½¿ç”¨ CLI é€šè¿‡ RPC è·Ÿè¸ª Gateway ç½‘å…³æ—¥å¿—æ–‡ä»¶ï¼š
 
 ```bash
 OpenKrab logs --follow
 ```
 
-输出模式：
+è¾“å‡ºæ¨¡å¼ï¼š
 
-- **TTY 会话**：美观、彩色、结构化的日志行。
-- **非 TTY 会话**：纯文本。
-- `--json`：行分隔的 JSON（每行一个日志事件）。
-- `--plain`：在 TTY 会话中强制纯文本。
-- `--no-color`：禁用 ANSI 颜色。
+- **TTY ä¼šè¯**ï¼šç¾Žè§‚ã€å½©è‰²ã€ç»“æž„åŒ–çš„æ—¥å¿—è¡Œã€‚
+- **éž TTY ä¼šè¯**ï¼šçº¯æ–‡æœ¬ã€‚
+- `--json`ï¼šè¡Œåˆ†éš”çš„ JSONï¼ˆæ¯è¡Œä¸€ä¸ªæ—¥å¿—äº‹ä»¶ï¼‰ã€‚
+- `--plain`ï¼šåœ¨ TTY ä¼šè¯ä¸­å¼ºåˆ¶çº¯æ–‡æœ¬ã€‚
+- `--no-color`ï¼šç¦ç”¨ ANSI é¢œè‰²ã€‚
 
-在 JSON 模式下，CLI 输出带 `type` 标签的对象：
+åœ¨ JSON æ¨¡å¼ä¸‹ï¼ŒCLI è¾“å‡ºå¸¦ `type` æ ‡ç­¾çš„å¯¹è±¡ï¼š
 
-- `meta`：流元数据（文件、游标、大小）
-- `log`：解析的日志条目
-- `notice`：截断/轮转提示
-- `raw`：未解析的日志行
+- `meta`ï¼šæµå…ƒæ•°æ®ï¼ˆæ–‡ä»¶ã€æ¸¸æ ‡ã€å¤§å°ï¼‰
+- `log`ï¼šè§£æžçš„æ—¥å¿—æ¡ç›®
+- `notice`ï¼šæˆªæ–­/è½®è½¬æç¤º
+- `raw`ï¼šæœªè§£æžçš„æ—¥å¿—è¡Œ
 
-如果 Gateway 网关无法访问，CLI 会打印一个简短提示运行：
+å¦‚æžœ Gateway ç½‘å…³æ— æ³•è®¿é—®ï¼ŒCLI ä¼šæ‰“å°ä¸€ä¸ªç®€çŸ­æç¤ºè¿è¡Œï¼š
 
 ```bash
 OpenKrab doctor
 ```
 
-### 控制 UI（Web）
+### æŽ§åˆ¶ UIï¼ˆWebï¼‰
 
-控制 UI 的**日志**标签页使用 `logs.tail` 跟踪相同的文件。
-参见 [/web/control-ui](/web/control-ui) 了解如何打开它。
+æŽ§åˆ¶ UI çš„**æ—¥å¿—**æ ‡ç­¾é¡µä½¿ç”¨ `logs.tail` è·Ÿè¸ªç›¸åŒçš„æ–‡ä»¶ã€‚
+å‚è§ [/web/control-ui](/web/control-ui) äº†è§£å¦‚ä½•æ‰“å¼€å®ƒã€‚
 
-### 仅渠道日志
+### ä»…æ¸ é“æ—¥å¿—
 
-要过滤渠道活动（WhatsApp/Telegram 等），使用：
+è¦è¿‡æ»¤æ¸ é“æ´»åŠ¨ï¼ˆWhatsApp/Telegram ç­‰ï¼‰ï¼Œä½¿ç”¨ï¼š
 
 ```bash
 OpenKrab channels logs --channel whatsapp
 ```
 
-## 日志格式
+## æ—¥å¿—æ ¼å¼
 
-### 文件日志（JSONL）
+### æ–‡ä»¶æ—¥å¿—ï¼ˆJSONLï¼‰
 
-日志文件中的每一行都是一个 JSON 对象。CLI 和控制 UI 解析这些条目以渲染结构化输出（时间、级别、子系统、消息）。
+æ—¥å¿—æ–‡ä»¶ä¸­çš„æ¯ä¸€è¡Œéƒ½æ˜¯ä¸€ä¸ª JSON å¯¹è±¡ã€‚CLI å’ŒæŽ§åˆ¶ UI è§£æžè¿™äº›æ¡ç›®ä»¥æ¸²æŸ“ç»“æž„åŒ–è¾“å‡ºï¼ˆæ—¶é—´ã€çº§åˆ«ã€å­ç³»ç»Ÿã€æ¶ˆæ¯ï¼‰ã€‚
 
-### 控制台输出
+### æŽ§åˆ¶å°è¾“å‡º
 
-控制台日志**感知 TTY**并格式化以提高可读性：
+æŽ§åˆ¶å°æ—¥å¿—**æ„ŸçŸ¥ TTY**å¹¶æ ¼å¼åŒ–ä»¥æé«˜å¯è¯»æ€§ï¼š
 
-- 子系统前缀（例如 `gateway/channels/whatsapp`）
-- 级别着色（info/warn/error）
-- 可选的紧凑或 JSON 模式
+- å­ç³»ç»Ÿå‰ç¼€ï¼ˆä¾‹å¦‚ `gateway/channels/whatsapp`ï¼‰
+- çº§åˆ«ç€è‰²ï¼ˆinfo/warn/errorï¼‰
+- å¯é€‰çš„ç´§å‡‘æˆ– JSON æ¨¡å¼
 
-控制台格式由 `logging.consoleStyle` 控制。
+æŽ§åˆ¶å°æ ¼å¼ç”± `logging.consoleStyle` æŽ§åˆ¶ã€‚
 
-## 配置日志
+## é…ç½®æ—¥å¿—
 
-所有日志配置都在 `~/.OpenKrab/OpenKrab.json` 的 `logging` 下。
+æ‰€æœ‰æ—¥å¿—é…ç½®éƒ½åœ¨ `~/.OpenKrab/OpenKrab.json` çš„ `logging` ä¸‹ã€‚
 
 ```json
 {
@@ -118,74 +118,74 @@ OpenKrab channels logs --channel whatsapp
 }
 ```
 
-### 日志级别
+### æ—¥å¿—çº§åˆ«
 
-- `logging.level`：**文件日志**（JSONL）级别。
-- `logging.consoleLevel`：**控制台**详细程度级别。
+- `logging.level`ï¼š**æ–‡ä»¶æ—¥å¿—**ï¼ˆJSONLï¼‰çº§åˆ«ã€‚
+- `logging.consoleLevel`ï¼š**æŽ§åˆ¶å°**è¯¦ç»†ç¨‹åº¦çº§åˆ«ã€‚
 
-`--verbose` 仅影响控制台输出；它不改变文件日志级别。
+`--verbose` ä»…å½±å“æŽ§åˆ¶å°è¾“å‡ºï¼›å®ƒä¸æ”¹å˜æ–‡ä»¶æ—¥å¿—çº§åˆ«ã€‚
 
-### 控制台样式
+### æŽ§åˆ¶å°æ ·å¼
 
-`logging.consoleStyle`：
+`logging.consoleStyle`ï¼š
 
-- `pretty`：人类友好、彩色、带时间戳。
-- `compact`：更紧凑的输出（最适合长会话）。
-- `json`：每行 JSON（用于日志处理器）。
+- `pretty`ï¼šäººç±»å‹å¥½ã€å½©è‰²ã€å¸¦æ—¶é—´æˆ³ã€‚
+- `compact`ï¼šæ›´ç´§å‡‘çš„è¾“å‡ºï¼ˆæœ€é€‚åˆé•¿ä¼šè¯ï¼‰ã€‚
+- `json`ï¼šæ¯è¡Œ JSONï¼ˆç”¨äºŽæ—¥å¿—å¤„ç†å™¨ï¼‰ã€‚
 
-### 脱敏
+### è„±æ•
 
-工具摘要可以在敏感令牌输出到控制台之前对其进行脱敏：
+å·¥å…·æ‘˜è¦å¯ä»¥åœ¨æ•æ„Ÿä»¤ç‰Œè¾“å‡ºåˆ°æŽ§åˆ¶å°ä¹‹å‰å¯¹å…¶è¿›è¡Œè„±æ•ï¼š
 
-- `logging.redactSensitive`：`off` | `tools`（默认：`tools`）
-- `logging.redactPatterns`：用于覆盖默认集的正则表达式字符串列表
+- `logging.redactSensitive`ï¼š`off` | `tools`ï¼ˆé»˜è®¤ï¼š`tools`ï¼‰
+- `logging.redactPatterns`ï¼šç”¨äºŽè¦†ç›–é»˜è®¤é›†çš„æ­£åˆ™è¡¨è¾¾å¼å­—ç¬¦ä¸²åˆ—è¡¨
 
-脱敏仅影响**控制台输出**，不会改变文件日志。
+è„±æ•ä»…å½±å“**æŽ§åˆ¶å°è¾“å‡º**ï¼Œä¸ä¼šæ”¹å˜æ–‡ä»¶æ—¥å¿—ã€‚
 
-## 诊断 + OpenTelemetry
+## è¯Šæ–­ + OpenTelemetry
 
-诊断是用于模型运行**和**消息流遥测（webhooks、队列、会话状态）的结构化、机器可读事件。它们**不**替代日志；它们存在是为了向指标、追踪和其他导出器提供数据。
+è¯Šæ–­æ˜¯ç”¨äºŽæ¨¡åž‹è¿è¡Œ**å’Œ**æ¶ˆæ¯æµé¥æµ‹ï¼ˆwebhooksã€é˜Ÿåˆ—ã€ä¼šè¯çŠ¶æ€ï¼‰çš„ç»“æž„åŒ–ã€æœºå™¨å¯è¯»äº‹ä»¶ã€‚å®ƒä»¬**ä¸**æ›¿ä»£æ—¥å¿—ï¼›å®ƒä»¬å­˜åœ¨æ˜¯ä¸ºäº†å‘æŒ‡æ ‡ã€è¿½è¸ªå’Œå…¶ä»–å¯¼å‡ºå™¨æä¾›æ•°æ®ã€‚
 
-诊断事件在进程内发出，但导出器仅在启用诊断 + 导出器插件时才附加。
+è¯Šæ–­äº‹ä»¶åœ¨è¿›ç¨‹å†…å‘å‡ºï¼Œä½†å¯¼å‡ºå™¨ä»…åœ¨å¯ç”¨è¯Šæ–­ + å¯¼å‡ºå™¨æ’ä»¶æ—¶æ‰é™„åŠ ã€‚
 
-### OpenTelemetry 与 OTLP
+### OpenTelemetry ä¸Ž OTLP
 
-- **OpenTelemetry（OTel）**：追踪、指标和日志的数据模型 + SDK。
-- **OTLP**：用于将 OTel 数据导出到收集器/后端的线路协议。
-- OpenKrab 目前通过 **OTLP/HTTP（protobuf）** 导出。
+- **OpenTelemetryï¼ˆOTelï¼‰**ï¼šè¿½è¸ªã€æŒ‡æ ‡å’Œæ—¥å¿—çš„æ•°æ®æ¨¡åž‹ + SDKã€‚
+- **OTLP**ï¼šç”¨äºŽå°† OTel æ•°æ®å¯¼å‡ºåˆ°æ”¶é›†å™¨/åŽç«¯çš„çº¿è·¯åè®®ã€‚
+- OpenKrab ç›®å‰é€šè¿‡ **OTLP/HTTPï¼ˆprotobufï¼‰** å¯¼å‡ºã€‚
 
-### 导出的信号
+### å¯¼å‡ºçš„ä¿¡å·
 
-- **指标**：计数器 + 直方图（令牌使用、消息流、队列）。
-- **追踪**：模型使用 + webhook/消息处理的 span。
-- **日志**：启用 `diagnostics.otel.logs` 时通过 OTLP 导出。日志量可能很大；请注意 `logging.level` 和导出器过滤器。
+- **æŒ‡æ ‡**ï¼šè®¡æ•°å™¨ + ç›´æ–¹å›¾ï¼ˆä»¤ç‰Œä½¿ç”¨ã€æ¶ˆæ¯æµã€é˜Ÿåˆ—ï¼‰ã€‚
+- **è¿½è¸ª**ï¼šæ¨¡åž‹ä½¿ç”¨ + webhook/æ¶ˆæ¯å¤„ç†çš„ spanã€‚
+- **æ—¥å¿—**ï¼šå¯ç”¨ `diagnostics.otel.logs` æ—¶é€šè¿‡ OTLP å¯¼å‡ºã€‚æ—¥å¿—é‡å¯èƒ½å¾ˆå¤§ï¼›è¯·æ³¨æ„ `logging.level` å’Œå¯¼å‡ºå™¨è¿‡æ»¤å™¨ã€‚
 
-### 诊断事件目录
+### è¯Šæ–­äº‹ä»¶ç›®å½•
 
-模型使用：
+æ¨¡åž‹ä½¿ç”¨ï¼š
 
-- `model.usage`：令牌、成本、持续时间、上下文、提供商/模型/渠道、会话 ID。
+- `model.usage`ï¼šä»¤ç‰Œã€æˆæœ¬ã€æŒç»­æ—¶é—´ã€ä¸Šä¸‹æ–‡ã€æä¾›å•†/æ¨¡åž‹/æ¸ é“ã€ä¼šè¯ IDã€‚
 
-消息流：
+æ¶ˆæ¯æµï¼š
 
-- `webhook.received`：每渠道的 webhook 入口。
-- `webhook.processed`：webhook 已处理 + 持续时间。
-- `webhook.error`：webhook 处理程序错误。
-- `message.queued`：消息入队等待处理。
-- `message.processed`：结果 + 持续时间 + 可选错误。
+- `webhook.received`ï¼šæ¯æ¸ é“çš„ webhook å…¥å£ã€‚
+- `webhook.processed`ï¼šwebhook å·²å¤„ç† + æŒç»­æ—¶é—´ã€‚
+- `webhook.error`ï¼šwebhook å¤„ç†ç¨‹åºé”™è¯¯ã€‚
+- `message.queued`ï¼šæ¶ˆæ¯å…¥é˜Ÿç­‰å¾…å¤„ç†ã€‚
+- `message.processed`ï¼šç»“æžœ + æŒç»­æ—¶é—´ + å¯é€‰é”™è¯¯ã€‚
 
-队列 + 会话：
+é˜Ÿåˆ— + ä¼šè¯ï¼š
 
-- `queue.lane.enqueue`：命令队列通道入队 + 深度。
-- `queue.lane.dequeue`：命令队列通道出队 + 等待时间。
-- `session.state`：会话状态转换 + 原因。
-- `session.stuck`：会话卡住警告 + 持续时间。
-- `run.attempt`：运行重试/尝试元数据。
-- `diagnostic.heartbeat`：聚合计数器（webhooks/队列/会话）。
+- `queue.lane.enqueue`ï¼šå‘½ä»¤é˜Ÿåˆ—é€šé“å…¥é˜Ÿ + æ·±åº¦ã€‚
+- `queue.lane.dequeue`ï¼šå‘½ä»¤é˜Ÿåˆ—é€šé“å‡ºé˜Ÿ + ç­‰å¾…æ—¶é—´ã€‚
+- `session.state`ï¼šä¼šè¯çŠ¶æ€è½¬æ¢ + åŽŸå› ã€‚
+- `session.stuck`ï¼šä¼šè¯å¡ä½è­¦å‘Š + æŒç»­æ—¶é—´ã€‚
+- `run.attempt`ï¼šè¿è¡Œé‡è¯•/å°è¯•å…ƒæ•°æ®ã€‚
+- `diagnostic.heartbeat`ï¼šèšåˆè®¡æ•°å™¨ï¼ˆwebhooks/é˜Ÿåˆ—/ä¼šè¯ï¼‰ã€‚
 
-### 启用诊断（无导出器）
+### å¯ç”¨è¯Šæ–­ï¼ˆæ— å¯¼å‡ºå™¨ï¼‰
 
-如果你希望诊断事件可用于插件或自定义接收器，使用此配置：
+å¦‚æžœä½ å¸Œæœ›è¯Šæ–­äº‹ä»¶å¯ç”¨äºŽæ’ä»¶æˆ–è‡ªå®šä¹‰æŽ¥æ”¶å™¨ï¼Œä½¿ç”¨æ­¤é…ç½®ï¼š
 
 ```json
 {
@@ -195,10 +195,10 @@ OpenKrab channels logs --channel whatsapp
 }
 ```
 
-### 诊断标志（定向日志）
+### è¯Šæ–­æ ‡å¿—ï¼ˆå®šå‘æ—¥å¿—ï¼‰
 
-使用标志在不提高 `logging.level` 的情况下开启额外的定向调试日志。
-标志不区分大小写，支持通配符（例如 `telegram.*` 或 `*`）。
+ä½¿ç”¨æ ‡å¿—åœ¨ä¸æé«˜ `logging.level` çš„æƒ…å†µä¸‹å¼€å¯é¢å¤–çš„å®šå‘è°ƒè¯•æ—¥å¿—ã€‚
+æ ‡å¿—ä¸åŒºåˆ†å¤§å°å†™ï¼Œæ”¯æŒé€šé…ç¬¦ï¼ˆä¾‹å¦‚ `telegram.*` æˆ– `*`ï¼‰ã€‚
 
 ```json
 {
@@ -208,21 +208,21 @@ OpenKrab channels logs --channel whatsapp
 }
 ```
 
-环境变量覆盖（一次性）：
+çŽ¯å¢ƒå˜é‡è¦†ç›–ï¼ˆä¸€æ¬¡æ€§ï¼‰ï¼š
 
 ```
-OpenKrab_DIAGNOSTICS=telegram.http,telegram.payload
+OPENKRAB_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
-注意：
+æ³¨æ„ï¼š
 
-- 标志日志进入标准日志文件（与 `logging.file` 相同）。
-- 输出仍根据 `logging.redactSensitive` 进行脱敏。
-- 完整指南：[/diagnostics/flags](/diagnostics/flags)。
+- æ ‡å¿—æ—¥å¿—è¿›å…¥æ ‡å‡†æ—¥å¿—æ–‡ä»¶ï¼ˆä¸Ž `logging.file` ç›¸åŒï¼‰ã€‚
+- è¾“å‡ºä»æ ¹æ® `logging.redactSensitive` è¿›è¡Œè„±æ•ã€‚
+- å®Œæ•´æŒ‡å—ï¼š[/diagnostics/flags](/diagnostics/flags)ã€‚
 
-### 导出到 OpenTelemetry
+### å¯¼å‡ºåˆ° OpenTelemetry
 
-诊断可以通过 `diagnostics-otel` 插件（OTLP/HTTP）导出。这适用于任何接受 OTLP/HTTP 的 OpenTelemetry 收集器/后端。
+è¯Šæ–­å¯ä»¥é€šè¿‡ `diagnostics-otel` æ’ä»¶ï¼ˆOTLP/HTTPï¼‰å¯¼å‡ºã€‚è¿™é€‚ç”¨äºŽä»»ä½•æŽ¥å— OTLP/HTTP çš„ OpenTelemetry æ”¶é›†å™¨/åŽç«¯ã€‚
 
 ```json
 {
@@ -251,80 +251,81 @@ OpenKrab_DIAGNOSTICS=telegram.http,telegram.payload
 }
 ```
 
-注意：
+æ³¨æ„ï¼š
 
-- 你也可以使用 `OpenKrab plugins enable diagnostics-otel` 启用插件。
-- `protocol` 目前仅支持 `http/protobuf`。`grpc` 被忽略。
-- 指标包括令牌使用、成本、上下文大小、运行持续时间和消息流计数器/直方图（webhooks、队列、会话状态、队列深度/等待）。
-- 追踪/指标可以通过 `traces` / `metrics` 切换（默认：开启）。启用时，追踪包括模型使用 span 加上 webhook/消息处理 span。
-- 当你的收集器需要认证时设置 `headers`。
-- 支持的环境变量：`OTEL_EXPORTER_OTLP_ENDPOINT`、`OTEL_SERVICE_NAME`、`OTEL_EXPORTER_OTLP_PROTOCOL`。
+- ä½ ä¹Ÿå¯ä»¥ä½¿ç”¨ `OpenKrab plugins enable diagnostics-otel` å¯ç”¨æ’ä»¶ã€‚
+- `protocol` ç›®å‰ä»…æ”¯æŒ `http/protobuf`ã€‚`grpc` è¢«å¿½ç•¥ã€‚
+- æŒ‡æ ‡åŒ…æ‹¬ä»¤ç‰Œä½¿ç”¨ã€æˆæœ¬ã€ä¸Šä¸‹æ–‡å¤§å°ã€è¿è¡ŒæŒç»­æ—¶é—´å’Œæ¶ˆæ¯æµè®¡æ•°å™¨/ç›´æ–¹å›¾ï¼ˆwebhooksã€é˜Ÿåˆ—ã€ä¼šè¯çŠ¶æ€ã€é˜Ÿåˆ—æ·±åº¦/ç­‰å¾…ï¼‰ã€‚
+- è¿½è¸ª/æŒ‡æ ‡å¯ä»¥é€šè¿‡ `traces` / `metrics` åˆ‡æ¢ï¼ˆé»˜è®¤ï¼šå¼€å¯ï¼‰ã€‚å¯ç”¨æ—¶ï¼Œè¿½è¸ªåŒ…æ‹¬æ¨¡åž‹ä½¿ç”¨ span åŠ ä¸Š webhook/æ¶ˆæ¯å¤„ç† spanã€‚
+- å½“ä½ çš„æ”¶é›†å™¨éœ€è¦è®¤è¯æ—¶è®¾ç½® `headers`ã€‚
+- æ”¯æŒçš„çŽ¯å¢ƒå˜é‡ï¼š`OTEL_EXPORTER_OTLP_ENDPOINT`ã€`OTEL_SERVICE_NAME`ã€`OTEL_EXPORTER_OTLP_PROTOCOL`ã€‚
 
-### 导出的指标（名称 + 类型）
+### å¯¼å‡ºçš„æŒ‡æ ‡ï¼ˆåç§° + ç±»åž‹ï¼‰
 
-模型使用：
+æ¨¡åž‹ä½¿ç”¨ï¼š
 
-- `OpenKrab.tokens`（计数器，属性：`OpenKrab.token`、`OpenKrab.channel`、`OpenKrab.provider`、`OpenKrab.model`）
-- `OpenKrab.cost.usd`（计数器，属性：`OpenKrab.channel`、`OpenKrab.provider`、`OpenKrab.model`）
-- `OpenKrab.run.duration_ms`（直方图，属性：`OpenKrab.channel`、`OpenKrab.provider`、`OpenKrab.model`）
-- `OpenKrab.context.tokens`（直方图，属性：`OpenKrab.context`、`OpenKrab.channel`、`OpenKrab.provider`、`OpenKrab.model`）
+- `OpenKrab.tokens`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.token`ã€`OpenKrab.channel`ã€`OpenKrab.provider`ã€`OpenKrab.model`ï¼‰
+- `OpenKrab.cost.usd`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.provider`ã€`OpenKrab.model`ï¼‰
+- `OpenKrab.run.duration_ms`ï¼ˆç›´æ–¹å›¾ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.provider`ã€`OpenKrab.model`ï¼‰
+- `OpenKrab.context.tokens`ï¼ˆç›´æ–¹å›¾ï¼Œå±žæ€§ï¼š`OpenKrab.context`ã€`OpenKrab.channel`ã€`OpenKrab.provider`ã€`OpenKrab.model`ï¼‰
 
-消息流：
+æ¶ˆæ¯æµï¼š
 
-- `OpenKrab.webhook.received`（计数器，属性：`OpenKrab.channel`、`OpenKrab.webhook`）
-- `OpenKrab.webhook.error`（计数器，属性：`OpenKrab.channel`、`OpenKrab.webhook`）
-- `OpenKrab.webhook.duration_ms`（直方图，属性：`OpenKrab.channel`、`OpenKrab.webhook`）
-- `OpenKrab.message.queued`（计数器，属性：`OpenKrab.channel`、`OpenKrab.source`）
-- `OpenKrab.message.processed`（计数器，属性：`OpenKrab.channel`、`OpenKrab.outcome`）
-- `OpenKrab.message.duration_ms`（直方图，属性：`OpenKrab.channel`、`OpenKrab.outcome`）
+- `OpenKrab.webhook.received`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.webhook`ï¼‰
+- `OpenKrab.webhook.error`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.webhook`ï¼‰
+- `OpenKrab.webhook.duration_ms`ï¼ˆç›´æ–¹å›¾ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.webhook`ï¼‰
+- `OpenKrab.message.queued`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.source`ï¼‰
+- `OpenKrab.message.processed`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.outcome`ï¼‰
+- `OpenKrab.message.duration_ms`ï¼ˆç›´æ–¹å›¾ï¼Œå±žæ€§ï¼š`OpenKrab.channel`ã€`OpenKrab.outcome`ï¼‰
 
-队列 + 会话：
+é˜Ÿåˆ— + ä¼šè¯ï¼š
 
-- `OpenKrab.queue.lane.enqueue`（计数器，属性：`OpenKrab.lane`）
-- `OpenKrab.queue.lane.dequeue`（计数器，属性：`OpenKrab.lane`）
-- `OpenKrab.queue.depth`（直方图，属性：`OpenKrab.lane` 或 `OpenKrab.channel=heartbeat`）
-- `OpenKrab.queue.wait_ms`（直方图，属性：`OpenKrab.lane`）
-- `OpenKrab.session.state`（计数器，属性：`OpenKrab.state`、`OpenKrab.reason`）
-- `OpenKrab.session.stuck`（计数器，属性：`OpenKrab.state`）
-- `OpenKrab.session.stuck_age_ms`（直方图，属性：`OpenKrab.state`）
-- `OpenKrab.run.attempt`（计数器，属性：`OpenKrab.attempt`）
+- `OpenKrab.queue.lane.enqueue`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.lane`ï¼‰
+- `OpenKrab.queue.lane.dequeue`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.lane`ï¼‰
+- `OpenKrab.queue.depth`ï¼ˆç›´æ–¹å›¾ï¼Œå±žæ€§ï¼š`OpenKrab.lane` æˆ– `OpenKrab.channel=heartbeat`ï¼‰
+- `OpenKrab.queue.wait_ms`ï¼ˆç›´æ–¹å›¾ï¼Œå±žæ€§ï¼š`OpenKrab.lane`ï¼‰
+- `OpenKrab.session.state`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.state`ã€`OpenKrab.reason`ï¼‰
+- `OpenKrab.session.stuck`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.state`ï¼‰
+- `OpenKrab.session.stuck_age_ms`ï¼ˆç›´æ–¹å›¾ï¼Œå±žæ€§ï¼š`OpenKrab.state`ï¼‰
+- `OpenKrab.run.attempt`ï¼ˆè®¡æ•°å™¨ï¼Œå±žæ€§ï¼š`OpenKrab.attempt`ï¼‰
 
-### 导出的 span（名称 + 关键属性）
+### å¯¼å‡ºçš„ spanï¼ˆåç§° + å…³é”®å±žæ€§ï¼‰
 
 - `OpenKrab.model.usage`
-  - `OpenKrab.channel`、`OpenKrab.provider`、`OpenKrab.model`
-  - `OpenKrab.sessionKey`、`OpenKrab.sessionId`
-  - `OpenKrab.tokens.*`（input/output/cache_read/cache_write/total）
+  - `OpenKrab.channel`ã€`OpenKrab.provider`ã€`OpenKrab.model`
+  - `OpenKrab.sessionKey`ã€`OpenKrab.sessionId`
+  - `OpenKrab.tokens.*`ï¼ˆinput/output/cache_read/cache_write/totalï¼‰
 - `OpenKrab.webhook.processed`
-  - `OpenKrab.channel`、`OpenKrab.webhook`、`OpenKrab.chatId`
+  - `OpenKrab.channel`ã€`OpenKrab.webhook`ã€`OpenKrab.chatId`
 - `OpenKrab.webhook.error`
-  - `OpenKrab.channel`、`OpenKrab.webhook`、`OpenKrab.chatId`、`OpenKrab.error`
+  - `OpenKrab.channel`ã€`OpenKrab.webhook`ã€`OpenKrab.chatId`ã€`OpenKrab.error`
 - `OpenKrab.message.processed`
-  - `OpenKrab.channel`、`OpenKrab.outcome`、`OpenKrab.chatId`、`OpenKrab.messageId`、`OpenKrab.sessionKey`、`OpenKrab.sessionId`、`OpenKrab.reason`
+  - `OpenKrab.channel`ã€`OpenKrab.outcome`ã€`OpenKrab.chatId`ã€`OpenKrab.messageId`ã€`OpenKrab.sessionKey`ã€`OpenKrab.sessionId`ã€`OpenKrab.reason`
 - `OpenKrab.session.stuck`
-  - `OpenKrab.state`、`OpenKrab.ageMs`、`OpenKrab.queueDepth`、`OpenKrab.sessionKey`、`OpenKrab.sessionId`
+  - `OpenKrab.state`ã€`OpenKrab.ageMs`ã€`OpenKrab.queueDepth`ã€`OpenKrab.sessionKey`ã€`OpenKrab.sessionId`
 
-### 采样 + 刷新
+### é‡‡æ · + åˆ·æ–°
 
-- 追踪采样：`diagnostics.otel.sampleRate`（0.0–1.0，仅根 span）。
-- 指标导出间隔：`diagnostics.otel.flushIntervalMs`（最小 1000ms）。
+- è¿½è¸ªé‡‡æ ·ï¼š`diagnostics.otel.sampleRate`ï¼ˆ0.0â€“1.0ï¼Œä»…æ ¹ spanï¼‰ã€‚
+- æŒ‡æ ‡å¯¼å‡ºé—´éš”ï¼š`diagnostics.otel.flushIntervalMs`ï¼ˆæœ€å° 1000msï¼‰ã€‚
 
-### 协议说明
+### åè®®è¯´æ˜Ž
 
-- OTLP/HTTP 端点可以通过 `diagnostics.otel.endpoint` 或 `OTEL_EXPORTER_OTLP_ENDPOINT` 设置。
-- 如果端点已包含 `/v1/traces` 或 `/v1/metrics`，则按原样使用。
-- 如果端点已包含 `/v1/logs`，则按原样用于日志。
-- `diagnostics.otel.logs` 为主日志器输出启用 OTLP 日志导出。
+- OTLP/HTTP ç«¯ç‚¹å¯ä»¥é€šè¿‡ `diagnostics.otel.endpoint` æˆ– `OTEL_EXPORTER_OTLP_ENDPOINT` è®¾ç½®ã€‚
+- å¦‚æžœç«¯ç‚¹å·²åŒ…å« `/v1/traces` æˆ– `/v1/metrics`ï¼Œåˆ™æŒ‰åŽŸæ ·ä½¿ç”¨ã€‚
+- å¦‚æžœç«¯ç‚¹å·²åŒ…å« `/v1/logs`ï¼Œåˆ™æŒ‰åŽŸæ ·ç”¨äºŽæ—¥å¿—ã€‚
+- `diagnostics.otel.logs` ä¸ºä¸»æ—¥å¿—å™¨è¾“å‡ºå¯ç”¨ OTLP æ—¥å¿—å¯¼å‡ºã€‚
 
-### 日志导出行为
+### æ—¥å¿—å¯¼å‡ºè¡Œä¸º
 
-- OTLP 日志使用与写入 `logging.file` 相同的结构化记录。
-- 遵守 `logging.level`（文件日志级别）。控制台脱敏**不**适用于 OTLP 日志。
-- 高流量安装应优先使用 OTLP 收集器采样/过滤。
+- OTLP æ—¥å¿—ä½¿ç”¨ä¸Žå†™å…¥ `logging.file` ç›¸åŒçš„ç»“æž„åŒ–è®°å½•ã€‚
+- éµå®ˆ `logging.level`ï¼ˆæ–‡ä»¶æ—¥å¿—çº§åˆ«ï¼‰ã€‚æŽ§åˆ¶å°è„±æ•**ä¸**é€‚ç”¨äºŽ OTLP æ—¥å¿—ã€‚
+- é«˜æµé‡å®‰è£…åº”ä¼˜å…ˆä½¿ç”¨ OTLP æ”¶é›†å™¨é‡‡æ ·/è¿‡æ»¤ã€‚
 
-## 故障排除提示
+## æ•…éšœæŽ’é™¤æç¤º
 
-- **Gateway 网关无法访问？** 先运行 `OpenKrab doctor`。
-- **日志为空？** 检查 Gateway 网关是否正在运行并写入 `logging.file` 中的文件路径。
-- **需要更多细节？** 将 `logging.level` 设置为 `debug` 或 `trace` 并重试。
+- **Gateway ç½‘å…³æ— æ³•è®¿é—®ï¼Ÿ** å…ˆè¿è¡Œ `OpenKrab doctor`ã€‚
+- **æ—¥å¿—ä¸ºç©ºï¼Ÿ** æ£€æŸ¥ Gateway ç½‘å…³æ˜¯å¦æ­£åœ¨è¿è¡Œå¹¶å†™å…¥ `logging.file` ä¸­çš„æ–‡ä»¶è·¯å¾„ã€‚
+- **éœ€è¦æ›´å¤šç»†èŠ‚ï¼Ÿ** å°† `logging.level` è®¾ç½®ä¸º `debug` æˆ– `trace` å¹¶é‡è¯•ã€‚
+
 

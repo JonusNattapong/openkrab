@@ -1,4 +1,4 @@
-use krabkrab::channels::session::{
+use openkrab::channels::session::{
     record_inbound_session, InboundLastRouteUpdate, RecordInboundSessionParams,
 };
 use serde_json::json;
@@ -27,3 +27,4 @@ fn record_and_read_session_file() {
     assert!(contents.contains("tester"));
     assert!(contents.contains("+123"));
 }
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Heartbeat polling messages and notification rules"
 read_when:
   - Adjusting heartbeat cadence or messaging
@@ -46,7 +46,7 @@ Example config:
 - Prompt body (configurable via `agents.defaults.heartbeat.prompt`):
   `Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`
 - The heartbeat prompt is sent **verbatim** as the user message. The system
-  prompt includes a “Heartbeat” section and the run is flagged internally.
+  prompt includes a â€œHeartbeatâ€ section and the run is flagged internally.
 - Active hours (`heartbeat.activeHours`) are checked in the configured timezone.
   Outside the window, heartbeats are skipped until the next tick inside the window.
 
@@ -54,22 +54,22 @@ Example config:
 
 The default prompt is intentionally broad:
 
-- **Background tasks**: “Consider outstanding tasks” nudges the agent to review
+- **Background tasks**: â€œConsider outstanding tasksâ€ nudges the agent to review
   follow-ups (inbox, calendar, reminders, queued work) and surface anything urgent.
-- **Human check-in**: “Checkup sometimes on your human during day time” nudges an
-  occasional lightweight “anything you need?” message, but avoids night-time spam
+- **Human check-in**: â€œCheckup sometimes on your human during day timeâ€ nudges an
+  occasional lightweight â€œanything you need?â€ message, but avoids night-time spam
   by using your configured local timezone (see [/concepts/timezone](/concepts/timezone)).
 
-If you want a heartbeat to do something very specific (e.g. “check Gmail PubSub
-stats” or “verify gateway health”), set `agents.defaults.heartbeat.prompt` (or
+If you want a heartbeat to do something very specific (e.g. â€œcheck Gmail PubSub
+statsâ€ or â€œverify gateway healthâ€), set `agents.defaults.heartbeat.prompt` (or
 `agents.list[].heartbeat.prompt`) to a custom body (sent verbatim).
 
 ## Response contract
 
 - If nothing needs attention, reply with **`HEARTBEAT_OK`**.
-- During heartbeat runs, openkrab treats `HEARTBEAT_OK` as an ack when it appears
+- During heartbeat runs, OpenKrab treats `HEARTBEAT_OK` as an ack when it appears
   at the **start or end** of the reply. The token is stripped and the reply is
-  dropped if the remaining content is **≤ `ackMaxChars`** (default: 300).
+  dropped if the remaining content is **â‰¤ `ackMaxChars`** (default: 300).
 - If `HEARTBEAT_OK` appears in the **middle** of a reply, it is not treated
   specially.
 - For alerts, **do not** include `HEARTBEAT_OK`; return only the alert text.
@@ -229,7 +229,7 @@ Use `accountId` to target a specific account on multi-account channels like Tele
 
 ## Delivery behavior
 
-- Heartbeats run in the agent’s main session by default (`agent:<id>:<mainKey>`),
+- Heartbeats run in the agentâ€™s main session by default (`agent:<id>:<mainKey>`),
   or `global` when `session.scope = "global"`. Set `session` to override to a
   specific channel session (Discord/WhatsApp/etc.).
 - `session` only affects the run context; delivery is controlled by `target` and `to`.
@@ -263,7 +263,7 @@ channels:
           showAlerts: false # Suppress alert delivery for this account
 ```
 
-Precedence: per-account → per-channel → channel defaults → built-in defaults.
+Precedence: per-account â†’ per-channel â†’ channel defaults â†’ built-in defaults.
 
 ### What each flag does
 
@@ -271,7 +271,7 @@ Precedence: per-account → per-channel → channel defaults → built-in defaul
 - `showAlerts`: sends the alert content when the model returns a non-OK reply.
 - `useIndicator`: emits indicator events for UI status surfaces.
 
-If **all three** are false, openkrab skips the heartbeat run entirely (no model call).
+If **all three** are false, OpenKrab skips the heartbeat run entirely (no model call).
 
 ### Per-channel vs per-account examples
 
@@ -306,11 +306,11 @@ channels:
 ## HEARTBEAT.md (optional)
 
 If a `HEARTBEAT.md` file exists in the workspace, the default prompt tells the
-agent to read it. Think of it as your “heartbeat checklist”: small, stable, and
+agent to read it. Think of it as your â€œheartbeat checklistâ€: small, stable, and
 safe to include every 30 minutes.
 
 If `HEARTBEAT.md` exists but is effectively empty (only blank lines and markdown
-headers like `# Heading`), openkrab skips the heartbeat run to save API calls.
+headers like `# Heading`), OpenKrab skips the heartbeat run to save API calls.
 If the file is missing, the heartbeat still runs and the model decides what to do.
 
 Keep it tiny (short checklist or reminders) to avoid prompt bloat.
@@ -321,33 +321,32 @@ Example `HEARTBEAT.md`:
 # Heartbeat checklist
 
 - Quick scan: anything urgent in inboxes?
-- If it’s daytime, do a lightweight check-in if nothing else is pending.
+- If itâ€™s daytime, do a lightweight check-in if nothing else is pending.
 - If a task is blocked, write down _what is missing_ and ask Peter next time.
 ```
 
 ### Can the agent update HEARTBEAT.md?
 
-Yes — if you ask it to.
+Yes â€” if you ask it to.
 
 `HEARTBEAT.md` is just a normal file in the agent workspace, so you can tell the
 agent (in a normal chat) something like:
 
-- “Update `HEARTBEAT.md` to add a daily calendar check.”
-- “Rewrite `HEARTBEAT.md` so it’s shorter and focused on inbox follow-ups.”
+- â€œUpdate `HEARTBEAT.md` to add a daily calendar check.â€
+- â€œRewrite `HEARTBEAT.md` so itâ€™s shorter and focused on inbox follow-ups.â€
 
 If you want this to happen proactively, you can also include an explicit line in
-your heartbeat prompt like: “If the checklist becomes stale, update HEARTBEAT.md
-with a better one.”
+your heartbeat prompt like: â€œIf the checklist becomes stale, update HEARTBEAT.md
+with a better one.â€
 
-Safety note: don’t put secrets (API keys, phone numbers, private tokens) into
-`HEARTBEAT.md` — it becomes part of the prompt context.
+Safety note: donâ€™t put secrets (API keys, phone numbers, private tokens) into
+`HEARTBEAT.md` â€” it becomes part of the prompt context.
 
 ## Manual wake (on-demand)
 
 You can enqueue a system event and trigger an immediate heartbeat with:
 
-```bash
-openkrab system event --text "Check for urgent follow-ups" --mode now
+```bash\nOpenKrab system event --text "Check for urgent follow-ups" --mode now
 ```
 
 If multiple agents have `heartbeat` configured, a manual wake runs each of those
@@ -357,7 +356,7 @@ Use `--mode next-heartbeat` to wait for the next scheduled tick.
 
 ## Reasoning delivery (optional)
 
-By default, heartbeats deliver only the final “answer” payload.
+By default, heartbeats deliver only the final â€œanswerâ€ payload.
 
 If you want transparency, enable:
 
@@ -366,7 +365,7 @@ If you want transparency, enable:
 When enabled, heartbeats will also deliver a separate message prefixed
 `Reasoning:` (same shape as `/reasoning on`). This can be useful when the agent
 is managing multiple sessions/codexes and you want to see why it decided to ping
-you — but it can also leak more internal detail than you want. Prefer keeping it
+you â€” but it can also leak more internal detail than you want. Prefer keeping it
 off in group chats.
 
 ## Cost awareness
@@ -374,3 +373,4 @@ off in group chats.
 Heartbeats run full agent turns. Shorter intervals burn more tokens. Keep
 `HEARTBEAT.md` small and consider a cheaper `model` or `target: "none"` if you
 only want internal state updates.
+

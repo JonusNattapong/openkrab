@@ -1,4 +1,4 @@
-//! sandbox — Security sandboxing for untrusted plugins.
+﻿//! sandbox â€” Security sandboxing for untrusted plugins.
 //!
 //! Provides resource limits, filesystem isolation, and network controls
 //! for safely executing third-party plugins.
@@ -264,7 +264,7 @@ impl Default for EnvironmentPolicy {
     fn default() -> Self {
         Self {
             allow_env_access: false,
-            allowed_prefixes: vec!["KRABKRAB_".to_string()],
+            allowed_prefixes: vec!["openkrab_".to_string()],
             allowed_vars: Vec::new(),
             blocked_vars: vec![
                 "HOME".to_string(),
@@ -443,7 +443,7 @@ pub struct Sandbox {
 impl Sandbox {
     /// Create a new sandbox for a plugin
     pub fn new(plugin_name: impl Into<String>, config: SandboxConfig) -> Self {
-        let temp_dir = std::env::temp_dir().join("krabkrab").join("sandbox");
+        let temp_dir = std::env::temp_dir().join("openkrab").join("sandbox");
         Self {
             config,
             plugin_name: plugin_name.into(),
@@ -715,13 +715,15 @@ mod tests {
     fn env_policy() {
         let policy = EnvironmentPolicy {
             allow_env_access: false,
-            allowed_prefixes: vec!["KRABKRAB_".to_string()],
-            blocked_vars: vec!["KRABKRAB_SECRET".to_string()],
+            allowed_prefixes: vec!["openkrab_".to_string()],
+            blocked_vars: vec!["OPENKRAB_SECRET".to_string()],
             ..Default::default()
         };
 
-        assert!(policy.can_access("KRABKRAB_SETTING"));
-        assert!(!policy.can_access("KRABKRAB_SECRET"));
+        assert!(policy.can_access("OPENKRAB_SETTING"));
+        assert!(!policy.can_access("OPENKRAB_SECRET"));
         assert!(!policy.can_access("HOME"));
     }
 }
+
+

@@ -1,5 +1,5 @@
-use crate::channels::chat_type::normalize_chat_type;
-use crate::openkrab_config::SessionConfig;
+﻿use crate::channels::chat_type::normalize_chat_type;
+use crate::OPENKRAB_CONFIG::SessionConfig;
 use crate::sessions::{SendPolicy, Session};
 
 pub fn normalize_send_policy(raw: Option<&str>) -> Option<SendPolicy> {
@@ -147,3 +147,4 @@ pub fn resolve_send_policy(params: ResolveSendPolicyParams) -> SendPolicy {
 
     normalize_send_policy(policy.default.as_deref()).unwrap_or(SendPolicy::Allow)
 }
+

@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
+﻿use serde::{Deserialize, Serialize};
 
-fn map_openkrab_channel_config(c: &crate::openkrab_config::ChannelConfig) -> ChannelConfig {
+fn map_OPENKRAB_CHANNEL_CONFIG(c: &crate::OPENKRAB_CONFIG::ChannelConfig) -> ChannelConfig {
     ChannelConfig {
         enabled: c.enabled,
         allowlist: c.allowlist.clone(),
@@ -11,8 +11,8 @@ fn map_openkrab_channel_config(c: &crate::openkrab_config::ChannelConfig) -> Cha
     }
 }
 
-fn map_openkrab_channels(
-    channels: Option<&crate::openkrab_config::ChannelsConfig>,
+fn map_OPENKRAB_CHANNELS(
+    channels: Option<&crate::OPENKRAB_CONFIG::ChannelsConfig>,
 ) -> ChannelsConfig {
     let Some(channels) = channels else {
         return ChannelsConfig::default();
@@ -71,23 +71,23 @@ fn map_openkrab_channels(
         slack: channels
             .slack
             .iter()
-            .map(|(k, v)| (k.clone(), map_openkrab_channel_config(v)))
+            .map(|(k, v)| (k.clone(), map_OPENKRAB_CHANNEL_CONFIG(v)))
             .collect(),
         discord,
         whatsapp: channels
             .whatsapp
             .iter()
-            .map(|(k, v)| (k.clone(), map_openkrab_channel_config(v)))
+            .map(|(k, v)| (k.clone(), map_OPENKRAB_CHANNEL_CONFIG(v)))
             .collect(),
         accounts: channels
             .accounts
             .iter()
-            .map(|(k, v)| (k.clone(), map_openkrab_channel_config(v)))
+            .map(|(k, v)| (k.clone(), map_OPENKRAB_CHANNEL_CONFIG(v)))
             .collect(),
     }
 }
 
-fn map_openkrab_agents(agents: Option<&crate::openkrab_config::AgentsConfig>) -> AgentsConfig {
+fn map_OPENKRAB_AGENTS(agents: Option<&crate::OPENKRAB_CONFIG::AgentsConfig>) -> AgentsConfig {
     let Some(agents) = agents else {
         return AgentsConfig::default();
     };
@@ -114,7 +114,7 @@ fn map_openkrab_agents(agents: Option<&crate::openkrab_config::AgentsConfig>) ->
     }
 }
 
-fn map_openkrab_auth(auth: Option<&crate::openkrab_config::AuthConfig>) -> AuthConfig {
+fn map_OPENKRAB_AUTH(auth: Option<&crate::OPENKRAB_CONFIG::AuthConfig>) -> AuthConfig {
     let Some(auth) = auth else {
         return AuthConfig::default();
     };
@@ -132,13 +132,13 @@ fn map_openkrab_auth(auth: Option<&crate::openkrab_config::AuthConfig>) -> AuthC
 }
 
 /// Re-export OpenKrabConfig as the main config type
-pub use crate::openkrab_config::OpenKrabConfig;
+pub use crate::OPENKRAB_CONFIG::OpenKrabConfig;
 
 /// Re-export config I/O functions
 pub use crate::config_io::{
     apply_env_substitution, clear_config_cache, get_default_config, load_config, load_config_file,
     load_config_from_path, migrate_legacy_config, read_config_snapshot, resolve_config_path,
-    save_config, save_config_to_path, validate_config as validate_openkrab_config,
+    save_config, save_config_to_path, validate_config as validate_OPENKRAB_CONFIG,
 };
 
 /// Re-export validation functions
@@ -148,7 +148,7 @@ pub use crate::config_validation::{
 };
 
 /// Convert OpenKrabConfig to AppConfig (for backward compatibility)
-pub fn openkrab_to_app_config(openkrab: &OpenKrabConfig) -> AppConfig {
+pub fn OPENKRAB_TO_APP_CONFIG(openkrab: &OpenKrabConfig) -> AppConfig {
     AppConfig {
         profile: "default".to_string(),
         log_level: openkrab
@@ -191,19 +191,19 @@ pub fn openkrab_to_app_config(openkrab: &OpenKrabConfig) -> AppConfig {
         memory: crate::memory::config::MemoryConfig::default(),
         agent: crate::agents::AgentIdentity::default(),
         feature_matrix: FeatureMatrix::default(),
-        agents: map_openkrab_agents(openkrab.agents.as_ref()),
-        auth: map_openkrab_auth(openkrab.auth.as_ref()),
-        channels: map_openkrab_channels(openkrab.channels.as_ref()),
+        agents: map_OPENKRAB_AGENTS(openkrab.agents.as_ref()),
+        auth: map_OPENKRAB_AUTH(openkrab.auth.as_ref()),
+        channels: map_OPENKRAB_CHANNELS(openkrab.channels.as_ref()),
         gateway: GatewayConfig::default(),
         logging: LoggingConfig::default(),
     }
 }
 
 /// Convert AppConfig to OpenKrabConfig (for forward compatibility)
-pub fn app_to_openkrab_config(app: &AppConfig) -> OpenKrabConfig {
-    let mut channels = crate::openkrab_config::ChannelsConfig::default();
+pub fn app_to_OPENKRAB_CONFIG(app: &AppConfig) -> OpenKrabConfig {
+    let mut channels = crate::OPENKRAB_CONFIG::ChannelsConfig::default();
 
-    let to_openkrab_channel = |cfg: Option<&ChannelConfig>| crate::openkrab_config::ChannelConfig {
+    let to_OPENKRAB_CHANNEL = |cfg: Option<&ChannelConfig>| crate::OPENKRAB_CONFIG::ChannelConfig {
         enabled: cfg.map(|c| c.enabled).unwrap_or(true),
         allowlist: cfg.map(|c| c.allowlist.clone()).unwrap_or_default(),
         token: cfg.and_then(|c| c.token.clone()),
@@ -214,10 +214,10 @@ pub fn app_to_openkrab_config(app: &AppConfig) -> OpenKrabConfig {
 
     if app.enable_telegram {
         let acct_cfg = app.channels.telegram.get("default");
-        let mut tc = crate::openkrab_config::TelegramConfig::default();
+        let mut tc = crate::OPENKRAB_CONFIG::TelegramConfig::default();
         tc.accounts.insert(
             "default".to_string(),
-            crate::openkrab_config::TelegramAccountConfig {
+            crate::OPENKRAB_CONFIG::TelegramAccountConfig {
                 enabled: acct_cfg.map(|c| c.enabled).unwrap_or(true),
                 allowlist: acct_cfg.map(|c| c.allowlist.clone()).unwrap_or_default(),
                 token: acct_cfg.and_then(|c| c.token.clone()),
@@ -232,16 +232,16 @@ pub fn app_to_openkrab_config(app: &AppConfig) -> OpenKrabConfig {
     if app.enable_slack {
         channels.slack.insert(
             "default".to_string(),
-            to_openkrab_channel(app.channels.slack.get("default")),
+            to_OPENKRAB_CHANNEL(app.channels.slack.get("default")),
         );
     }
 
     if app.enable_discord {
         let acct_cfg = app.channels.discord.get("default");
-        let mut dc = crate::openkrab_config::DiscordConfig::default();
+        let mut dc = crate::OPENKRAB_CONFIG::DiscordConfig::default();
         dc.accounts.insert(
             "default".to_string(),
-            crate::openkrab_config::DiscordAccountConfig {
+            crate::OPENKRAB_CONFIG::DiscordAccountConfig {
                 enabled: acct_cfg.map(|c| c.enabled).unwrap_or(true),
                 allowlist: acct_cfg.map(|c| c.allowlist.clone()).unwrap_or_default(),
                 token: acct_cfg.and_then(|c| c.token.clone()),
@@ -254,7 +254,7 @@ pub fn app_to_openkrab_config(app: &AppConfig) -> OpenKrabConfig {
     if app.enable_whatsapp {
         channels.whatsapp.insert(
             "default".to_string(),
-            to_openkrab_channel(app.channels.whatsapp.get("default")),
+            to_OPENKRAB_CHANNEL(app.channels.whatsapp.get("default")),
         );
     }
 
@@ -265,16 +265,16 @@ pub fn app_to_openkrab_config(app: &AppConfig) -> OpenKrabConfig {
         .and_then(|p| p.parse().ok());
 
     OpenKrabConfig {
-        meta: Some(crate::openkrab_config::ConfigMeta {
+        meta: Some(crate::OPENKRAB_CONFIG::ConfigMeta {
             last_touched_version: Some(env!("CARGO_PKG_VERSION").to_string()),
             last_touched_at: Some(chrono::Utc::now().to_rfc3339()),
         }),
-        logging: Some(crate::openkrab_config::LoggingConfig {
+        logging: Some(crate::OPENKRAB_CONFIG::LoggingConfig {
             level: app.log_level.clone(),
             file: None,
             ..Default::default()
         }),
-        web: Some(crate::openkrab_config::WebConfig {
+        web: Some(crate::OPENKRAB_CONFIG::WebConfig {
             enabled: app.enable_dashboard,
             port,
         }),
@@ -349,20 +349,20 @@ impl FeatureMatrix {
 pub struct AppConfig {
     pub profile: String,
     pub log_level: String,
-    // ── Connector toggles ────────────────────────────────────────────────────
+    // â”€â”€ Connector toggles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     pub enable_telegram: bool,
     pub enable_slack: bool,
     pub enable_discord: bool,
     pub enable_line: bool,
     pub enable_whatsapp: bool,
-    // ── Web Dashboard ───────────────────────────────────────────────────────
+    // â”€â”€ Web Dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     pub enable_dashboard: bool,
     pub dashboard_bind: String,
-    // ── Sub-configs ──────────────────────────────────────────────────────────
+    // â”€â”€ Sub-configs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     pub memory: crate::memory::config::MemoryConfig,
     pub agent: crate::agents::AgentIdentity,
     pub feature_matrix: FeatureMatrix,
-    // ── Legacy/OpenClaw fields ───────────────────────────────────────────
+    // â”€â”€ Legacy/OpenKrab fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     #[serde(default)]
     pub agents: AgentsConfig,
     #[serde(default)]
@@ -608,3 +608,5 @@ mod tests {
         assert!(validate_config(&cfg).is_err());
     }
 }
+
+

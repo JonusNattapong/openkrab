@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Cron jobs + wakeups for the Gateway scheduler"
 read_when:
   - Scheduling background jobs or wakeups
@@ -11,10 +11,10 @@ title: "Cron Jobs"
 
 > **Cron vs Heartbeat?** See [Cron vs Heartbeat](/automation/cron-vs-heartbeat) for guidance on when to use each.
 
-Cron is the Gateway’s built-in scheduler. It persists jobs, wakes the agent at
+Cron is the Gatewayâ€™s built-in scheduler. It persists jobs, wakes the agent at
 the right time, and can optionally deliver output back to a chat.
 
-If you want _“run this every morning”_ or _“poke the agent in 20 minutes”_,
+If you want _â€œrun this every morningâ€_ or _â€œpoke the agent in 20 minutesâ€_,
 cron is the mechanism.
 
 Troubleshooting: [/automation/troubleshooting](/automation/troubleshooting)
@@ -22,11 +22,11 @@ Troubleshooting: [/automation/troubleshooting](/automation/troubleshooting)
 ## TL;DR
 
 - Cron runs **inside the Gateway** (not inside the model).
-- Jobs persist under `~/.openkrab/cron/` so restarts don’t lose schedules.
+- Jobs persist under `~/.openkrab/cron/` so restarts donâ€™t lose schedules.
 - Two execution styles:
   - **Main session**: enqueue a system event, then run on the next heartbeat.
   - **Isolated**: run a dedicated agent turn in `cron:<jobId>`, with delivery (announce by default or none).
-- Wakeups are first-class: a job can request “wake now” vs “next heartbeat”.
+- Wakeups are first-class: a job can request â€œwake nowâ€ vs â€œnext heartbeatâ€.
 - Webhook posting is per job via `delivery.mode = "webhook"` + `delivery.to = "<url>"`.
 - Legacy fallback remains for stored jobs with `notify: true` when `cron.webhook` is set, migrate those jobs to webhook delivery mode.
 
@@ -34,24 +34,19 @@ Troubleshooting: [/automation/troubleshooting](/automation/troubleshooting)
 
 Create a one-shot reminder, verify it exists, and run it immediately:
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Reminder" \
   --at "2026-02-01T16:00:00Z" \
   --session main \
   --system-event "Reminder: check the cron docs draft" \
   --wake now \
   --delete-after-run
-
-openkrab cron list
-openkrab cron run <job-id>
-openkrab cron runs --id <job-id>
+\nOpenKrab cron list\nOpenKrab cron run <job-id>\nOpenKrab cron runs --id <job-id>
 ```
 
 Schedule a recurring isolated job with delivery:
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Morning brief" \
   --cron "0 7 * * *" \
   --tz "America/Los_Angeles" \
@@ -78,17 +73,17 @@ tool call API for changes.
 Think of a cron job as: **when** to run + **what** to do.
 
 1. **Choose a schedule**
-   - One-shot reminder → `schedule.kind = "at"` (CLI: `--at`)
-   - Repeating job → `schedule.kind = "every"` or `schedule.kind = "cron"`
+   - One-shot reminder â†’ `schedule.kind = "at"` (CLI: `--at`)
+   - Repeating job â†’ `schedule.kind = "every"` or `schedule.kind = "cron"`
    - If your ISO timestamp omits a timezone, it is treated as **UTC**.
 
 2. **Choose where it runs**
-   - `sessionTarget: "main"` → run during the next heartbeat with main context.
-   - `sessionTarget: "isolated"` → run a dedicated agent turn in `cron:<jobId>`.
+   - `sessionTarget: "main"` â†’ run during the next heartbeat with main context.
+   - `sessionTarget: "isolated"` â†’ run a dedicated agent turn in `cron:<jobId>`.
 
 3. **Choose the payload**
-   - Main session → `payload.kind = "systemEvent"`
-   - Isolated session → `payload.kind = "agentTurn"`
+   - Main session â†’ `payload.kind = "systemEvent"`
+   - Isolated session â†’ `payload.kind = "agentTurn"`
 
 Optional: one-shot jobs (`schedule.kind = "at"`) delete after success by default. Set
 `deleteAfterRun: false` to keep them (they will disable after success).
@@ -117,10 +112,10 @@ Cron supports three schedule kinds:
 - `every`: fixed interval (ms).
 - `cron`: 5-field cron expression (or 6-field with seconds) with optional IANA timezone.
 
-Cron expressions use `croner`. If a timezone is omitted, the Gateway host’s
+Cron expressions use `croner`. If a timezone is omitted, the Gateway hostâ€™s
 local timezone is used.
 
-To reduce top-of-hour load spikes across many gateways, openkrab applies a
+To reduce top-of-hour load spikes across many gateways, OpenKrab applies a
 deterministic per-job stagger window of up to 5 minutes for recurring
 top-of-hour expressions (for example `0 * * * *`, `0 */2 * * *`). Fixed-hour
 expressions such as `0 7 * * *` remain exact.
@@ -187,7 +182,7 @@ Delivery config:
 Announce delivery suppresses messaging tool sends for the run; use `delivery.channel`/`delivery.to`
 to target the chat instead. When `delivery.mode = "none"`, no summary is posted to the main session.
 
-If `delivery` is omitted for isolated jobs, openkrab defaults to `announce`.
+If `delivery` is omitted for isolated jobs, OpenKrab defaults to `announce`.
 
 #### Announce delivery flow
 
@@ -246,8 +241,8 @@ Isolated jobs can deliver output to a channel via the top-level `delivery` confi
 `announce` delivery is only valid for isolated jobs (`sessionTarget: "isolated"`).
 `webhook` delivery is valid for both main and isolated jobs.
 
-If `delivery.channel` or `delivery.to` is omitted, cron can fall back to the main session’s
-“last route” (the last place the agent replied).
+If `delivery.channel` or `delivery.to` is omitted, cron can fall back to the main sessionâ€™s
+â€œlast routeâ€ (the last place the agent replied).
 
 Target format reminders:
 
@@ -378,14 +373,13 @@ Webhook behavior:
 Disable cron entirely:
 
 - `cron.enabled: false` (config)
-- `openkrab_SKIP_CRON=1` (env)
+- `OPENKRAB_SKIP_CRON=1` (env)
 
 ## CLI quickstart
 
 One-shot reminder (UTC ISO, auto-delete after success):
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Send reminder" \
   --at "2026-01-12T18:00:00Z" \
   --session main \
@@ -396,8 +390,7 @@ openkrab cron add \
 
 One-shot reminder (main session, wake immediately):
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Calendar check" \
   --at "20m" \
   --session main \
@@ -407,8 +400,7 @@ openkrab cron add \
 
 Recurring isolated job (announce to WhatsApp):
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Morning status" \
   --cron "0 7 * * *" \
   --tz "America/Los_Angeles" \
@@ -421,8 +413,7 @@ openkrab cron add \
 
 Recurring cron job with explicit 30-second stagger:
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Minute watcher" \
   --cron "0 * * * * *" \
   --tz "UTC" \
@@ -434,8 +425,7 @@ openkrab cron add \
 
 Recurring isolated job (deliver to a Telegram topic):
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Nightly summary (topic)" \
   --cron "0 22 * * *" \
   --tz "America/Los_Angeles" \
@@ -448,8 +438,7 @@ openkrab cron add \
 
 Isolated job with model and thinking override:
 
-```bash
-openkrab cron add \
+```bash\nOpenKrab cron add \
   --name "Deep analysis" \
   --cron "0 6 * * 1" \
   --tz "America/Los_Angeles" \
@@ -465,25 +454,19 @@ openkrab cron add \
 Agent selection (multi-agent setups):
 
 ```bash
-# Pin a job to agent "ops" (falls back to default if that agent is missing)
-openkrab cron add --name "Ops sweep" --cron "0 6 * * *" --session isolated --message "Check ops queue" --agent ops
+# Pin a job to agent "ops" (falls back to default if that agent is missing)\nOpenKrab cron add --name "Ops sweep" --cron "0 6 * * *" --session isolated --message "Check ops queue" --agent ops
 
-# Switch or clear the agent on an existing job
-openkrab cron edit <jobId> --agent ops
-openkrab cron edit <jobId> --clear-agent
+# Switch or clear the agent on an existing job\nOpenKrab cron edit <jobId> --agent ops\nOpenKrab cron edit <jobId> --clear-agent
 ```
 
 Manual run (force is the default, use `--due` to only run when due):
 
-```bash
-openkrab cron run <jobId>
-openkrab cron run <jobId> --due
+```bash\nOpenKrab cron run <jobId>\nOpenKrab cron run <jobId> --due
 ```
 
 Edit an existing job (patch fields):
 
-```bash
-openkrab cron edit <jobId> \
+```bash\nOpenKrab cron edit <jobId> \
   --message "Updated prompt" \
   --model "opus" \
   --thinking low
@@ -491,20 +474,17 @@ openkrab cron edit <jobId> \
 
 Force an existing cron job to run exactly on schedule (no stagger):
 
-```bash
-openkrab cron edit <jobId> --exact
+```bash\nOpenKrab cron edit <jobId> --exact
 ```
 
 Run history:
 
-```bash
-openkrab cron runs --id <jobId> --limit 50
+```bash\nOpenKrab cron runs --id <jobId> --limit 50
 ```
 
 Immediate system event without creating a job:
 
-```bash
-openkrab system event --mode now --text "Next heartbeat: check battery."
+```bash\nOpenKrab system event --mode now --text "Next heartbeat: check battery."
 ```
 
 ## Gateway API surface
@@ -515,23 +495,23 @@ openkrab system event --mode now --text "Next heartbeat: check battery."
 
 ## Troubleshooting
 
-### “Nothing runs”
+### â€œNothing runsâ€
 
-- Check cron is enabled: `cron.enabled` and `openkrab_SKIP_CRON`.
+- Check cron is enabled: `cron.enabled` and `OPENKRAB_SKIP_CRON`.
 - Check the Gateway is running continuously (cron runs inside the Gateway process).
 - For `cron` schedules: confirm timezone (`--tz`) vs the host timezone.
 
 ### A recurring job keeps delaying after failures
 
-- openkrab applies exponential retry backoff for recurring jobs after consecutive errors:
+- OpenKrab applies exponential retry backoff for recurring jobs after consecutive errors:
   30s, 1m, 5m, 15m, then 60m between retries.
 - Backoff resets automatically after the next successful run.
 - One-shot (`at`) jobs disable after a terminal run (`ok`, `error`, or `skipped`) and do not retry.
 
 ### Telegram delivers to the wrong place
 
-- For forum topics, use `-100…:topic:<id>` so it’s explicit and unambiguous.
-- If you see `telegram:...` prefixes in logs or stored “last route” targets, that’s normal;
+- For forum topics, use `-100â€¦:topic:<id>` so itâ€™s explicit and unambiguous.
+- If you see `telegram:...` prefixes in logs or stored â€œlast routeâ€ targets, thatâ€™s normal;
   cron delivery accepts them and still parses topic IDs correctly.
 
 ### Subagent announce delivery retries
@@ -540,3 +520,5 @@ openkrab system event --mode now --text "Next heartbeat: check battery."
 - If the announce flow returns `false` (e.g. requester session is busy), the gateway retries up to 3 times with tracking via `announceRetryCount`.
 - Announces older than 5 minutes past `endedAt` are force-expired to prevent stale entries from looping indefinitely.
 - If you see repeated announce deliveries in logs, check the subagent registry for entries with high `announceRetryCount` values.
+
+

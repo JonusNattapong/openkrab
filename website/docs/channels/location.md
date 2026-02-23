@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Inbound channel location parsing (Telegram + WhatsApp) and context fields"
 read_when:
   - Adding or modifying channel location parsing
@@ -7,8 +7,7 @@ title: "Channel Location Parsing"
 ---
 
 # Channel location parsing
-
-openkrab normalizes shared locations from chat channels into:
+\nOpenKrab normalizes shared locations from chat channels into:
 
 - human-readable text appended to the inbound body, and
 - structured fields in the auto-reply context payload.
@@ -24,16 +23,16 @@ Currently supported:
 Locations are rendered as friendly lines without brackets:
 
 - Pin:
-  - `📍 48.858844, 2.294351 ±12m`
+  - `ðŸ“ 48.858844, 2.294351 Â±12m`
 - Named place:
-  - `📍 Eiffel Tower — Champ de Mars, Paris (48.858844, 2.294351 ±12m)`
+  - `ðŸ“ Eiffel Tower â€” Champ de Mars, Paris (48.858844, 2.294351 Â±12m)`
 - Live share:
-  - `🛰 Live location: 48.858844, 2.294351 ±12m`
+  - `ðŸ›° Live location: 48.858844, 2.294351 Â±12m`
 
 If the channel includes a caption/comment, it is appended on the next line:
 
 ```
-📍 48.858844, 2.294351 ±12m
+ðŸ“ 48.858844, 2.294351 Â±12m
 Meet here
 ```
 
@@ -54,3 +53,4 @@ When a location is present, these fields are added to `ctx`:
 - **Telegram**: venues map to `LocationName/LocationAddress`; live locations use `live_period`.
 - **WhatsApp**: `locationMessage.comment` and `liveLocationMessage.caption` are appended as the caption line.
 - **Matrix**: `geo_uri` is parsed as a pin location; altitude is ignored and `LocationIsLive` is always false.
+

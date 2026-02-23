@@ -1,5 +1,5 @@
----
-summary: "Run openkrab on local LLMs (LM Studio, vLLM, LiteLLM, custom OpenAI endpoints)"
+﻿---
+summary: "Run OpenKrab on local LLMs (LM Studio, vLLM, LiteLLM, custom OpenAI endpoints)"
 read_when:
   - You want to serve models from your own GPU box
   - You are wiring LM Studio or an OpenAI-compatible proxy
@@ -9,7 +9,7 @@ title: "Local Models"
 
 # Local models
 
-Local is doable, but openkrab expects large context + strong defenses against prompt injection. Small cards truncate context and leak safety. Aim high: **≥2 maxed-out Mac Studios or equivalent GPU rig (~$30k+)**. A single **24 GB** GPU works only for lighter prompts with higher latency. Use the **largest / full-size model variant you can run**; aggressively quantized or “small” checkpoints raise prompt-injection risk (see [Security](/gateway/security)).
+Local is doable, but OpenKrab expects large context + strong defenses against prompt injection. Small cards truncate context and leak safety. Aim high: **â‰¥2 maxed-out Mac Studios or equivalent GPU rig (~$30k+)**. A single **24 GB** GPU works only for lighter prompts with higher latency. Use the **largest / full-size model variant you can run**; aggressively quantized or â€œsmallâ€ checkpoints raise prompt-injection risk (see [Security](/gateway/security)).
 
 ## Recommended: LM Studio + MiniMax M2.1 (Responses API, full-size)
 
@@ -53,7 +53,7 @@ Best current local stack. Load MiniMax M2.1 in LM Studio, enable the local serve
 **Setup checklist**
 
 - Install LM Studio: [https://lmstudio.ai](https://lmstudio.ai)
-- In LM Studio, download the **largest MiniMax M2.1 build available** (avoid “small”/heavily quantized variants), start the server, confirm `http://127.0.0.1:1234/v1/models` lists it.
+- In LM Studio, download the **largest MiniMax M2.1 build available** (avoid â€œsmallâ€/heavily quantized variants), start the server, confirm `http://127.0.0.1:1234/v1/models` lists it.
 - Keep the model loaded; cold-load adds startup latency.
 - Adjust `contextWindow`/`maxTokens` if your LM Studio build differs.
 - For WhatsApp, stick to Responses API so only final text is sent.
@@ -145,6 +145,7 @@ Keep `models.mode: "merge"` so hosted models stay available as fallbacks.
 ## Troubleshooting
 
 - Gateway can reach the proxy? `curl http://127.0.0.1:1234/v1/models`.
-- LM Studio model unloaded? Reload; cold start is a common “hanging” cause.
+- LM Studio model unloaded? Reload; cold start is a common â€œhangingâ€ cause.
 - Context errors? Lower `contextWindow` or raise your server limit.
 - Safety: local models skip provider-side filters; keep agents narrow and compaction on to limit prompt injection blast radius.
+

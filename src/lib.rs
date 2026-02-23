@@ -1,4 +1,4 @@
-//! krabkrab — incremental Rust port of `openkrab` (TypeScript → Rust).
+﻿//! openkrab â€” incremental Rust port of `openkrab` (TypeScript â†’ Rust).
 
 pub mod acp;
 pub mod agents;
@@ -33,7 +33,7 @@ pub mod memory;
 pub mod mission_control;
 pub mod node_host;
 pub mod oauth;
-pub mod openkrab_config;
+pub mod OPENKRAB_CONFIG;
 pub mod pairing;
 pub mod plugin_sdk;
 pub mod plugins;
@@ -76,7 +76,9 @@ pub struct Hello {
 
 pub fn hello() -> Hello {
     Hello {
-        message: "hello from krabkrab".into(),
+        message: "hello from openkrab".into(),
         version: VERSION.clone(),
     }
 }
+
+

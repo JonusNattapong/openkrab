@@ -1,4 +1,4 @@
-use krabkrab::channels::mention_gating::*;
+use openkrab::channels::mention_gating::*;
 
 #[test]
 fn test_resolve_mention_gating_not_mentioned_requires_mention() {
@@ -46,3 +46,4 @@ fn test_resolve_mention_with_bypass_conditions() {
     assert_eq!(res.effective_was_mentioned, true);
     assert_eq!(res.should_skip, false);
 }
+

@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 学习如何配置 OpenKrab
-  - 寻找配置示例
-  - 首次设置 OpenKrab
-summary: 符合模式的常见 OpenKrab 设置配置示例
-title: 配置示例
+  - å­¦ä¹ å¦‚ä½•é…ç½® OpenKrab
+  - å¯»æ‰¾é…ç½®ç¤ºä¾‹
+  - é¦–æ¬¡è®¾ç½® OpenKrab
+summary: ç¬¦åˆæ¨¡å¼çš„å¸¸è§ OpenKrab è®¾ç½®é…ç½®ç¤ºä¾‹
+title: é…ç½®ç¤ºä¾‹
 x-i18n:
   generated_at: "2026-02-03T07:48:39Z"
   model: claude-opus-4-5
@@ -14,13 +14,13 @@ x-i18n:
   workflow: 15
 ---
 
-# 配置示例
+# é…ç½®ç¤ºä¾‹
 
-以下示例与当前配置模式一致。有关详尽的参考和每个字段的说明，请参阅[配置](/gateway/configuration)。
+ä»¥ä¸‹ç¤ºä¾‹ä¸Žå½“å‰é…ç½®æ¨¡å¼ä¸€è‡´ã€‚æœ‰å…³è¯¦å°½çš„å‚è€ƒå’Œæ¯ä¸ªå­—æ®µçš„è¯´æ˜Žï¼Œè¯·å‚é˜…[é…ç½®](/gateway/configuration)ã€‚
 
-## 快速开始
+## å¿«é€Ÿå¼€å§‹
 
-### 绝对最小配置
+### ç»å¯¹æœ€å°é…ç½®
 
 ```json5
 {
@@ -29,16 +29,16 @@ x-i18n:
 }
 ```
 
-保存到 `~/.OpenKrab/OpenKrab.json`，你就可以从该号码私信机器人了。
+ä¿å­˜åˆ° `~/.OpenKrab/OpenKrab.json`ï¼Œä½ å°±å¯ä»¥ä»Žè¯¥å·ç ç§ä¿¡æœºå™¨äººäº†ã€‚
 
-### 推荐的入门配置
+### æŽ¨èçš„å…¥é—¨é…ç½®
 
 ```json5
 {
   identity: {
-    name: "Clawd",
+    name: "Krabd",
     theme: "helpful assistant",
-    emoji: "🦞",
+    emoji: "ðŸ¦ž",
   },
   agent: {
     workspace: "~/.OpenKrab/workspace",
@@ -53,13 +53,13 @@ x-i18n:
 }
 ```
 
-## 扩展示例（主要选项）
+## æ‰©å±•ç¤ºä¾‹ï¼ˆä¸»è¦é€‰é¡¹ï¼‰
 
-> JSON5 允许你使用注释和尾随逗号。普通 JSON 也可以使用。
+> JSON5 å…è®¸ä½ ä½¿ç”¨æ³¨é‡Šå’Œå°¾éšé€—å·ã€‚æ™®é€š JSON ä¹Ÿå¯ä»¥ä½¿ç”¨ã€‚
 
 ```json5
 {
-  // 环境 + shell
+  // çŽ¯å¢ƒ + shell
   env: {
     OPENROUTER_API_KEY: "sk-or-...",
     vars: {
@@ -71,7 +71,7 @@ x-i18n:
     },
   },
 
-  // 认证配置文件元数据（密钥存储在 auth-profiles.json 中）
+  // è®¤è¯é…ç½®æ–‡ä»¶å…ƒæ•°æ®ï¼ˆå¯†é’¥å­˜å‚¨åœ¨ auth-profiles.json ä¸­ï¼‰
   auth: {
     profiles: {
       "anthropic:me@example.com": { provider: "anthropic", mode: "oauth", email: "me@example.com" },
@@ -86,14 +86,14 @@ x-i18n:
     },
   },
 
-  // 身份
+  // èº«ä»½
   identity: {
     name: "Samantha",
     theme: "helpful sloth",
-    emoji: "🦥",
+    emoji: "ðŸ¦¥",
   },
 
-  // 日志
+  // æ—¥å¿—
   logging: {
     level: "info",
     file: "/tmp/OpenKrab/OpenKrab.log",
@@ -102,15 +102,15 @@ x-i18n:
     redactSensitive: "tools",
   },
 
-  // 消息格式
+  // æ¶ˆæ¯æ ¼å¼
   messages: {
     messagePrefix: "[OpenKrab]",
     responsePrefix: ">",
-    ackReaction: "👀",
+    ackReaction: "ðŸ‘€",
     ackReactionScope: "group-mentions",
   },
 
-  // 路由 + 队列
+  // è·¯ç”± + é˜Ÿåˆ—
   routing: {
     groupChat: {
       mentionPatterns: ["@OpenKrab", "OpenKrab"],
@@ -133,7 +133,7 @@ x-i18n:
     },
   },
 
-  // 工具
+  // å·¥å…·
   tools: {
     media: {
       audio: {
@@ -141,7 +141,7 @@ x-i18n:
         maxBytes: 20971520,
         models: [
           { provider: "openai", model: "gpt-4o-mini-transcribe" },
-          // 可选的 CLI 回退（Whisper 二进制）：
+          // å¯é€‰çš„ CLI å›žé€€ï¼ˆWhisper äºŒè¿›åˆ¶ï¼‰ï¼š
           // { type: "cli", command: "whisper", args: ["--model", "base", "{{MediaPath}}"] }
         ],
         timeoutSeconds: 120,
@@ -154,7 +154,7 @@ x-i18n:
     },
   },
 
-  // 会话行为
+  // ä¼šè¯è¡Œä¸º
   session: {
     scope: "per-sender",
     reset: {
@@ -174,7 +174,7 @@ x-i18n:
     },
   },
 
-  // 渠道
+  // æ¸ é“
   channels: {
     whatsapp: {
       dmPolicy: "pairing",
@@ -226,7 +226,7 @@ x-i18n:
     },
   },
 
-  // 智能体运行时
+  // æ™ºèƒ½ä½“è¿è¡Œæ—¶
   agents: {
     defaults: {
       workspace: "~/.OpenKrab/workspace",
@@ -320,7 +320,7 @@ x-i18n:
     },
   },
 
-  // 自定义模型提供商
+  // è‡ªå®šä¹‰æ¨¡åž‹æä¾›å•†
   models: {
     mode: "merge",
     providers: {
@@ -346,7 +346,7 @@ x-i18n:
     },
   },
 
-  // Cron 作业
+  // Cron ä½œä¸š
   cron: {
     enabled: true,
     store: "~/.OpenKrab/cron/cron.json",
@@ -393,7 +393,7 @@ x-i18n:
     },
   },
 
-  // Gateway 网关 + 网络
+  // Gateway ç½‘å…³ + ç½‘ç»œ
   gateway: {
     mode: "local",
     port: 18789,
@@ -430,9 +430,9 @@ x-i18n:
 }
 ```
 
-## 常见模式
+## å¸¸è§æ¨¡å¼
 
-### 多平台设置
+### å¤šå¹³å°è®¾ç½®
 
 ```json5
 {
@@ -453,7 +453,7 @@ x-i18n:
 }
 ```
 
-### OAuth 带 API 密钥回退
+### OAuth å¸¦ API å¯†é’¥å›žé€€
 
 ```json5
 {
@@ -483,7 +483,7 @@ x-i18n:
 }
 ```
 
-### Anthropic 订阅 + API 密钥，MiniMax 回退
+### Anthropic è®¢é˜… + API å¯†é’¥ï¼ŒMiniMax å›žé€€
 
 ```json5
 {
@@ -522,7 +522,7 @@ x-i18n:
 }
 ```
 
-### 工作机器人（受限访问）
+### å·¥ä½œæœºå™¨äººï¼ˆå—é™è®¿é—®ï¼‰
 
 ```json5
 {
@@ -547,7 +547,7 @@ x-i18n:
 }
 ```
 
-### 仅本地模型
+### ä»…æœ¬åœ°æ¨¡åž‹
 
 ```json5
 {
@@ -579,10 +579,11 @@ x-i18n:
 }
 ```
 
-## 提示
+## æç¤º
 
-- 如果你设置 `dmPolicy: "open"`，匹配的 `allowFrom` 列表必须包含 `"*"`。
-- 提供商 ID 各不相同（电话号码、用户 ID、频道 ID）。使用提供商文档确认格式。
-- 稍后添加的可选部分：`web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
-- 参阅[提供商](/channels/whatsapp)和[故障排除](/gateway/troubleshooting)了解更深入的设置说明。
+- å¦‚æžœä½ è®¾ç½® `dmPolicy: "open"`ï¼ŒåŒ¹é…çš„ `allowFrom` åˆ—è¡¨å¿…é¡»åŒ…å« `"*"`ã€‚
+- æä¾›å•† ID å„ä¸ç›¸åŒï¼ˆç”µè¯å·ç ã€ç”¨æˆ· IDã€é¢‘é“ IDï¼‰ã€‚ä½¿ç”¨æä¾›å•†æ–‡æ¡£ç¡®è®¤æ ¼å¼ã€‚
+- ç¨åŽæ·»åŠ çš„å¯é€‰éƒ¨åˆ†ï¼š`web`ã€`browser`ã€`ui`ã€`discovery`ã€`canvasHost`ã€`talk`ã€`signal`ã€`imessage`ã€‚
+- å‚é˜…[æä¾›å•†](/channels/whatsapp)å’Œ[æ•…éšœæŽ’é™¤](/gateway/troubleshooting)äº†è§£æ›´æ·±å…¥çš„è®¾ç½®è¯´æ˜Žã€‚
+
 

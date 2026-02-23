@@ -1,4 +1,4 @@
-use krabkrab::connectors::{bluebubbles, discord, slack, telegram};
+use openkrab::connectors::{bluebubbles, discord, slack, telegram};
 
 #[test]
 fn telegram_normalize_inbound() {
@@ -49,3 +49,4 @@ fn bluebubbles_normalize_target() {
         "+15550001111"
     );
 }
+

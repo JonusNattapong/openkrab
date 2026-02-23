@@ -1,4 +1,4 @@
-use crate::config::AppConfig;
+﻿use crate::config::AppConfig;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 
 /// Non-interactive configure input for scripting / testing.
@@ -8,16 +8,16 @@ pub struct ConfigureInput {
     pub verbose: bool,
 }
 
-/// Non-interactive configure command — used in tests and scripted flows.
+/// Non-interactive configure command â€” used in tests and scripted flows.
 pub fn configure_command(input: ConfigureInput) -> String {
     let verbose_str = if input.verbose { "on" } else { "off" };
     format!("profile={} verbose={}", input.profile, verbose_str)
 }
 
-/// Interactive TUI configure command — used from the CLI.
+/// Interactive TUI configure command â€” used from the CLI.
 pub fn configure_command_interactive() -> String {
     let theme = ColorfulTheme::default();
-    println!("🦀 krabkrab Configuration Helper 🦀\n");
+    println!("ðŸ¦€ openkrab Configuration Helper ðŸ¦€\n");
 
     let mut config = AppConfig::default();
 
@@ -54,14 +54,16 @@ pub fn configure_command_interactive() -> String {
     config.memory.provider = providers[selection].to_string();
 
     // 3. Persist configuration
-    let openkrab_cfg = crate::config::app_to_openkrab_config(&config);
-    match crate::config::save_config(&openkrab_cfg) {
+    let OPENKRAB_CFG = crate::config::app_to_OPENKRAB_CONFIG(&config);
+    match crate::config::save_config(&OPENKRAB_CFG) {
         Ok(()) => {
             let path = crate::config::resolve_config_path()
                 .map(|p| p.display().to_string())
                 .unwrap_or_else(|_| "(unknown path)".to_string());
-            format!("✅ Configuration saved to {}", path)
+            format!("âœ… Configuration saved to {}", path)
         }
-        Err(e) => format!("❌ Failed to save configuration: {}", e),
+        Err(e) => format!("âŒ Failed to save configuration: {}", e),
     }
 }
+
+

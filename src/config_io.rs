@@ -1,6 +1,6 @@
-//! Config I/O — port of `openkrab/src/config/io.ts` (Phase 1-4 config loading)
+﻿//! Config I/O â€” port of `openkrab/src/config/io.ts` (Phase 1-4 config loading)
 
-use crate::openkrab_config::OpenKrabConfig;
+use crate::OPENKRAB_CONFIG::OpenKrabConfig;
 use anyhow::{anyhow, bail, Result};
 use once_cell::sync::Lazy;
 use path_clean::PathClean;
@@ -93,7 +93,7 @@ pub fn save_config(config: &OpenKrabConfig) -> Result<()> {
 pub fn save_config_to_path(config: &OpenKrabConfig, path: &Path) -> Result<()> {
     // Update metadata
     let mut config_with_meta = config.clone();
-    config_with_meta.meta = Some(crate::openkrab_config::ConfigMeta {
+    config_with_meta.meta = Some(crate::OPENKRAB_CONFIG::ConfigMeta {
         last_touched_version: Some(env!("CARGO_PKG_VERSION").to_string()),
         last_touched_at: Some(chrono::Utc::now().to_rfc3339()),
     });
@@ -137,7 +137,7 @@ pub fn clear_config_cache() {
 /// Resolve configuration file path
 pub fn resolve_config_path() -> Result<PathBuf> {
     let home = dirs::config_dir().ok_or_else(|| anyhow!("Could not find config directory"))?;
-    Ok(home.join("krabkrab").join("config.json"))
+    Ok(home.join("openkrab").join("config.json"))
 }
 
 /// Parse JSON5 configuration content
@@ -451,17 +451,17 @@ pub fn validate_config(config: &OpenKrabConfig) -> Result<()> {
 /// Get default configuration values
 pub fn get_default_config() -> OpenKrabConfig {
     OpenKrabConfig {
-        gateway: Some(crate::openkrab_config::GatewayConfig {
+        gateway: Some(crate::OPENKRAB_CONFIG::GatewayConfig {
             enabled: true,
             port: Some(18789),
             bind_address: Some("127.0.0.1".to_string()),
         }),
-        logging: Some(crate::openkrab_config::LoggingConfig {
+        logging: Some(crate::OPENKRAB_CONFIG::LoggingConfig {
             level: "info".to_string(),
             file: None,
             ..Default::default()
         }),
-        diagnostics: Some(crate::openkrab_config::DiagnosticsConfig { enabled: true }),
+        diagnostics: Some(crate::OPENKRAB_CONFIG::DiagnosticsConfig { enabled: true }),
         ..Default::default()
     }
 }
@@ -475,7 +475,7 @@ pub fn migrate_legacy_config(legacy_content: &str) -> Result<OpenKrabConfig> {
     }
 
     if let Ok(app_cfg) = serde_json::from_value::<crate::config::AppConfig>(raw.clone()) {
-        return Ok(crate::config::app_to_openkrab_config(&app_cfg));
+        return Ok(crate::config::app_to_OPENKRAB_CONFIG(&app_cfg));
     }
 
     let mut app_cfg = crate::config::AppConfig::default();
@@ -507,7 +507,7 @@ pub fn migrate_legacy_config(legacy_content: &str) -> Result<OpenKrabConfig> {
         if let Some(v) = obj.get("dashboard_bind").and_then(|v| v.as_str()) {
             app_cfg.dashboard_bind = v.to_string();
         }
-        return Ok(crate::config::app_to_openkrab_config(&app_cfg));
+        return Ok(crate::config::app_to_OPENKRAB_CONFIG(&app_cfg));
     }
 
     bail!("Unrecognized legacy config format")
@@ -533,7 +533,7 @@ mod tests {
         let config_path = temp_file.path();
 
         let mut config = OpenKrabConfig::default();
-        config.gateway = Some(crate::openkrab_config::GatewayConfig {
+        config.gateway = Some(crate::OPENKRAB_CONFIG::GatewayConfig {
             enabled: true,
             port: Some(8080),
             bind_address: Some("localhost".to_string()),
@@ -555,7 +555,7 @@ mod tests {
         let hash1 = compute_file_hash(config_path).unwrap();
 
         let mut config2 = OpenKrabConfig::default();
-        config2.gateway = Some(crate::openkrab_config::GatewayConfig {
+        config2.gateway = Some(crate::OPENKRAB_CONFIG::GatewayConfig {
             enabled: true,
             port: Some(9000),
             bind_address: None,
@@ -569,7 +569,7 @@ mod tests {
     #[test]
     fn validate_config_basic_checks() {
         let mut config = OpenKrabConfig::default();
-        config.logging = Some(crate::openkrab_config::LoggingConfig {
+        config.logging = Some(crate::OPENKRAB_CONFIG::LoggingConfig {
             level: "".to_string(),
             file: None,
         });
@@ -584,3 +584,5 @@ mod tests {
         assert_eq!(config.gateway.as_ref().unwrap().port, Some(18789));
     }
 }
+
+

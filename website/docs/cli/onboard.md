@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab onboard` (interactive onboarding wizard)"
 read_when:
   - You want guided setup for gateway, workspace, auth, channels, and skills
@@ -19,17 +19,12 @@ Interactive onboarding wizard (local or remote Gateway setup).
 
 ## Examples
 
-```bash
-openkrab onboard
-openkrab onboard --flow quickstart
-openkrab onboard --flow manual
-openkrab onboard --mode remote --remote-url ws://gateway-host:18789
+```bash\nOpenKrab onboard\nOpenKrab onboard --flow quickstart\nOpenKrab onboard --flow manual\nOpenKrab onboard --mode remote --remote-url ws://gateway-host:18789
 ```
 
 Non-interactive custom provider:
 
-```bash
-openkrab onboard --non-interactive \
+```bash\nOpenKrab onboard --non-interactive \
   --auth-choice custom-api-key \
   --custom-base-url "https://llm.example.com/v1" \
   --custom-model-id "foo-large" \
@@ -45,8 +40,7 @@ Note: `--auth-choice zai-api-key` now auto-detects the best Z.AI endpoint for yo
 If you specifically want the GLM Coding Plan endpoints, pick `zai-coding-global` or `zai-coding-cn`.
 
 ```bash
-# Promptless endpoint selection
-openkrab onboard --non-interactive \
+# Promptless endpoint selection\nOpenKrab onboard --non-interactive \
   --auth-choice zai-coding-global \
   --zai-api-key "$ZAI_API_KEY"
 
@@ -66,11 +60,10 @@ Flow notes:
 
 ## Common follow-up commands
 
-```bash
-openkrab configure
-openkrab agents add <name>
+```bash\nOpenKrab configure\nOpenKrab agents add <name>
 ```
 
 <Note>
 `--json` does not imply non-interactive mode. Use `--non-interactive` for scripts.
 </Note>
+

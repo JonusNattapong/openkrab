@@ -1,4 +1,4 @@
-# Build environment configuration for krabkrab
+# Build environment configuration for openkrab
 # Placed here so it applies to all cargo commands in this workspace.
 
 [env]
@@ -8,3 +8,4 @@ AWS_LC_SYS_NO_ASM = "1"
 
 # Prevent aws-lc-sys from looking for NASM or using prebuilt NASM scripts.
 AWS_LC_SYS_PREBUILT_NASM = "0"
+

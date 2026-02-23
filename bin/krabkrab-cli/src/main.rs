@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use krabkrab::commands::{
+use openkrab::commands::{
     bridge_command, channels_add_command, channels_list_command, channels_logs_command,
     channels_remove_command, channels_status_command, config_edit_command, config_get_command,
     config_set_command, config_show_command, configure_command_interactive, cron_add_command,
@@ -388,7 +388,7 @@ enum BrowserSub {
 async fn main() -> anyhow::Result<()> {
     let opts = Opts::parse();
     match opts.command.unwrap_or(CliCommand::Hello) {
-        CliCommand::Hello => println!("{}", krabkrab::hello().message),
+        CliCommand::Hello => println!("{}", openkrab::hello().message),
         CliCommand::Status => println!("{}", status_simple()),
         CliCommand::Doctor => println!("{}", doctor_simple()),
         CliCommand::Onboard { sub, profile } => {
@@ -407,7 +407,7 @@ async fn main() -> anyhow::Result<()> {
             token,
             session,
         } => {
-            use krabkrab::shell::ShellConfig;
+            use openkrab::shell::ShellConfig;
             run_interactive_shell(ShellConfig {
                 url,
                 token,
@@ -459,9 +459,9 @@ async fn main() -> anyhow::Result<()> {
         } => {
             if dry_run {
                 let payload = if let Some(media_url) = media_url {
-                    krabkrab::connectors::whatsapp_client::build_whatsapp_text_payload(&to, &text)
+                    openkrab::connectors::whatsapp_client::build_whatsapp_text_payload(&to, &text)
                 } else {
-                    krabkrab::connectors::whatsapp_client::build_whatsapp_text_payload(&to, &text)
+                    openkrab::connectors::whatsapp_client::build_whatsapp_text_payload(&to, &text)
                 };
                 println!(
                     "WhatsApp dry run: {}",
@@ -491,7 +491,7 @@ async fn main() -> anyhow::Result<()> {
             println!("{out}");
         }
         CliCommand::Ask { query, db } => {
-            let out = krabkrab::commands::ask_command(&query, db.as_deref()).await?;
+            let out = openkrab::commands::ask_command(&query, db.as_deref()).await?;
             println!("{out}");
         }
         CliCommand::Memory { sub } => match sub {
@@ -511,7 +511,7 @@ async fn main() -> anyhow::Result<()> {
         },
         CliCommand::Gateway { sub } => match sub {
             GatewaySub::Start { db } => {
-                krabkrab::commands::gateway_start_command(db.as_deref()).await?;
+                openkrab::commands::gateway_start_command(db.as_deref()).await?;
             }
         },
         CliCommand::Models { provider } => {
@@ -629,7 +629,7 @@ async fn main() -> anyhow::Result<()> {
         CliCommand::Sandbox { action } => println!("{}", sandbox_command(&action)),
         CliCommand::Nodes { action } => println!("{}", nodes_command(&action)),
         CliCommand::Browser { sub } => {
-            use krabkrab::browser;
+            use openkrab::browser;
             match sub {
                 BrowserSub::ProfileAdd { name, cdp_url } => {
                     browser::register_profile(&name, &cdp_url)?;
@@ -707,7 +707,7 @@ async fn main() -> anyhow::Result<()> {
         CliCommand::Devices { action } => println!("{}", devices_command(&action)),
         CliCommand::Daemon { action } => println!("{}", daemon_command(&action)),
         CliCommand::Tui { url, session } => {
-            use krabkrab::tui::{run_tui, TuiConfig};
+            use openkrab::tui::{run_tui, TuiConfig};
             let config = TuiConfig {
                 gateway_url: url,
                 session,
@@ -719,7 +719,7 @@ async fn main() -> anyhow::Result<()> {
         }
         CliCommand::MissionControl { web, port } => {
             if web {
-                krabkrab::mission_control::web::start_web_server(port).await;
+                openkrab::mission_control::web::start_web_server(port).await;
             } else {
                 if let Err(e) = mission_control_command() {
                     eprintln!("Mission Control error: {}", e);
@@ -729,3 +729,4 @@ async fn main() -> anyhow::Result<()> {
     }
     Ok(())
 }
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Microsoft Teams bot support status, capabilities, and configuration"
 read_when:
   - Working on MS Teams channel features
@@ -23,18 +23,15 @@ Explainable: keeps core installs lighter and lets MS Teams dependencies update i
 
 Install via CLI (npm registry):
 
-```bash
-openkrab plugins install @openkrab/msteams
+```bash\nOpenKrab plugins install @openkrab/msteams
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/msteams
+```bash\nOpenKrab plugins install ./extensions/msteams
 ```
 
-If you choose Teams during configure/onboarding and a git checkout is detected,
-openkrab will offer the local install path automatically.
+If you choose Teams during configure/onboarding and a git checkout is detected,\nOpenKrab will offer the local install path automatically.
 
 Details: [Plugins](/tools/plugin)
 
@@ -42,7 +39,7 @@ Details: [Plugins](/tools/plugin)
 
 1. Install the Microsoft Teams plugin.
 2. Create an **Azure Bot** (App ID + client secret + tenant ID).
-3. Configure openkrab with those credentials.
+3. Configure OpenKrab with those credentials.
 4. Expose `/api/messages` (port 3978 by default) via a public URL or tunnel.
 5. Install the Teams app package and start the gateway.
 
@@ -66,7 +63,7 @@ Note: group chats are blocked by default (`channels.msteams.groupPolicy: "allowl
 
 ## Goals
 
-- Talk to openkrab via Teams DMs, group chats, or channels.
+- Talk to OpenKrab via Teams DMs, group chats, or channels.
 - Keep routing deterministic: replies always go back to the channel they arrived on.
 - Default to safe channel behavior (mentions required unless configured otherwise).
 
@@ -93,7 +90,7 @@ Disable with:
 
 - Default: `channels.msteams.groupPolicy = "allowlist"` (blocked unless you add `groupAllowFrom`). Use `channels.defaults.groupPolicy` to override the default when unset.
 - `channels.msteams.groupAllowFrom` controls which senders can trigger in group chats/channels (falls back to `channels.msteams.allowFrom`).
-- Set `groupPolicy: "open"` to allow any member (still mention‑gated by default).
+- Set `groupPolicy: "open"` to allow any member (still mentionâ€‘gated by default).
 - To allow **no channels**, set `channels.msteams.groupPolicy: "disabled"`.
 
 Example:
@@ -113,9 +110,9 @@ Example:
 
 - Scope group/channel replies by listing teams and channels under `channels.msteams.teams`.
 - Keys can be team IDs or names; channel keys can be conversation IDs or names.
-- When `groupPolicy="allowlist"` and a teams allowlist is present, only listed teams/channels are accepted (mention‑gated).
+- When `groupPolicy="allowlist"` and a teams allowlist is present, only listed teams/channels are accepted (mentionâ€‘gated).
 - The configure wizard accepts `Team/Channel` entries and stores them for you.
-- On startup, openkrab resolves team/channel and user allowlist names to IDs (when Graph permissions allow)
+- On startup, OpenKrab resolves team/channel and user allowlist names to IDs (when Graph permissions allow)
   and logs the mapping; unresolved entries are kept as typed.
 
 Example:
@@ -148,7 +145,7 @@ Example:
 
 ## Azure Bot Setup (Prerequisites)
 
-Before configuring openkrab, you need to create an Azure Bot resource.
+Before configuring OpenKrab, you need to create an Azure Bot resource.
 
 ### Step 1: Create Azure Bot
 
@@ -166,27 +163,27 @@ Before configuring openkrab, you need to create an Azure Bot resource.
 
 > **Deprecation notice:** Creation of new multi-tenant bots was deprecated after 2025-07-31. Use **Single Tenant** for new bots.
 
-3. Click **Review + create** → **Create** (wait ~1-2 minutes)
+3. Click **Review + create** â†’ **Create** (wait ~1-2 minutes)
 
 ### Step 2: Get Credentials
 
-1. Go to your Azure Bot resource → **Configuration**
-2. Copy **Microsoft App ID** → this is your `appId`
-3. Click **Manage Password** → go to the App Registration
-4. Under **Certificates & secrets** → **New client secret** → copy the **Value** → this is your `appPassword`
-5. Go to **Overview** → copy **Directory (tenant) ID** → this is your `tenantId`
+1. Go to your Azure Bot resource â†’ **Configuration**
+2. Copy **Microsoft App ID** â†’ this is your `appId`
+3. Click **Manage Password** â†’ go to the App Registration
+4. Under **Certificates & secrets** â†’ **New client secret** â†’ copy the **Value** â†’ this is your `appPassword`
+5. Go to **Overview** â†’ copy **Directory (tenant) ID** â†’ this is your `tenantId`
 
 ### Step 3: Configure Messaging Endpoint
 
-1. In Azure Bot → **Configuration**
+1. In Azure Bot â†’ **Configuration**
 2. Set **Messaging endpoint** to your webhook URL:
    - Production: `https://your-domain.com/api/messages`
    - Local dev: Use a tunnel (see [Local Development](#local-development-tunneling) below)
 
 ### Step 4: Enable Teams Channel
 
-1. In Azure Bot → **Channels**
-2. Click **Microsoft Teams** → Configure → Save
+1. In Azure Bot â†’ **Channels**
+2. Click **Microsoft Teams** â†’ Configure â†’ Save
 3. Accept the Terms of Service
 
 ## Local Development (Tunneling)
@@ -214,11 +211,11 @@ Instead of manually creating a manifest ZIP, you can use the [Teams Developer Po
 
 1. Click **+ New app**
 2. Fill in basic info (name, description, developer info)
-3. Go to **App features** → **Bot**
+3. Go to **App features** â†’ **Bot**
 4. Select **Enter a bot ID manually** and paste your Azure Bot App ID
 5. Check scopes: **Personal**, **Team**, **Group Chat**
-6. Click **Distribute** → **Download app package**
-7. In Teams: **Apps** → **Manage your apps** → **Upload a custom app** → select the ZIP
+6. Click **Distribute** â†’ **Download app package**
+7. In Teams: **Apps** â†’ **Manage your apps** â†’ **Upload a custom app** â†’ select the ZIP
 
 This is often easier than hand-editing JSON manifests.
 
@@ -226,7 +223,7 @@ This is often easier than hand-editing JSON manifests.
 
 **Option A: Azure Web Chat (verify webhook first)**
 
-1. In Azure Portal → your Azure Bot resource → **Test in Web Chat**
+1. In Azure Portal â†’ your Azure Bot resource â†’ **Test in Web Chat**
 2. Send a message - you should see a response
 3. This confirms your webhook endpoint works before Teams setup
 
@@ -369,11 +366,11 @@ Minimal, valid example with the required fields. Replace IDs and URLs.
 To update an already-installed Teams app (e.g., to add RSC permissions):
 
 1. Update your `manifest.json` with the new settings
-2. **Increment the `version` field** (e.g., `1.0.0` → `1.1.0`)
+2. **Increment the `version` field** (e.g., `1.0.0` â†’ `1.1.0`)
 3. **Re-zip** the manifest with icons (`manifest.json`, `outline.png`, `color.png`)
 4. Upload the new zip:
-   - **Option A (Teams Admin Center):** Teams Admin Center → Teams apps → Manage apps → find your app → Upload new version
-   - **Option B (Sideload):** In Teams → Apps → Manage your apps → Upload a custom app
+   - **Option A (Teams Admin Center):** Teams Admin Center â†’ Teams apps â†’ Manage apps â†’ find your app â†’ Upload new version
+   - **Option B (Sideload):** In Teams â†’ Apps â†’ Manage your apps â†’ Upload a custom app
 5. **For team channels:** Reinstall the app in each team for new permissions to take effect
 6. **Fully quit and relaunch Teams** (not just close the window) to clear cached app metadata
 
@@ -434,8 +431,7 @@ Teams delivers messages via HTTP webhook. If processing takes too long (e.g., sl
 - Gateway timeouts
 - Teams retrying the message (causing duplicates)
 - Dropped replies
-
-openkrab handles this by returning quickly and sending replies proactively, but very slow responses may still cause issues.
+\nOpenKrab handles this by returning quickly and sending replies proactively, but very slow responses may still cause issues.
 
 ### Formatting
 
@@ -490,8 +486,8 @@ Teams recently introduced two channel UI styles over the same underlying data mo
 
 **The problem:** The Teams API does not expose which UI style a channel uses. If you use the wrong `replyStyle`:
 
-- `thread` in a Threads-style channel → replies appear nested awkwardly
-- `top-level` in a Posts-style channel → replies appear as separate top-level posts instead of in-thread
+- `thread` in a Threads-style channel â†’ replies appear nested awkwardly
+- `top-level` in a Posts-style channel â†’ replies appear as separate top-level posts instead of in-thread
 
 **Solution:** Configure `replyStyle` per-channel based on how the channel is set up:
 
@@ -520,7 +516,7 @@ Teams recently introduced two channel UI styles over the same underlying data mo
 - **Channels/groups:** Attachments live in M365 storage (SharePoint/OneDrive). The webhook payload only includes an HTML stub, not the actual file bytes. **Graph API permissions are required** to download channel attachments.
 
 Without Graph permissions, channel messages with images will be received as text-only (the image content is not accessible to the bot).
-By default, openkrab only downloads media from Microsoft/Teams hostnames. Override with `channels.msteams.mediaAllowHosts` (use `["*"]` to allow any host).
+By default, OpenKrab only downloads media from Microsoft/Teams hostnames. Override with `channels.msteams.mediaAllowHosts` (use `["*"]` to allow any host).
 Authorization headers are only attached for hosts in `channels.msteams.mediaAuthAllowHosts` (defaults to Graph + Bot Framework hosts). Keep this list strict (avoid multi-tenant suffixes).
 
 ## Sending files in group chats
@@ -529,8 +525,8 @@ Bots can send files in DMs using the FileConsentCard flow (built-in). However, *
 
 | Context                  | How files are sent                           | Setup needed                                    |
 | ------------------------ | -------------------------------------------- | ----------------------------------------------- |
-| **DMs**                  | FileConsentCard → user accepts → bot uploads | Works out of the box                            |
-| **Group chats/channels** | Upload to SharePoint → share link            | Requires `sharePointSiteId` + Graph permissions |
+| **DMs**                  | FileConsentCard â†’ user accepts â†’ bot uploads | Works out of the box                            |
+| **Group chats/channels** | Upload to SharePoint â†’ share link            | Requires `sharePointSiteId` + Graph permissions |
 | **Images (any context)** | Base64-encoded inline                        | Works out of the box                            |
 
 ### Why group chats need SharePoint
@@ -539,7 +535,7 @@ Bots don't have a personal OneDrive drive (the `/me/drive` Graph API endpoint do
 
 ### Setup
 
-1. **Add Graph API permissions** in Entra ID (Azure AD) → App Registration:
+1. **Add Graph API permissions** in Entra ID (Azure AD) â†’ App Registration:
    - `Sites.ReadWrite.All` (Application) - upload files to SharePoint
    - `Chat.Read.All` (Application) - optional, enables per-user sharing links
 
@@ -595,8 +591,7 @@ Per-user sharing is more secure as only the chat participants can access the fil
 Uploaded files are stored in a `/openkrabShared/` folder in the configured SharePoint site's default document library.
 
 ## Polls (Adaptive Cards)
-
-openkrab sends Teams polls as Adaptive Cards (there is no native Teams poll API).
+\nOpenKrab sends Teams polls as Adaptive Cards (there is no native Teams poll API).
 
 - CLI: `openkrab message poll --channel msteams --target conversation:<id> ...`
 - Votes are recorded by the gateway in `~/.openkrab/msteams-polls.json`.
@@ -626,8 +621,7 @@ The `card` parameter accepts an Adaptive Card JSON object. When `card` is provid
 
 **CLI:**
 
-```bash
-openkrab message send --channel msteams \
+```bash\nOpenKrab message send --channel msteams \
   --target "conversation:19:abc...@thread.tacv2" \
   --card '{"type":"AdaptiveCard","version":"1.5","body":[{"type":"TextBlock","text":"Hello!"}]}'
 ```
@@ -648,17 +642,13 @@ MSTeams targets use prefixes to distinguish between users and conversations:
 **CLI examples:**
 
 ```bash
-# Send to a user by ID
-openkrab message send --channel msteams --target "user:40a1a0ed-..." --message "Hello"
+# Send to a user by ID\nOpenKrab message send --channel msteams --target "user:40a1a0ed-..." --message "Hello"
 
-# Send to a user by display name (triggers Graph API lookup)
-openkrab message send --channel msteams --target "user:John Smith" --message "Hello"
+# Send to a user by display name (triggers Graph API lookup)\nOpenKrab message send --channel msteams --target "user:John Smith" --message "Hello"
 
-# Send to a group chat or channel
-openkrab message send --channel msteams --target "conversation:19:abc...@thread.tacv2" --message "Hello"
+# Send to a group chat or channel\nOpenKrab message send --channel msteams --target "conversation:19:abc...@thread.tacv2" --message "Hello"
 
-# Send an Adaptive Card to a conversation
-openkrab message send --channel msteams --target "conversation:19:abc...@thread.tacv2" \
+# Send an Adaptive Card to a conversation\nOpenKrab message send --channel msteams --target "conversation:19:abc...@thread.tacv2" \
   --card '{"type":"AdaptiveCard","version":"1.5","body":[{"type":"TextBlock","text":"Hello"}]}'
 ```
 
@@ -701,7 +691,7 @@ The `groupId` query parameter in Teams URLs is **NOT** the team ID used for conf
 
 ```
 https://teams.microsoft.com/l/team/19%3ABk4j...%40thread.tacv2/conversations?groupId=...
-                                    └────────────────────────────┘
+                                    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
                                     Team ID (URL-decode this)
 ```
 
@@ -709,7 +699,7 @@ https://teams.microsoft.com/l/team/19%3ABk4j...%40thread.tacv2/conversations?gro
 
 ```
 https://teams.microsoft.com/l/channel/19%3A15bc...%40thread.tacv2/ChannelName?groupId=...
-                                      └─────────────────────────┘
+                                      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
                                       Channel ID (URL-decode this)
 ```
 
@@ -750,7 +740,7 @@ Bots have limited support in private channels:
 
 - **"Icon file cannot be empty":** The manifest references icon files that are 0 bytes. Create valid PNG icons (32x32 for `outline.png`, 192x192 for `color.png`).
 - **"webApplicationInfo.Id already in use":** The app is still installed in another team/chat. Find and uninstall it first, or wait 5-10 minutes for propagation.
-- **"Something went wrong" on upload:** Upload via [https://admin.teams.microsoft.com](https://admin.teams.microsoft.com) instead, open browser DevTools (F12) → Network tab, and check the response body for the actual error.
+- **"Something went wrong" on upload:** Upload via [https://admin.teams.microsoft.com](https://admin.teams.microsoft.com) instead, open browser DevTools (F12) â†’ Network tab, and check the response body for the actual error.
 - **Sideload failing:** Try "Upload an app to your org's app catalog" instead of "Upload a custom app" - this often bypasses sideload restrictions.
 
 ### RSC permissions not working
@@ -769,3 +759,4 @@ Bots have limited support in private channels:
 - [RSC permissions reference](https://learn.microsoft.com/en-us/microsoftteams/platform/graph-api/rsc/resource-specific-consent)
 - [Teams bot file handling](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/bots-filesv4) (channel/group requires Graph)
 - [Proactive messaging](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/conversations/send-proactive-messages)
+

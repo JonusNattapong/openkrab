@@ -1,4 +1,4 @@
----
+﻿---
 title: Deploy on Render
 ---
 
@@ -38,11 +38,11 @@ services:
         value: "8080"
       - key: SETUP_PASSWORD
         sync: false # prompts during deploy
-      - key: OpenKrab_STATE_DIR
+      - key: OPENKRAB_STATE_DIR
         value: /data/.OpenKrab
-      - key: OpenKrab_WORKSPACE_DIR
+      - key: OPENKRAB_WORKSPACE_DIR
         value: /data/workspace
-      - key: OpenKrab_GATEWAY_TOKEN
+      - key: OPENKRAB_GATEWAY_TOKEN
         generateValue: true # auto-generates a secure token
     disk:
       name: OpenKrab-data
@@ -89,7 +89,7 @@ The web dashboard is available at `https://<your-service>.onrender.com/OpenKrab`
 
 ### Logs
 
-View real-time logs in **Dashboard → your service → Logs**. Filter by:
+View real-time logs in **Dashboard â†’ your service â†’ Logs**. Filter by:
 
 - Build logs (Docker image creation)
 - Deploy logs (service startup)
@@ -97,11 +97,11 @@ View real-time logs in **Dashboard → your service → Logs**. Filter by:
 
 ### Shell access
 
-For debugging, open a shell session via **Dashboard → your service → Shell**. The persistent disk is mounted at `/data`.
+For debugging, open a shell session via **Dashboard â†’ your service â†’ Shell**. The persistent disk is mounted at `/data`.
 
 ### Environment variables
 
-Modify variables in **Dashboard → your service → Environment**. Changes trigger an automatic redeploy.
+Modify variables in **Dashboard â†’ your service â†’ Environment**. Changes trigger an automatic redeploy.
 
 ### Auto-deploy
 
@@ -109,7 +109,7 @@ If you use the original OpenKrab repository, Render will not auto-deploy your Op
 
 ## Custom domain
 
-1. Go to **Dashboard → your service → Settings → Custom Domains**
+1. Go to **Dashboard â†’ your service â†’ Settings â†’ Custom Domains**
 2. Add your domain
 3. Configure DNS as instructed (CNAME to `*.onrender.com`)
 4. Render provisions a TLS certificate automatically
@@ -139,8 +139,8 @@ This downloads a portable backup you can restore on any OpenKrab host.
 
 Check the deploy logs in the Render Dashboard. Common issues:
 
-- Missing `SETUP_PASSWORD` — the Blueprint prompts for this, but verify it's set
-- Port mismatch — ensure `PORT=8080` matches the Dockerfile's exposed port
+- Missing `SETUP_PASSWORD` â€” the Blueprint prompts for this, but verify it's set
+- Port mismatch â€” ensure `PORT=8080` matches the Dockerfile's exposed port
 
 ### Slow cold starts (free tier)
 
@@ -157,4 +157,5 @@ Render expects a 200 response from `/health` within 30 seconds. If builds succee
 
 - Build logs for errors
 - Whether the container runs locally with `docker build && docker run`
+
 

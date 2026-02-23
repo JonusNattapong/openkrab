@@ -1,4 +1,4 @@
-//! Skills module - Load and manage skills from SKILL.md files
+﻿//! Skills module - Load and manage skills from SKILL.md files
 
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -183,16 +183,16 @@ pub fn format_skills_list(report: &SkillsReport, eligible_only: bool) -> String 
 
     for skill in skills {
         let status = if skill.eligible {
-            "✓ ready"
+            "âœ“ ready"
         } else if !skill.missing.bins.is_empty() {
-            "✗ missing bins"
+            "âœ— missing bins"
         } else if !skill.missing.env.is_empty() {
-            "✗ missing env"
+            "âœ— missing env"
         } else {
-            "✗ missing"
+            "âœ— missing"
         };
 
-        let emoji = skill.metadata.emoji.as_deref().unwrap_or("📦");
+        let emoji = skill.metadata.emoji.as_deref().unwrap_or("ðŸ“¦");
         output.push_str(&format!("{} {} - {}\n", emoji, skill.name, status));
 
         if !skill.description.is_empty() {
@@ -217,7 +217,7 @@ pub fn format_skills_list(report: &SkillsReport, eligible_only: bool) -> String 
         output.push('\n');
     }
 
-    output.push_str("Tip: use clawdhub to search, install, and sync skills.\n");
+    output.push_str("Tip: use Krabdhub to search, install, and sync skills.\n");
 
     output
 }
@@ -228,11 +228,11 @@ pub fn format_skill_info(report: &SkillsReport, name: &str) -> String {
     match skill {
         Some(s) => {
             let mut output = String::new();
-            let emoji = s.metadata.emoji.as_deref().unwrap_or("📦");
+            let emoji = s.metadata.emoji.as_deref().unwrap_or("ðŸ“¦");
             let status = if s.eligible {
-                "✓ Ready"
+                "âœ“ Ready"
             } else {
-                "✗ Missing requirements"
+                "âœ— Missing requirements"
             };
 
             output.push_str(&format!("{} {} {}\n\n", emoji, s.name, status));
@@ -248,7 +248,7 @@ pub fn format_skill_info(report: &SkillsReport, name: &str) -> String {
                 output.push_str("\nRequirements - Binaries:\n");
                 for bin in &s.metadata.requires.bins {
                     let installed = which::which(bin).is_ok();
-                    let mark = if installed { "✓" } else { "✗" };
+                    let mark = if installed { "âœ“" } else { "âœ—" };
                     output.push_str(&format!("  {} {}\n", mark, bin));
                 }
             }
@@ -257,7 +257,7 @@ pub fn format_skill_info(report: &SkillsReport, name: &str) -> String {
                 output.push_str("\nRequirements - Environment:\n");
                 for env in &s.metadata.requires.env {
                     let installed = std::env::var(env).is_ok();
-                    let mark = if installed { "✓" } else { "✗" };
+                    let mark = if installed { "âœ“" } else { "âœ—" };
                     output.push_str(&format!("  {} ${}\n", mark, env));
                 }
             }
@@ -267,3 +267,4 @@ pub fn format_skill_info(report: &SkillsReport, name: &str) -> String {
         None => format!("Skill \"{}\" not found.", name),
     }
 }
+

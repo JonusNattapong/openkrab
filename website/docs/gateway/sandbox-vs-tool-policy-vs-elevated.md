@@ -1,4 +1,4 @@
----
+﻿---
 title: Sandbox vs Tool Policy vs Elevated
 summary: "Why a tool is blocked: sandbox runtime, tool allow/deny policy, and elevated exec gates"
 read_when: "You hit 'sandbox jail' or see a tool/elevated refusal and want the exact config key to change."
@@ -6,22 +6,17 @@ status: active
 ---
 
 # Sandbox vs Tool Policy vs Elevated
-
-openkrab has three related (but different) controls:
+\nOpenKrab has three related (but different) controls:
 
 1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) decides **where tools run** (Docker vs host).
 2. **Tool policy** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`) decides **which tools are available/allowed**.
-3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`) is an **exec-only escape hatch** to run on the host when you’re sandboxed.
+3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`) is an **exec-only escape hatch** to run on the host when youâ€™re sandboxed.
 
 ## Quick debug
 
-Use the inspector to see what openkrab is _actually_ doing:
+Use the inspector to see what OpenKrab is _actually_ doing:
 
-```bash
-openkrab sandbox explain
-openkrab sandbox explain --session agent:main:main
-openkrab sandbox explain --agent work
-openkrab sandbox explain --json
+```bash\nOpenKrab sandbox explain\nOpenKrab sandbox explain --session agent:main:main\nOpenKrab sandbox explain --agent work\nOpenKrab sandbox explain --json
 ```
 
 It prints:
@@ -36,7 +31,7 @@ It prints:
 Sandboxing is controlled by `agents.defaults.sandbox.mode`:
 
 - `"off"`: everything runs on the host.
-- `"non-main"`: only non-main sessions are sandboxed (common “surprise” for groups/channels).
+- `"non-main"`: only non-main sessions are sandboxed (common â€œsurpriseâ€ for groups/channels).
 - `"all"`: everything is sandboxed.
 
 See [Sandboxing](/gateway/sandboxing) for the full matrix (scope, workspace mounts, images).
@@ -93,15 +88,15 @@ Available groups:
 - `group:automation`: `cron`, `gateway`
 - `group:messaging`: `message`
 - `group:nodes`: `nodes`
-- `group:openkrab`: all built-in openkrab tools (excludes provider plugins)
+- `group:openkrab`: all built-in OpenKrab tools (excludes provider plugins)
 
-## Elevated: exec-only “run on host”
+## Elevated: exec-only â€œrun on hostâ€
 
 Elevated does **not** grant extra tools; it only affects `exec`.
 
-- If you’re sandboxed, `/elevated on` (or `exec` with `elevated: true`) runs on the host (approvals may still apply).
+- If youâ€™re sandboxed, `/elevated on` (or `exec` with `elevated: true`) runs on the host (approvals may still apply).
 - Use `/elevated full` to skip exec approvals for the session.
-- If you’re already running direct, elevated is effectively a no-op (still gated).
+- If youâ€™re already running direct, elevated is effectively a no-op (still gated).
 - Elevated is **not** skill-scoped and does **not** override tool allow/deny.
 - `/exec` is separate from elevated. It only adjusts per-session exec defaults for authorized senders.
 
@@ -112,9 +107,9 @@ Gates:
 
 See [Elevated Mode](/tools/elevated).
 
-## Common “sandbox jail” fixes
+## Common â€œsandbox jailâ€ fixes
 
-### “Tool X blocked by sandbox tool policy”
+### â€œTool X blocked by sandbox tool policyâ€
 
 Fix-it keys (pick one):
 
@@ -123,6 +118,7 @@ Fix-it keys (pick one):
   - remove it from `tools.sandbox.tools.deny` (or per-agent `agents.list[].tools.sandbox.tools.deny`)
   - or add it to `tools.sandbox.tools.allow` (or per-agent allow)
 
-### “I thought this was main, why is it sandboxed?”
+### â€œI thought this was main, why is it sandboxed?â€
 
 In `"non-main"` mode, group/channel keys are _not_ main. Use the main session key (shown by `sandbox explain`) or switch mode to `"off"`.
+

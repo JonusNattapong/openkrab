@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab models` (status/list/set/scan, aliases, fallbacks, auth)"
 read_when:
   - You want to change default models or view provider auth status
@@ -17,11 +17,7 @@ Related:
 
 ## Common commands
 
-```bash
-openkrab models status
-openkrab models list
-openkrab models set <model-or-alias>
-openkrab models scan
+```bash\nOpenKrab models status\nOpenKrab models list\nOpenKrab models set <model-or-alias>\nOpenKrab models scan
 ```
 
 `openkrab models status` shows the resolved default/fallbacks plus an auth overview.
@@ -29,15 +25,15 @@ When provider usage snapshots are available, the OAuth/token status section incl
 provider usage headers.
 Add `--probe` to run live auth probes against each configured provider profile.
 Probes are real requests (may consume tokens and trigger rate limits).
-Use `--agent <id>` to inspect a configured agent’s model/auth state. When omitted,
-the command uses `openkrab_AGENT_DIR`/`PI_CODING_AGENT_DIR` if set, otherwise the
+Use `--agent <id>` to inspect a configured agentâ€™s model/auth state. When omitted,
+the command uses `OPENKRAB_AGENT_DIR`/`PI_CODING_AGENT_DIR` if set, otherwise the
 configured default agent.
 
 Notes:
 
 - `models set <model-or-alias>` accepts `provider/model` or an alias.
 - Model refs are parsed by splitting on the **first** `/`. If the model ID includes `/` (OpenRouter-style), include the provider prefix (example: `openrouter/moonshotai/kimi-k2`).
-- If you omit the provider, openkrab treats the input as an alias or a model for the **default provider** (only works when there is no `/` in the model ID).
+- If you omit the provider, OpenKrab treats the input as an alias or a model for the **default provider** (only works when there is no `/` in the model ID).
 
 ### `models status`
 
@@ -52,28 +48,24 @@ Options:
 - `--probe-timeout <ms>`
 - `--probe-concurrency <n>`
 - `--probe-max-tokens <n>`
-- `--agent <id>` (configured agent id; overrides `openkrab_AGENT_DIR`/`PI_CODING_AGENT_DIR`)
+- `--agent <id>` (configured agent id; overrides `OPENKRAB_AGENT_DIR`/`PI_CODING_AGENT_DIR`)
 
 ## Aliases + fallbacks
 
-```bash
-openkrab models aliases list
-openkrab models fallbacks list
+```bash\nOpenKrab models aliases list\nOpenKrab models fallbacks list
 ```
 
 ## Auth profiles
 
-```bash
-openkrab models auth add
-openkrab models auth login --provider <id>
-openkrab models auth setup-token
-openkrab models auth paste-token
+```bash\nOpenKrab models auth add\nOpenKrab models auth login --provider <id>\nOpenKrab models auth setup-token\nOpenKrab models auth paste-token
 ```
 
-`models auth login` runs a provider plugin’s auth flow (OAuth/API key). Use
+`models auth login` runs a provider pluginâ€™s auth flow (OAuth/API key). Use
 `openkrab plugins list` to see which providers are installed.
 
 Notes:
 
 - `setup-token` prompts for a setup-token value (generate it with `claude setup-token` on any machine).
 - `paste-token` accepts a token string generated elsewhere or from automation.
+
+

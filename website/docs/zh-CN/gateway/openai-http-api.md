@@ -1,7 +1,7 @@
----
+﻿---
 read_when:
-  - 集成需要 OpenAI Chat Completions 的工具
-summary: 从 Gateway 网关暴露 OpenAI 兼容的 /v1/chat/completions HTTP 端点
+  - é›†æˆéœ€è¦ OpenAI Chat Completions çš„å·¥å…·
+summary: ä»Ž Gateway ç½‘å…³æš´éœ² OpenAI å…¼å®¹çš„ /v1/chat/completions HTTP ç«¯ç‚¹
 title: OpenAI Chat Completions
 x-i18n:
   generated_at: "2026-02-03T07:48:15Z"
@@ -12,46 +12,46 @@ x-i18n:
   workflow: 15
 ---
 
-# OpenAI Chat Completions（HTTP）
+# OpenAI Chat Completionsï¼ˆHTTPï¼‰
 
-OpenKrab 的 Gateway 网关可以提供一个小型的 OpenAI 兼容 Chat Completions 端点。
+OpenKrab çš„ Gateway ç½‘å…³å¯ä»¥æä¾›ä¸€ä¸ªå°åž‹çš„ OpenAI å…¼å®¹ Chat Completions ç«¯ç‚¹ã€‚
 
-此端点**默认禁用**。请先在配置中启用它。
+æ­¤ç«¯ç‚¹**é»˜è®¤ç¦ç”¨**ã€‚è¯·å…ˆåœ¨é…ç½®ä¸­å¯ç”¨å®ƒã€‚
 
 - `POST /v1/chat/completions`
-- 与 Gateway 网关相同的端口（WS + HTTP 多路复用）：`http://<gateway-host>:<port>/v1/chat/completions`
+- ä¸Ž Gateway ç½‘å…³ç›¸åŒçš„ç«¯å£ï¼ˆWS + HTTP å¤šè·¯å¤ç”¨ï¼‰ï¼š`http://<gateway-host>:<port>/v1/chat/completions`
 
-底层实现中，请求作为普通的 Gateway 网关智能体运行执行（与 `OpenKrab agent` 相同的代码路径），因此路由/权限/配置与你的 Gateway 网关一致。
+åº•å±‚å®žçŽ°ä¸­ï¼Œè¯·æ±‚ä½œä¸ºæ™®é€šçš„ Gateway ç½‘å…³æ™ºèƒ½ä½“è¿è¡Œæ‰§è¡Œï¼ˆä¸Ž `OpenKrab agent` ç›¸åŒçš„ä»£ç è·¯å¾„ï¼‰ï¼Œå› æ­¤è·¯ç”±/æƒé™/é…ç½®ä¸Žä½ çš„ Gateway ç½‘å…³ä¸€è‡´ã€‚
 
-## 认证
+## è®¤è¯
 
-使用 Gateway 网关认证配置。发送 bearer 令牌：
+ä½¿ç”¨ Gateway ç½‘å…³è®¤è¯é…ç½®ã€‚å‘é€ bearer ä»¤ç‰Œï¼š
 
 - `Authorization: Bearer <token>`
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 当 `gateway.auth.mode="token"` 时，使用 `gateway.auth.token`（或 `OpenKrab_GATEWAY_TOKEN`）。
-- 当 `gateway.auth.mode="password"` 时，使用 `gateway.auth.password`（或 `OpenKrab_GATEWAY_PASSWORD`）。
+- å½“ `gateway.auth.mode="token"` æ—¶ï¼Œä½¿ç”¨ `gateway.auth.token`ï¼ˆæˆ– `OPENKRAB_GATEWAY_TOKEN`ï¼‰ã€‚
+- å½“ `gateway.auth.mode="password"` æ—¶ï¼Œä½¿ç”¨ `gateway.auth.password`ï¼ˆæˆ– `OPENKRAB_GATEWAY_PASSWORD`ï¼‰ã€‚
 
-## 选择智能体
+## é€‰æ‹©æ™ºèƒ½ä½“
 
-无需自定义头：在 OpenAI `model` 字段中编码智能体 ID：
+æ— éœ€è‡ªå®šä¹‰å¤´ï¼šåœ¨ OpenAI `model` å­—æ®µä¸­ç¼–ç æ™ºèƒ½ä½“ IDï¼š
 
-- `model: "OpenKrab:<agentId>"`（例如：`"OpenKrab:main"`、`"OpenKrab:beta"`）
-- `model: "agent:<agentId>"`（别名）
+- `model: "OpenKrab:<agentId>"`ï¼ˆä¾‹å¦‚ï¼š`"OpenKrab:main"`ã€`"OpenKrab:beta"`ï¼‰
+- `model: "agent:<agentId>"`ï¼ˆåˆ«åï¼‰
 
-或通过头指定特定的 OpenKrab 智能体：
+æˆ–é€šè¿‡å¤´æŒ‡å®šç‰¹å®šçš„ OpenKrab æ™ºèƒ½ä½“ï¼š
 
-- `x-OpenKrab-agent-id: <agentId>`（默认：`main`）
+- `x-OpenKrab-agent-id: <agentId>`ï¼ˆé»˜è®¤ï¼š`main`ï¼‰
 
-高级选项：
+é«˜çº§é€‰é¡¹ï¼š
 
-- `x-OpenKrab-session-key: <sessionKey>` 完全控制会话路由。
+- `x-OpenKrab-session-key: <sessionKey>` å®Œå…¨æŽ§åˆ¶ä¼šè¯è·¯ç”±ã€‚
 
-## 启用端点
+## å¯ç”¨ç«¯ç‚¹
 
-将 `gateway.http.endpoints.chatCompletions.enabled` 设置为 `true`：
+å°† `gateway.http.endpoints.chatCompletions.enabled` è®¾ç½®ä¸º `true`ï¼š
 
 ```json5
 {
@@ -65,9 +65,9 @@ OpenKrab 的 Gateway 网关可以提供一个小型的 OpenAI 兼容 Chat Comple
 }
 ```
 
-## 禁用端点
+## ç¦ç”¨ç«¯ç‚¹
 
-将 `gateway.http.endpoints.chatCompletions.enabled` 设置为 `false`：
+å°† `gateway.http.endpoints.chatCompletions.enabled` è®¾ç½®ä¸º `false`ï¼š
 
 ```json5
 {
@@ -81,23 +81,23 @@ OpenKrab 的 Gateway 网关可以提供一个小型的 OpenAI 兼容 Chat Comple
 }
 ```
 
-## 会话行为
+## ä¼šè¯è¡Œä¸º
 
-默认情况下，端点是**每请求无状态**的（每次调用生成新的会话键）。
+é»˜è®¤æƒ…å†µä¸‹ï¼Œç«¯ç‚¹æ˜¯**æ¯è¯·æ±‚æ— çŠ¶æ€**çš„ï¼ˆæ¯æ¬¡è°ƒç”¨ç”Ÿæˆæ–°çš„ä¼šè¯é”®ï¼‰ã€‚
 
-如果请求包含 OpenAI `user` 字符串，Gateway 网关会从中派生一个稳定的会话键，因此重复调用可以共享智能体会话。
+å¦‚æžœè¯·æ±‚åŒ…å« OpenAI `user` å­—ç¬¦ä¸²ï¼ŒGateway ç½‘å…³ä¼šä»Žä¸­æ´¾ç”Ÿä¸€ä¸ªç¨³å®šçš„ä¼šè¯é”®ï¼Œå› æ­¤é‡å¤è°ƒç”¨å¯ä»¥å…±äº«æ™ºèƒ½ä½“ä¼šè¯ã€‚
 
-## 流式传输（SSE）
+## æµå¼ä¼ è¾“ï¼ˆSSEï¼‰
 
-设置 `stream: true` 以接收 Server-Sent Events（SSE）：
+è®¾ç½® `stream: true` ä»¥æŽ¥æ”¶ Server-Sent Eventsï¼ˆSSEï¼‰ï¼š
 
 - `Content-Type: text/event-stream`
-- 每个事件行是 `data: <json>`
-- 流以 `data: [DONE]` 结束
+- æ¯ä¸ªäº‹ä»¶è¡Œæ˜¯ `data: <json>`
+- æµä»¥ `data: [DONE]` ç»“æŸ
 
-## 示例
+## ç¤ºä¾‹
 
-非流式：
+éžæµå¼ï¼š
 
 ```bash
 curl -sS http://127.0.0.1:18789/v1/chat/completions \
@@ -110,7 +110,7 @@ curl -sS http://127.0.0.1:18789/v1/chat/completions \
   }'
 ```
 
-流式：
+æµå¼ï¼š
 
 ```bash
 curl -N http://127.0.0.1:18789/v1/chat/completions \
@@ -123,4 +123,5 @@ curl -N http://127.0.0.1:18789/v1/chat/completions \
     "messages": [{"role":"user","content":"hi"}]
   }'
 ```
+
 

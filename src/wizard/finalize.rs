@@ -44,7 +44,7 @@ pub async fn finalize_onboarding_wizard(
     let launched_tui = if options.flow == WizardFlow::Quickstart {
         prompter
             .note(
-                "Run `krabkrab` to start the gateway and TUI.",
+                "Run `openkrab` to start the gateway and TUI.",
                 Some("Ready"),
             )
             .await?;
@@ -114,7 +114,7 @@ fn build_next_steps(options: &FinalizeOnboardingOptions<'_>) -> String {
     let mut lines = Vec::new();
 
     lines.push("1. Start the gateway:".to_string());
-    lines.push("   krabkrab".to_string());
+    lines.push("   openkrab".to_string());
     lines.push("".to_string());
 
     lines.push("2. Connect from a client:".to_string());
@@ -122,11 +122,11 @@ fn build_next_steps(options: &FinalizeOnboardingOptions<'_>) -> String {
     lines.push("".to_string());
 
     lines.push("3. Configure channels:".to_string());
-    lines.push("   krabkrab configure".to_string());
+    lines.push("   openkrab configure".to_string());
     lines.push("".to_string());
 
     lines.push("4. Run security audit:".to_string());
-    lines.push("   krabkrab security audit --deep".to_string());
+    lines.push("   openkrab security audit --deep".to_string());
 
     lines.join("\n")
 }
@@ -178,7 +178,8 @@ mod tests {
             settings: &settings,
         };
         let steps = build_next_steps(&finalize_opts);
-        assert!(steps.contains("krabkrab"));
+        assert!(steps.contains("openkrab"));
         assert!(steps.contains("security audit"));
     }
 }
+

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Signal support via signal-cli (JSON-RPC + SSE), setup paths, and number model"
 read_when:
   - Setting up Signal support
@@ -12,7 +12,7 @@ Status: external CLI integration. Gateway talks to `signal-cli` over HTTP JSON-R
 
 ## Prerequisites
 
-- openkrab installed on your server (Linux flow below tested on Ubuntu 24).
+- OpenKrab installed on your server (Linux flow below tested on Ubuntu 24).
 - `signal-cli` available on the host where the gateway runs.
 - A phone number that can receive one verification SMS (for SMS registration path).
 - Browser access for Signal captcha (`signalcaptchas.org`) during registration.
@@ -24,7 +24,7 @@ Status: external CLI integration. Gateway talks to `signal-cli` over HTTP JSON-R
 3. Choose one setup path:
    - **Path A (QR link):** `signal-cli link -n "openkrab"` and scan with Signal.
    - **Path B (SMS register):** register a dedicated number with captcha + SMS verification.
-4. Configure openkrab and restart the gateway.
+4. Configure OpenKrab and restart the gateway.
 5. Send a first DM and approve pairing (`openkrab pairing approve signal <CODE>`).
 
 Minimal config:
@@ -138,15 +138,13 @@ signal-cli -a +<BOT_PHONE_NUMBER> register --captcha '<SIGNALCAPTCHA_URL>'
 signal-cli -a +<BOT_PHONE_NUMBER> verify <VERIFICATION_CODE>
 ```
 
-4. Configure openkrab, restart gateway, verify channel:
+4. Configure OpenKrab, restart gateway, verify channel:
 
 ```bash
 # If you run the gateway as a user systemd service:
 systemctl --user restart openkrab-gateway
 
-# Then verify:
-openkrab doctor
-openkrab channels status --probe
+# Then verify:\nOpenKrab doctor\nOpenKrab channels status --probe
 ```
 
 5. Pair your DM sender:
@@ -164,7 +162,7 @@ Upstream references:
 
 ## External daemon mode (httpUrl)
 
-If you want to manage `signal-cli` yourself (slow JVM cold starts, container init, or shared CPUs), run the daemon separately and point openkrab at it:
+If you want to manage `signal-cli` yourself (slow JVM cold starts, container init, or shared CPUs), run the daemon separately and point OpenKrab at it:
 
 ```json5
 {
@@ -177,7 +175,7 @@ If you want to manage `signal-cli` yourself (slow JVM cold starts, container ini
 }
 ```
 
-This skips auto-spawn and the startup wait inside openkrab. For slow starts when auto-spawning, set `channels.signal.startupTimeoutMs`.
+This skips auto-spawn and the startup wait inside OpenKrab. For slow starts when auto-spawning, set `channels.signal.startupTimeoutMs`.
 
 ## Access control (DMs + groups)
 
@@ -213,23 +211,23 @@ Groups:
 
 ## Typing + read receipts
 
-- **Typing indicators**: openkrab sends typing signals via `signal-cli sendTyping` and refreshes them while a reply is running.
-- **Read receipts**: when `channels.signal.sendReadReceipts` is true, openkrab forwards read receipts for allowed DMs.
+- **Typing indicators**: OpenKrab sends typing signals via `signal-cli sendTyping` and refreshes them while a reply is running.
+- **Read receipts**: when `channels.signal.sendReadReceipts` is true, OpenKrab forwards read receipts for allowed DMs.
 - Signal-cli does not expose read receipts for groups.
 
 ## Reactions (message tool)
 
 - Use `message action=react` with `channel=signal`.
 - Targets: sender E.164 or UUID (use `uuid:<id>` from pairing output; bare UUID works too).
-- `messageId` is the Signal timestamp for the message you’re reacting to.
+- `messageId` is the Signal timestamp for the message youâ€™re reacting to.
 - Group reactions require `targetAuthor` or `targetAuthorUuid`.
 
 Examples:
 
 ```
-message action=react channel=signal target=uuid:123e4567-e89b-12d3-a456-426614174000 messageId=1737630212345 emoji=🔥
-message action=react channel=signal target=+15551234567 messageId=1737630212345 emoji=🔥 remove=true
-message action=react channel=signal target=signal:group:<groupId> targetAuthor=uuid:<sender-uuid> messageId=1737630212345 emoji=✅
+message action=react channel=signal target=uuid:123e4567-e89b-12d3-a456-426614174000 messageId=1737630212345 emoji=ðŸ”¥
+message action=react channel=signal target=+15551234567 messageId=1737630212345 emoji=ðŸ”¥ remove=true
+message action=react channel=signal target=signal:group:<groupId> targetAuthor=uuid:<sender-uuid> messageId=1737630212345 emoji=âœ…
 ```
 
 Config:
@@ -251,18 +249,12 @@ Config:
 
 Run this ladder first:
 
-```bash
-openkrab status
-openkrab gateway status
-openkrab logs --follow
-openkrab doctor
-openkrab channels status --probe
+```bash\nOpenKrab status\nOpenKrab gateway status\nOpenKrab logs --follow\nOpenKrab doctor\nOpenKrab channels status --probe
 ```
 
 Then confirm DM pairing state if needed:
 
-```bash
-openkrab pairing list signal
+```bash\nOpenKrab pairing list signal
 ```
 
 Common failures:
@@ -275,8 +267,7 @@ Common failures:
 
 Extra checks:
 
-```bash
-openkrab pairing list signal
+```bash\nOpenKrab pairing list signal
 pgrep -af signal-cli
 grep -i "signal" "/tmp/openkrab/openkrab-$(date +%Y-%m-%d).log" | tail -20
 ```
@@ -322,3 +313,4 @@ Related global options:
 - `agents.list[].groupChat.mentionPatterns` (Signal does not support native mentions).
 - `messages.groupChat.mentionPatterns` (global fallback).
 - `messages.responsePrefix`.
+

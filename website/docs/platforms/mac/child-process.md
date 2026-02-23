@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Gateway lifecycle on macOS (launchd)"
 read_when:
   - Integrating the mac app with the gateway lifecycle
@@ -8,18 +8,18 @@ title: "Gateway Lifecycle"
 # Gateway lifecycle on macOS
 
 The macOS app **manages the Gateway via launchd** by default and does not spawn
-the Gateway as a child process. It first tries to attach to an already‑running
+the Gateway as a child process. It first tries to attach to an alreadyâ€‘running
 Gateway on the configured port; if none is reachable, it enables the launchd
 service via the external `OpenKrab` CLI (no embedded runtime). This gives you
-reliable auto‑start at login and restart on crashes.
+reliable autoâ€‘start at login and restart on crashes.
 
-Child‑process mode (Gateway spawned directly by the app) is **not in use** today.
+Childâ€‘process mode (Gateway spawned directly by the app) is **not in use** today.
 If you need tighter coupling to the UI, run the Gateway manually in a terminal.
 
 ## Default behavior (launchd)
 
-- The app installs a per‑user LaunchAgent labeled `bot.molt.gateway`
-  (or `bot.molt.<profile>` when using `--profile`/`OpenKrab_PROFILE`; legacy `com.OpenKrab.*` is supported).
+- The app installs a perâ€‘user LaunchAgent labeled `bot.molt.gateway`
+  (or `bot.molt.<profile>` when using `--profile`/`OPENKRAB_PROFILE`; legacy `com.OpenKrab.*` is supported).
 - When Local mode is enabled, the app ensures the LaunchAgent is loaded and
   starts the Gateway if needed.
 - Logs are written to the launchd gateway log path (visible in Debug Settings).
@@ -35,7 +35,7 @@ Replace the label with `bot.molt.<profile>` when running a named profile.
 
 ## Unsigned dev builds
 
-`scripts/restart-mac.sh --no-sign` is for fast local builds when you don’t have
+`scripts/restart-mac.sh --no-sign` is for fast local builds when you donâ€™t have
 signing keys. To prevent launchd from pointing at an unsigned relay binary, it:
 
 - Writes `~/.OpenKrab/disable-launchagent`.
@@ -61,10 +61,11 @@ remote host and connects over that tunnel.
 
 ## Why we prefer launchd
 
-- Auto‑start at login.
-- Built‑in restart/KeepAlive semantics.
+- Autoâ€‘start at login.
+- Builtâ€‘in restart/KeepAlive semantics.
 - Predictable logs and supervision.
 
-If a true child‑process mode is ever needed again, it should be documented as a
-separate, explicit dev‑only mode.
+If a true childâ€‘process mode is ever needed again, it should be documented as a
+separate, explicit devâ€‘only mode.
+
 

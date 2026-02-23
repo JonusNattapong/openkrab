@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 你需要检查原始模型输出以查找推理泄漏
-  - 你想在迭代时以监视模式运行 Gateway 网关
-  - 你需要可重复的调试工作流
-summary: 调试工具：监视模式、原始模型流和追踪推理泄漏
-title: 调试
+  - ä½ éœ€è¦æ£€æŸ¥åŽŸå§‹æ¨¡åž‹è¾“å‡ºä»¥æŸ¥æ‰¾æŽ¨ç†æ³„æ¼
+  - ä½ æƒ³åœ¨è¿­ä»£æ—¶ä»¥ç›‘è§†æ¨¡å¼è¿è¡Œ Gateway ç½‘å…³
+  - ä½ éœ€è¦å¯é‡å¤çš„è°ƒè¯•å·¥ä½œæµ
+summary: è°ƒè¯•å·¥å…·ï¼šç›‘è§†æ¨¡å¼ã€åŽŸå§‹æ¨¡åž‹æµå’Œè¿½è¸ªæŽ¨ç†æ³„æ¼
+title: è°ƒè¯•
 x-i18n:
   generated_at: "2026-02-03T07:47:23Z"
   model: claude-opus-4-5
@@ -14,17 +14,17 @@ x-i18n:
   workflow: 15
 ---
 
-# 调试
+# è°ƒè¯•
 
-本页介绍用于流式输出的调试辅助工具，特别是当提供商将推理混入正常文本时。
+æœ¬é¡µä»‹ç»ç”¨äºŽæµå¼è¾“å‡ºçš„è°ƒè¯•è¾…åŠ©å·¥å…·ï¼Œç‰¹åˆ«æ˜¯å½“æä¾›å•†å°†æŽ¨ç†æ··å…¥æ­£å¸¸æ–‡æœ¬æ—¶ã€‚
 
-## 运行时调试覆盖
+## è¿è¡Œæ—¶è°ƒè¯•è¦†ç›–
 
-在聊天中使用 `/debug` 设置**仅运行时**配置覆盖（内存中，不写入磁盘）。
-`/debug` 默认禁用；通过 `commands.debug: true` 启用。
-当你需要切换不常用的设置而不编辑 `OpenKrab.json` 时，这非常方便。
+åœ¨èŠå¤©ä¸­ä½¿ç”¨ `/debug` è®¾ç½®**ä»…è¿è¡Œæ—¶**é…ç½®è¦†ç›–ï¼ˆå†…å­˜ä¸­ï¼Œä¸å†™å…¥ç£ç›˜ï¼‰ã€‚
+`/debug` é»˜è®¤ç¦ç”¨ï¼›é€šè¿‡ `commands.debug: true` å¯ç”¨ã€‚
+å½“ä½ éœ€è¦åˆ‡æ¢ä¸å¸¸ç”¨çš„è®¾ç½®è€Œä¸ç¼–è¾‘ `OpenKrab.json` æ—¶ï¼Œè¿™éžå¸¸æ–¹ä¾¿ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```
 /debug show
@@ -33,129 +33,130 @@ x-i18n:
 /debug reset
 ```
 
-`/debug reset` 清除所有覆盖并返回到磁盘上的配置。
+`/debug reset` æ¸…é™¤æ‰€æœ‰è¦†ç›–å¹¶è¿”å›žåˆ°ç£ç›˜ä¸Šçš„é…ç½®ã€‚
 
-## Gateway 网关监视模式
+## Gateway ç½‘å…³ç›‘è§†æ¨¡å¼
 
-为了快速迭代，在文件监视器下运行 Gateway 网关：
+ä¸ºäº†å¿«é€Ÿè¿­ä»£ï¼Œåœ¨æ–‡ä»¶ç›‘è§†å™¨ä¸‹è¿è¡Œ Gateway ç½‘å…³ï¼š
 
 ```bash
 pnpm gateway:watch --force
 ```
 
-这映射到：
+è¿™æ˜ å°„åˆ°ï¼š
 
 ```bash
 tsx watch src/entry.ts gateway --force
 ```
 
-在 `gateway:watch` 后添加任何 Gateway 网关 CLI 标志，它们将在每次重启时传递。
+åœ¨ `gateway:watch` åŽæ·»åŠ ä»»ä½• Gateway ç½‘å…³ CLI æ ‡å¿—ï¼Œå®ƒä»¬å°†åœ¨æ¯æ¬¡é‡å¯æ—¶ä¼ é€’ã€‚
 
-## Dev 配置文件 + dev Gateway 网关（--dev）
+## Dev é…ç½®æ–‡ä»¶ + dev Gateway ç½‘å…³ï¼ˆ--devï¼‰
 
-使用 dev 配置文件来隔离状态，并启动一个安全、可丢弃的调试设置。有**两个** `--dev` 标志：
+ä½¿ç”¨ dev é…ç½®æ–‡ä»¶æ¥éš”ç¦»çŠ¶æ€ï¼Œå¹¶å¯åŠ¨ä¸€ä¸ªå®‰å…¨ã€å¯ä¸¢å¼ƒçš„è°ƒè¯•è®¾ç½®ã€‚æœ‰**ä¸¤ä¸ª** `--dev` æ ‡å¿—ï¼š
 
-- **全局 `--dev`（配置文件）：** 将状态隔离到 `~/.OpenKrab-dev` 下，并将 Gateway 网关端口默认为 `19001`（派生端口随之移动）。
-- **`gateway --dev`：告诉 Gateway 网关在缺失时自动创建默认配置 + 工作区**（并跳过 BOOTSTRAP.md）。
+- **å…¨å±€ `--dev`ï¼ˆé…ç½®æ–‡ä»¶ï¼‰ï¼š** å°†çŠ¶æ€éš”ç¦»åˆ° `~/.OpenKrab-dev` ä¸‹ï¼Œå¹¶å°† Gateway ç½‘å…³ç«¯å£é»˜è®¤ä¸º `19001`ï¼ˆæ´¾ç”Ÿç«¯å£éšä¹‹ç§»åŠ¨ï¼‰ã€‚
+- **`gateway --dev`ï¼šå‘Šè¯‰ Gateway ç½‘å…³åœ¨ç¼ºå¤±æ—¶è‡ªåŠ¨åˆ›å»ºé»˜è®¤é…ç½® + å·¥ä½œåŒº**ï¼ˆå¹¶è·³è¿‡ BOOTSTRAP.mdï¼‰ã€‚
 
-推荐流程（dev 配置文件 + dev 引导）：
+æŽ¨èæµç¨‹ï¼ˆdev é…ç½®æ–‡ä»¶ + dev å¼•å¯¼ï¼‰ï¼š
 
 ```bash
 pnpm gateway:dev
-OpenKrab_PROFILE=dev OpenKrab tui
+OPENKRAB_PROFILE=dev OpenKrab tui
 ```
 
-如果你还没有全局安装，请通过 `pnpm OpenKrab ...` 运行 CLI。
+å¦‚æžœä½ è¿˜æ²¡æœ‰å…¨å±€å®‰è£…ï¼Œè¯·é€šè¿‡ `pnpm OpenKrab ...` è¿è¡Œ CLIã€‚
 
-这会执行：
+è¿™ä¼šæ‰§è¡Œï¼š
 
-1. **配置文件隔离**（全局 `--dev`）
-   - `OpenKrab_PROFILE=dev`
-   - `OpenKrab_STATE_DIR=~/.OpenKrab-dev`
-   - `OpenKrab_CONFIG_PATH=~/.OpenKrab-dev/OpenKrab.json`
-   - `OpenKrab_GATEWAY_PORT=19001`（浏览器/画布相应移动）
+1. **é…ç½®æ–‡ä»¶éš”ç¦»**ï¼ˆå…¨å±€ `--dev`ï¼‰
+   - `OPENKRAB_PROFILE=dev`
+   - `OPENKRAB_STATE_DIR=~/.OpenKrab-dev`
+   - `OPENKRAB_CONFIG_PATH=~/.OpenKrab-dev/OpenKrab.json`
+   - `OPENKRAB_GATEWAY_PORT=19001`ï¼ˆæµè§ˆå™¨/ç”»å¸ƒç›¸åº”ç§»åŠ¨ï¼‰
 
-2. **Dev 引导**（`gateway --dev`）
-   - 如果缺失则写入最小配置（`gateway.mode=local`，绑定 loopback）。
-   - 将 `agent.workspace` 设置为 dev 工作区。
-   - 设置 `agent.skipBootstrap=true`（无 BOOTSTRAP.md）。
-   - 如果缺失则填充工作区文件：
-     `AGENTS.md`、`SOUL.md`、`TOOLS.md`、`IDENTITY.md`、`USER.md`、`HEARTBEAT.md`。
-   - 默认身份：**C3‑PO**（礼仪机器人）。
-   - 在 dev 模式下跳过渠道提供商（`OpenKrab_SKIP_CHANNELS=1`）。
+2. **Dev å¼•å¯¼**ï¼ˆ`gateway --dev`ï¼‰
+   - å¦‚æžœç¼ºå¤±åˆ™å†™å…¥æœ€å°é…ç½®ï¼ˆ`gateway.mode=local`ï¼Œç»‘å®š loopbackï¼‰ã€‚
+   - å°† `agent.workspace` è®¾ç½®ä¸º dev å·¥ä½œåŒºã€‚
+   - è®¾ç½® `agent.skipBootstrap=true`ï¼ˆæ—  BOOTSTRAP.mdï¼‰ã€‚
+   - å¦‚æžœç¼ºå¤±åˆ™å¡«å……å·¥ä½œåŒºæ–‡ä»¶ï¼š
+     `AGENTS.md`ã€`SOUL.md`ã€`TOOLS.md`ã€`IDENTITY.md`ã€`USER.md`ã€`HEARTBEAT.md`ã€‚
+   - é»˜è®¤èº«ä»½ï¼š**C3â€‘PO**ï¼ˆç¤¼ä»ªæœºå™¨äººï¼‰ã€‚
+   - åœ¨ dev æ¨¡å¼ä¸‹è·³è¿‡æ¸ é“æä¾›å•†ï¼ˆ`OPENKRAB_SKIP_CHANNELS=1`ï¼‰ã€‚
 
-重置流程（全新开始）：
+é‡ç½®æµç¨‹ï¼ˆå…¨æ–°å¼€å§‹ï¼‰ï¼š
 
 ```bash
 pnpm gateway:dev:reset
 ```
 
-注意：`--dev` 是**全局**配置文件标志，会被某些运行器吞掉。
-如果你需要明确拼写，请使用环境变量形式：
+æ³¨æ„ï¼š`--dev` æ˜¯**å…¨å±€**é…ç½®æ–‡ä»¶æ ‡å¿—ï¼Œä¼šè¢«æŸäº›è¿è¡Œå™¨åžæŽ‰ã€‚
+å¦‚æžœä½ éœ€è¦æ˜Žç¡®æ‹¼å†™ï¼Œè¯·ä½¿ç”¨çŽ¯å¢ƒå˜é‡å½¢å¼ï¼š
 
 ```bash
-OpenKrab_PROFILE=dev OpenKrab gateway --dev --reset
+OPENKRAB_PROFILE=dev OpenKrab gateway --dev --reset
 ```
 
-`--reset` 清除配置、凭证、会话和 dev 工作区（使用 `trash`，而非 `rm`），然后重新创建默认的 dev 设置。
+`--reset` æ¸…é™¤é…ç½®ã€å‡­è¯ã€ä¼šè¯å’Œ dev å·¥ä½œåŒºï¼ˆä½¿ç”¨ `trash`ï¼Œè€Œéž `rm`ï¼‰ï¼Œç„¶åŽé‡æ–°åˆ›å»ºé»˜è®¤çš„ dev è®¾ç½®ã€‚
 
-提示：如果非 dev Gateway 网关已在运行（launchd/systemd），请先停止它：
+æç¤ºï¼šå¦‚æžœéž dev Gateway ç½‘å…³å·²åœ¨è¿è¡Œï¼ˆlaunchd/systemdï¼‰ï¼Œè¯·å…ˆåœæ­¢å®ƒï¼š
 
 ```bash
 OpenKrab gateway stop
 ```
 
-## 原始流日志（OpenKrab）
+## åŽŸå§‹æµæ—¥å¿—ï¼ˆOpenKrabï¼‰
 
-OpenKrab 可以在任何过滤/格式化之前记录**原始助手流**。
-这是查看推理是否作为纯文本增量到达（或作为单独的思考块）的最佳方式。
+OpenKrab å¯ä»¥åœ¨ä»»ä½•è¿‡æ»¤/æ ¼å¼åŒ–ä¹‹å‰è®°å½•**åŽŸå§‹åŠ©æ‰‹æµ**ã€‚
+è¿™æ˜¯æŸ¥çœ‹æŽ¨ç†æ˜¯å¦ä½œä¸ºçº¯æ–‡æœ¬å¢žé‡åˆ°è¾¾ï¼ˆæˆ–ä½œä¸ºå•ç‹¬çš„æ€è€ƒå—ï¼‰çš„æœ€ä½³æ–¹å¼ã€‚
 
-通过 CLI 启用：
+é€šè¿‡ CLI å¯ç”¨ï¼š
 
 ```bash
 pnpm gateway:watch --force --raw-stream
 ```
 
-可选路径覆盖：
+å¯é€‰è·¯å¾„è¦†ç›–ï¼š
 
 ```bash
 pnpm gateway:watch --force --raw-stream --raw-stream-path ~/.OpenKrab/logs/raw-stream.jsonl
 ```
 
-等效环境变量：
+ç­‰æ•ˆçŽ¯å¢ƒå˜é‡ï¼š
 
 ```bash
-OpenKrab_RAW_STREAM=1
-OpenKrab_RAW_STREAM_PATH=~/.OpenKrab/logs/raw-stream.jsonl
+OPENKRAB_RAW_STREAM=1
+OPENKRAB_RAW_STREAM_PATH=~/.OpenKrab/logs/raw-stream.jsonl
 ```
 
-默认文件：
+é»˜è®¤æ–‡ä»¶ï¼š
 
 `~/.OpenKrab/logs/raw-stream.jsonl`
 
-## 原始块日志（pi-mono）
+## åŽŸå§‹å—æ—¥å¿—ï¼ˆpi-monoï¼‰
 
-要在解析为块之前捕获**原始 OpenAI 兼容块**，pi-mono 暴露了一个单独的日志记录器：
+è¦åœ¨è§£æžä¸ºå—ä¹‹å‰æ•èŽ·**åŽŸå§‹ OpenAI å…¼å®¹å—**ï¼Œpi-mono æš´éœ²äº†ä¸€ä¸ªå•ç‹¬çš„æ—¥å¿—è®°å½•å™¨ï¼š
 
 ```bash
 PI_RAW_STREAM=1
 ```
 
-可选路径：
+å¯é€‰è·¯å¾„ï¼š
 
 ```bash
 PI_RAW_STREAM_PATH=~/.pi-mono/logs/raw-openai-completions.jsonl
 ```
 
-默认文件：
+é»˜è®¤æ–‡ä»¶ï¼š
 
 `~/.pi-mono/logs/raw-openai-completions.jsonl`
 
-> 注意：这仅由使用 pi-mono 的 `openai-completions` 提供商的进程发出。
+> æ³¨æ„ï¼šè¿™ä»…ç”±ä½¿ç”¨ pi-mono çš„ `openai-completions` æä¾›å•†çš„è¿›ç¨‹å‘å‡ºã€‚
 
-## 安全注意事项
+## å®‰å…¨æ³¨æ„äº‹é¡¹
 
-- 原始流日志可能包含完整提示、工具输出和用户数据。
-- 保持日志在本地并在调试后删除它们。
-- 如果你分享日志，请先清除密钥和个人身份信息。
+- åŽŸå§‹æµæ—¥å¿—å¯èƒ½åŒ…å«å®Œæ•´æç¤ºã€å·¥å…·è¾“å‡ºå’Œç”¨æˆ·æ•°æ®ã€‚
+- ä¿æŒæ—¥å¿—åœ¨æœ¬åœ°å¹¶åœ¨è°ƒè¯•åŽåˆ é™¤å®ƒä»¬ã€‚
+- å¦‚æžœä½ åˆ†äº«æ—¥å¿—ï¼Œè¯·å…ˆæ¸…é™¤å¯†é’¥å’Œä¸ªäººèº«ä»½ä¿¡æ¯ã€‚
+
 

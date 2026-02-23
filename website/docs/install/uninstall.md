@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Uninstall OpenKrab completely (CLI, service, state, workspace)"
 read_when:
   - You want to remove OpenKrab from a machine
@@ -45,10 +45,10 @@ OpenKrab gateway uninstall
 3. Delete state + config:
 
 ```bash
-rm -rf "${OpenKrab_STATE_DIR:-$HOME/.OpenKrab}"
+rm -rf "${OPENKRAB_STATE_DIR:-$HOME/.OpenKrab}"
 ```
 
-If you set `OpenKrab_CONFIG_PATH` to a custom location outside the state dir, delete that file too.
+If you set `OPENKRAB_CONFIG_PATH` to a custom location outside the state dir, delete that file too.
 
 4. Delete your workspace (optional, removes agent files):
 
@@ -72,7 +72,7 @@ rm -rf /Applications/OpenKrab.app
 
 Notes:
 
-- If you used profiles (`--profile` / `OpenKrab_PROFILE`), repeat step 3 for each state dir (defaults are `~/.OpenKrab-<profile>`).
+- If you used profiles (`--profile` / `OPENKRAB_PROFILE`), repeat step 3 for each state dir (defaults are `~/.OpenKrab-<profile>`).
 - In remote mode, the state dir lives on the **gateway host**, so run steps 1-4 there too.
 
 ## Manual service removal (CLI not installed)
@@ -126,4 +126,5 @@ If you run from a repo checkout (`git clone` + `OpenKrab ...` / `bun run OpenKra
 1. Uninstall the gateway service **before** deleting the repo (use the easy path above or manual service removal).
 2. Delete the repo directory.
 3. Remove state + workspace as shown above.
+
 

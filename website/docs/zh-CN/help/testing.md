@@ -1,10 +1,10 @@
----
+﻿---
 read_when:
-  - 在本地或 CI 中运行测试
-  - 为模型/提供商问题添加回归测试
-  - 调试 Gateway 网关 + 智能体行为
-summary: 测试套件：单元/端到端/实时测试套件、Docker 运行器，以及每个测试的覆盖范围
-title: 测试
+  - åœ¨æœ¬åœ°æˆ– CI ä¸­è¿è¡Œæµ‹è¯•
+  - ä¸ºæ¨¡åž‹/æä¾›å•†é—®é¢˜æ·»åŠ å›žå½’æµ‹è¯•
+  - è°ƒè¯• Gateway ç½‘å…³ + æ™ºèƒ½ä½“è¡Œä¸º
+summary: æµ‹è¯•å¥—ä»¶ï¼šå•å…ƒ/ç«¯åˆ°ç«¯/å®žæ—¶æµ‹è¯•å¥—ä»¶ã€Docker è¿è¡Œå™¨ï¼Œä»¥åŠæ¯ä¸ªæµ‹è¯•çš„è¦†ç›–èŒƒå›´
+title: æµ‹è¯•
 x-i18n:
   generated_at: "2026-02-03T09:23:12Z"
   model: claude-opus-4-5
@@ -14,363 +14,364 @@ x-i18n:
   workflow: 15
 ---
 
-# 测试
+# æµ‹è¯•
 
-OpenKrab 包含三个 Vitest 测试套件（单元/集成、端到端、实时）以及一小组 Docker 运行器。
+OpenKrab åŒ…å«ä¸‰ä¸ª Vitest æµ‹è¯•å¥—ä»¶ï¼ˆå•å…ƒ/é›†æˆã€ç«¯åˆ°ç«¯ã€å®žæ—¶ï¼‰ä»¥åŠä¸€å°ç»„ Docker è¿è¡Œå™¨ã€‚
 
-本文档是一份"我们如何测试"的指南：
+æœ¬æ–‡æ¡£æ˜¯ä¸€ä»½"æˆ‘ä»¬å¦‚ä½•æµ‹è¯•"çš„æŒ‡å—ï¼š
 
-- 每个套件覆盖什么（以及它刻意*不*覆盖什么）
-- 常见工作流程应运行哪些命令（本地、推送前、调试）
-- 实时测试如何发现凭证并选择模型/提供商
-- 如何为现实中的模型/提供商问题添加回归测试
+- æ¯ä¸ªå¥—ä»¶è¦†ç›–ä»€ä¹ˆï¼ˆä»¥åŠå®ƒåˆ»æ„*ä¸*è¦†ç›–ä»€ä¹ˆï¼‰
+- å¸¸è§å·¥ä½œæµç¨‹åº”è¿è¡Œå“ªäº›å‘½ä»¤ï¼ˆæœ¬åœ°ã€æŽ¨é€å‰ã€è°ƒè¯•ï¼‰
+- å®žæ—¶æµ‹è¯•å¦‚ä½•å‘çŽ°å‡­è¯å¹¶é€‰æ‹©æ¨¡åž‹/æä¾›å•†
+- å¦‚ä½•ä¸ºçŽ°å®žä¸­çš„æ¨¡åž‹/æä¾›å•†é—®é¢˜æ·»åŠ å›žå½’æµ‹è¯•
 
-## 快速开始
+## å¿«é€Ÿå¼€å§‹
 
-日常使用：
+æ—¥å¸¸ä½¿ç”¨ï¼š
 
-- 完整检查（推送前的预期流程）：`pnpm build && pnpm check && pnpm test`
+- å®Œæ•´æ£€æŸ¥ï¼ˆæŽ¨é€å‰çš„é¢„æœŸæµç¨‹ï¼‰ï¼š`pnpm build && pnpm check && pnpm test`
 
-当你修改测试或需要额外的信心时：
+å½“ä½ ä¿®æ”¹æµ‹è¯•æˆ–éœ€è¦é¢å¤–çš„ä¿¡å¿ƒæ—¶ï¼š
 
-- 覆盖率检查：`pnpm test:coverage`
-- 端到端套件：`pnpm test:e2e`
+- è¦†ç›–çŽ‡æ£€æŸ¥ï¼š`pnpm test:coverage`
+- ç«¯åˆ°ç«¯å¥—ä»¶ï¼š`pnpm test:e2e`
 
-调试真实提供商/模型时（需要真实凭证）：
+è°ƒè¯•çœŸå®žæä¾›å•†/æ¨¡åž‹æ—¶ï¼ˆéœ€è¦çœŸå®žå‡­è¯ï¼‰ï¼š
 
-- 实时套件（模型 + Gateway 网关工具/图像探测）：`pnpm test:live`
+- å®žæ—¶å¥—ä»¶ï¼ˆæ¨¡åž‹ + Gateway ç½‘å…³å·¥å…·/å›¾åƒæŽ¢æµ‹ï¼‰ï¼š`pnpm test:live`
 
-提示：当你只需要一个失败用例时，建议使用下文描述的允许列表环境变量来缩小实时测试范围。
+æç¤ºï¼šå½“ä½ åªéœ€è¦ä¸€ä¸ªå¤±è´¥ç”¨ä¾‹æ—¶ï¼Œå»ºè®®ä½¿ç”¨ä¸‹æ–‡æè¿°çš„å…è®¸åˆ—è¡¨çŽ¯å¢ƒå˜é‡æ¥ç¼©å°å®žæ—¶æµ‹è¯•èŒƒå›´ã€‚
 
-## 测试套件（在哪里运行什么）
+## æµ‹è¯•å¥—ä»¶ï¼ˆåœ¨å“ªé‡Œè¿è¡Œä»€ä¹ˆï¼‰
 
-可以将这些套件理解为"逐渐增强的真实性"（以及逐渐增加的不稳定性/成本）：
+å¯ä»¥å°†è¿™äº›å¥—ä»¶ç†è§£ä¸º"é€æ¸å¢žå¼ºçš„çœŸå®žæ€§"ï¼ˆä»¥åŠé€æ¸å¢žåŠ çš„ä¸ç¨³å®šæ€§/æˆæœ¬ï¼‰ï¼š
 
-### 单元/集成测试（默认）
+### å•å…ƒ/é›†æˆæµ‹è¯•ï¼ˆé»˜è®¤ï¼‰
 
-- 命令：`pnpm test`
-- 配置：`vitest.config.ts`
-- 文件：`src/**/*.test.ts`
-- 范围：
-  - 纯单元测试
-  - 进程内集成测试（Gateway 网关认证、路由、工具、解析、配置）
-  - 已知问题的确定性回归测试
-- 预期：
-  - 在 CI 中运行
-  - 不需要真实密钥
-  - 应该快速且稳定
+- å‘½ä»¤ï¼š`pnpm test`
+- é…ç½®ï¼š`vitest.config.ts`
+- æ–‡ä»¶ï¼š`src/**/*.test.ts`
+- èŒƒå›´ï¼š
+  - çº¯å•å…ƒæµ‹è¯•
+  - è¿›ç¨‹å†…é›†æˆæµ‹è¯•ï¼ˆGateway ç½‘å…³è®¤è¯ã€è·¯ç”±ã€å·¥å…·ã€è§£æžã€é…ç½®ï¼‰
+  - å·²çŸ¥é—®é¢˜çš„ç¡®å®šæ€§å›žå½’æµ‹è¯•
+- é¢„æœŸï¼š
+  - åœ¨ CI ä¸­è¿è¡Œ
+  - ä¸éœ€è¦çœŸå®žå¯†é’¥
+  - åº”è¯¥å¿«é€Ÿä¸”ç¨³å®š
 
-### 端到端测试（Gateway 网关冒烟测试）
+### ç«¯åˆ°ç«¯æµ‹è¯•ï¼ˆGateway ç½‘å…³å†’çƒŸæµ‹è¯•ï¼‰
 
-- 命令：`pnpm test:e2e`
-- 配置：`vitest.e2e.config.ts`
-- 文件：`src/**/*.e2e.test.ts`
-- 范围：
-  - 多实例 Gateway 网关端到端行为
-  - WebSocket/HTTP 接口、节点配对和较重的网络操作
-- 预期：
-  - 在 CI 中运行（当在流水线中启用时）
-  - 不需要真实密钥
-  - 比单元测试有更多活动部件（可能较慢）
+- å‘½ä»¤ï¼š`pnpm test:e2e`
+- é…ç½®ï¼š`vitest.e2e.config.ts`
+- æ–‡ä»¶ï¼š`src/**/*.e2e.test.ts`
+- èŒƒå›´ï¼š
+  - å¤šå®žä¾‹ Gateway ç½‘å…³ç«¯åˆ°ç«¯è¡Œä¸º
+  - WebSocket/HTTP æŽ¥å£ã€èŠ‚ç‚¹é…å¯¹å’Œè¾ƒé‡çš„ç½‘ç»œæ“ä½œ
+- é¢„æœŸï¼š
+  - åœ¨ CI ä¸­è¿è¡Œï¼ˆå½“åœ¨æµæ°´çº¿ä¸­å¯ç”¨æ—¶ï¼‰
+  - ä¸éœ€è¦çœŸå®žå¯†é’¥
+  - æ¯”å•å…ƒæµ‹è¯•æœ‰æ›´å¤šæ´»åŠ¨éƒ¨ä»¶ï¼ˆå¯èƒ½è¾ƒæ…¢ï¼‰
 
-### 实时测试（真实提供商 + 真实模型）
+### å®žæ—¶æµ‹è¯•ï¼ˆçœŸå®žæä¾›å•† + çœŸå®žæ¨¡åž‹ï¼‰
 
-- 命令：`pnpm test:live`
-- 配置：`vitest.live.config.ts`
-- 文件：`src/**/*.live.test.ts`
-- 默认：通过 `pnpm test:live` **启用**（设置 `OpenKrab_LIVE_TEST=1`）
-- 范围：
-  - "这个提供商/模型用真实凭证*今天*实际能工作吗？"
-  - 捕获提供商格式变更、工具调用怪癖、认证问题和速率限制行为
-- 预期：
-  - 设计上不适合 CI 稳定运行（真实网络、真实提供商策略、配额、故障）
-  - 花费金钱/使用速率限制
-  - 建议运行缩小范围的子集而非"全部"
-  - 实时运行会加载 `~/.profile` 以获取缺失的 API 密钥
-  - Anthropic 密钥轮换：设置 `OpenKrab_LIVE_ANTHROPIC_KEYS="sk-...,sk-..."`（或 `OpenKrab_LIVE_ANTHROPIC_KEY=sk-...`）或多个 `ANTHROPIC_API_KEY*` 变量；测试会在遇到速率限制时重试
+- å‘½ä»¤ï¼š`pnpm test:live`
+- é…ç½®ï¼š`vitest.live.config.ts`
+- æ–‡ä»¶ï¼š`src/**/*.live.test.ts`
+- é»˜è®¤ï¼šé€šè¿‡ `pnpm test:live` **å¯ç”¨**ï¼ˆè®¾ç½® `OPENKRAB_LIVE_TEST=1`ï¼‰
+- èŒƒå›´ï¼š
+  - "è¿™ä¸ªæä¾›å•†/æ¨¡åž‹ç”¨çœŸå®žå‡­è¯*ä»Šå¤©*å®žé™…èƒ½å·¥ä½œå—ï¼Ÿ"
+  - æ•èŽ·æä¾›å•†æ ¼å¼å˜æ›´ã€å·¥å…·è°ƒç”¨æ€ªç™–ã€è®¤è¯é—®é¢˜å’Œé€ŸçŽ‡é™åˆ¶è¡Œä¸º
+- é¢„æœŸï¼š
+  - è®¾è®¡ä¸Šä¸é€‚åˆ CI ç¨³å®šè¿è¡Œï¼ˆçœŸå®žç½‘ç»œã€çœŸå®žæä¾›å•†ç­–ç•¥ã€é…é¢ã€æ•…éšœï¼‰
+  - èŠ±è´¹é‡‘é’±/ä½¿ç”¨é€ŸçŽ‡é™åˆ¶
+  - å»ºè®®è¿è¡Œç¼©å°èŒƒå›´çš„å­é›†è€Œéž"å…¨éƒ¨"
+  - å®žæ—¶è¿è¡Œä¼šåŠ è½½ `~/.profile` ä»¥èŽ·å–ç¼ºå¤±çš„ API å¯†é’¥
+  - Anthropic å¯†é’¥è½®æ¢ï¼šè®¾ç½® `OPENKRAB_LIVE_ANTHROPIC_KEYS="sk-...,sk-..."`ï¼ˆæˆ– `OPENKRAB_LIVE_ANTHROPIC_KEY=sk-...`ï¼‰æˆ–å¤šä¸ª `ANTHROPIC_API_KEY*` å˜é‡ï¼›æµ‹è¯•ä¼šåœ¨é‡åˆ°é€ŸçŽ‡é™åˆ¶æ—¶é‡è¯•
 
-## 我应该运行哪个套件？
+## æˆ‘åº”è¯¥è¿è¡Œå“ªä¸ªå¥—ä»¶ï¼Ÿ
 
-使用这个决策表：
+ä½¿ç”¨è¿™ä¸ªå†³ç­–è¡¨ï¼š
 
-- 编辑逻辑/测试：运行 `pnpm test`（如果改动较大，加上 `pnpm test:coverage`）
-- 涉及 Gateway 网关网络/WS 协议/配对：加上 `pnpm test:e2e`
-- 调试"我的机器人挂了"/提供商特定故障/工具调用：运行缩小范围的 `pnpm test:live`
+- ç¼–è¾‘é€»è¾‘/æµ‹è¯•ï¼šè¿è¡Œ `pnpm test`ï¼ˆå¦‚æžœæ”¹åŠ¨è¾ƒå¤§ï¼ŒåŠ ä¸Š `pnpm test:coverage`ï¼‰
+- æ¶‰åŠ Gateway ç½‘å…³ç½‘ç»œ/WS åè®®/é…å¯¹ï¼šåŠ ä¸Š `pnpm test:e2e`
+- è°ƒè¯•"æˆ‘çš„æœºå™¨äººæŒ‚äº†"/æä¾›å•†ç‰¹å®šæ•…éšœ/å·¥å…·è°ƒç”¨ï¼šè¿è¡Œç¼©å°èŒƒå›´çš„ `pnpm test:live`
 
-## 实时测试：模型冒烟测试（配置文件密钥）
+## å®žæ—¶æµ‹è¯•ï¼šæ¨¡åž‹å†’çƒŸæµ‹è¯•ï¼ˆé…ç½®æ–‡ä»¶å¯†é’¥ï¼‰
 
-实时测试分为两层，以便隔离故障：
+å®žæ—¶æµ‹è¯•åˆ†ä¸ºä¸¤å±‚ï¼Œä»¥ä¾¿éš”ç¦»æ•…éšœï¼š
 
-- "直接模型"告诉我们提供商/模型是否能用给定的密钥正常响应。
-- "Gateway 网关冒烟测试"告诉我们完整的 Gateway 网关 + 智能体管道是否对该模型正常工作（会话、历史记录、工具、沙箱策略等）。
+- "ç›´æŽ¥æ¨¡åž‹"å‘Šè¯‰æˆ‘ä»¬æä¾›å•†/æ¨¡åž‹æ˜¯å¦èƒ½ç”¨ç»™å®šçš„å¯†é’¥æ­£å¸¸å“åº”ã€‚
+- "Gateway ç½‘å…³å†’çƒŸæµ‹è¯•"å‘Šè¯‰æˆ‘ä»¬å®Œæ•´çš„ Gateway ç½‘å…³ + æ™ºèƒ½ä½“ç®¡é“æ˜¯å¦å¯¹è¯¥æ¨¡åž‹æ­£å¸¸å·¥ä½œï¼ˆä¼šè¯ã€åŽ†å²è®°å½•ã€å·¥å…·ã€æ²™ç®±ç­–ç•¥ç­‰ï¼‰ã€‚
 
-### 第一层：直接模型补全（无 Gateway 网关）
+### ç¬¬ä¸€å±‚ï¼šç›´æŽ¥æ¨¡åž‹è¡¥å…¨ï¼ˆæ—  Gateway ç½‘å…³ï¼‰
 
-- 测试：`src/agents/models.profiles.live.test.ts`
-- 目标：
-  - 枚举发现的模型
-  - 使用 `getApiKeyForModel` 选择你有凭证的模型
-  - 每个模型运行一个小型补全（以及需要时的针对性回归测试）
-- 如何启用：
-  - `pnpm test:live`（或直接调用 Vitest 时使用 `OpenKrab_LIVE_TEST=1`）
-- 设置 `OpenKrab_LIVE_MODELS=modern`（或 `all`，modern 的别名）以实际运行此套件；否则会跳过以保持 `pnpm test:live` 专注于 Gateway 网关冒烟测试
-- 如何选择模型：
-  - `OpenKrab_LIVE_MODELS=modern` 运行现代允许列表（Opus/Sonnet/Haiku 4.5、GPT-5.x + Codex、Gemini 3、GLM 4.7、MiniMax M2.1、Grok 4）
-  - `OpenKrab_LIVE_MODELS=all` 是现代允许列表的别名
-  - 或 `OpenKrab_LIVE_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-5,..."`（逗号分隔的允许列表）
-- 如何选择提供商：
-  - `OpenKrab_LIVE_PROVIDERS="google,google-antigravity,google-gemini-cli"`（逗号分隔的允许列表）
-- 密钥来源：
-  - 默认：配置文件存储和环境变量回退
-  - 设置 `OpenKrab_LIVE_REQUIRE_PROFILE_KEYS=1` 以强制**仅使用配置文件存储**
-- 为什么存在这个测试：
-  - 将"提供商 API 损坏/密钥无效"与"Gateway 网关智能体管道损坏"分离
-  - 包含小型、隔离的回归测试（例如：OpenAI Responses/Codex Responses 推理重放 + 工具调用流程）
+- æµ‹è¯•ï¼š`src/agents/models.profiles.live.test.ts`
+- ç›®æ ‡ï¼š
+  - æžšä¸¾å‘çŽ°çš„æ¨¡åž‹
+  - ä½¿ç”¨ `getApiKeyForModel` é€‰æ‹©ä½ æœ‰å‡­è¯çš„æ¨¡åž‹
+  - æ¯ä¸ªæ¨¡åž‹è¿è¡Œä¸€ä¸ªå°åž‹è¡¥å…¨ï¼ˆä»¥åŠéœ€è¦æ—¶çš„é’ˆå¯¹æ€§å›žå½’æµ‹è¯•ï¼‰
+- å¦‚ä½•å¯ç”¨ï¼š
+  - `pnpm test:live`ï¼ˆæˆ–ç›´æŽ¥è°ƒç”¨ Vitest æ—¶ä½¿ç”¨ `OPENKRAB_LIVE_TEST=1`ï¼‰
+- è®¾ç½® `OPENKRAB_LIVE_MODELS=modern`ï¼ˆæˆ– `all`ï¼Œmodern çš„åˆ«åï¼‰ä»¥å®žé™…è¿è¡Œæ­¤å¥—ä»¶ï¼›å¦åˆ™ä¼šè·³è¿‡ä»¥ä¿æŒ `pnpm test:live` ä¸“æ³¨äºŽ Gateway ç½‘å…³å†’çƒŸæµ‹è¯•
+- å¦‚ä½•é€‰æ‹©æ¨¡åž‹ï¼š
+  - `OPENKRAB_LIVE_MODELS=modern` è¿è¡ŒçŽ°ä»£å…è®¸åˆ—è¡¨ï¼ˆOpus/Sonnet/Haiku 4.5ã€GPT-5.x + Codexã€Gemini 3ã€GLM 4.7ã€MiniMax M2.1ã€Grok 4ï¼‰
+  - `OPENKRAB_LIVE_MODELS=all` æ˜¯çŽ°ä»£å…è®¸åˆ—è¡¨çš„åˆ«å
+  - æˆ– `OPENKRAB_LIVE_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-5,..."`ï¼ˆé€—å·åˆ†éš”çš„å…è®¸åˆ—è¡¨ï¼‰
+- å¦‚ä½•é€‰æ‹©æä¾›å•†ï¼š
+  - `OPENKRAB_LIVE_PROVIDERS="google,google-antigravity,google-gemini-cli"`ï¼ˆé€—å·åˆ†éš”çš„å…è®¸åˆ—è¡¨ï¼‰
+- å¯†é’¥æ¥æºï¼š
+  - é»˜è®¤ï¼šé…ç½®æ–‡ä»¶å­˜å‚¨å’ŒçŽ¯å¢ƒå˜é‡å›žé€€
+  - è®¾ç½® `OPENKRAB_LIVE_REQUIRE_PROFILE_KEYS=1` ä»¥å¼ºåˆ¶**ä»…ä½¿ç”¨é…ç½®æ–‡ä»¶å­˜å‚¨**
+- ä¸ºä»€ä¹ˆå­˜åœ¨è¿™ä¸ªæµ‹è¯•ï¼š
+  - å°†"æä¾›å•† API æŸå/å¯†é’¥æ— æ•ˆ"ä¸Ž"Gateway ç½‘å…³æ™ºèƒ½ä½“ç®¡é“æŸå"åˆ†ç¦»
+  - åŒ…å«å°åž‹ã€éš”ç¦»çš„å›žå½’æµ‹è¯•ï¼ˆä¾‹å¦‚ï¼šOpenAI Responses/Codex Responses æŽ¨ç†é‡æ”¾ + å·¥å…·è°ƒç”¨æµç¨‹ï¼‰
 
-### 第二层：Gateway 网关 + 开发智能体冒烟测试（"@OpenKrab"实际做的事）
+### ç¬¬äºŒå±‚ï¼šGateway ç½‘å…³ + å¼€å‘æ™ºèƒ½ä½“å†’çƒŸæµ‹è¯•ï¼ˆ"@OpenKrab"å®žé™…åšçš„äº‹ï¼‰
 
-- 测试：`src/gateway/gateway-models.profiles.live.test.ts`
-- 目标：
-  - 启动一个进程内 Gateway 网关
-  - 创建/修补一个 `agent:dev:*` 会话（每次运行覆盖模型）
-  - 遍历有密钥的模型并断言：
-    - "有意义的"响应（无工具）
-    - 真实的工具调用工作正常（读取探测）
-    - 可选的额外工具探测（执行+读取探测）
-    - OpenAI 回归路径（仅工具调用 → 后续）保持工作
-- 探测详情（以便你能快速解释故障）：
-  - `read` 探测：测试在工作区写入一个随机数文件，要求智能体 `read` 它并回显随机数。
-  - `exec+read` 探测：测试要求智能体 `exec` 将随机数写入临时文件，然后 `read` 回来。
-  - 图像探测：测试附加一个生成的 PNG（猫 + 随机代码），期望模型返回 `cat <CODE>`。
-  - 实现参考：`src/gateway/gateway-models.profiles.live.test.ts` 和 `src/gateway/live-image-probe.ts`。
-- 如何启用：
-  - `pnpm test:live`（或直接调用 Vitest 时使用 `OpenKrab_LIVE_TEST=1`）
-- 如何选择模型：
-  - 默认：现代允许列表（Opus/Sonnet/Haiku 4.5、GPT-5.x + Codex、Gemini 3、GLM 4.7、MiniMax M2.1、Grok 4）
-  - `OpenKrab_LIVE_GATEWAY_MODELS=all` 是现代允许列表的别名
-  - 或设置 `OpenKrab_LIVE_GATEWAY_MODELS="provider/model"`（或逗号分隔列表）来缩小范围
-- 如何选择提供商（避免"OpenRouter 全部"）：
-  - `OpenKrab_LIVE_GATEWAY_PROVIDERS="google,google-antigravity,google-gemini-cli,openai,anthropic,zai,minimax"`（逗号分隔的允许列表）
-- 工具 + 图像探测在此实时测试中始终开启：
-  - `read` 探测 + `exec+read` 探测（工具压力测试）
-  - 当模型声明支持图像输入时运行图像探测
-  - 流程（高层次）：
-    - 测试生成一个带有"CAT"+ 随机代码的小型 PNG（`src/gateway/live-image-probe.ts`）
-    - 通过 `agent` `attachments: [{ mimeType: "image/png", content: "<base64>" }]` 发送
-    - Gateway 网关将附件解析为 `images[]`（`src/gateway/server-methods/agent.ts` + `src/gateway/chat-attachments.ts`）
-    - 嵌入式智能体将多模态用户消息转发给模型
-    - 断言：回复包含 `cat` + 代码（OCR 容差：允许轻微错误）
+- æµ‹è¯•ï¼š`src/gateway/gateway-models.profiles.live.test.ts`
+- ç›®æ ‡ï¼š
+  - å¯åŠ¨ä¸€ä¸ªè¿›ç¨‹å†… Gateway ç½‘å…³
+  - åˆ›å»º/ä¿®è¡¥ä¸€ä¸ª `agent:dev:*` ä¼šè¯ï¼ˆæ¯æ¬¡è¿è¡Œè¦†ç›–æ¨¡åž‹ï¼‰
+  - éåŽ†æœ‰å¯†é’¥çš„æ¨¡åž‹å¹¶æ–­è¨€ï¼š
+    - "æœ‰æ„ä¹‰çš„"å“åº”ï¼ˆæ— å·¥å…·ï¼‰
+    - çœŸå®žçš„å·¥å…·è°ƒç”¨å·¥ä½œæ­£å¸¸ï¼ˆè¯»å–æŽ¢æµ‹ï¼‰
+    - å¯é€‰çš„é¢å¤–å·¥å…·æŽ¢æµ‹ï¼ˆæ‰§è¡Œ+è¯»å–æŽ¢æµ‹ï¼‰
+    - OpenAI å›žå½’è·¯å¾„ï¼ˆä»…å·¥å…·è°ƒç”¨ â†’ åŽç»­ï¼‰ä¿æŒå·¥ä½œ
+- æŽ¢æµ‹è¯¦æƒ…ï¼ˆä»¥ä¾¿ä½ èƒ½å¿«é€Ÿè§£é‡Šæ•…éšœï¼‰ï¼š
+  - `read` æŽ¢æµ‹ï¼šæµ‹è¯•åœ¨å·¥ä½œåŒºå†™å…¥ä¸€ä¸ªéšæœºæ•°æ–‡ä»¶ï¼Œè¦æ±‚æ™ºèƒ½ä½“ `read` å®ƒå¹¶å›žæ˜¾éšæœºæ•°ã€‚
+  - `exec+read` æŽ¢æµ‹ï¼šæµ‹è¯•è¦æ±‚æ™ºèƒ½ä½“ `exec` å°†éšæœºæ•°å†™å…¥ä¸´æ—¶æ–‡ä»¶ï¼Œç„¶åŽ `read` å›žæ¥ã€‚
+  - å›¾åƒæŽ¢æµ‹ï¼šæµ‹è¯•é™„åŠ ä¸€ä¸ªç”Ÿæˆçš„ PNGï¼ˆçŒ« + éšæœºä»£ç ï¼‰ï¼ŒæœŸæœ›æ¨¡åž‹è¿”å›ž `cat <CODE>`ã€‚
+  - å®žçŽ°å‚è€ƒï¼š`src/gateway/gateway-models.profiles.live.test.ts` å’Œ `src/gateway/live-image-probe.ts`ã€‚
+- å¦‚ä½•å¯ç”¨ï¼š
+  - `pnpm test:live`ï¼ˆæˆ–ç›´æŽ¥è°ƒç”¨ Vitest æ—¶ä½¿ç”¨ `OPENKRAB_LIVE_TEST=1`ï¼‰
+- å¦‚ä½•é€‰æ‹©æ¨¡åž‹ï¼š
+  - é»˜è®¤ï¼šçŽ°ä»£å…è®¸åˆ—è¡¨ï¼ˆOpus/Sonnet/Haiku 4.5ã€GPT-5.x + Codexã€Gemini 3ã€GLM 4.7ã€MiniMax M2.1ã€Grok 4ï¼‰
+  - `OPENKRAB_LIVE_GATEWAY_MODELS=all` æ˜¯çŽ°ä»£å…è®¸åˆ—è¡¨çš„åˆ«å
+  - æˆ–è®¾ç½® `OPENKRAB_LIVE_GATEWAY_MODELS="provider/model"`ï¼ˆæˆ–é€—å·åˆ†éš”åˆ—è¡¨ï¼‰æ¥ç¼©å°èŒƒå›´
+- å¦‚ä½•é€‰æ‹©æä¾›å•†ï¼ˆé¿å…"OpenRouter å…¨éƒ¨"ï¼‰ï¼š
+  - `OPENKRAB_LIVE_GATEWAY_PROVIDERS="google,google-antigravity,google-gemini-cli,openai,anthropic,zai,minimax"`ï¼ˆé€—å·åˆ†éš”çš„å…è®¸åˆ—è¡¨ï¼‰
+- å·¥å…· + å›¾åƒæŽ¢æµ‹åœ¨æ­¤å®žæ—¶æµ‹è¯•ä¸­å§‹ç»ˆå¼€å¯ï¼š
+  - `read` æŽ¢æµ‹ + `exec+read` æŽ¢æµ‹ï¼ˆå·¥å…·åŽ‹åŠ›æµ‹è¯•ï¼‰
+  - å½“æ¨¡åž‹å£°æ˜Žæ”¯æŒå›¾åƒè¾“å…¥æ—¶è¿è¡Œå›¾åƒæŽ¢æµ‹
+  - æµç¨‹ï¼ˆé«˜å±‚æ¬¡ï¼‰ï¼š
+    - æµ‹è¯•ç”Ÿæˆä¸€ä¸ªå¸¦æœ‰"CAT"+ éšæœºä»£ç çš„å°åž‹ PNGï¼ˆ`src/gateway/live-image-probe.ts`ï¼‰
+    - é€šè¿‡ `agent` `attachments: [{ mimeType: "image/png", content: "<base64>" }]` å‘é€
+    - Gateway ç½‘å…³å°†é™„ä»¶è§£æžä¸º `images[]`ï¼ˆ`src/gateway/server-methods/agent.ts` + `src/gateway/chat-attachments.ts`ï¼‰
+    - åµŒå…¥å¼æ™ºèƒ½ä½“å°†å¤šæ¨¡æ€ç”¨æˆ·æ¶ˆæ¯è½¬å‘ç»™æ¨¡åž‹
+    - æ–­è¨€ï¼šå›žå¤åŒ…å« `cat` + ä»£ç ï¼ˆOCR å®¹å·®ï¼šå…è®¸è½»å¾®é”™è¯¯ï¼‰
 
-提示：要查看你的机器上可以测试什么（以及确切的 `provider/model` ID），运行：
+æç¤ºï¼šè¦æŸ¥çœ‹ä½ çš„æœºå™¨ä¸Šå¯ä»¥æµ‹è¯•ä»€ä¹ˆï¼ˆä»¥åŠç¡®åˆ‡çš„ `provider/model` IDï¼‰ï¼Œè¿è¡Œï¼š
 
 ```bash
 OpenKrab models list
 OpenKrab models list --json
 ```
 
-## 实时测试：Anthropic 设置令牌冒烟测试
+## å®žæ—¶æµ‹è¯•ï¼šAnthropic è®¾ç½®ä»¤ç‰Œå†’çƒŸæµ‹è¯•
 
-- 测试：`src/agents/anthropic.setup-token.live.test.ts`
-- 目标：验证 Claude Code CLI 设置令牌（或粘贴的设置令牌配置文件）能完成 Anthropic 提示。
-- 启用：
-  - `pnpm test:live`（或直接调用 Vitest 时使用 `OpenKrab_LIVE_TEST=1`）
-  - `OpenKrab_LIVE_SETUP_TOKEN=1`
-- 令牌来源（选择一个）：
-  - 配置文件：`OpenKrab_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test`
-  - 原始令牌：`OpenKrab_LIVE_SETUP_TOKEN_VALUE=sk-ant-oat01-...`
-- 模型覆盖（可选）：
-  - `OpenKrab_LIVE_SETUP_TOKEN_MODEL=anthropic/claude-opus-4-5`
+- æµ‹è¯•ï¼š`src/agents/anthropic.setup-token.live.test.ts`
+- ç›®æ ‡ï¼šéªŒè¯ Claude Code CLI è®¾ç½®ä»¤ç‰Œï¼ˆæˆ–ç²˜è´´çš„è®¾ç½®ä»¤ç‰Œé…ç½®æ–‡ä»¶ï¼‰èƒ½å®Œæˆ Anthropic æç¤ºã€‚
+- å¯ç”¨ï¼š
+  - `pnpm test:live`ï¼ˆæˆ–ç›´æŽ¥è°ƒç”¨ Vitest æ—¶ä½¿ç”¨ `OPENKRAB_LIVE_TEST=1`ï¼‰
+  - `OPENKRAB_LIVE_SETUP_TOKEN=1`
+- ä»¤ç‰Œæ¥æºï¼ˆé€‰æ‹©ä¸€ä¸ªï¼‰ï¼š
+  - é…ç½®æ–‡ä»¶ï¼š`OPENKRAB_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test`
+  - åŽŸå§‹ä»¤ç‰Œï¼š`OPENKRAB_LIVE_SETUP_TOKEN_VALUE=sk-ant-oat01-...`
+- æ¨¡åž‹è¦†ç›–ï¼ˆå¯é€‰ï¼‰ï¼š
+  - `OPENKRAB_LIVE_SETUP_TOKEN_MODEL=anthropic/claude-opus-4-5`
 
-设置示例：
+è®¾ç½®ç¤ºä¾‹ï¼š
 
 ```bash
 OpenKrab models auth paste-token --provider anthropic --profile-id anthropic:setup-token-test
-OpenKrab_LIVE_SETUP_TOKEN=1 OpenKrab_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test pnpm test:live src/agents/anthropic.setup-token.live.test.ts
+OPENKRAB_LIVE_SETUP_TOKEN=1 OPENKRAB_LIVE_SETUP_TOKEN_PROFILE=anthropic:setup-token-test pnpm test:live src/agents/anthropic.setup-token.live.test.ts
 ```
 
-## 实时测试：CLI 后端冒烟测试（Claude Code CLI 或其他本地 CLI）
+## å®žæ—¶æµ‹è¯•ï¼šCLI åŽç«¯å†’çƒŸæµ‹è¯•ï¼ˆClaude Code CLI æˆ–å…¶ä»–æœ¬åœ° CLIï¼‰
 
-- 测试：`src/gateway/gateway-cli-backend.live.test.ts`
-- 目标：使用本地 CLI 后端验证 Gateway 网关 + 智能体管道，而不影响你的默认配置。
-- 启用：
-  - `pnpm test:live`（或直接调用 Vitest 时使用 `OpenKrab_LIVE_TEST=1`）
-  - `OpenKrab_LIVE_CLI_BACKEND=1`
-- 默认值：
-  - 模型：`claude-cli/claude-sonnet-4-5`
-  - 命令：`claude`
-  - 参数：`["-p","--output-format","json","--dangerously-skip-permissions"]`
-- 覆盖（可选）：
-  - `OpenKrab_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-opus-4-5"`
-  - `OpenKrab_LIVE_CLI_BACKEND_MODEL="codex-cli/gpt-5.2-codex"`
-  - `OpenKrab_LIVE_CLI_BACKEND_COMMAND="/full/path/to/claude"`
-  - `OpenKrab_LIVE_CLI_BACKEND_ARGS='["-p","--output-format","json","--permission-mode","bypassPermissions"]'`
-  - `OpenKrab_LIVE_CLI_BACKEND_CLEAR_ENV='["ANTHROPIC_API_KEY","ANTHROPIC_API_KEY_OLD"]'`
-  - `OpenKrab_LIVE_CLI_BACKEND_IMAGE_PROBE=1` 发送真实图像附件（路径注入到提示中）。
-  - `OpenKrab_LIVE_CLI_BACKEND_IMAGE_ARG="--image"` 将图像文件路径作为 CLI 参数传递而非提示注入。
-  - `OpenKrab_LIVE_CLI_BACKEND_IMAGE_MODE="repeat"`（或 `"list"`）控制设置 `IMAGE_ARG` 时如何传递图像参数。
-  - `OpenKrab_LIVE_CLI_BACKEND_RESUME_PROBE=1` 发送第二轮并验证恢复流程。
-- `OpenKrab_LIVE_CLI_BACKEND_DISABLE_MCP_CONFIG=0` 保持 Claude Code CLI MCP 配置启用（默认使用临时空文件禁用 MCP 配置）。
+- æµ‹è¯•ï¼š`src/gateway/gateway-cli-backend.live.test.ts`
+- ç›®æ ‡ï¼šä½¿ç”¨æœ¬åœ° CLI åŽç«¯éªŒè¯ Gateway ç½‘å…³ + æ™ºèƒ½ä½“ç®¡é“ï¼Œè€Œä¸å½±å“ä½ çš„é»˜è®¤é…ç½®ã€‚
+- å¯ç”¨ï¼š
+  - `pnpm test:live`ï¼ˆæˆ–ç›´æŽ¥è°ƒç”¨ Vitest æ—¶ä½¿ç”¨ `OPENKRAB_LIVE_TEST=1`ï¼‰
+  - `OPENKRAB_LIVE_CLI_BACKEND=1`
+- é»˜è®¤å€¼ï¼š
+  - æ¨¡åž‹ï¼š`claude-cli/claude-sonnet-4-5`
+  - å‘½ä»¤ï¼š`claude`
+  - å‚æ•°ï¼š`["-p","--output-format","json","--dangerously-skip-permissions"]`
+- è¦†ç›–ï¼ˆå¯é€‰ï¼‰ï¼š
+  - `OPENKRAB_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-opus-4-5"`
+  - `OPENKRAB_LIVE_CLI_BACKEND_MODEL="codex-cli/gpt-5.2-codex"`
+  - `OPENKRAB_LIVE_CLI_BACKEND_COMMAND="/full/path/to/claude"`
+  - `OPENKRAB_LIVE_CLI_BACKEND_ARGS='["-p","--output-format","json","--permission-mode","bypassPermissions"]'`
+  - `OPENKRAB_LIVE_CLI_BACKEND_CLEAR_ENV='["ANTHROPIC_API_KEY","ANTHROPIC_API_KEY_OLD"]'`
+  - `OPENKRAB_LIVE_CLI_BACKEND_IMAGE_PROBE=1` å‘é€çœŸå®žå›¾åƒé™„ä»¶ï¼ˆè·¯å¾„æ³¨å…¥åˆ°æç¤ºä¸­ï¼‰ã€‚
+  - `OPENKRAB_LIVE_CLI_BACKEND_IMAGE_ARG="--image"` å°†å›¾åƒæ–‡ä»¶è·¯å¾„ä½œä¸º CLI å‚æ•°ä¼ é€’è€Œéžæç¤ºæ³¨å…¥ã€‚
+  - `OPENKRAB_LIVE_CLI_BACKEND_IMAGE_MODE="repeat"`ï¼ˆæˆ– `"list"`ï¼‰æŽ§åˆ¶è®¾ç½® `IMAGE_ARG` æ—¶å¦‚ä½•ä¼ é€’å›¾åƒå‚æ•°ã€‚
+  - `OPENKRAB_LIVE_CLI_BACKEND_RESUME_PROBE=1` å‘é€ç¬¬äºŒè½®å¹¶éªŒè¯æ¢å¤æµç¨‹ã€‚
+- `OPENKRAB_LIVE_CLI_BACKEND_DISABLE_MCP_CONFIG=0` ä¿æŒ Claude Code CLI MCP é…ç½®å¯ç”¨ï¼ˆé»˜è®¤ä½¿ç”¨ä¸´æ—¶ç©ºæ–‡ä»¶ç¦ç”¨ MCP é…ç½®ï¼‰ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```bash
-OpenKrab_LIVE_CLI_BACKEND=1 \
-  OpenKrab_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-sonnet-4-5" \
+OPENKRAB_LIVE_CLI_BACKEND=1 \
+  OPENKRAB_LIVE_CLI_BACKEND_MODEL="claude-cli/claude-sonnet-4-5" \
   pnpm test:live src/gateway/gateway-cli-backend.live.test.ts
 ```
 
-### 推荐的实时测试配方
+### æŽ¨èçš„å®žæ—¶æµ‹è¯•é…æ–¹
 
-缩小范围的显式允许列表最快且最不易出错：
+ç¼©å°èŒƒå›´çš„æ˜¾å¼å…è®¸åˆ—è¡¨æœ€å¿«ä¸”æœ€ä¸æ˜“å‡ºé”™ï¼š
 
-- 单个模型，直接测试（无 Gateway 网关）：
-  - `OpenKrab_LIVE_MODELS="openai/gpt-5.2" pnpm test:live src/agents/models.profiles.live.test.ts`
+- å•ä¸ªæ¨¡åž‹ï¼Œç›´æŽ¥æµ‹è¯•ï¼ˆæ—  Gateway ç½‘å…³ï¼‰ï¼š
+  - `OPENKRAB_LIVE_MODELS="openai/gpt-5.2" pnpm test:live src/agents/models.profiles.live.test.ts`
 
-- 单个模型，Gateway 网关冒烟测试：
-  - `OpenKrab_LIVE_GATEWAY_MODELS="openai/gpt-5.2" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+- å•ä¸ªæ¨¡åž‹ï¼ŒGateway ç½‘å…³å†’çƒŸæµ‹è¯•ï¼š
+  - `OPENKRAB_LIVE_GATEWAY_MODELS="openai/gpt-5.2" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
-- 跨多个提供商的工具调用：
-  - `OpenKrab_LIVE_GATEWAY_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-5,google/gemini-3-flash-preview,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+- è·¨å¤šä¸ªæä¾›å•†çš„å·¥å…·è°ƒç”¨ï¼š
+  - `OPENKRAB_LIVE_GATEWAY_MODELS="openai/gpt-5.2,anthropic/claude-opus-4-5,google/gemini-3-flash-preview,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
-- Google 专项（Gemini API 密钥 + Antigravity）：
-  - Gemini（API 密钥）：`OpenKrab_LIVE_GATEWAY_MODELS="google/gemini-3-flash-preview" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
-  - Antigravity（OAuth）：`OpenKrab_LIVE_GATEWAY_MODELS="google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-pro-high" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+- Google ä¸“é¡¹ï¼ˆGemini API å¯†é’¥ + Antigravityï¼‰ï¼š
+  - Geminiï¼ˆAPI å¯†é’¥ï¼‰ï¼š`OPENKRAB_LIVE_GATEWAY_MODELS="google/gemini-3-flash-preview" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+  - Antigravityï¼ˆOAuthï¼‰ï¼š`OPENKRAB_LIVE_GATEWAY_MODELS="google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-pro-high" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
-注意：
+æ³¨æ„ï¼š
 
-- `google/...` 使用 Gemini API（API 密钥）。
-- `google-antigravity/...` 使用 Antigravity OAuth 桥接（Cloud Code Assist 风格的智能体端点）。
-- `google-gemini-cli/...` 使用你机器上的本地 Gemini CLI（独立的认证 + 工具怪癖）。
-- Gemini API 与 Gemini CLI：
-  - API：OpenKrab 通过 HTTP 调用 Google 托管的 Gemini API（API 密钥/配置文件认证）；这是大多数用户说的"Gemini"。
-  - CLI：OpenKrab 调用本地 `gemini` 二进制文件；它有自己的认证，行为可能不同（流式传输/工具支持/版本差异）。
+- `google/...` ä½¿ç”¨ Gemini APIï¼ˆAPI å¯†é’¥ï¼‰ã€‚
+- `google-antigravity/...` ä½¿ç”¨ Antigravity OAuth æ¡¥æŽ¥ï¼ˆCloud Code Assist é£Žæ ¼çš„æ™ºèƒ½ä½“ç«¯ç‚¹ï¼‰ã€‚
+- `google-gemini-cli/...` ä½¿ç”¨ä½ æœºå™¨ä¸Šçš„æœ¬åœ° Gemini CLIï¼ˆç‹¬ç«‹çš„è®¤è¯ + å·¥å…·æ€ªç™–ï¼‰ã€‚
+- Gemini API ä¸Ž Gemini CLIï¼š
+  - APIï¼šOpenKrab é€šè¿‡ HTTP è°ƒç”¨ Google æ‰˜ç®¡çš„ Gemini APIï¼ˆAPI å¯†é’¥/é…ç½®æ–‡ä»¶è®¤è¯ï¼‰ï¼›è¿™æ˜¯å¤§å¤šæ•°ç”¨æˆ·è¯´çš„"Gemini"ã€‚
+  - CLIï¼šOpenKrab è°ƒç”¨æœ¬åœ° `gemini` äºŒè¿›åˆ¶æ–‡ä»¶ï¼›å®ƒæœ‰è‡ªå·±çš„è®¤è¯ï¼Œè¡Œä¸ºå¯èƒ½ä¸åŒï¼ˆæµå¼ä¼ è¾“/å·¥å…·æ”¯æŒ/ç‰ˆæœ¬å·®å¼‚ï¼‰ã€‚
 
-## 实时测试：模型矩阵（我们覆盖什么）
+## å®žæ—¶æµ‹è¯•ï¼šæ¨¡åž‹çŸ©é˜µï¼ˆæˆ‘ä»¬è¦†ç›–ä»€ä¹ˆï¼‰
 
-没有固定的"CI 模型列表"（实时测试是可选的），但这些是建议在有密钥的开发机器上定期覆盖的**推荐**模型。
+æ²¡æœ‰å›ºå®šçš„"CI æ¨¡åž‹åˆ—è¡¨"ï¼ˆå®žæ—¶æµ‹è¯•æ˜¯å¯é€‰çš„ï¼‰ï¼Œä½†è¿™äº›æ˜¯å»ºè®®åœ¨æœ‰å¯†é’¥çš„å¼€å‘æœºå™¨ä¸Šå®šæœŸè¦†ç›–çš„**æŽ¨è**æ¨¡åž‹ã€‚
 
-### 现代冒烟测试集（工具调用 + 图像）
+### çŽ°ä»£å†’çƒŸæµ‹è¯•é›†ï¼ˆå·¥å…·è°ƒç”¨ + å›¾åƒï¼‰
 
-这是我们期望保持工作的"常用模型"运行：
+è¿™æ˜¯æˆ‘ä»¬æœŸæœ›ä¿æŒå·¥ä½œçš„"å¸¸ç”¨æ¨¡åž‹"è¿è¡Œï¼š
 
-- OpenAI（非 Codex）：`openai/gpt-5.2`（可选：`openai/gpt-5.1`）
-- OpenAI Codex：`openai-codex/gpt-5.2`（可选：`openai-codex/gpt-5.2-codex`）
-- Anthropic：`anthropic/claude-opus-4-5`（或 `anthropic/claude-sonnet-4-5`）
-- Google（Gemini API）：`google/gemini-3-pro-preview` 和 `google/gemini-3-flash-preview`（避免较旧的 Gemini 2.x 模型）
-- Google（Antigravity）：`google-antigravity/claude-opus-4-6-thinking` 和 `google-antigravity/gemini-3-flash`
-- Z.AI（GLM）：`zai/glm-4.7`
-- MiniMax：`minimax/minimax-m2.1`
+- OpenAIï¼ˆéž Codexï¼‰ï¼š`openai/gpt-5.2`ï¼ˆå¯é€‰ï¼š`openai/gpt-5.1`ï¼‰
+- OpenAI Codexï¼š`openai-codex/gpt-5.2`ï¼ˆå¯é€‰ï¼š`openai-codex/gpt-5.2-codex`ï¼‰
+- Anthropicï¼š`anthropic/claude-opus-4-5`ï¼ˆæˆ– `anthropic/claude-sonnet-4-5`ï¼‰
+- Googleï¼ˆGemini APIï¼‰ï¼š`google/gemini-3-pro-preview` å’Œ `google/gemini-3-flash-preview`ï¼ˆé¿å…è¾ƒæ—§çš„ Gemini 2.x æ¨¡åž‹ï¼‰
+- Googleï¼ˆAntigravityï¼‰ï¼š`google-antigravity/claude-opus-4-6-thinking` å’Œ `google-antigravity/gemini-3-flash`
+- Z.AIï¼ˆGLMï¼‰ï¼š`zai/glm-4.7`
+- MiniMaxï¼š`minimax/minimax-m2.1`
 
-运行带工具 + 图像的 Gateway 网关冒烟测试：
-`OpenKrab_LIVE_GATEWAY_MODELS="openai/gpt-5.2,openai-codex/gpt-5.2,anthropic/claude-opus-4-5,google/gemini-3-pro-preview,google/gemini-3-flash-preview,google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-flash,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
+è¿è¡Œå¸¦å·¥å…· + å›¾åƒçš„ Gateway ç½‘å…³å†’çƒŸæµ‹è¯•ï¼š
+`OPENKRAB_LIVE_GATEWAY_MODELS="openai/gpt-5.2,openai-codex/gpt-5.2,anthropic/claude-opus-4-5,google/gemini-3-pro-preview,google/gemini-3-flash-preview,google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-flash,zai/glm-4.7,minimax/minimax-m2.1" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
-### 基线：工具调用（Read + 可选 Exec）
+### åŸºçº¿ï¼šå·¥å…·è°ƒç”¨ï¼ˆRead + å¯é€‰ Execï¼‰
 
-每个提供商系列至少选择一个：
+æ¯ä¸ªæä¾›å•†ç³»åˆ—è‡³å°‘é€‰æ‹©ä¸€ä¸ªï¼š
 
-- OpenAI：`openai/gpt-5.2`（或 `openai/gpt-5-mini`）
-- Anthropic：`anthropic/claude-opus-4-5`（或 `anthropic/claude-sonnet-4-5`）
-- Google：`google/gemini-3-flash-preview`（或 `google/gemini-3-pro-preview`）
-- Z.AI（GLM）：`zai/glm-4.7`
-- MiniMax：`minimax/minimax-m2.1`
+- OpenAIï¼š`openai/gpt-5.2`ï¼ˆæˆ– `openai/gpt-5-mini`ï¼‰
+- Anthropicï¼š`anthropic/claude-opus-4-5`ï¼ˆæˆ– `anthropic/claude-sonnet-4-5`ï¼‰
+- Googleï¼š`google/gemini-3-flash-preview`ï¼ˆæˆ– `google/gemini-3-pro-preview`ï¼‰
+- Z.AIï¼ˆGLMï¼‰ï¼š`zai/glm-4.7`
+- MiniMaxï¼š`minimax/minimax-m2.1`
 
-可选的额外覆盖（锦上添花）：
+å¯é€‰çš„é¢å¤–è¦†ç›–ï¼ˆé”¦ä¸Šæ·»èŠ±ï¼‰ï¼š
 
-- xAI：`xai/grok-4`（或最新可用版本）
-- Mistral：`mistral/`…（选择一个你已启用的"工具"能力模型）
-- Cerebras：`cerebras/`…（如果你有访问权限）
-- LM Studio：`lmstudio/`…（本地；工具调用取决于 API 模式）
+- xAIï¼š`xai/grok-4`ï¼ˆæˆ–æœ€æ–°å¯ç”¨ç‰ˆæœ¬ï¼‰
+- Mistralï¼š`mistral/`â€¦ï¼ˆé€‰æ‹©ä¸€ä¸ªä½ å·²å¯ç”¨çš„"å·¥å…·"èƒ½åŠ›æ¨¡åž‹ï¼‰
+- Cerebrasï¼š`cerebras/`â€¦ï¼ˆå¦‚æžœä½ æœ‰è®¿é—®æƒé™ï¼‰
+- LM Studioï¼š`lmstudio/`â€¦ï¼ˆæœ¬åœ°ï¼›å·¥å…·è°ƒç”¨å–å†³äºŽ API æ¨¡å¼ï¼‰
 
-### 视觉：图像发送（附件 → 多模态消息）
+### è§†è§‰ï¼šå›¾åƒå‘é€ï¼ˆé™„ä»¶ â†’ å¤šæ¨¡æ€æ¶ˆæ¯ï¼‰
 
-在 `OpenKrab_LIVE_GATEWAY_MODELS` 中至少包含一个支持图像的模型（Claude/Gemini/OpenAI 视觉能力变体等）以测试图像探测。
+åœ¨ `OPENKRAB_LIVE_GATEWAY_MODELS` ä¸­è‡³å°‘åŒ…å«ä¸€ä¸ªæ”¯æŒå›¾åƒçš„æ¨¡åž‹ï¼ˆClaude/Gemini/OpenAI è§†è§‰èƒ½åŠ›å˜ä½“ç­‰ï¼‰ä»¥æµ‹è¯•å›¾åƒæŽ¢æµ‹ã€‚
 
-### 聚合器/替代 Gateway 网关
+### èšåˆå™¨/æ›¿ä»£ Gateway ç½‘å…³
 
-如果你启用了密钥，我们也支持通过以下方式测试：
+å¦‚æžœä½ å¯ç”¨äº†å¯†é’¥ï¼Œæˆ‘ä»¬ä¹Ÿæ”¯æŒé€šè¿‡ä»¥ä¸‹æ–¹å¼æµ‹è¯•ï¼š
 
-- OpenRouter：`openrouter/...`（数百个模型；使用 `OpenKrab models scan` 查找支持工具+图像的候选模型）
-- OpenCode Zen：`opencode/...`（通过 `OPENCODE_API_KEY` / `OPENCODE_ZEN_API_KEY` 认证）
+- OpenRouterï¼š`openrouter/...`ï¼ˆæ•°ç™¾ä¸ªæ¨¡åž‹ï¼›ä½¿ç”¨ `OpenKrab models scan` æŸ¥æ‰¾æ”¯æŒå·¥å…·+å›¾åƒçš„å€™é€‰æ¨¡åž‹ï¼‰
+- OpenCode Zenï¼š`opencode/...`ï¼ˆé€šè¿‡ `OPENCODE_API_KEY` / `OPENCODE_ZEN_API_KEY` è®¤è¯ï¼‰
 
-如果你有凭证/配置，可以在实时矩阵中包含更多提供商：
+å¦‚æžœä½ æœ‰å‡­è¯/é…ç½®ï¼Œå¯ä»¥åœ¨å®žæ—¶çŸ©é˜µä¸­åŒ…å«æ›´å¤šæä¾›å•†ï¼š
 
-- 内置：`openai`、`openai-codex`、`anthropic`、`google`、`google-vertex`、`google-antigravity`、`google-gemini-cli`、`zai`、`openrouter`、`opencode`、`xai`、`groq`、`cerebras`、`mistral`、`github-copilot`
-- 通过 `models.providers`（自定义端点）：`minimax`（云/API），以及任何 OpenAI/Anthropic 兼容代理（LM Studio、vLLM、LiteLLM 等）
+- å†…ç½®ï¼š`openai`ã€`openai-codex`ã€`anthropic`ã€`google`ã€`google-vertex`ã€`google-antigravity`ã€`google-gemini-cli`ã€`zai`ã€`openrouter`ã€`opencode`ã€`xai`ã€`groq`ã€`cerebras`ã€`mistral`ã€`github-copilot`
+- é€šè¿‡ `models.providers`ï¼ˆè‡ªå®šä¹‰ç«¯ç‚¹ï¼‰ï¼š`minimax`ï¼ˆäº‘/APIï¼‰ï¼Œä»¥åŠä»»ä½• OpenAI/Anthropic å…¼å®¹ä»£ç†ï¼ˆLM Studioã€vLLMã€LiteLLM ç­‰ï¼‰
 
-提示：不要试图在文档中硬编码"所有模型"。权威列表是你机器上 `discoverModels(...)` 返回的内容 + 可用的密钥。
+æç¤ºï¼šä¸è¦è¯•å›¾åœ¨æ–‡æ¡£ä¸­ç¡¬ç¼–ç "æ‰€æœ‰æ¨¡åž‹"ã€‚æƒå¨åˆ—è¡¨æ˜¯ä½ æœºå™¨ä¸Š `discoverModels(...)` è¿”å›žçš„å†…å®¹ + å¯ç”¨çš„å¯†é’¥ã€‚
 
-## 凭证（绝不提交）
+## å‡­è¯ï¼ˆç»ä¸æäº¤ï¼‰
 
-实时测试以与 CLI 相同的方式发现凭证。实际含义：
+å®žæ—¶æµ‹è¯•ä»¥ä¸Ž CLI ç›¸åŒçš„æ–¹å¼å‘çŽ°å‡­è¯ã€‚å®žé™…å«ä¹‰ï¼š
 
-- 如果 CLI 能工作，实时测试应该能找到相同的密钥。
-- 如果实时测试说"无凭证"，用调试 `OpenKrab models list`/模型选择相同的方式调试。
+- å¦‚æžœ CLI èƒ½å·¥ä½œï¼Œå®žæ—¶æµ‹è¯•åº”è¯¥èƒ½æ‰¾åˆ°ç›¸åŒçš„å¯†é’¥ã€‚
+- å¦‚æžœå®žæ—¶æµ‹è¯•è¯´"æ— å‡­è¯"ï¼Œç”¨è°ƒè¯• `OpenKrab models list`/æ¨¡åž‹é€‰æ‹©ç›¸åŒçš„æ–¹å¼è°ƒè¯•ã€‚
 
-- 配置文件存储：`~/.OpenKrab/credentials/`（首选；测试中"配置文件密钥"的含义）
-- 配置：`~/.OpenKrab/OpenKrab.json`（或 `OpenKrab_CONFIG_PATH`）
+- é…ç½®æ–‡ä»¶å­˜å‚¨ï¼š`~/.OpenKrab/credentials/`ï¼ˆé¦–é€‰ï¼›æµ‹è¯•ä¸­"é…ç½®æ–‡ä»¶å¯†é’¥"çš„å«ä¹‰ï¼‰
+- é…ç½®ï¼š`~/.OpenKrab/OpenKrab.json`ï¼ˆæˆ– `OPENKRAB_CONFIG_PATH`ï¼‰
 
-如果你想依赖环境变量密钥（例如在 `~/.profile` 中导出的），在 `source ~/.profile` 后运行本地测试，或使用下面的 Docker 运行器（它们可以将 `~/.profile` 挂载到容器中）。
+å¦‚æžœä½ æƒ³ä¾èµ–çŽ¯å¢ƒå˜é‡å¯†é’¥ï¼ˆä¾‹å¦‚åœ¨ `~/.profile` ä¸­å¯¼å‡ºçš„ï¼‰ï¼Œåœ¨ `source ~/.profile` åŽè¿è¡Œæœ¬åœ°æµ‹è¯•ï¼Œæˆ–ä½¿ç”¨ä¸‹é¢çš„ Docker è¿è¡Œå™¨ï¼ˆå®ƒä»¬å¯ä»¥å°† `~/.profile` æŒ‚è½½åˆ°å®¹å™¨ä¸­ï¼‰ã€‚
 
-## Deepgram 实时测试（音频转录）
+## Deepgram å®žæ—¶æµ‹è¯•ï¼ˆéŸ³é¢‘è½¬å½•ï¼‰
 
-- 测试：`src/media-understanding/providers/deepgram/audio.live.test.ts`
-- 启用：`DEEPGRAM_API_KEY=... DEEPGRAM_LIVE_TEST=1 pnpm test:live src/media-understanding/providers/deepgram/audio.live.test.ts`
+- æµ‹è¯•ï¼š`src/media-understanding/providers/deepgram/audio.live.test.ts`
+- å¯ç”¨ï¼š`DEEPGRAM_API_KEY=... DEEPGRAM_LIVE_TEST=1 pnpm test:live src/media-understanding/providers/deepgram/audio.live.test.ts`
 
-## Docker 运行器（可选的"在 Linux 中工作"检查）
+## Docker è¿è¡Œå™¨ï¼ˆå¯é€‰çš„"åœ¨ Linux ä¸­å·¥ä½œ"æ£€æŸ¥ï¼‰
 
-这些在仓库 Docker 镜像内运行 `pnpm test:live`，挂载你的本地配置目录和工作区（如果挂载了 `~/.profile` 则会加载它）：
+è¿™äº›åœ¨ä»“åº“ Docker é•œåƒå†…è¿è¡Œ `pnpm test:live`ï¼ŒæŒ‚è½½ä½ çš„æœ¬åœ°é…ç½®ç›®å½•å’Œå·¥ä½œåŒºï¼ˆå¦‚æžœæŒ‚è½½äº† `~/.profile` åˆ™ä¼šåŠ è½½å®ƒï¼‰ï¼š
 
-- 直接模型：`pnpm test:docker:live-models`（脚本：`scripts/test-live-models-docker.sh`）
-- Gateway 网关 + 开发智能体：`pnpm test:docker:live-gateway`（脚本：`scripts/test-live-gateway-models-docker.sh`）
-- 新手引导向导（TTY，完整脚手架）：`pnpm test:docker:onboard`（脚本：`scripts/e2e/onboard-docker.sh`）
-- Gateway 网关网络（两个容器，WS 认证 + 健康检查）：`pnpm test:docker:gateway-network`（脚本：`scripts/e2e/gateway-network-docker.sh`）
-- 插件（自定义扩展加载 + 注册表冒烟测试）：`pnpm test:docker:plugins`（脚本：`scripts/e2e/plugins-docker.sh`）
+- ç›´æŽ¥æ¨¡åž‹ï¼š`pnpm test:docker:live-models`ï¼ˆè„šæœ¬ï¼š`scripts/test-live-models-docker.sh`ï¼‰
+- Gateway ç½‘å…³ + å¼€å‘æ™ºèƒ½ä½“ï¼š`pnpm test:docker:live-gateway`ï¼ˆè„šæœ¬ï¼š`scripts/test-live-gateway-models-docker.sh`ï¼‰
+- æ–°æ‰‹å¼•å¯¼å‘å¯¼ï¼ˆTTYï¼Œå®Œæ•´è„šæ‰‹æž¶ï¼‰ï¼š`pnpm test:docker:onboard`ï¼ˆè„šæœ¬ï¼š`scripts/e2e/onboard-docker.sh`ï¼‰
+- Gateway ç½‘å…³ç½‘ç»œï¼ˆä¸¤ä¸ªå®¹å™¨ï¼ŒWS è®¤è¯ + å¥åº·æ£€æŸ¥ï¼‰ï¼š`pnpm test:docker:gateway-network`ï¼ˆè„šæœ¬ï¼š`scripts/e2e/gateway-network-docker.sh`ï¼‰
+- æ’ä»¶ï¼ˆè‡ªå®šä¹‰æ‰©å±•åŠ è½½ + æ³¨å†Œè¡¨å†’çƒŸæµ‹è¯•ï¼‰ï¼š`pnpm test:docker:plugins`ï¼ˆè„šæœ¬ï¼š`scripts/e2e/plugins-docker.sh`ï¼‰
 
-有用的环境变量：
+æœ‰ç”¨çš„çŽ¯å¢ƒå˜é‡ï¼š
 
-- `OpenKrab_CONFIG_DIR=...`（默认：`~/.OpenKrab`）挂载到 `/home/node/.OpenKrab`
-- `OpenKrab_WORKSPACE_DIR=...`（默认：`~/.OpenKrab/workspace`）挂载到 `/home/node/.OpenKrab/workspace`
-- `OpenKrab_PROFILE_FILE=...`（默认：`~/.profile`）挂载到 `/home/node/.profile` 并在运行测试前加载
-- `OpenKrab_LIVE_GATEWAY_MODELS=...` / `OpenKrab_LIVE_MODELS=...` 用于缩小运行范围
-- `OpenKrab_LIVE_REQUIRE_PROFILE_KEYS=1` 确保凭证来自配置文件存储（而非环境变量）
+- `OPENKRAB_CONFIG_DIR=...`ï¼ˆé»˜è®¤ï¼š`~/.OpenKrab`ï¼‰æŒ‚è½½åˆ° `/home/node/.OpenKrab`
+- `OPENKRAB_WORKSPACE_DIR=...`ï¼ˆé»˜è®¤ï¼š`~/.OpenKrab/workspace`ï¼‰æŒ‚è½½åˆ° `/home/node/.OpenKrab/workspace`
+- `OPENKRAB_PROFILE_FILE=...`ï¼ˆé»˜è®¤ï¼š`~/.profile`ï¼‰æŒ‚è½½åˆ° `/home/node/.profile` å¹¶åœ¨è¿è¡Œæµ‹è¯•å‰åŠ è½½
+- `OPENKRAB_LIVE_GATEWAY_MODELS=...` / `OPENKRAB_LIVE_MODELS=...` ç”¨äºŽç¼©å°è¿è¡ŒèŒƒå›´
+- `OPENKRAB_LIVE_REQUIRE_PROFILE_KEYS=1` ç¡®ä¿å‡­è¯æ¥è‡ªé…ç½®æ–‡ä»¶å­˜å‚¨ï¼ˆè€ŒéžçŽ¯å¢ƒå˜é‡ï¼‰
 
-## 文档完整性检查
+## æ–‡æ¡£å®Œæ•´æ€§æ£€æŸ¥
 
-文档编辑后运行文档检查：`pnpm docs:list`。
+æ–‡æ¡£ç¼–è¾‘åŽè¿è¡Œæ–‡æ¡£æ£€æŸ¥ï¼š`pnpm docs:list`ã€‚
 
-## 离线回归测试（CI 安全）
+## ç¦»çº¿å›žå½’æµ‹è¯•ï¼ˆCI å®‰å…¨ï¼‰
 
-这些是没有真实提供商的"真实管道"回归测试：
+è¿™äº›æ˜¯æ²¡æœ‰çœŸå®žæä¾›å•†çš„"çœŸå®žç®¡é“"å›žå½’æµ‹è¯•ï¼š
 
-- Gateway 网关工具调用（模拟 OpenAI，真实 Gateway 网关 + 智能体循环）：`src/gateway/gateway.tool-calling.mock-openai.test.ts`
-- Gateway 网关向导（WS `wizard.start`/`wizard.next`，写入配置 + 强制认证）：`src/gateway/gateway.wizard.e2e.test.ts`
+- Gateway ç½‘å…³å·¥å…·è°ƒç”¨ï¼ˆæ¨¡æ‹Ÿ OpenAIï¼ŒçœŸå®ž Gateway ç½‘å…³ + æ™ºèƒ½ä½“å¾ªçŽ¯ï¼‰ï¼š`src/gateway/gateway.tool-calling.mock-openai.test.ts`
+- Gateway ç½‘å…³å‘å¯¼ï¼ˆWS `wizard.start`/`wizard.next`ï¼Œå†™å…¥é…ç½® + å¼ºåˆ¶è®¤è¯ï¼‰ï¼š`src/gateway/gateway.wizard.e2e.test.ts`
 
-## 智能体可靠性评估（Skills）
+## æ™ºèƒ½ä½“å¯é æ€§è¯„ä¼°ï¼ˆSkillsï¼‰
 
-我们已经有一些 CI 安全的测试，它们的行为类似于"智能体可靠性评估"：
+æˆ‘ä»¬å·²ç»æœ‰ä¸€äº› CI å®‰å…¨çš„æµ‹è¯•ï¼Œå®ƒä»¬çš„è¡Œä¸ºç±»ä¼¼äºŽ"æ™ºèƒ½ä½“å¯é æ€§è¯„ä¼°"ï¼š
 
-- 通过真实 Gateway 网关 + 智能体循环的模拟工具调用（`src/gateway/gateway.tool-calling.mock-openai.test.ts`）。
-- 验证会话连接和配置效果的端到端向导流程（`src/gateway/gateway.wizard.e2e.test.ts`）。
+- é€šè¿‡çœŸå®ž Gateway ç½‘å…³ + æ™ºèƒ½ä½“å¾ªçŽ¯çš„æ¨¡æ‹Ÿå·¥å…·è°ƒç”¨ï¼ˆ`src/gateway/gateway.tool-calling.mock-openai.test.ts`ï¼‰ã€‚
+- éªŒè¯ä¼šè¯è¿žæŽ¥å’Œé…ç½®æ•ˆæžœçš„ç«¯åˆ°ç«¯å‘å¯¼æµç¨‹ï¼ˆ`src/gateway/gateway.wizard.e2e.test.ts`ï¼‰ã€‚
 
-对于 Skills 仍然缺少的内容（参见 [Skills](/tools/skills)）：
+å¯¹äºŽ Skills ä»ç„¶ç¼ºå°‘çš„å†…å®¹ï¼ˆå‚è§ [Skills](/tools/skills)ï¼‰ï¼š
 
-- **决策：** 当 Skills 在提示中列出时，智能体是否选择正确的 skill（或避免不相关的）？
-- **合规性：** 智能体是否在使用前读取 `SKILL.md` 并遵循所需的步骤/参数？
-- **工作流契约：** 断言工具顺序、会话历史延续和沙箱边界的多轮场景。
+- **å†³ç­–ï¼š** å½“ Skills åœ¨æç¤ºä¸­åˆ—å‡ºæ—¶ï¼Œæ™ºèƒ½ä½“æ˜¯å¦é€‰æ‹©æ­£ç¡®çš„ skillï¼ˆæˆ–é¿å…ä¸ç›¸å…³çš„ï¼‰ï¼Ÿ
+- **åˆè§„æ€§ï¼š** æ™ºèƒ½ä½“æ˜¯å¦åœ¨ä½¿ç”¨å‰è¯»å– `SKILL.md` å¹¶éµå¾ªæ‰€éœ€çš„æ­¥éª¤/å‚æ•°ï¼Ÿ
+- **å·¥ä½œæµå¥‘çº¦ï¼š** æ–­è¨€å·¥å…·é¡ºåºã€ä¼šè¯åŽ†å²å»¶ç»­å’Œæ²™ç®±è¾¹ç•Œçš„å¤šè½®åœºæ™¯ã€‚
 
-未来的评估应该首先保持确定性：
+æœªæ¥çš„è¯„ä¼°åº”è¯¥é¦–å…ˆä¿æŒç¡®å®šæ€§ï¼š
 
-- 使用模拟提供商来断言工具调用 + 顺序、skill 文件读取和会话连接的场景运行器。
-- 一小套专注于 skill 的场景（使用 vs 避免、门控、提示注入）。
-- 可选的实时评估（可选的，环境变量门控），仅在 CI 安全套件就位后。
+- ä½¿ç”¨æ¨¡æ‹Ÿæä¾›å•†æ¥æ–­è¨€å·¥å…·è°ƒç”¨ + é¡ºåºã€skill æ–‡ä»¶è¯»å–å’Œä¼šè¯è¿žæŽ¥çš„åœºæ™¯è¿è¡Œå™¨ã€‚
+- ä¸€å°å¥—ä¸“æ³¨äºŽ skill çš„åœºæ™¯ï¼ˆä½¿ç”¨ vs é¿å…ã€é—¨æŽ§ã€æç¤ºæ³¨å…¥ï¼‰ã€‚
+- å¯é€‰çš„å®žæ—¶è¯„ä¼°ï¼ˆå¯é€‰çš„ï¼ŒçŽ¯å¢ƒå˜é‡é—¨æŽ§ï¼‰ï¼Œä»…åœ¨ CI å®‰å…¨å¥—ä»¶å°±ä½åŽã€‚
 
-## 添加回归测试（指导）
+## æ·»åŠ å›žå½’æµ‹è¯•ï¼ˆæŒ‡å¯¼ï¼‰
 
-当你修复在实时测试中发现的提供商/模型问题时：
+å½“ä½ ä¿®å¤åœ¨å®žæ—¶æµ‹è¯•ä¸­å‘çŽ°çš„æä¾›å•†/æ¨¡åž‹é—®é¢˜æ—¶ï¼š
 
-- 如果可能，添加 CI 安全的回归测试（模拟/存根提供商，或捕获确切的请求形状转换）
-- 如果它本质上是仅限实时的（速率限制、认证策略），保持实时测试范围小且通过环境变量可选
-- 优先针对能捕获问题的最小层：
-  - 提供商请求转换/重放问题 → 直接模型测试
-  - Gateway 网关会话/历史/工具管道问题 → Gateway 网关实时冒烟测试或 CI 安全的 Gateway 网关模拟测试
+- å¦‚æžœå¯èƒ½ï¼Œæ·»åŠ  CI å®‰å…¨çš„å›žå½’æµ‹è¯•ï¼ˆæ¨¡æ‹Ÿ/å­˜æ ¹æä¾›å•†ï¼Œæˆ–æ•èŽ·ç¡®åˆ‡çš„è¯·æ±‚å½¢çŠ¶è½¬æ¢ï¼‰
+- å¦‚æžœå®ƒæœ¬è´¨ä¸Šæ˜¯ä»…é™å®žæ—¶çš„ï¼ˆé€ŸçŽ‡é™åˆ¶ã€è®¤è¯ç­–ç•¥ï¼‰ï¼Œä¿æŒå®žæ—¶æµ‹è¯•èŒƒå›´å°ä¸”é€šè¿‡çŽ¯å¢ƒå˜é‡å¯é€‰
+- ä¼˜å…ˆé’ˆå¯¹èƒ½æ•èŽ·é—®é¢˜çš„æœ€å°å±‚ï¼š
+  - æä¾›å•†è¯·æ±‚è½¬æ¢/é‡æ”¾é—®é¢˜ â†’ ç›´æŽ¥æ¨¡åž‹æµ‹è¯•
+  - Gateway ç½‘å…³ä¼šè¯/åŽ†å²/å·¥å…·ç®¡é“é—®é¢˜ â†’ Gateway ç½‘å…³å®žæ—¶å†’çƒŸæµ‹è¯•æˆ– CI å®‰å…¨çš„ Gateway ç½‘å…³æ¨¡æ‹Ÿæµ‹è¯•
+
 

@@ -5,9 +5,9 @@ use crate::config::AppConfig;
 use std::process::Command;
 
 /// Default sandbox Docker images.
-pub const DEFAULT_SANDBOX_IMAGE: &str = "krabkrab/sandbox:latest";
-pub const DEFAULT_SANDBOX_BROWSER_IMAGE: &str = "krabkrab/sandbox-browser:latest";
-pub const DEFAULT_SANDBOX_COMMON_IMAGE: &str = "krabkrab/sandbox-common:latest";
+pub const DEFAULT_SANDBOX_IMAGE: &str = "openkrab/sandbox:latest";
+pub const DEFAULT_SANDBOX_BROWSER_IMAGE: &str = "openkrab/sandbox-browser:latest";
+pub const DEFAULT_SANDBOX_COMMON_IMAGE: &str = "openkrab/sandbox-common:latest";
 
 /// Sandbox health status.
 #[derive(Debug, Clone)]
@@ -104,21 +104,21 @@ pub fn check_sandbox_health(cfg: &AppConfig) -> SandboxHealth {
 
     if !default_image_present {
         issues.push(format!(
-            "Default sandbox image '{}' not found. Run 'krabkrab sandbox build' to build it.",
+            "Default sandbox image '{}' not found. Run 'openkrab sandbox build' to build it.",
             default_image
         ));
     }
 
     if !browser_image_present {
         issues.push(format!(
-            "Browser sandbox image '{}' not found. Run 'krabkrab sandbox build --browser' to build it.",
+            "Browser sandbox image '{}' not found. Run 'openkrab sandbox build --browser' to build it.",
             browser_image
         ));
     }
 
     if !common_image_present {
         issues.push(format!(
-            "Common sandbox image '{}' not found. Run 'krabkrab sandbox build --common' to build it.",
+            "Common sandbox image '{}' not found. Run 'openkrab sandbox build --common' to build it.",
             common_image
         ));
     }
@@ -244,3 +244,4 @@ mod tests {
         assert!(output.contains("Issues:"));
     }
 }
+

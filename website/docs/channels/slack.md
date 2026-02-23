@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Slack setup and runtime behavior (Socket Mode + HTTP Events API)"
 read_when:
   - Setting up Slack or debugging Slack socket/HTTP mode
@@ -73,8 +73,7 @@ SLACK_BOT_TOKEN=xoxb-...
 
       <Step title="Start gateway">
 
-```bash
-openkrab gateway
+```bash\nOpenKrab gateway
 ```
 
       </Step>
@@ -92,7 +91,7 @@ openkrab gateway
 
       </Step>
 
-      <Step title="Configure openkrab HTTP mode">
+      <Step title="Configure OpenKrab HTTP mode">
 
 ```json5
 {
@@ -299,14 +298,14 @@ Available action groups in current Slack tooling:
 
 ## Ack reactions
 
-`ackReaction` sends an acknowledgement emoji while openkrab is processing an inbound message.
+`ackReaction` sends an acknowledgement emoji while OpenKrab is processing an inbound message.
 
 Resolution order:
 
 - `channels.slack.accounts.<accountId>.ackReaction`
 - `channels.slack.ackReaction`
 - `messages.ackReaction`
-- agent identity emoji fallback (`agents.list[].identity.emoji`, else "👀")
+- agent identity emoji fallback (`agents.list[].identity.emoji`, else "ðŸ‘€")
 
 Notes:
 
@@ -415,10 +414,7 @@ Notes:
 
     Useful commands:
 
-```bash
-openkrab channels status --probe
-openkrab logs --follow
-openkrab doctor
+```bash\nOpenKrab channels status --probe\nOpenKrab logs --follow\nOpenKrab doctor
 ```
 
   </Accordion>
@@ -430,8 +426,7 @@ openkrab doctor
     - `channels.slack.dmPolicy` (or legacy `channels.slack.dm.policy`)
     - pairing approvals / allowlist entries
 
-```bash
-openkrab pairing list slack
+```bash\nOpenKrab pairing list slack
 ```
 
   </Accordion>
@@ -462,8 +457,7 @@ openkrab pairing list slack
 </AccordionGroup>
 
 ## Text streaming
-
-openkrab supports Slack native text streaming via the Agents and AI Apps API.
+\nOpenKrab supports Slack native text streaming via the Agents and AI Apps API.
 
 By default, streaming is enabled. Disable it per account:
 
@@ -485,7 +479,7 @@ channels:
 - Later text chunks append to the same stream (`chat.appendStream`).
 - End of reply finalizes stream (`chat.stopStream`).
 - Media and non-text payloads fall back to normal delivery.
-- If streaming fails mid-reply, openkrab falls back to normal delivery for remaining payloads.
+- If streaming fails mid-reply, OpenKrab falls back to normal delivery for remaining payloads.
 
 ## Configuration reference pointers
 
@@ -508,3 +502,4 @@ Primary reference:
 - [Troubleshooting](/channels/troubleshooting)
 - [Configuration](/gateway/configuration)
 - [Slash commands](/tools/slash-commands)
+

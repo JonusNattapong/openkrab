@@ -1,4 +1,4 @@
-//! infra — Infrastructure helpers: env vars, paths, workspace discovery.
+﻿//! infra â€” Infrastructure helpers: env vars, paths, workspace discovery.
 //! Ported from `openkrab/src/infra/` (Phase 7).
 //!
 //! Centralises all OS-level path resolution so the rest of the codebase
@@ -10,7 +10,7 @@ pub mod notifications;
 pub mod outbound;
 pub mod retry_http;
 
-// ─── Known directories ────────────────────────────────────────────────────────
+// â”€â”€â”€ Known directories â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Returns the platform home directory.
 /// Checks `$HOME` (or `$USERPROFILE` on Windows), then falls back to `.`.
@@ -21,53 +21,53 @@ pub fn home_dir() -> PathBuf {
         .unwrap_or_else(|_| PathBuf::from("."))
 }
 
-/// Returns `$HOME/.config/krabkrab` (or `%APPDATA%\krabkrab` on Windows).
+/// Returns `$HOME/.config/openkrab` (or `%APPDATA%\openkrab` on Windows).
 pub fn config_dir() -> PathBuf {
     #[cfg(target_os = "windows")]
     {
         std::env::var("APPDATA")
-            .map(|p| PathBuf::from(p).join("krabkrab"))
-            .unwrap_or_else(|_| home_dir().join(".config").join("krabkrab"))
+            .map(|p| PathBuf::from(p).join("openkrab"))
+            .unwrap_or_else(|_| home_dir().join(".config").join("openkrab"))
     }
     #[cfg(not(target_os = "windows"))]
     {
         std::env::var("XDG_CONFIG_HOME")
-            .map(|p| PathBuf::from(p).join("krabkrab"))
-            .unwrap_or_else(|_| home_dir().join(".config").join("krabkrab"))
+            .map(|p| PathBuf::from(p).join("openkrab"))
+            .unwrap_or_else(|_| home_dir().join(".config").join("openkrab"))
     }
 }
 
-/// Returns the default data directory for krabkrab (`$HOME/.local/share/krabkrab`).
+/// Returns the default data directory for openkrab (`$HOME/.local/share/openkrab`).
 pub fn data_dir() -> PathBuf {
     #[cfg(target_os = "windows")]
     {
         std::env::var("LOCALAPPDATA")
-            .map(|p| PathBuf::from(p).join("krabkrab"))
-            .unwrap_or_else(|_| home_dir().join(".krabkrab"))
+            .map(|p| PathBuf::from(p).join("openkrab"))
+            .unwrap_or_else(|_| home_dir().join(".openkrab"))
     }
     #[cfg(not(target_os = "windows"))]
     {
         std::env::var("XDG_DATA_HOME")
-            .map(|p| PathBuf::from(p).join("krabkrab"))
-            .unwrap_or_else(|_| home_dir().join(".local").join("share").join("krabkrab"))
+            .map(|p| PathBuf::from(p).join("openkrab"))
+            .unwrap_or_else(|_| home_dir().join(".local").join("share").join("openkrab"))
     }
 }
 
-/// Returns the runtime/cache directory (`/tmp/krabkrab` or `%TEMP%\krabkrab`).
+/// Returns the runtime/cache directory (`/tmp/openkrab` or `%TEMP%\openkrab`).
 pub fn cache_dir() -> PathBuf {
-    std::env::var("KRABKRAB_CACHE_DIR")
+    std::env::var("OPENKRAB_CACHE_DIR")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| std::env::temp_dir().join("krabkrab"))
+        .unwrap_or_else(|_| std::env::temp_dir().join("openkrab"))
 }
 
-// ─── Workspace discovery ──────────────────────────────────────────────────────
+// â”€â”€â”€ Workspace discovery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Find the workspace root by walking up from `start` looking for a
-/// `krabkrab.toml`, `Cargo.toml`, or `.git` marker.
+/// `openkrab.toml`, `Cargo.toml`, or `.git` marker.
 pub fn find_workspace_root(start: &Path) -> PathBuf {
     let mut current = start.to_path_buf();
     loop {
-        if current.join("krabkrab.toml").exists()
+        if current.join("openkrab.toml").exists()
             || current.join("Cargo.toml").exists()
             || current.join(".git").exists()
         {
@@ -90,7 +90,7 @@ pub fn logs_dir(workspace: &Path) -> PathBuf {
     workspace.join("logs")
 }
 
-// ─── Env helpers ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Env helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Read an env var, returning `None` if missing or empty.
 pub fn env_optional(key: &str) -> Option<String> {
@@ -117,11 +117,11 @@ pub fn is_ci() -> bool {
     std::env::var("CI").is_ok()
 }
 
-// ─── Profile resolution ───────────────────────────────────────────────────────
+// â”€â”€â”€ Profile resolution â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// The active profile name (`KRABKRAB_PROFILE` env, default "default").
+/// The active profile name (`OPENKRAB_PROFILE` env, default "default").
 pub fn active_profile() -> String {
-    env_or("KRABKRAB_PROFILE", "default")
+    env_or("OPENKRAB_PROFILE", "default")
 }
 
 /// Path to the config file for the given profile.
@@ -140,39 +140,41 @@ mod tests {
     }
 
     #[test]
-    fn config_dir_ends_with_krabkrab() {
+    fn config_dir_ends_with_openkrab() {
         let d = config_dir();
-        assert!(d.to_str().unwrap_or("").contains("krabkrab"));
+        assert!(d.to_str().unwrap_or("").contains("openkrab"));
     }
 
     #[test]
     fn env_optional_missing_returns_none() {
-        assert!(env_optional("___KRABKRAB_NO_SUCH_VAR___").is_none());
+        assert!(env_optional("___OPENKRAB_NO_SUCH_VAR___").is_none());
     }
 
     #[test]
     fn env_or_fallback() {
-        assert_eq!(env_or("___KRABKRAB_NO_SUCH_VAR___", "fallback"), "fallback");
+        assert_eq!(env_or("___OPENKRAB_NO_SUCH_VAR___", "fallback"), "fallback");
     }
 
     #[test]
     fn env_required_missing_is_err() {
-        assert!(env_required("___KRABKRAB_NO_SUCH_VAR___").is_err());
+        assert!(env_required("___OPENKRAB_NO_SUCH_VAR___").is_err());
     }
 
     #[test]
     fn active_profile_default() {
         // Without env var set, should be "default"
-        if std::env::var("KRABKRAB_PROFILE").is_err() {
+        if std::env::var("OPENKRAB_PROFILE").is_err() {
             assert_eq!(active_profile(), "default");
         }
     }
 
     #[test]
     fn workspace_root_finds_cargo_toml() {
-        // The krabkrab crate has Cargo.toml at its root
+        // The openkrab crate has Cargo.toml at its root
         let start = std::env::current_dir().unwrap();
         let root = find_workspace_root(&start);
         assert!(root.exists());
     }
 }
+
+

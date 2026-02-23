@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Doctor command: health checks, config migrations, and repair steps"
 read_when:
   - Adding or modifying doctor migrations
@@ -8,44 +8,38 @@ title: "Doctor"
 
 # Doctor
 
-`openkrab doctor` is the repair + migration tool for openkrab. It fixes stale
+`openkrab doctor` is the repair + migration tool for OpenKrab. It fixes stale
 config/state, checks health, and provides actionable repair steps.
 
 ## Quick start
 
-```bash
-openkrab doctor
+```bash\nOpenKrab doctor
 ```
 
 ### Headless / automation
 
-```bash
-openkrab doctor --yes
+```bash\nOpenKrab doctor --yes
 ```
 
 Accept defaults without prompting (including restart/service/sandbox repair steps when applicable).
 
-```bash
-openkrab doctor --repair
+```bash\nOpenKrab doctor --repair
 ```
 
 Apply recommended repairs without prompting (repairs + restarts where safe).
 
-```bash
-openkrab doctor --repair --force
+```bash\nOpenKrab doctor --repair --force
 ```
 
 Apply aggressive repairs too (overwrites custom supervisor configs).
 
-```bash
-openkrab doctor --non-interactive
+```bash\nOpenKrab doctor --non-interactive
 ```
 
 Run without prompts and only apply safe migrations (config normalization + on-disk state moves). Skips restart/service/sandbox actions that require human confirmation.
 Legacy state migrations run automatically when detected.
 
-```bash
-openkrab doctor --deep
+```bash\nOpenKrab doctor --deep
 ```
 
 Scan system services for extra gateway installs (launchd/systemd/schtasks).
@@ -111,24 +105,24 @@ legacy config format, so stale configs are repaired without manual intervention.
 
 Current migrations:
 
-- `routing.allowFrom` → `channels.whatsapp.allowFrom`
-- `routing.groupChat.requireMention` → `channels.whatsapp/telegram/imessage.groups."*".requireMention`
-- `routing.groupChat.historyLimit` → `messages.groupChat.historyLimit`
-- `routing.groupChat.mentionPatterns` → `messages.groupChat.mentionPatterns`
-- `routing.queue` → `messages.queue`
-- `routing.bindings` → top-level `bindings`
-- `routing.agents`/`routing.defaultAgentId` → `agents.list` + `agents.list[].default`
-- `routing.agentToAgent` → `tools.agentToAgent`
-- `routing.transcribeAudio` → `tools.media.audio.models`
-- `bindings[].match.accountID` → `bindings[].match.accountId`
-- `identity` → `agents.list[].identity`
-- `agent.*` → `agents.defaults` + `tools.*` (tools/elevated/exec/sandbox/subagents)
+- `routing.allowFrom` â†’ `channels.whatsapp.allowFrom`
+- `routing.groupChat.requireMention` â†’ `channels.whatsapp/telegram/imessage.groups."*".requireMention`
+- `routing.groupChat.historyLimit` â†’ `messages.groupChat.historyLimit`
+- `routing.groupChat.mentionPatterns` â†’ `messages.groupChat.mentionPatterns`
+- `routing.queue` â†’ `messages.queue`
+- `routing.bindings` â†’ top-level `bindings`
+- `routing.agents`/`routing.defaultAgentId` â†’ `agents.list` + `agents.list[].default`
+- `routing.agentToAgent` â†’ `tools.agentToAgent`
+- `routing.transcribeAudio` â†’ `tools.media.audio.models`
+- `bindings[].match.accountID` â†’ `bindings[].match.accountId`
+- `identity` â†’ `agents.list[].identity`
+- `agent.*` â†’ `agents.defaults` + `tools.*` (tools/elevated/exec/sandbox/subagents)
 - `agent.model`/`allowedModels`/`modelAliases`/`modelFallbacks`/`imageModelFallbacks`
-  → `agents.defaults.models` + `agents.defaults.model.primary/fallbacks` + `agents.defaults.imageModel.primary/fallbacks`
+  â†’ `agents.defaults.models` + `agents.defaults.model.primary/fallbacks` + `agents.defaults.imageModel.primary/fallbacks`
 
 ### 2b) OpenCode Zen provider overrides
 
-If you’ve added `models.providers.opencode` (or `opencode-zen`) manually, it
+If youâ€™ve added `models.providers.opencode` (or `opencode-zen`) manually, it
 overrides the built-in OpenCode Zen catalog from `@mariozechner/pi-ai`. That can
 force every model onto a single API or zero out costs. Doctor warns so you can
 remove the override and restore per-model API routing + costs.
@@ -166,10 +160,10 @@ Doctor checks:
   required to persist history and avoid `ENOENT` crashes.
 - **Transcript mismatch**: warns when recent session entries have missing
   transcript files.
-- **Main session “1-line JSONL”**: flags when the main transcript has only one
+- **Main session â€œ1-line JSONLâ€**: flags when the main transcript has only one
   line (history is not accumulating).
 - **Multiple state dirs**: warns when multiple `~/.openkrab` folders exist across
-  home directories or when `openkrab_STATE_DIR` points elsewhere (history can
+  home directories or when `OPENKRAB_STATE_DIR` points elsewhere (history can
   split between installs).
 - **Remote mode reminder**: if `gateway.mode=remote`, doctor reminds you to run
   it on the remote host (the state lives there).
@@ -192,7 +186,7 @@ Doctor also reports auth profiles that are temporarily unusable due to:
 ### 6) Hooks model validation
 
 If `hooks.gmail.model` is set, doctor validates the model reference against the
-catalog and allowlist and warns when it won’t resolve or is disallowed.
+catalog and allowlist and warns when it wonâ€™t resolve or is disallowed.
 
 ### 7) Sandbox image repair
 
@@ -202,9 +196,9 @@ switch to legacy names if the current image is missing.
 ### 8) Gateway service migrations and cleanup hints
 
 Doctor detects legacy gateway services (launchd/systemd/schtasks) and
-offers to remove them and install the openkrab service using the current gateway
+offers to remove them and install the OpenKrab service using the current gateway
 port. It can also scan for extra gateway-like services and print cleanup hints.
-Profile-named openkrab gateway services are considered first-class and are not
+Profile-named OpenKrab gateway services are considered first-class and are not
 flagged as "extra."
 
 ### 9) Security warnings
@@ -280,3 +274,5 @@ if the workspace is not already under git.
 
 See [/concepts/agent-workspace](/concepts/agent-workspace) for a full guide to
 workspace structure and git backup (recommended private GitHub or GitLab).
+
+

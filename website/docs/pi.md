@@ -1,4 +1,4 @@
----
+﻿---
 title: "Pi Integration Architecture"
 ---
 
@@ -39,93 +39,93 @@ OpenKrab uses the pi SDK to embed an AI coding agent into its messaging gateway 
 
 ```
 src/agents/
-├── pi-embedded-runner.ts          # Re-exports from pi-embedded-runner/
-├── pi-embedded-runner/
-│   ├── run.ts                     # Main entry: runEmbeddedPiAgent()
-│   ├── run/
-│   │   ├── attempt.ts             # Single attempt logic with session setup
-│   │   ├── params.ts              # RunEmbeddedPiAgentParams type
-│   │   ├── payloads.ts            # Build response payloads from run results
-│   │   ├── images.ts              # Vision model image injection
-│   │   └── types.ts               # EmbeddedRunAttemptResult
-│   ├── abort.ts                   # Abort error detection
-│   ├── cache-ttl.ts               # Cache TTL tracking for context pruning
-│   ├── compact.ts                 # Manual/auto compaction logic
-│   ├── extensions.ts              # Load pi extensions for embedded runs
-│   ├── extra-params.ts            # Provider-specific stream params
-│   ├── google.ts                  # Google/Gemini turn ordering fixes
-│   ├── history.ts                 # History limiting (DM vs group)
-│   ├── lanes.ts                   # Session/global command lanes
-│   ├── logger.ts                  # Subsystem logger
-│   ├── model.ts                   # Model resolution via ModelRegistry
-│   ├── runs.ts                    # Active run tracking, abort, queue
-│   ├── sandbox-info.ts            # Sandbox info for system prompt
-│   ├── session-manager-cache.ts   # SessionManager instance caching
-│   ├── session-manager-init.ts    # Session file initialization
-│   ├── system-prompt.ts           # System prompt builder
-│   ├── tool-split.ts              # Split tools into builtIn vs custom
-│   ├── types.ts                   # EmbeddedPiAgentMeta, EmbeddedPiRunResult
-│   └── utils.ts                   # ThinkLevel mapping, error description
-├── pi-embedded-subscribe.ts       # Session event subscription/dispatch
-├── pi-embedded-subscribe.types.ts # SubscribeEmbeddedPiSessionParams
-├── pi-embedded-subscribe.handlers.ts # Event handler factory
-├── pi-embedded-subscribe.handlers.lifecycle.ts
-├── pi-embedded-subscribe.handlers.types.ts
-├── pi-embedded-block-chunker.ts   # Streaming block reply chunking
-├── pi-embedded-messaging.ts       # Messaging tool sent tracking
-├── pi-embedded-helpers.ts         # Error classification, turn validation
-├── pi-embedded-helpers/           # Helper modules
-├── pi-embedded-utils.ts           # Formatting utilities
-├── pi-tools.ts                    # createOpenKrabCodingTools()
-├── pi-tools.abort.ts              # AbortSignal wrapping for tools
-├── pi-tools.policy.ts             # Tool allowlist/denylist policy
-├── pi-tools.read.ts               # Read tool customizations
-├── pi-tools.schema.ts             # Tool schema normalization
-├── pi-tools.types.ts              # AnyAgentTool type alias
-├── pi-tool-definition-adapter.ts  # AgentTool -> ToolDefinition adapter
-├── pi-settings.ts                 # Settings overrides
-├── pi-extensions/                 # Custom pi extensions
-│   ├── compaction-safeguard.ts    # Safeguard extension
-│   ├── compaction-safeguard-runtime.ts
-│   ├── context-pruning.ts         # Cache-TTL context pruning extension
-│   └── context-pruning/
-├── model-auth.ts                  # Auth profile resolution
-├── auth-profiles.ts               # Profile store, cooldown, failover
-├── model-selection.ts             # Default model resolution
-├── models-config.ts               # models.json generation
-├── model-catalog.ts               # Model catalog cache
-├── context-window-guard.ts        # Context window validation
-├── failover-error.ts              # FailoverError class
-├── defaults.ts                    # DEFAULT_PROVIDER, DEFAULT_MODEL
-├── system-prompt.ts               # buildAgentSystemPrompt()
-├── system-prompt-params.ts        # System prompt parameter resolution
-├── system-prompt-report.ts        # Debug report generation
-├── tool-summaries.ts              # Tool description summaries
-├── tool-policy.ts                 # Tool policy resolution
-├── transcript-policy.ts           # Transcript validation policy
-├── skills.ts                      # Skill snapshot/prompt building
-├── skills/                        # Skill subsystem
-├── sandbox.ts                     # Sandbox context resolution
-├── sandbox/                       # Sandbox subsystem
-├── channel-tools.ts               # Channel-specific tool injection
-├── OpenKrab-tools.ts              # OpenKrab-specific tools
-├── bash-tools.ts                  # exec/process tools
-├── apply-patch.ts                 # apply_patch tool (OpenAI)
-├── tools/                         # Individual tool implementations
-│   ├── browser-tool.ts
-│   ├── canvas-tool.ts
-│   ├── cron-tool.ts
-│   ├── discord-actions*.ts
-│   ├── gateway-tool.ts
-│   ├── image-tool.ts
-│   ├── message-tool.ts
-│   ├── nodes-tool.ts
-│   ├── session*.ts
-│   ├── slack-actions.ts
-│   ├── telegram-actions.ts
-│   ├── web-*.ts
-│   └── whatsapp-actions.ts
-└── ...
+â”œâ”€â”€ pi-embedded-runner.ts          # Re-exports from pi-embedded-runner/
+â”œâ”€â”€ pi-embedded-runner/
+â”‚   â”œâ”€â”€ run.ts                     # Main entry: runEmbeddedPiAgent()
+â”‚   â”œâ”€â”€ run/
+â”‚   â”‚   â”œâ”€â”€ attempt.ts             # Single attempt logic with session setup
+â”‚   â”‚   â”œâ”€â”€ params.ts              # RunEmbeddedPiAgentParams type
+â”‚   â”‚   â”œâ”€â”€ payloads.ts            # Build response payloads from run results
+â”‚   â”‚   â”œâ”€â”€ images.ts              # Vision model image injection
+â”‚   â”‚   â””â”€â”€ types.ts               # EmbeddedRunAttemptResult
+â”‚   â”œâ”€â”€ abort.ts                   # Abort error detection
+â”‚   â”œâ”€â”€ cache-ttl.ts               # Cache TTL tracking for context pruning
+â”‚   â”œâ”€â”€ compact.ts                 # Manual/auto compaction logic
+â”‚   â”œâ”€â”€ extensions.ts              # Load pi extensions for embedded runs
+â”‚   â”œâ”€â”€ extra-params.ts            # Provider-specific stream params
+â”‚   â”œâ”€â”€ google.ts                  # Google/Gemini turn ordering fixes
+â”‚   â”œâ”€â”€ history.ts                 # History limiting (DM vs group)
+â”‚   â”œâ”€â”€ lanes.ts                   # Session/global command lanes
+â”‚   â”œâ”€â”€ logger.ts                  # Subsystem logger
+â”‚   â”œâ”€â”€ model.ts                   # Model resolution via ModelRegistry
+â”‚   â”œâ”€â”€ runs.ts                    # Active run tracking, abort, queue
+â”‚   â”œâ”€â”€ sandbox-info.ts            # Sandbox info for system prompt
+â”‚   â”œâ”€â”€ session-manager-cache.ts   # SessionManager instance caching
+â”‚   â”œâ”€â”€ session-manager-init.ts    # Session file initialization
+â”‚   â”œâ”€â”€ system-prompt.ts           # System prompt builder
+â”‚   â”œâ”€â”€ tool-split.ts              # Split tools into builtIn vs custom
+â”‚   â”œâ”€â”€ types.ts                   # EmbeddedPiAgentMeta, EmbeddedPiRunResult
+â”‚   â””â”€â”€ utils.ts                   # ThinkLevel mapping, error description
+â”œâ”€â”€ pi-embedded-subscribe.ts       # Session event subscription/dispatch
+â”œâ”€â”€ pi-embedded-subscribe.types.ts # SubscribeEmbeddedPiSessionParams
+â”œâ”€â”€ pi-embedded-subscribe.handlers.ts # Event handler factory
+â”œâ”€â”€ pi-embedded-subscribe.handlers.lifecycle.ts
+â”œâ”€â”€ pi-embedded-subscribe.handlers.types.ts
+â”œâ”€â”€ pi-embedded-block-chunker.ts   # Streaming block reply chunking
+â”œâ”€â”€ pi-embedded-messaging.ts       # Messaging tool sent tracking
+â”œâ”€â”€ pi-embedded-helpers.ts         # Error classification, turn validation
+â”œâ”€â”€ pi-embedded-helpers/           # Helper modules
+â”œâ”€â”€ pi-embedded-utils.ts           # Formatting utilities
+â”œâ”€â”€ pi-tools.ts                    # createOpenKrabCodingTools()
+â”œâ”€â”€ pi-tools.abort.ts              # AbortSignal wrapping for tools
+â”œâ”€â”€ pi-tools.policy.ts             # Tool allowlist/denylist policy
+â”œâ”€â”€ pi-tools.read.ts               # Read tool customizations
+â”œâ”€â”€ pi-tools.schema.ts             # Tool schema normalization
+â”œâ”€â”€ pi-tools.types.ts              # AnyAgentTool type alias
+â”œâ”€â”€ pi-tool-definition-adapter.ts  # AgentTool -> ToolDefinition adapter
+â”œâ”€â”€ pi-settings.ts                 # Settings overrides
+â”œâ”€â”€ pi-extensions/                 # Custom pi extensions
+â”‚   â”œâ”€â”€ compaction-safeguard.ts    # Safeguard extension
+â”‚   â”œâ”€â”€ compaction-safeguard-runtime.ts
+â”‚   â”œâ”€â”€ context-pruning.ts         # Cache-TTL context pruning extension
+â”‚   â””â”€â”€ context-pruning/
+â”œâ”€â”€ model-auth.ts                  # Auth profile resolution
+â”œâ”€â”€ auth-profiles.ts               # Profile store, cooldown, failover
+â”œâ”€â”€ model-selection.ts             # Default model resolution
+â”œâ”€â”€ models-config.ts               # models.json generation
+â”œâ”€â”€ model-catalog.ts               # Model catalog cache
+â”œâ”€â”€ context-window-guard.ts        # Context window validation
+â”œâ”€â”€ failover-error.ts              # FailoverError class
+â”œâ”€â”€ defaults.ts                    # DEFAULT_PROVIDER, DEFAULT_MODEL
+â”œâ”€â”€ system-prompt.ts               # buildAgentSystemPrompt()
+â”œâ”€â”€ system-prompt-params.ts        # System prompt parameter resolution
+â”œâ”€â”€ system-prompt-report.ts        # Debug report generation
+â”œâ”€â”€ tool-summaries.ts              # Tool description summaries
+â”œâ”€â”€ tool-policy.ts                 # Tool policy resolution
+â”œâ”€â”€ transcript-policy.ts           # Transcript validation policy
+â”œâ”€â”€ skills.ts                      # Skill snapshot/prompt building
+â”œâ”€â”€ skills/                        # Skill subsystem
+â”œâ”€â”€ sandbox.ts                     # Sandbox context resolution
+â”œâ”€â”€ sandbox/                       # Sandbox subsystem
+â”œâ”€â”€ channel-tools.ts               # Channel-specific tool injection
+â”œâ”€â”€ OpenKrab-tools.ts              # OpenKrab-specific tools
+â”œâ”€â”€ bash-tools.ts                  # exec/process tools
+â”œâ”€â”€ apply-patch.ts                 # apply_patch tool (OpenAI)
+â”œâ”€â”€ tools/                         # Individual tool implementations
+â”‚   â”œâ”€â”€ browser-tool.ts
+â”‚   â”œâ”€â”€ canvas-tool.ts
+â”‚   â”œâ”€â”€ cron-tool.ts
+â”‚   â”œâ”€â”€ discord-actions*.ts
+â”‚   â”œâ”€â”€ gateway-tool.ts
+â”‚   â”œâ”€â”€ image-tool.ts
+â”‚   â”œâ”€â”€ message-tool.ts
+â”‚   â”œâ”€â”€ nodes-tool.ts
+â”‚   â”œâ”€â”€ session*.ts
+â”‚   â”œâ”€â”€ slack-actions.ts
+â”‚   â”œâ”€â”€ telegram-actions.ts
+â”‚   â”œâ”€â”€ web-*.ts
+â”‚   â””â”€â”€ whatsapp-actions.ts
+â””â”€â”€ ...
 ```
 
 ## Core Integration Flow
@@ -516,7 +516,7 @@ This provides the interactive terminal experience similar to pi's native mode.
 | Invocation      | `pi` command / RPC      | SDK via `createAgentSession()`                                                                 |
 | Tools           | Default coding tools    | Custom OpenKrab tool suite                                                                     |
 | System prompt   | AGENTS.md + prompts     | Dynamic per-channel/context                                                                    |
-| Session storage | `~/.pi/agent/sessions/` | `~/.OpenKrab/agents/<agentId>/sessions/` (or `$OpenKrab_STATE_DIR/agents/<agentId>/sessions/`) |
+| Session storage | `~/.pi/agent/sessions/` | `~/.OpenKrab/agents/<agentId>/sessions/` (or `$OPENKRAB_STATE_DIR/agents/<agentId>/sessions/`) |
 | Auth            | Single credential       | Multi-profile with rotation                                                                    |
 | Extensions      | Loaded from disk        | Programmatic + disk paths                                                                      |
 | Event handling  | TUI rendering           | Callback-based (onBlockReply, etc.)                                                            |
@@ -610,4 +610,5 @@ All existing tests that cover the pi integration and its extensions:
 - `src/agents/pi-tools.policy.test.ts`
 - `src/agents/pi-tools.safe-bins.test.ts`
 - `src/agents/pi-tools.workspace-paths.test.ts`
+
 

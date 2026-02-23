@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 添加或修改插件/扩展
-  - 记录插件安装或加载规则
-summary: OpenKrab 插件/扩展：发现、配置和安全
-title: 插件
+  - æ·»åŠ æˆ–ä¿®æ”¹æ’ä»¶/æ‰©å±•
+  - è®°å½•æ’ä»¶å®‰è£…æˆ–åŠ è½½è§„åˆ™
+summary: OpenKrab æ’ä»¶/æ‰©å±•ï¼šå‘çŽ°ã€é…ç½®å’Œå®‰å…¨
+title: æ’ä»¶
 x-i18n:
   generated_at: "2026-02-03T07:55:25Z"
   model: claude-opus-4-5
@@ -13,67 +13,67 @@ x-i18n:
   workflow: 15
 ---
 
-# 插件（扩展）
+# æ’ä»¶ï¼ˆæ‰©å±•ï¼‰
 
-## 快速开始（插件新手？）
+## å¿«é€Ÿå¼€å§‹ï¼ˆæ’ä»¶æ–°æ‰‹ï¼Ÿï¼‰
 
-插件只是一个**小型代码模块**，用额外功能（命令、工具和 Gateway 网关 RPC）扩展 OpenKrab。
+æ’ä»¶åªæ˜¯ä¸€ä¸ª**å°åž‹ä»£ç æ¨¡å—**ï¼Œç”¨é¢å¤–åŠŸèƒ½ï¼ˆå‘½ä»¤ã€å·¥å…·å’Œ Gateway ç½‘å…³ RPCï¼‰æ‰©å±• OpenKrabã€‚
 
-大多数时候，当你想要一个尚未内置到核心 OpenKrab 的功能（或你想将可选功能排除在主安装之外）时，你会使用插件。
+å¤§å¤šæ•°æ—¶å€™ï¼Œå½“ä½ æƒ³è¦ä¸€ä¸ªå°šæœªå†…ç½®åˆ°æ ¸å¿ƒ OpenKrab çš„åŠŸèƒ½ï¼ˆæˆ–ä½ æƒ³å°†å¯é€‰åŠŸèƒ½æŽ’é™¤åœ¨ä¸»å®‰è£…ä¹‹å¤–ï¼‰æ—¶ï¼Œä½ ä¼šä½¿ç”¨æ’ä»¶ã€‚
 
-快速路径：
+å¿«é€Ÿè·¯å¾„ï¼š
 
-1. 查看已加载的内容：
+1. æŸ¥çœ‹å·²åŠ è½½çš„å†…å®¹ï¼š
 
 ```bash
 OpenKrab plugins list
 ```
 
-2. 安装官方插件（例如：Voice Call）：
+2. å®‰è£…å®˜æ–¹æ’ä»¶ï¼ˆä¾‹å¦‚ï¼šVoice Callï¼‰ï¼š
 
 ```bash
 OpenKrab plugins install @OpenKrab/voice-call
 ```
 
-3. 重启 Gateway 网关，然后在 `plugins.entries.<id>.config` 下配置。
+3. é‡å¯ Gateway ç½‘å…³ï¼Œç„¶åŽåœ¨ `plugins.entries.<id>.config` ä¸‹é…ç½®ã€‚
 
-参见 [Voice Call](/plugins/voice-call) 了解具体的插件示例。
+å‚è§ [Voice Call](/plugins/voice-call) äº†è§£å…·ä½“çš„æ’ä»¶ç¤ºä¾‹ã€‚
 
-## 可用插件（官方）
+## å¯ç”¨æ’ä»¶ï¼ˆå®˜æ–¹ï¼‰
 
-- 从 2026.1.15 起 Microsoft Teams 仅作为插件提供；如果使用 Teams，请安装 `@OpenKrab/msteams`。
-- Memory (Core) — 捆绑的记忆搜索插件（通过 `plugins.slots.memory` 默认启用）
-- Memory (LanceDB) — 捆绑的长期记忆插件（自动召回/捕获；设置 `plugins.slots.memory = "memory-lancedb"`）
-- [Voice Call](/plugins/voice-call) — `@OpenKrab/voice-call`
-- [Zalo Personal](/plugins/zalouser) — `@OpenKrab/zalouser`
-- [Matrix](/channels/matrix) — `@OpenKrab/matrix`
-- [Nostr](/channels/nostr) — `@OpenKrab/nostr`
-- [Zalo](/channels/zalo) — `@OpenKrab/zalo`
-- [Microsoft Teams](/channels/msteams) — `@OpenKrab/msteams`
-- Google Antigravity OAuth（提供商认证）— 作为 `google-antigravity-auth` 捆绑（默认禁用）
-- Gemini CLI OAuth（提供商认证）— 作为 `google-gemini-cli-auth` 捆绑（默认禁用）
-- Qwen OAuth（提供商认证）— 作为 `qwen-portal-auth` 捆绑（默认禁用）
-- Copilot Proxy（提供商认证）— 本地 VS Code Copilot Proxy 桥接；与内置 `github-copilot` 设备登录不同（捆绑，默认禁用）
+- ä»Ž 2026.1.15 èµ· Microsoft Teams ä»…ä½œä¸ºæ’ä»¶æä¾›ï¼›å¦‚æžœä½¿ç”¨ Teamsï¼Œè¯·å®‰è£… `@OpenKrab/msteams`ã€‚
+- Memory (Core) â€” æ†ç»‘çš„è®°å¿†æœç´¢æ’ä»¶ï¼ˆé€šè¿‡ `plugins.slots.memory` é»˜è®¤å¯ç”¨ï¼‰
+- Memory (LanceDB) â€” æ†ç»‘çš„é•¿æœŸè®°å¿†æ’ä»¶ï¼ˆè‡ªåŠ¨å¬å›ž/æ•èŽ·ï¼›è®¾ç½® `plugins.slots.memory = "memory-lancedb"`ï¼‰
+- [Voice Call](/plugins/voice-call) â€” `@OpenKrab/voice-call`
+- [Zalo Personal](/plugins/zalouser) â€” `@OpenKrab/zalouser`
+- [Matrix](/channels/matrix) â€” `@OpenKrab/matrix`
+- [Nostr](/channels/nostr) â€” `@OpenKrab/nostr`
+- [Zalo](/channels/zalo) â€” `@OpenKrab/zalo`
+- [Microsoft Teams](/channels/msteams) â€” `@OpenKrab/msteams`
+- Google Antigravity OAuthï¼ˆæä¾›å•†è®¤è¯ï¼‰â€” ä½œä¸º `google-antigravity-auth` æ†ç»‘ï¼ˆé»˜è®¤ç¦ç”¨ï¼‰
+- Gemini CLI OAuthï¼ˆæä¾›å•†è®¤è¯ï¼‰â€” ä½œä¸º `google-gemini-cli-auth` æ†ç»‘ï¼ˆé»˜è®¤ç¦ç”¨ï¼‰
+- Qwen OAuthï¼ˆæä¾›å•†è®¤è¯ï¼‰â€” ä½œä¸º `qwen-portal-auth` æ†ç»‘ï¼ˆé»˜è®¤ç¦ç”¨ï¼‰
+- Copilot Proxyï¼ˆæä¾›å•†è®¤è¯ï¼‰â€” æœ¬åœ° VS Code Copilot Proxy æ¡¥æŽ¥ï¼›ä¸Žå†…ç½® `github-copilot` è®¾å¤‡ç™»å½•ä¸åŒï¼ˆæ†ç»‘ï¼Œé»˜è®¤ç¦ç”¨ï¼‰
 
-OpenKrab 插件是通过 jiti 在运行时加载的 **TypeScript 模块**。**配置验证不会执行插件代码**；它使用插件清单和 JSON Schema。参见 [插件清单](/plugins/manifest)。
+OpenKrab æ’ä»¶æ˜¯é€šè¿‡ jiti åœ¨è¿è¡Œæ—¶åŠ è½½çš„ **TypeScript æ¨¡å—**ã€‚**é…ç½®éªŒè¯ä¸ä¼šæ‰§è¡Œæ’ä»¶ä»£ç **ï¼›å®ƒä½¿ç”¨æ’ä»¶æ¸…å•å’Œ JSON Schemaã€‚å‚è§ [æ’ä»¶æ¸…å•](/plugins/manifest)ã€‚
 
-插件可以注册：
+æ’ä»¶å¯ä»¥æ³¨å†Œï¼š
 
-- Gateway 网关 RPC 方法
-- Gateway 网关 HTTP 处理程序
-- 智能体工具
-- CLI 命令
-- 后台服务
-- 可选的配置验证
-- **Skills**（通过在插件清单中列出 `skills` 目录）
-- **自动回复命令**（不调用 AI 智能体即可执行）
+- Gateway ç½‘å…³ RPC æ–¹æ³•
+- Gateway ç½‘å…³ HTTP å¤„ç†ç¨‹åº
+- æ™ºèƒ½ä½“å·¥å…·
+- CLI å‘½ä»¤
+- åŽå°æœåŠ¡
+- å¯é€‰çš„é…ç½®éªŒè¯
+- **Skills**ï¼ˆé€šè¿‡åœ¨æ’ä»¶æ¸…å•ä¸­åˆ—å‡º `skills` ç›®å½•ï¼‰
+- **è‡ªåŠ¨å›žå¤å‘½ä»¤**ï¼ˆä¸è°ƒç”¨ AI æ™ºèƒ½ä½“å³å¯æ‰§è¡Œï¼‰
 
-插件与 Gateway 网关**在同一进程中**运行，因此将它们视为受信任的代码。
-工具编写指南：[插件智能体工具](/plugins/agent-tools)。
+æ’ä»¶ä¸Ž Gateway ç½‘å…³**åœ¨åŒä¸€è¿›ç¨‹ä¸­**è¿è¡Œï¼Œå› æ­¤å°†å®ƒä»¬è§†ä¸ºå—ä¿¡ä»»çš„ä»£ç ã€‚
+å·¥å…·ç¼–å†™æŒ‡å—ï¼š[æ’ä»¶æ™ºèƒ½ä½“å·¥å…·](/plugins/agent-tools)ã€‚
 
-## 运行时辅助工具
+## è¿è¡Œæ—¶è¾…åŠ©å·¥å…·
 
-插件可以通过 `api.runtime` 访问选定的核心辅助工具。对于电话 TTS：
+æ’ä»¶å¯ä»¥é€šè¿‡ `api.runtime` è®¿é—®é€‰å®šçš„æ ¸å¿ƒè¾…åŠ©å·¥å…·ã€‚å¯¹äºŽç”µè¯ TTSï¼š
 
 ```ts
 const result = await api.runtime.tts.textToSpeechTelephony({
@@ -82,43 +82,43 @@ const result = await api.runtime.tts.textToSpeechTelephony({
 });
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 使用核心 `messages.tts` 配置（OpenAI 或 ElevenLabs）。
-- 返回 PCM 音频缓冲区 + 采样率。插件必须为提供商重新采样/编码。
-- Edge TTS 不支持电话。
+- ä½¿ç”¨æ ¸å¿ƒ `messages.tts` é…ç½®ï¼ˆOpenAI æˆ– ElevenLabsï¼‰ã€‚
+- è¿”å›ž PCM éŸ³é¢‘ç¼“å†²åŒº + é‡‡æ ·çŽ‡ã€‚æ’ä»¶å¿…é¡»ä¸ºæä¾›å•†é‡æ–°é‡‡æ ·/ç¼–ç ã€‚
+- Edge TTS ä¸æ”¯æŒç”µè¯ã€‚
 
-## 发现和优先级
+## å‘çŽ°å’Œä¼˜å…ˆçº§
 
-OpenKrab 按顺序扫描：
+OpenKrab æŒ‰é¡ºåºæ‰«æï¼š
 
-1. 配置路径
+1. é…ç½®è·¯å¾„
 
-- `plugins.load.paths`（文件或目录）
+- `plugins.load.paths`ï¼ˆæ–‡ä»¶æˆ–ç›®å½•ï¼‰
 
-2. 工作区扩展
+2. å·¥ä½œåŒºæ‰©å±•
 
 - `<workspace>/.OpenKrab/extensions/*.ts`
 - `<workspace>/.OpenKrab/extensions/*/index.ts`
 
-3. 全局扩展
+3. å…¨å±€æ‰©å±•
 
 - `~/.OpenKrab/extensions/*.ts`
 - `~/.OpenKrab/extensions/*/index.ts`
 
-4. 捆绑扩展（随 OpenKrab 一起发布，**默认禁用**）
+4. æ†ç»‘æ‰©å±•ï¼ˆéš OpenKrab ä¸€èµ·å‘å¸ƒï¼Œ**é»˜è®¤ç¦ç”¨**ï¼‰
 
 - `<OpenKrab>/extensions/*`
 
-捆绑插件必须通过 `plugins.entries.<id>.enabled` 或 `OpenKrab plugins enable <id>` 显式启用。已安装的插件默认启用，但可以用相同方式禁用。
+æ†ç»‘æ’ä»¶å¿…é¡»é€šè¿‡ `plugins.entries.<id>.enabled` æˆ– `OpenKrab plugins enable <id>` æ˜¾å¼å¯ç”¨ã€‚å·²å®‰è£…çš„æ’ä»¶é»˜è®¤å¯ç”¨ï¼Œä½†å¯ä»¥ç”¨ç›¸åŒæ–¹å¼ç¦ç”¨ã€‚
 
-每个插件必须在其根目录中包含 `OpenKrab.plugin.json` 文件。如果路径指向文件，则插件根目录是文件的目录，必须包含清单。
+æ¯ä¸ªæ’ä»¶å¿…é¡»åœ¨å…¶æ ¹ç›®å½•ä¸­åŒ…å« `OpenKrab.plugin.json` æ–‡ä»¶ã€‚å¦‚æžœè·¯å¾„æŒ‡å‘æ–‡ä»¶ï¼Œåˆ™æ’ä»¶æ ¹ç›®å½•æ˜¯æ–‡ä»¶çš„ç›®å½•ï¼Œå¿…é¡»åŒ…å«æ¸…å•ã€‚
 
-如果多个插件解析到相同的 id，上述顺序中的第一个匹配项获胜，较低优先级的副本被忽略。
+å¦‚æžœå¤šä¸ªæ’ä»¶è§£æžåˆ°ç›¸åŒçš„ idï¼Œä¸Šè¿°é¡ºåºä¸­çš„ç¬¬ä¸€ä¸ªåŒ¹é…é¡¹èŽ·èƒœï¼Œè¾ƒä½Žä¼˜å…ˆçº§çš„å‰¯æœ¬è¢«å¿½ç•¥ã€‚
 
-### 包集合
+### åŒ…é›†åˆ
 
-插件目录可以包含带有 `OpenKrab.extensions` 的 `package.json`：
+æ’ä»¶ç›®å½•å¯ä»¥åŒ…å«å¸¦æœ‰ `OpenKrab.extensions` çš„ `package.json`ï¼š
 
 ```json
 {
@@ -129,15 +129,15 @@ OpenKrab 按顺序扫描：
 }
 ```
 
-每个条目成为一个插件。如果包列出多个扩展，插件 id 变为 `name/<fileBase>`。
+æ¯ä¸ªæ¡ç›®æˆä¸ºä¸€ä¸ªæ’ä»¶ã€‚å¦‚æžœåŒ…åˆ—å‡ºå¤šä¸ªæ‰©å±•ï¼Œæ’ä»¶ id å˜ä¸º `name/<fileBase>`ã€‚
 
-如果你的插件导入 npm 依赖，请在该目录中安装它们以便 `node_modules` 可用（`npm install` / `pnpm install`）。
+å¦‚æžœä½ çš„æ’ä»¶å¯¼å…¥ npm ä¾èµ–ï¼Œè¯·åœ¨è¯¥ç›®å½•ä¸­å®‰è£…å®ƒä»¬ä»¥ä¾¿ `node_modules` å¯ç”¨ï¼ˆ`npm install` / `pnpm install`ï¼‰ã€‚
 
-### 渠道目录元数据
+### æ¸ é“ç›®å½•å…ƒæ•°æ®
 
-渠道插件可以通过 `OpenKrab.channel` 广播新手引导元数据，通过 `OpenKrab.install` 广播安装提示。这使核心目录保持无数据。
+æ¸ é“æ’ä»¶å¯ä»¥é€šè¿‡ `OpenKrab.channel` å¹¿æ’­æ–°æ‰‹å¼•å¯¼å…ƒæ•°æ®ï¼Œé€šè¿‡ `OpenKrab.install` å¹¿æ’­å®‰è£…æç¤ºã€‚è¿™ä½¿æ ¸å¿ƒç›®å½•ä¿æŒæ— æ•°æ®ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```json
 {
@@ -163,24 +163,24 @@ OpenKrab 按顺序扫描：
 }
 ```
 
-OpenKrab 还可以合并**外部渠道目录**（例如，MPM 注册表导出）。将 JSON 文件放在以下位置之一：
+OpenKrab è¿˜å¯ä»¥åˆå¹¶**å¤–éƒ¨æ¸ é“ç›®å½•**ï¼ˆä¾‹å¦‚ï¼ŒMPM æ³¨å†Œè¡¨å¯¼å‡ºï¼‰ã€‚å°† JSON æ–‡ä»¶æ”¾åœ¨ä»¥ä¸‹ä½ç½®ä¹‹ä¸€ï¼š
 
 - `~/.OpenKrab/mpm/plugins.json`
 - `~/.OpenKrab/mpm/catalog.json`
 - `~/.OpenKrab/plugins/catalog.json`
 
-或将 `OpenKrab_PLUGIN_CATALOG_PATHS`（或 `OpenKrab_MPM_CATALOG_PATHS`）指向一个或多个 JSON 文件（逗号/分号/`PATH` 分隔）。每个文件应包含 `{ "entries": [ { "name": "@scope/pkg", "OpenKrab": { "channel": {...}, "install": {...} } } ] }`。
+æˆ–å°† `OPENKRAB_PLUGIN_CATALOG_PATHS`ï¼ˆæˆ– `OPENKRAB_MPM_CATALOG_PATHS`ï¼‰æŒ‡å‘ä¸€ä¸ªæˆ–å¤šä¸ª JSON æ–‡ä»¶ï¼ˆé€—å·/åˆ†å·/`PATH` åˆ†éš”ï¼‰ã€‚æ¯ä¸ªæ–‡ä»¶åº”åŒ…å« `{ "entries": [ { "name": "@scope/pkg", "OpenKrab": { "channel": {...}, "install": {...} } } ] }`ã€‚
 
-## 插件 ID
+## æ’ä»¶ ID
 
-默认插件 id：
+é»˜è®¤æ’ä»¶ idï¼š
 
-- 包集合：`package.json` 的 `name`
-- 独立文件：文件基本名称（`~/.../voice-call.ts` → `voice-call`）
+- åŒ…é›†åˆï¼š`package.json` çš„ `name`
+- ç‹¬ç«‹æ–‡ä»¶ï¼šæ–‡ä»¶åŸºæœ¬åç§°ï¼ˆ`~/.../voice-call.ts` â†’ `voice-call`ï¼‰
 
-如果插件导出 `id`，OpenKrab 会使用它，但当它与配置的 id 不匹配时会发出警告。
+å¦‚æžœæ’ä»¶å¯¼å‡º `id`ï¼ŒOpenKrab ä¼šä½¿ç”¨å®ƒï¼Œä½†å½“å®ƒä¸Žé…ç½®çš„ id ä¸åŒ¹é…æ—¶ä¼šå‘å‡ºè­¦å‘Šã€‚
 
-## 配置
+## é…ç½®
 
 ```json5
 {
@@ -196,26 +196,26 @@ OpenKrab 还可以合并**外部渠道目录**（例如，MPM 注册表导出）
 }
 ```
 
-字段：
+å­—æ®µï¼š
 
-- `enabled`：主开关（默认：true）
-- `allow`：允许列表（可选）
-- `deny`：拒绝列表（可选；deny 优先）
-- `load.paths`：额外的插件文件/目录
-- `entries.<id>`：每个插件的开关 + 配置
+- `enabled`ï¼šä¸»å¼€å…³ï¼ˆé»˜è®¤ï¼štrueï¼‰
+- `allow`ï¼šå…è®¸åˆ—è¡¨ï¼ˆå¯é€‰ï¼‰
+- `deny`ï¼šæ‹’ç»åˆ—è¡¨ï¼ˆå¯é€‰ï¼›deny ä¼˜å…ˆï¼‰
+- `load.paths`ï¼šé¢å¤–çš„æ’ä»¶æ–‡ä»¶/ç›®å½•
+- `entries.<id>`ï¼šæ¯ä¸ªæ’ä»¶çš„å¼€å…³ + é…ç½®
 
-配置更改**需要重启 Gateway 网关**。
+é…ç½®æ›´æ”¹**éœ€è¦é‡å¯ Gateway ç½‘å…³**ã€‚
 
-验证规则（严格）：
+éªŒè¯è§„åˆ™ï¼ˆä¸¥æ ¼ï¼‰ï¼š
 
-- `entries`、`allow`、`deny` 或 `slots` 中的未知插件 id 是**错误**。
-- 未知的 `channels.<id>` 键是**错误**，除非插件清单声明了渠道 id。
-- 插件配置使用嵌入在 `OpenKrab.plugin.json`（`configSchema`）中的 JSON Schema 进行验证。
-- 如果插件被禁用，其配置会保留并发出**警告**。
+- `entries`ã€`allow`ã€`deny` æˆ– `slots` ä¸­çš„æœªçŸ¥æ’ä»¶ id æ˜¯**é”™è¯¯**ã€‚
+- æœªçŸ¥çš„ `channels.<id>` é”®æ˜¯**é”™è¯¯**ï¼Œé™¤éžæ’ä»¶æ¸…å•å£°æ˜Žäº†æ¸ é“ idã€‚
+- æ’ä»¶é…ç½®ä½¿ç”¨åµŒå…¥åœ¨ `OpenKrab.plugin.json`ï¼ˆ`configSchema`ï¼‰ä¸­çš„ JSON Schema è¿›è¡ŒéªŒè¯ã€‚
+- å¦‚æžœæ’ä»¶è¢«ç¦ç”¨ï¼Œå…¶é…ç½®ä¼šä¿ç•™å¹¶å‘å‡º**è­¦å‘Š**ã€‚
 
-## 插件槽位（独占类别）
+## æ’ä»¶æ§½ä½ï¼ˆç‹¬å ç±»åˆ«ï¼‰
 
-某些插件类别是**独占的**（一次只有一个活跃）。使用 `plugins.slots` 选择哪个插件拥有该槽位：
+æŸäº›æ’ä»¶ç±»åˆ«æ˜¯**ç‹¬å çš„**ï¼ˆä¸€æ¬¡åªæœ‰ä¸€ä¸ªæ´»è·ƒï¼‰ã€‚ä½¿ç”¨ `plugins.slots` é€‰æ‹©å“ªä¸ªæ’ä»¶æ‹¥æœ‰è¯¥æ§½ä½ï¼š
 
 ```json5
 {
@@ -227,21 +227,21 @@ OpenKrab 还可以合并**外部渠道目录**（例如，MPM 注册表导出）
 }
 ```
 
-如果多个插件声明 `kind: "memory"`，只有选定的那个加载。其他的被禁用并带有诊断信息。
+å¦‚æžœå¤šä¸ªæ’ä»¶å£°æ˜Ž `kind: "memory"`ï¼Œåªæœ‰é€‰å®šçš„é‚£ä¸ªåŠ è½½ã€‚å…¶ä»–çš„è¢«ç¦ç”¨å¹¶å¸¦æœ‰è¯Šæ–­ä¿¡æ¯ã€‚
 
-## 控制界面（schema + 标签）
+## æŽ§åˆ¶ç•Œé¢ï¼ˆschema + æ ‡ç­¾ï¼‰
 
-控制界面使用 `config.schema`（JSON Schema + `uiHints`）来渲染更好的表单。
+æŽ§åˆ¶ç•Œé¢ä½¿ç”¨ `config.schema`ï¼ˆJSON Schema + `uiHints`ï¼‰æ¥æ¸²æŸ“æ›´å¥½çš„è¡¨å•ã€‚
 
-OpenKrab 在运行时根据发现的插件增强 `uiHints`：
+OpenKrab åœ¨è¿è¡Œæ—¶æ ¹æ®å‘çŽ°çš„æ’ä»¶å¢žå¼º `uiHints`ï¼š
 
-- 为 `plugins.entries.<id>` / `.enabled` / `.config` 添加每插件标签
-- 在以下位置合并可选的插件提供的配置字段提示：
+- ä¸º `plugins.entries.<id>` / `.enabled` / `.config` æ·»åŠ æ¯æ’ä»¶æ ‡ç­¾
+- åœ¨ä»¥ä¸‹ä½ç½®åˆå¹¶å¯é€‰çš„æ’ä»¶æä¾›çš„é…ç½®å­—æ®µæç¤ºï¼š
   `plugins.entries.<id>.config.<field>`
 
-如果你希望插件配置字段显示良好的标签/占位符（并将密钥标记为敏感），请在插件清单中提供 `uiHints` 和 JSON Schema。
+å¦‚æžœä½ å¸Œæœ›æ’ä»¶é…ç½®å­—æ®µæ˜¾ç¤ºè‰¯å¥½çš„æ ‡ç­¾/å ä½ç¬¦ï¼ˆå¹¶å°†å¯†é’¥æ ‡è®°ä¸ºæ•æ„Ÿï¼‰ï¼Œè¯·åœ¨æ’ä»¶æ¸…å•ä¸­æä¾› `uiHints` å’Œ JSON Schemaã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```json
 {
@@ -279,22 +279,22 @@ OpenKrab plugins disable <id>
 OpenKrab plugins doctor
 ```
 
-`plugins update` 仅适用于在 `plugins.installs` 下跟踪的 npm 安装。
+`plugins update` ä»…é€‚ç”¨äºŽåœ¨ `plugins.installs` ä¸‹è·Ÿè¸ªçš„ npm å®‰è£…ã€‚
 
-插件也可以注册自己的顶级命令（例如：`OpenKrab voicecall`）。
+æ’ä»¶ä¹Ÿå¯ä»¥æ³¨å†Œè‡ªå·±çš„é¡¶çº§å‘½ä»¤ï¼ˆä¾‹å¦‚ï¼š`OpenKrab voicecall`ï¼‰ã€‚
 
-## 插件 API（概述）
+## æ’ä»¶ APIï¼ˆæ¦‚è¿°ï¼‰
 
-插件导出以下之一：
+æ’ä»¶å¯¼å‡ºä»¥ä¸‹ä¹‹ä¸€ï¼š
 
-- 函数：`(api) => { ... }`
-- 对象：`{ id, name, configSchema, register(api) { ... } }`
+- å‡½æ•°ï¼š`(api) => { ... }`
+- å¯¹è±¡ï¼š`{ id, name, configSchema, register(api) { ... } }`
 
-## 插件钩子
+## æ’ä»¶é’©å­
 
-插件可以附带钩子并在运行时注册它们。这让插件可以捆绑事件驱动的自动化，而无需单独安装钩子包。
+æ’ä»¶å¯ä»¥é™„å¸¦é’©å­å¹¶åœ¨è¿è¡Œæ—¶æ³¨å†Œå®ƒä»¬ã€‚è¿™è®©æ’ä»¶å¯ä»¥æ†ç»‘äº‹ä»¶é©±åŠ¨çš„è‡ªåŠ¨åŒ–ï¼Œè€Œæ— éœ€å•ç‹¬å®‰è£…é’©å­åŒ…ã€‚
 
-### 示例
+### ç¤ºä¾‹
 
 ```
 import { registerPluginHooksFromDir } from "OpenKrab/plugin-sdk";
@@ -304,22 +304,22 @@ export default function register(api) {
 }
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 钩子目录遵循正常的钩子结构（`HOOK.md` + `handler.ts`）。
-- 钩子资格规则仍然适用（操作系统/二进制文件/环境/配置要求）。
-- 插件管理的钩子在 `OpenKrab hooks list` 中显示为 `plugin:<id>`。
-- 你不能通过 `OpenKrab hooks` 启用/禁用插件管理的钩子；而是启用/禁用插件。
+- é’©å­ç›®å½•éµå¾ªæ­£å¸¸çš„é’©å­ç»“æž„ï¼ˆ`HOOK.md` + `handler.ts`ï¼‰ã€‚
+- é’©å­èµ„æ ¼è§„åˆ™ä»ç„¶é€‚ç”¨ï¼ˆæ“ä½œç³»ç»Ÿ/äºŒè¿›åˆ¶æ–‡ä»¶/çŽ¯å¢ƒ/é…ç½®è¦æ±‚ï¼‰ã€‚
+- æ’ä»¶ç®¡ç†çš„é’©å­åœ¨ `OpenKrab hooks list` ä¸­æ˜¾ç¤ºä¸º `plugin:<id>`ã€‚
+- ä½ ä¸èƒ½é€šè¿‡ `OpenKrab hooks` å¯ç”¨/ç¦ç”¨æ’ä»¶ç®¡ç†çš„é’©å­ï¼›è€Œæ˜¯å¯ç”¨/ç¦ç”¨æ’ä»¶ã€‚
 
-## 提供商插件（模型认证）
+## æä¾›å•†æ’ä»¶ï¼ˆæ¨¡åž‹è®¤è¯ï¼‰
 
-插件可以注册**模型提供商认证**流程，以便用户可以在 OpenKrab 内运行 OAuth 或 API 密钥设置（无需外部脚本）。
+æ’ä»¶å¯ä»¥æ³¨å†Œ**æ¨¡åž‹æä¾›å•†è®¤è¯**æµç¨‹ï¼Œä»¥ä¾¿ç”¨æˆ·å¯ä»¥åœ¨ OpenKrab å†…è¿è¡Œ OAuth æˆ– API å¯†é’¥è®¾ç½®ï¼ˆæ— éœ€å¤–éƒ¨è„šæœ¬ï¼‰ã€‚
 
-通过 `api.registerProvider(...)` 注册提供商。每个提供商暴露一个或多个认证方法（OAuth、API 密钥、设备码等）。这些方法驱动：
+é€šè¿‡ `api.registerProvider(...)` æ³¨å†Œæä¾›å•†ã€‚æ¯ä¸ªæä¾›å•†æš´éœ²ä¸€ä¸ªæˆ–å¤šä¸ªè®¤è¯æ–¹æ³•ï¼ˆOAuthã€API å¯†é’¥ã€è®¾å¤‡ç ç­‰ï¼‰ã€‚è¿™äº›æ–¹æ³•é©±åŠ¨ï¼š
 
 - `OpenKrab models auth login --provider <id> [--method <id>]`
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```ts
 api.registerProvider({
@@ -353,15 +353,15 @@ api.registerProvider({
 });
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `run` 接收带有 `prompter`、`runtime`、`openUrl` 和 `oauth.createVpsAwareHandlers` 辅助工具的 `ProviderAuthContext`。
-- 当需要添加默认模型或提供商配置时返回 `configPatch`。
-- 返回 `defaultModel` 以便 `--set-default` 可以更新智能体默认值。
+- `run` æŽ¥æ”¶å¸¦æœ‰ `prompter`ã€`runtime`ã€`openUrl` å’Œ `oauth.createVpsAwareHandlers` è¾…åŠ©å·¥å…·çš„ `ProviderAuthContext`ã€‚
+- å½“éœ€è¦æ·»åŠ é»˜è®¤æ¨¡åž‹æˆ–æä¾›å•†é…ç½®æ—¶è¿”å›ž `configPatch`ã€‚
+- è¿”å›ž `defaultModel` ä»¥ä¾¿ `--set-default` å¯ä»¥æ›´æ–°æ™ºèƒ½ä½“é»˜è®¤å€¼ã€‚
 
-### 注册消息渠道
+### æ³¨å†Œæ¶ˆæ¯æ¸ é“
 
-插件可以注册**渠道插件**，其行为类似于内置渠道（WhatsApp、Telegram 等）。渠道配置位于 `channels.<id>` 下，由你的渠道插件代码验证。
+æ’ä»¶å¯ä»¥æ³¨å†Œ**æ¸ é“æ’ä»¶**ï¼Œå…¶è¡Œä¸ºç±»ä¼¼äºŽå†…ç½®æ¸ é“ï¼ˆWhatsAppã€Telegram ç­‰ï¼‰ã€‚æ¸ é“é…ç½®ä½äºŽ `channels.<id>` ä¸‹ï¼Œç”±ä½ çš„æ¸ é“æ’ä»¶ä»£ç éªŒè¯ã€‚
 
 ```ts
 const myChannel = {
@@ -393,48 +393,48 @@ export default function (api) {
 }
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 将配置放在 `channels.<id>` 下（而不是 `plugins.entries`）。
-- `meta.label` 用于 CLI/UI 列表中的标签。
-- `meta.aliases` 添加用于规范化和 CLI 输入的备用 id。
-- `meta.preferOver` 列出当两者都配置时要跳过自动启用的渠道 id。
-- `meta.detailLabel` 和 `meta.systemImage` 让 UI 显示更丰富的渠道标签/图标。
+- å°†é…ç½®æ”¾åœ¨ `channels.<id>` ä¸‹ï¼ˆè€Œä¸æ˜¯ `plugins.entries`ï¼‰ã€‚
+- `meta.label` ç”¨äºŽ CLI/UI åˆ—è¡¨ä¸­çš„æ ‡ç­¾ã€‚
+- `meta.aliases` æ·»åŠ ç”¨äºŽè§„èŒƒåŒ–å’Œ CLI è¾“å…¥çš„å¤‡ç”¨ idã€‚
+- `meta.preferOver` åˆ—å‡ºå½“ä¸¤è€…éƒ½é…ç½®æ—¶è¦è·³è¿‡è‡ªåŠ¨å¯ç”¨çš„æ¸ é“ idã€‚
+- `meta.detailLabel` å’Œ `meta.systemImage` è®© UI æ˜¾ç¤ºæ›´ä¸°å¯Œçš„æ¸ é“æ ‡ç­¾/å›¾æ ‡ã€‚
 
-### 编写新的消息渠道（分步指南）
+### ç¼–å†™æ–°çš„æ¶ˆæ¯æ¸ é“ï¼ˆåˆ†æ­¥æŒ‡å—ï¼‰
 
-当你想要一个**新的聊天界面**（"消息渠道"）而不是模型提供商时使用此方法。
-模型提供商文档位于 `/providers/*` 下。
+å½“ä½ æƒ³è¦ä¸€ä¸ª**æ–°çš„èŠå¤©ç•Œé¢**ï¼ˆ"æ¶ˆæ¯æ¸ é“"ï¼‰è€Œä¸æ˜¯æ¨¡åž‹æä¾›å•†æ—¶ä½¿ç”¨æ­¤æ–¹æ³•ã€‚
+æ¨¡åž‹æä¾›å•†æ–‡æ¡£ä½äºŽ `/providers/*` ä¸‹ã€‚
 
-1. 选择 id + 配置结构
+1. é€‰æ‹© id + é…ç½®ç»“æž„
 
-- 所有渠道配置位于 `channels.<id>` 下。
-- 对于多账户设置，优先使用 `channels.<id>.accounts.<accountId>`。
+- æ‰€æœ‰æ¸ é“é…ç½®ä½äºŽ `channels.<id>` ä¸‹ã€‚
+- å¯¹äºŽå¤šè´¦æˆ·è®¾ç½®ï¼Œä¼˜å…ˆä½¿ç”¨ `channels.<id>.accounts.<accountId>`ã€‚
 
-2. 定义渠道元数据
+2. å®šä¹‰æ¸ é“å…ƒæ•°æ®
 
-- `meta.label`、`meta.selectionLabel`、`meta.docsPath`、`meta.blurb` 控制 CLI/UI 列表。
-- `meta.docsPath` 应指向像 `/channels/<id>` 这样的文档页面。
-- `meta.preferOver` 让插件替换另一个渠道（自动启用优先选择它）。
-- `meta.detailLabel` 和 `meta.systemImage` 被 UI 用于详细文本/图标。
+- `meta.label`ã€`meta.selectionLabel`ã€`meta.docsPath`ã€`meta.blurb` æŽ§åˆ¶ CLI/UI åˆ—è¡¨ã€‚
+- `meta.docsPath` åº”æŒ‡å‘åƒ `/channels/<id>` è¿™æ ·çš„æ–‡æ¡£é¡µé¢ã€‚
+- `meta.preferOver` è®©æ’ä»¶æ›¿æ¢å¦ä¸€ä¸ªæ¸ é“ï¼ˆè‡ªåŠ¨å¯ç”¨ä¼˜å…ˆé€‰æ‹©å®ƒï¼‰ã€‚
+- `meta.detailLabel` å’Œ `meta.systemImage` è¢« UI ç”¨äºŽè¯¦ç»†æ–‡æœ¬/å›¾æ ‡ã€‚
 
-3. 实现必需的适配器
+3. å®žçŽ°å¿…éœ€çš„é€‚é…å™¨
 
 - `config.listAccountIds` + `config.resolveAccount`
-- `capabilities`（聊天类型、媒体、线程等）
-- `outbound.deliveryMode` + `outbound.sendText`（用于基本发送）
+- `capabilities`ï¼ˆèŠå¤©ç±»åž‹ã€åª’ä½“ã€çº¿ç¨‹ç­‰ï¼‰
+- `outbound.deliveryMode` + `outbound.sendText`ï¼ˆç”¨äºŽåŸºæœ¬å‘é€ï¼‰
 
-4. 根据需要添加可选适配器
+4. æ ¹æ®éœ€è¦æ·»åŠ å¯é€‰é€‚é…å™¨
 
-- `setup`（向导）、`security`（私信策略）、`status`（健康/诊断）
-- `gateway`（启动/停止/登录）、`mentions`、`threading`、`streaming`
-- `actions`（消息操作）、`commands`（原生命令行为）
+- `setup`ï¼ˆå‘å¯¼ï¼‰ã€`security`ï¼ˆç§ä¿¡ç­–ç•¥ï¼‰ã€`status`ï¼ˆå¥åº·/è¯Šæ–­ï¼‰
+- `gateway`ï¼ˆå¯åŠ¨/åœæ­¢/ç™»å½•ï¼‰ã€`mentions`ã€`threading`ã€`streaming`
+- `actions`ï¼ˆæ¶ˆæ¯æ“ä½œï¼‰ã€`commands`ï¼ˆåŽŸç”Ÿå‘½ä»¤è¡Œä¸ºï¼‰
 
-5. 在插件中注册渠道
+5. åœ¨æ’ä»¶ä¸­æ³¨å†Œæ¸ é“
 
 - `api.registerChannel({ plugin })`
 
-最小配置示例：
+æœ€å°é…ç½®ç¤ºä¾‹ï¼š
 
 ```json5
 {
@@ -448,7 +448,7 @@ export default function (api) {
 }
 ```
 
-最小渠道插件（仅出站）：
+æœ€å°æ¸ é“æ’ä»¶ï¼ˆä»…å‡ºç«™ï¼‰ï¼š
 
 ```ts
 const plugin = {
@@ -483,13 +483,13 @@ export default function (api) {
 }
 ```
 
-加载插件（扩展目录或 `plugins.load.paths`），重启 Gateway 网关，然后在配置中配置 `channels.<id>`。
+åŠ è½½æ’ä»¶ï¼ˆæ‰©å±•ç›®å½•æˆ– `plugins.load.paths`ï¼‰ï¼Œé‡å¯ Gateway ç½‘å…³ï¼Œç„¶åŽåœ¨é…ç½®ä¸­é…ç½® `channels.<id>`ã€‚
 
-### 智能体工具
+### æ™ºèƒ½ä½“å·¥å…·
 
-参见专门指南：[插件智能体工具](/plugins/agent-tools)。
+å‚è§ä¸“é—¨æŒ‡å—ï¼š[æ’ä»¶æ™ºèƒ½ä½“å·¥å…·](/plugins/agent-tools)ã€‚
 
-### 注册 Gateway 网关 RPC 方法
+### æ³¨å†Œ Gateway ç½‘å…³ RPC æ–¹æ³•
 
 ```ts
 export default function (api) {
@@ -499,7 +499,7 @@ export default function (api) {
 }
 ```
 
-### 注册 CLI 命令
+### æ³¨å†Œ CLI å‘½ä»¤
 
 ```ts
 export default function (api) {
@@ -514,9 +514,9 @@ export default function (api) {
 }
 ```
 
-### 注册自动回复命令
+### æ³¨å†Œè‡ªåŠ¨å›žå¤å‘½ä»¤
 
-插件可以注册自定义斜杠命令，**无需调用 AI 智能体**即可执行。这对于切换命令、状态检查或不需要 LLM 处理的快速操作很有用。
+æ’ä»¶å¯ä»¥æ³¨å†Œè‡ªå®šä¹‰æ–œæ å‘½ä»¤ï¼Œ**æ— éœ€è°ƒç”¨ AI æ™ºèƒ½ä½“**å³å¯æ‰§è¡Œã€‚è¿™å¯¹äºŽåˆ‡æ¢å‘½ä»¤ã€çŠ¶æ€æ£€æŸ¥æˆ–ä¸éœ€è¦ LLM å¤„ç†çš„å¿«é€Ÿæ“ä½œå¾ˆæœ‰ç”¨ã€‚
 
 ```ts
 export default function (api) {
@@ -530,24 +530,24 @@ export default function (api) {
 }
 ```
 
-命令处理程序上下文：
+å‘½ä»¤å¤„ç†ç¨‹åºä¸Šä¸‹æ–‡ï¼š
 
-- `senderId`：发送者的 ID（如可用）
-- `channel`：发送命令的渠道
-- `isAuthorizedSender`：发送者是否是授权用户
-- `args`：命令后传递的参数（如果 `acceptsArgs: true`）
-- `commandBody`：完整的命令文本
-- `config`：当前 OpenKrab 配置
+- `senderId`ï¼šå‘é€è€…çš„ IDï¼ˆå¦‚å¯ç”¨ï¼‰
+- `channel`ï¼šå‘é€å‘½ä»¤çš„æ¸ é“
+- `isAuthorizedSender`ï¼šå‘é€è€…æ˜¯å¦æ˜¯æŽˆæƒç”¨æˆ·
+- `args`ï¼šå‘½ä»¤åŽä¼ é€’çš„å‚æ•°ï¼ˆå¦‚æžœ `acceptsArgs: true`ï¼‰
+- `commandBody`ï¼šå®Œæ•´çš„å‘½ä»¤æ–‡æœ¬
+- `config`ï¼šå½“å‰ OpenKrab é…ç½®
 
-命令选项：
+å‘½ä»¤é€‰é¡¹ï¼š
 
-- `name`：命令名称（不带前导 `/`）
-- `description`：命令列表中显示的帮助文本
-- `acceptsArgs`：命令是否接受参数（默认：false）。如果为 false 且提供了参数，命令不会匹配，消息会传递给其他处理程序
-- `requireAuth`：是否需要授权发送者（默认：true）
-- `handler`：返回 `{ text: string }` 的函数（可以是异步的）
+- `name`ï¼šå‘½ä»¤åç§°ï¼ˆä¸å¸¦å‰å¯¼ `/`ï¼‰
+- `description`ï¼šå‘½ä»¤åˆ—è¡¨ä¸­æ˜¾ç¤ºçš„å¸®åŠ©æ–‡æœ¬
+- `acceptsArgs`ï¼šå‘½ä»¤æ˜¯å¦æŽ¥å—å‚æ•°ï¼ˆé»˜è®¤ï¼šfalseï¼‰ã€‚å¦‚æžœä¸º false ä¸”æä¾›äº†å‚æ•°ï¼Œå‘½ä»¤ä¸ä¼šåŒ¹é…ï¼Œæ¶ˆæ¯ä¼šä¼ é€’ç»™å…¶ä»–å¤„ç†ç¨‹åº
+- `requireAuth`ï¼šæ˜¯å¦éœ€è¦æŽˆæƒå‘é€è€…ï¼ˆé»˜è®¤ï¼štrueï¼‰
+- `handler`ï¼šè¿”å›ž `{ text: string }` çš„å‡½æ•°ï¼ˆå¯ä»¥æ˜¯å¼‚æ­¥çš„ï¼‰
 
-带授权和参数的示例：
+å¸¦æŽˆæƒå’Œå‚æ•°çš„ç¤ºä¾‹ï¼š
 
 ```ts
 api.registerCommand({
@@ -563,16 +563,16 @@ api.registerCommand({
 });
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 插件命令在内置命令和 AI 智能体**之前**处理
-- 命令全局注册，适用于所有渠道
-- 命令名称不区分大小写（`/MyStatus` 匹配 `/mystatus`）
-- 命令名称必须以字母开头，只能包含字母、数字、连字符和下划线
-- 保留的命令名称（如 `help`、`status`、`reset` 等）不能被插件覆盖
-- 跨插件的重复命令注册将失败并显示诊断错误
+- æ’ä»¶å‘½ä»¤åœ¨å†…ç½®å‘½ä»¤å’Œ AI æ™ºèƒ½ä½“**ä¹‹å‰**å¤„ç†
+- å‘½ä»¤å…¨å±€æ³¨å†Œï¼Œé€‚ç”¨äºŽæ‰€æœ‰æ¸ é“
+- å‘½ä»¤åç§°ä¸åŒºåˆ†å¤§å°å†™ï¼ˆ`/MyStatus` åŒ¹é… `/mystatus`ï¼‰
+- å‘½ä»¤åç§°å¿…é¡»ä»¥å­—æ¯å¼€å¤´ï¼Œåªèƒ½åŒ…å«å­—æ¯ã€æ•°å­—ã€è¿žå­—ç¬¦å’Œä¸‹åˆ’çº¿
+- ä¿ç•™çš„å‘½ä»¤åç§°ï¼ˆå¦‚ `help`ã€`status`ã€`reset` ç­‰ï¼‰ä¸èƒ½è¢«æ’ä»¶è¦†ç›–
+- è·¨æ’ä»¶çš„é‡å¤å‘½ä»¤æ³¨å†Œå°†å¤±è´¥å¹¶æ˜¾ç¤ºè¯Šæ–­é”™è¯¯
 
-### 注册后台服务
+### æ³¨å†ŒåŽå°æœåŠ¡
 
 ```ts
 export default function (api) {
@@ -584,57 +584,58 @@ export default function (api) {
 }
 ```
 
-## 命名约定
+## å‘½åçº¦å®š
 
-- Gateway 网关方法：`pluginId.action`（例如：`voicecall.status`）
-- 工具：`snake_case`（例如：`voice_call`）
-- CLI 命令：kebab 或 camel，但避免与核心命令冲突
+- Gateway ç½‘å…³æ–¹æ³•ï¼š`pluginId.action`ï¼ˆä¾‹å¦‚ï¼š`voicecall.status`ï¼‰
+- å·¥å…·ï¼š`snake_case`ï¼ˆä¾‹å¦‚ï¼š`voice_call`ï¼‰
+- CLI å‘½ä»¤ï¼škebab æˆ– camelï¼Œä½†é¿å…ä¸Žæ ¸å¿ƒå‘½ä»¤å†²çª
 
 ## Skills
 
-插件可以在仓库中附带 Skills（`skills/<name>/SKILL.md`）。
-使用 `plugins.entries.<id>.enabled`（或其他配置门控）启用它，并确保它存在于你的工作区/托管 Skills 位置。
+æ’ä»¶å¯ä»¥åœ¨ä»“åº“ä¸­é™„å¸¦ Skillsï¼ˆ`skills/<name>/SKILL.md`ï¼‰ã€‚
+ä½¿ç”¨ `plugins.entries.<id>.enabled`ï¼ˆæˆ–å…¶ä»–é…ç½®é—¨æŽ§ï¼‰å¯ç”¨å®ƒï¼Œå¹¶ç¡®ä¿å®ƒå­˜åœ¨äºŽä½ çš„å·¥ä½œåŒº/æ‰˜ç®¡ Skills ä½ç½®ã€‚
 
-## 分发（npm）
+## åˆ†å‘ï¼ˆnpmï¼‰
 
-推荐的打包方式：
+æŽ¨èçš„æ‰“åŒ…æ–¹å¼ï¼š
 
-- 主包：`OpenKrab`（本仓库）
-- 插件：`@OpenKrab/*` 下的独立 npm 包（例如：`@OpenKrab/voice-call`）
+- ä¸»åŒ…ï¼š`OpenKrab`ï¼ˆæœ¬ä»“åº“ï¼‰
+- æ’ä»¶ï¼š`@OpenKrab/*` ä¸‹çš„ç‹¬ç«‹ npm åŒ…ï¼ˆä¾‹å¦‚ï¼š`@OpenKrab/voice-call`ï¼‰
 
-发布契约：
+å‘å¸ƒå¥‘çº¦ï¼š
 
-- 插件 `package.json` 必须包含带有一个或多个入口文件的 `OpenKrab.extensions`。
-- 入口文件可以是 `.js` 或 `.ts`（jiti 在运行时加载 TS）。
-- `OpenKrab plugins install <npm-spec>` 使用 `npm pack`，提取到 `~/.OpenKrab/extensions/<id>/`，并在配置中启用它。
-- 配置键稳定性：作用域包被规范化为 `plugins.entries.*` 的**无作用域** id。
+- æ’ä»¶ `package.json` å¿…é¡»åŒ…å«å¸¦æœ‰ä¸€ä¸ªæˆ–å¤šä¸ªå…¥å£æ–‡ä»¶çš„ `OpenKrab.extensions`ã€‚
+- å…¥å£æ–‡ä»¶å¯ä»¥æ˜¯ `.js` æˆ– `.ts`ï¼ˆjiti åœ¨è¿è¡Œæ—¶åŠ è½½ TSï¼‰ã€‚
+- `OpenKrab plugins install <npm-spec>` ä½¿ç”¨ `npm pack`ï¼Œæå–åˆ° `~/.OpenKrab/extensions/<id>/`ï¼Œå¹¶åœ¨é…ç½®ä¸­å¯ç”¨å®ƒã€‚
+- é…ç½®é”®ç¨³å®šæ€§ï¼šä½œç”¨åŸŸåŒ…è¢«è§„èŒƒåŒ–ä¸º `plugins.entries.*` çš„**æ— ä½œç”¨åŸŸ** idã€‚
 
-## 示例插件：Voice Call
+## ç¤ºä¾‹æ’ä»¶ï¼šVoice Call
 
-本仓库包含一个语音通话插件（Twilio 或 log 回退）：
+æœ¬ä»“åº“åŒ…å«ä¸€ä¸ªè¯­éŸ³é€šè¯æ’ä»¶ï¼ˆTwilio æˆ– log å›žé€€ï¼‰ï¼š
 
-- 源码：`extensions/voice-call`
-- Skills：`skills/voice-call`
-- CLI：`OpenKrab voicecall start|status`
-- 工具：`voice_call`
-- RPC：`voicecall.start`、`voicecall.status`
-- 配置（twilio）：`provider: "twilio"` + `twilio.accountSid/authToken/from`（可选 `statusCallbackUrl`、`twimlUrl`）
-- 配置（dev）：`provider: "log"`（无网络）
+- æºç ï¼š`extensions/voice-call`
+- Skillsï¼š`skills/voice-call`
+- CLIï¼š`OpenKrab voicecall start|status`
+- å·¥å…·ï¼š`voice_call`
+- RPCï¼š`voicecall.start`ã€`voicecall.status`
+- é…ç½®ï¼ˆtwilioï¼‰ï¼š`provider: "twilio"` + `twilio.accountSid/authToken/from`ï¼ˆå¯é€‰ `statusCallbackUrl`ã€`twimlUrl`ï¼‰
+- é…ç½®ï¼ˆdevï¼‰ï¼š`provider: "log"`ï¼ˆæ— ç½‘ç»œï¼‰
 
-参见 [Voice Call](/plugins/voice-call) 和 `extensions/voice-call/README.md` 了解设置和用法。
+å‚è§ [Voice Call](/plugins/voice-call) å’Œ `extensions/voice-call/README.md` äº†è§£è®¾ç½®å’Œç”¨æ³•ã€‚
 
-## 安全注意事项
+## å®‰å…¨æ³¨æ„äº‹é¡¹
 
-插件与 Gateway 网关在同一进程中运行。将它们视为受信任的代码：
+æ’ä»¶ä¸Ž Gateway ç½‘å…³åœ¨åŒä¸€è¿›ç¨‹ä¸­è¿è¡Œã€‚å°†å®ƒä»¬è§†ä¸ºå—ä¿¡ä»»çš„ä»£ç ï¼š
 
-- 只安装你信任的插件。
-- 优先使用 `plugins.allow` 允许列表。
-- 更改后重启 Gateway 网关。
+- åªå®‰è£…ä½ ä¿¡ä»»çš„æ’ä»¶ã€‚
+- ä¼˜å…ˆä½¿ç”¨ `plugins.allow` å…è®¸åˆ—è¡¨ã€‚
+- æ›´æ”¹åŽé‡å¯ Gateway ç½‘å…³ã€‚
 
-## 测试插件
+## æµ‹è¯•æ’ä»¶
 
-插件可以（也应该）附带测试：
+æ’ä»¶å¯ä»¥ï¼ˆä¹Ÿåº”è¯¥ï¼‰é™„å¸¦æµ‹è¯•ï¼š
 
-- 仓库内插件可以在 `src/**` 下保留 Vitest 测试（例如：`src/plugins/voice-call.plugin.test.ts`）。
-- 单独发布的插件应运行自己的 CI（lint/构建/测试）并验证 `OpenKrab.extensions` 指向构建的入口点（`dist/index.js`）。
+- ä»“åº“å†…æ’ä»¶å¯ä»¥åœ¨ `src/**` ä¸‹ä¿ç•™ Vitest æµ‹è¯•ï¼ˆä¾‹å¦‚ï¼š`src/plugins/voice-call.plugin.test.ts`ï¼‰ã€‚
+- å•ç‹¬å‘å¸ƒçš„æ’ä»¶åº”è¿è¡Œè‡ªå·±çš„ CIï¼ˆlint/æž„å»º/æµ‹è¯•ï¼‰å¹¶éªŒè¯ `OpenKrab.extensions` æŒ‡å‘æž„å»ºçš„å…¥å£ç‚¹ï¼ˆ`dist/index.js`ï¼‰ã€‚
+
 

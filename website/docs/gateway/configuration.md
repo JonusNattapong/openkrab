@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Configuration overview: common tasks, quick setup, and links to the full reference"
 read_when:
   - Setting up OpenKrab for the first time
@@ -9,7 +9,7 @@ title: "Configuration"
 
 # Configuration
 
-OpenKrab reads an optional **TOML** config from `~/.config/krabkrab/config.toml`.
+OpenKrab reads an optional **TOML** config from `~/.config/openkrab/config.toml`.
 
 If the file is missing, OpenKrab uses safe defaults. Common reasons to add a config:
 
@@ -26,7 +26,7 @@ See the [full reference](/gateway/configuration-reference) for every available f
 ## Minimal config
 
 ```toml
-# ~/.config/krabkrab/config.toml
+# ~/.config/openkrab/config.toml
 [channels.telegram]
 enabled = true
 bot_token = "123:abc"
@@ -42,13 +42,13 @@ model = "gpt-4o"
 <Tabs>
   <Tab title="CLI (one-liners)">
     ```bash
-    krabkrab config get providers.openai.api_key
-    krabkrab config set providers.openai.model "gpt-4o"
-    krabkrab config unset providers.openai.api_key
+    OpenKrab config get providers.openai.api_key
+    OpenKrab config set providers.openai.model "gpt-4o"
+    OpenKrab config unset providers.openai.api_key
     ```
   </Tab>
   <Tab title="Direct edit">
-    Edit `~/.config/krabkrab/config.toml` directly. The Gateway watches the file and applies changes automatically (see [hot reload](#config-hot-reload)).
+    Edit `~/.config/openkrab/config.toml` directly. The Gateway watches the file and applies changes automatically (see [hot reload](#config-hot-reload)).
   </Tab>
 </Tabs>
 
@@ -61,8 +61,8 @@ OpenKrab only accepts configurations that fully match the schema. Unknown keys, 
 When validation fails:
 
 - The Gateway does not boot
-- Only diagnostic commands work (`krabkrab doctor`, `krabkrab status`)
-- Run `krabkrab doctor` to see exact issues
+- Only diagnostic commands work (`openkrab doctor`, `openkrab status`)
+- Run `openkrab doctor` to see exact issues
 
 ## Common tasks
 
@@ -70,12 +70,12 @@ When validation fails:
   <Accordion title="Set up a channel (Telegram, Discord, Slack, etc.)">
     Each channel has its own config section under `channels.<provider>`. See the dedicated channel page for setup steps:
 
-    - [Telegram](/channels/telegram) — `channels.telegram`
-    - [Discord](/channels/discord) — `channels.discord`
-    - [Slack](/channels/slack) — `channels.slack`
-    - [WhatsApp](/channels/whatsapp) — `channels.whatsapp`
-    - [Signal](/channels/signal) — `channels.signal`
-    - [iMessage](/channels/imessage) — `channels.imessage`
+    - [Telegram](/channels/telegram) â€” `channels.telegram`
+    - [Discord](/channels/discord) â€” `channels.discord`
+    - [Slack](/channels/slack) â€” `channels.slack`
+    - [WhatsApp](/channels/whatsapp) â€” `channels.whatsapp`
+    - [Signal](/channels/signal) â€” `channels.signal`
+    - [iMessage](/channels/imessage) â€” `channels.imessage`
 
     All channels share the same DM policy pattern:
 
@@ -128,7 +128,10 @@ The Gateway watches `config.toml` and reloads most settings without a restart. C
 Override config values with environment variables:
 
 ```bash
-KRABKRAB_PROVIDERS__OPENAI__API_KEY="sk-..." krabkrab gateway
+OPENKRAB_PROVIDERS__OPENAI__API_KEY="sk-..." OpenKrab gateway
 ```
 
 See [Environment vars](/help/environment) for full details.
+
+
+

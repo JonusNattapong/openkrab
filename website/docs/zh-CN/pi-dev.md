@@ -1,5 +1,5 @@
----
-title: Pi 开发工作流程
+﻿---
+title: Pi å¼€å‘å·¥ä½œæµç¨‹
 x-i18n:
   generated_at: "2026-02-03T10:07:59Z"
   model: claude-opus-4-5
@@ -9,32 +9,32 @@ x-i18n:
   workflow: 15
 ---
 
-# Pi 开发工作流程
+# Pi å¼€å‘å·¥ä½œæµç¨‹
 
-本指南总结了在 OpenKrab 中开发 Pi 集成的合理工作流程。
+æœ¬æŒ‡å—æ€»ç»“äº†åœ¨ OpenKrab ä¸­å¼€å‘ Pi é›†æˆçš„åˆç†å·¥ä½œæµç¨‹ã€‚
 
-## 类型检查和代码检查
+## ç±»åž‹æ£€æŸ¥å’Œä»£ç æ£€æŸ¥
 
-- 类型检查和构建：`pnpm build`
-- 代码检查：`pnpm lint`
-- 格式检查：`pnpm format`
-- 推送前完整检查：`pnpm lint && pnpm build && pnpm test`
+- ç±»åž‹æ£€æŸ¥å’Œæž„å»ºï¼š`pnpm build`
+- ä»£ç æ£€æŸ¥ï¼š`pnpm lint`
+- æ ¼å¼æ£€æŸ¥ï¼š`pnpm format`
+- æŽ¨é€å‰å®Œæ•´æ£€æŸ¥ï¼š`pnpm lint && pnpm build && pnpm test`
 
-## 运行 Pi 测试
+## è¿è¡Œ Pi æµ‹è¯•
 
-使用专用脚本运行 Pi 集成测试集：
+ä½¿ç”¨ä¸“ç”¨è„šæœ¬è¿è¡Œ Pi é›†æˆæµ‹è¯•é›†ï¼š
 
 ```bash
 scripts/pi/run-tests.sh
 ```
 
-要包含执行真实提供商行为的实时测试：
+è¦åŒ…å«æ‰§è¡ŒçœŸå®žæä¾›å•†è¡Œä¸ºçš„å®žæ—¶æµ‹è¯•ï¼š
 
 ```bash
 scripts/pi/run-tests.sh --live
 ```
 
-该脚本通过以下 glob 模式运行所有 Pi 相关的单元测试：
+è¯¥è„šæœ¬é€šè¿‡ä»¥ä¸‹ glob æ¨¡å¼è¿è¡Œæ‰€æœ‰ Pi ç›¸å…³çš„å•å…ƒæµ‹è¯•ï¼š
 
 - `src/agents/pi-*.test.ts`
 - `src/agents/pi-embedded-*.test.ts`
@@ -43,36 +43,37 @@ scripts/pi/run-tests.sh --live
 - `src/agents/pi-tool-definition-adapter.test.ts`
 - `src/agents/pi-extensions/*.test.ts`
 
-## 手动测试
+## æ‰‹åŠ¨æµ‹è¯•
 
-推荐流程：
+æŽ¨èæµç¨‹ï¼š
 
-- 以开发模式运行 Gateway 网关：
+- ä»¥å¼€å‘æ¨¡å¼è¿è¡Œ Gateway ç½‘å…³ï¼š
   - `pnpm gateway:dev`
-- 直接触发智能体：
+- ç›´æŽ¥è§¦å‘æ™ºèƒ½ä½“ï¼š
   - `pnpm OpenKrab agent --message "Hello" --thinking low`
-- 使用 TUI 进行交互式调试：
+- ä½¿ç”¨ TUI è¿›è¡Œäº¤äº’å¼è°ƒè¯•ï¼š
   - `pnpm tui`
 
-对于工具调用行为，提示执行 `read` 或 `exec` 操作，以便查看工具流式传输和负载处理。
+å¯¹äºŽå·¥å…·è°ƒç”¨è¡Œä¸ºï¼Œæç¤ºæ‰§è¡Œ `read` æˆ– `exec` æ“ä½œï¼Œä»¥ä¾¿æŸ¥çœ‹å·¥å…·æµå¼ä¼ è¾“å’Œè´Ÿè½½å¤„ç†ã€‚
 
-## 完全重置
+## å®Œå…¨é‡ç½®
 
-状态存储在 OpenKrab 状态目录下。默认为 `~/.OpenKrab`。如果设置了 `OpenKrab_STATE_DIR`，则使用该目录。
+çŠ¶æ€å­˜å‚¨åœ¨ OpenKrab çŠ¶æ€ç›®å½•ä¸‹ã€‚é»˜è®¤ä¸º `~/.OpenKrab`ã€‚å¦‚æžœè®¾ç½®äº† `OPENKRAB_STATE_DIR`ï¼Œåˆ™ä½¿ç”¨è¯¥ç›®å½•ã€‚
 
-要重置所有内容：
+è¦é‡ç½®æ‰€æœ‰å†…å®¹ï¼š
 
-- `OpenKrab.json` 用于配置
-- `credentials/` 用于认证配置文件和 token
-- `agents/<agentId>/sessions/` 用于智能体会话历史
-- `agents/<agentId>/sessions.json` 用于会话索引
-- `sessions/` 如果存在旧版路径
-- `workspace/` 如果你想要一个空白工作区
+- `OpenKrab.json` ç”¨äºŽé…ç½®
+- `credentials/` ç”¨äºŽè®¤è¯é…ç½®æ–‡ä»¶å’Œ token
+- `agents/<agentId>/sessions/` ç”¨äºŽæ™ºèƒ½ä½“ä¼šè¯åŽ†å²
+- `agents/<agentId>/sessions.json` ç”¨äºŽä¼šè¯ç´¢å¼•
+- `sessions/` å¦‚æžœå­˜åœ¨æ—§ç‰ˆè·¯å¾„
+- `workspace/` å¦‚æžœä½ æƒ³è¦ä¸€ä¸ªç©ºç™½å·¥ä½œåŒº
 
-如果只想重置会话，删除该智能体的 `agents/<agentId>/sessions/` 和 `agents/<agentId>/sessions.json`。如果不想重新认证，保留 `credentials/`。
+å¦‚æžœåªæƒ³é‡ç½®ä¼šè¯ï¼Œåˆ é™¤è¯¥æ™ºèƒ½ä½“çš„ `agents/<agentId>/sessions/` å’Œ `agents/<agentId>/sessions.json`ã€‚å¦‚æžœä¸æƒ³é‡æ–°è®¤è¯ï¼Œä¿ç•™ `credentials/`ã€‚
 
-## 参考资料
+## å‚è€ƒèµ„æ–™
 
 - https://docs.OpenKrab.ai/testing
 - https://docs.OpenKrab.ai/start/getting-started
+
 

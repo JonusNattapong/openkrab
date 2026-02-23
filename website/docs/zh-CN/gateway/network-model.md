@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 你想要简要了解 Gateway 网关的网络模型
-summary: Gateway 网关、节点和 canvas 主机如何连接。
-title: 网络模型
+  - ä½ æƒ³è¦ç®€è¦äº†è§£ Gateway ç½‘å…³çš„ç½‘ç»œæ¨¡åž‹
+summary: Gateway ç½‘å…³ã€èŠ‚ç‚¹å’Œ canvas ä¸»æœºå¦‚ä½•è¿žæŽ¥ã€‚
+title: ç½‘ç»œæ¨¡åž‹
 x-i18n:
   generated_at: "2026-02-04T17:53:21Z"
   model: claude-opus-4-5
@@ -12,13 +12,14 @@ x-i18n:
   workflow: 15
 ---
 
-大多数操作通过 Gateway 网关（`OpenKrab gateway`）进行，它是一个长期运行的单一进程，负责管理渠道连接和 WebSocket 控制平面。
+å¤§å¤šæ•°æ“ä½œé€šè¿‡ Gateway ç½‘å…³ï¼ˆ`OpenKrab gateway`ï¼‰è¿›è¡Œï¼Œå®ƒæ˜¯ä¸€ä¸ªé•¿æœŸè¿è¡Œçš„å•ä¸€è¿›ç¨‹ï¼Œè´Ÿè´£ç®¡ç†æ¸ é“è¿žæŽ¥å’Œ WebSocket æŽ§åˆ¶å¹³é¢ã€‚
 
-## 核心规则
+## æ ¸å¿ƒè§„åˆ™
 
-- 建议每台主机运行一个 Gateway 网关。它是唯一允许拥有 WhatsApp Web 会话的进程。对于救援机器人或严格隔离的场景，可以使用隔离的配置文件和端口运行多个 Gateway 网关。参见[多 Gateway 网关](/gateway/multiple-gateways)。
-- 优先使用回环地址：Gateway 网关的 WS 默认为 `ws://127.0.0.1:18789`。即使是回环连接，向导也会默认生成 gateway token。若需通过 tailnet 访问，请运行 `OpenKrab gateway --bind tailnet --token ...`，因为非回环绑定必须使用 token。
-- 节点根据需要通过局域网、tailnet 或 SSH 连接到 Gateway 网关的 WS。旧版 TCP 桥接已弃用。
-- Canvas 主机是一个 HTTP 文件服务器，运行在 `canvasHost.port`（默认 `18793`）上，提供 `/__OpenKrab__/canvas/` 路径供节点 WebView 使用。参见 [Gateway 网关配置](/gateway/configuration)（`canvasHost`）。
-- 远程使用通常通过 SSH 隧道或 Tailscale VPN。参见[远程访问](/gateway/remote)和[设备发现](/gateway/discovery)。
+- å»ºè®®æ¯å°ä¸»æœºè¿è¡Œä¸€ä¸ª Gateway ç½‘å…³ã€‚å®ƒæ˜¯å”¯ä¸€å…è®¸æ‹¥æœ‰ WhatsApp Web ä¼šè¯çš„è¿›ç¨‹ã€‚å¯¹äºŽæ•‘æ´æœºå™¨äººæˆ–ä¸¥æ ¼éš”ç¦»çš„åœºæ™¯ï¼Œå¯ä»¥ä½¿ç”¨éš”ç¦»çš„é…ç½®æ–‡ä»¶å’Œç«¯å£è¿è¡Œå¤šä¸ª Gateway ç½‘å…³ã€‚å‚è§[å¤š Gateway ç½‘å…³](/gateway/multiple-gateways)ã€‚
+- ä¼˜å…ˆä½¿ç”¨å›žçŽ¯åœ°å€ï¼šGateway ç½‘å…³çš„ WS é»˜è®¤ä¸º `ws://127.0.0.1:18789`ã€‚å³ä½¿æ˜¯å›žçŽ¯è¿žæŽ¥ï¼Œå‘å¯¼ä¹Ÿä¼šé»˜è®¤ç”Ÿæˆ gateway tokenã€‚è‹¥éœ€é€šè¿‡ tailnet è®¿é—®ï¼Œè¯·è¿è¡Œ `OpenKrab gateway --bind tailnet --token ...`ï¼Œå› ä¸ºéžå›žçŽ¯ç»‘å®šå¿…é¡»ä½¿ç”¨ tokenã€‚
+- èŠ‚ç‚¹æ ¹æ®éœ€è¦é€šè¿‡å±€åŸŸç½‘ã€tailnet æˆ– SSH è¿žæŽ¥åˆ° Gateway ç½‘å…³çš„ WSã€‚æ—§ç‰ˆ TCP æ¡¥æŽ¥å·²å¼ƒç”¨ã€‚
+- Canvas ä¸»æœºæ˜¯ä¸€ä¸ª HTTP æ–‡ä»¶æœåŠ¡å™¨ï¼Œè¿è¡Œåœ¨ `canvasHost.port`ï¼ˆé»˜è®¤ `18793`ï¼‰ä¸Šï¼Œæä¾› `/__OPENKRAB__/canvas/` è·¯å¾„ä¾›èŠ‚ç‚¹ WebView ä½¿ç”¨ã€‚å‚è§ [Gateway ç½‘å…³é…ç½®](/gateway/configuration)ï¼ˆ`canvasHost`ï¼‰ã€‚
+- è¿œç¨‹ä½¿ç”¨é€šå¸¸é€šè¿‡ SSH éš§é“æˆ– Tailscale VPNã€‚å‚è§[è¿œç¨‹è®¿é—®](/gateway/remote)å’Œ[è®¾å¤‡å‘çŽ°](/gateway/discovery)ã€‚
+
 

@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab node` (headless node host)"
 read_when:
   - Running the headless node host
@@ -22,7 +22,7 @@ Common use cases:
 - Keep exec **sandboxed** on the gateway, but delegate approved runs to other hosts.
 - Provide a lightweight, headless execution target for automation or CI nodes.
 
-Execution is still guarded by **exec approvals** and per‑agent allowlists on the
+Execution is still guarded by **exec approvals** and perâ€‘agent allowlists on the
 node host, so you can keep command access scoped and explicit.
 
 ## Browser proxy (zero-config)
@@ -45,8 +45,7 @@ Disable it on the node if needed:
 
 ## Run (foreground)
 
-```bash
-openkrab node run --host <gateway-host> --port 18789
+```bash\nOpenKrab node run --host <gateway-host> --port 18789
 ```
 
 Options:
@@ -62,8 +61,7 @@ Options:
 
 Install a headless node host as a user service.
 
-```bash
-openkrab node install --host <gateway-host> --port 18789
+```bash\nOpenKrab node install --host <gateway-host> --port 18789
 ```
 
 Options:
@@ -79,11 +77,7 @@ Options:
 
 Manage the service:
 
-```bash
-openkrab node status
-openkrab node stop
-openkrab node restart
-openkrab node uninstall
+```bash\nOpenKrab node status\nOpenKrab node stop\nOpenKrab node restart\nOpenKrab node uninstall
 ```
 
 Use `openkrab node run` for a foreground node host (no service).
@@ -95,9 +89,7 @@ Service commands accept `--json` for machine-readable output.
 The first connection creates a pending node pair request on the Gateway.
 Approve it via:
 
-```bash
-openkrab nodes pending
-openkrab nodes approve <requestId>
+```bash\nOpenKrab nodes pending\nOpenKrab nodes approve <requestId>
 ```
 
 The node host stores its node id, token, display name, and gateway connection info in
@@ -110,3 +102,4 @@ The node host stores its node id, token, display name, and gateway connection in
 - `~/.openkrab/exec-approvals.json`
 - [Exec approvals](/tools/exec-approvals)
 - `openkrab approvals --node <id|name|ip>` (edit from the Gateway)
+

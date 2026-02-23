@@ -1,8 +1,8 @@
----
+﻿---
 read_when:
-  - 你想更改默认模型或查看提供商认证状态
-  - 你想扫描可用的模型/提供商并调试认证配置
-summary: "`OpenKrab models` 的 CLI 参考（status/list/set/scan、别名、回退、认证）"
+  - ä½ æƒ³æ›´æ”¹é»˜è®¤æ¨¡åž‹æˆ–æŸ¥çœ‹æä¾›å•†è®¤è¯çŠ¶æ€
+  - ä½ æƒ³æ‰«æå¯ç”¨çš„æ¨¡åž‹/æä¾›å•†å¹¶è°ƒè¯•è®¤è¯é…ç½®
+summary: "`OpenKrab models` çš„ CLI å‚è€ƒï¼ˆstatus/list/set/scanã€åˆ«åã€å›žé€€ã€è®¤è¯ï¼‰"
 title: models
 x-i18n:
   generated_at: "2026-02-01T20:21:16Z"
@@ -15,14 +15,14 @@ x-i18n:
 
 # `OpenKrab models`
 
-模型发现、扫描和配置（默认模型、回退、认证配置）。
+æ¨¡åž‹å‘çŽ°ã€æ‰«æå’Œé…ç½®ï¼ˆé»˜è®¤æ¨¡åž‹ã€å›žé€€ã€è®¤è¯é…ç½®ï¼‰ã€‚
 
-相关内容：
+ç›¸å…³å†…å®¹ï¼š
 
-- 提供商 + 模型：[模型](/providers/models)
-- 提供商认证设置：[快速开始](/start/getting-started)
+- æä¾›å•† + æ¨¡åž‹ï¼š[æ¨¡åž‹](/providers/models)
+- æä¾›å•†è®¤è¯è®¾ç½®ï¼š[å¿«é€Ÿå¼€å§‹](/start/getting-started)
 
-## 常用命令
+## å¸¸ç”¨å‘½ä»¤
 
 ```bash
 OpenKrab models status
@@ -31,43 +31,43 @@ OpenKrab models set <model-or-alias>
 OpenKrab models scan
 ```
 
-`OpenKrab models status` 显示已解析的默认模型/回退配置以及认证概览。
-当提供商使用快照可用时，OAuth/令牌状态部分会包含提供商使用头信息。
-添加 `--probe` 可对每个已配置的提供商配置运行实时认证探测。
-探测会发送真实请求（可能消耗令牌并触发速率限制）。
-使用 `--agent <id>` 可检查已配置智能体的模型/认证状态。省略时，
-命令会使用 `OpenKrab_AGENT_DIR`/`PI_CODING_AGENT_DIR`（如已设置），否则使用
-已配置的默认智能体。
+`OpenKrab models status` æ˜¾ç¤ºå·²è§£æžçš„é»˜è®¤æ¨¡åž‹/å›žé€€é…ç½®ä»¥åŠè®¤è¯æ¦‚è§ˆã€‚
+å½“æä¾›å•†ä½¿ç”¨å¿«ç…§å¯ç”¨æ—¶ï¼ŒOAuth/ä»¤ç‰ŒçŠ¶æ€éƒ¨åˆ†ä¼šåŒ…å«æä¾›å•†ä½¿ç”¨å¤´ä¿¡æ¯ã€‚
+æ·»åŠ  `--probe` å¯å¯¹æ¯ä¸ªå·²é…ç½®çš„æä¾›å•†é…ç½®è¿è¡Œå®žæ—¶è®¤è¯æŽ¢æµ‹ã€‚
+æŽ¢æµ‹ä¼šå‘é€çœŸå®žè¯·æ±‚ï¼ˆå¯èƒ½æ¶ˆè€—ä»¤ç‰Œå¹¶è§¦å‘é€ŸçŽ‡é™åˆ¶ï¼‰ã€‚
+ä½¿ç”¨ `--agent <id>` å¯æ£€æŸ¥å·²é…ç½®æ™ºèƒ½ä½“çš„æ¨¡åž‹/è®¤è¯çŠ¶æ€ã€‚çœç•¥æ—¶ï¼Œ
+å‘½ä»¤ä¼šä½¿ç”¨ `OPENKRAB_AGENT_DIR`/`PI_CODING_AGENT_DIR`ï¼ˆå¦‚å·²è®¾ç½®ï¼‰ï¼Œå¦åˆ™ä½¿ç”¨
+å·²é…ç½®çš„é»˜è®¤æ™ºèƒ½ä½“ã€‚
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `models set <model-or-alias>` 接受 `provider/model` 或别名。
-- 模型引用通过在**第一个** `/` 处拆分来解析。如果模型 ID 包含 `/`（OpenRouter 风格），需包含提供商前缀（示例：`openrouter/moonshotai/kimi-k2`）。
-- 如果省略提供商，OpenKrab 会将输入视为别名或**默认提供商**的模型（仅在模型 ID 不包含 `/` 时有效）。
+- `models set <model-or-alias>` æŽ¥å— `provider/model` æˆ–åˆ«åã€‚
+- æ¨¡åž‹å¼•ç”¨é€šè¿‡åœ¨**ç¬¬ä¸€ä¸ª** `/` å¤„æ‹†åˆ†æ¥è§£æžã€‚å¦‚æžœæ¨¡åž‹ ID åŒ…å« `/`ï¼ˆOpenRouter é£Žæ ¼ï¼‰ï¼Œéœ€åŒ…å«æä¾›å•†å‰ç¼€ï¼ˆç¤ºä¾‹ï¼š`openrouter/moonshotai/kimi-k2`ï¼‰ã€‚
+- å¦‚æžœçœç•¥æä¾›å•†ï¼ŒOpenKrab ä¼šå°†è¾“å…¥è§†ä¸ºåˆ«åæˆ–**é»˜è®¤æä¾›å•†**çš„æ¨¡åž‹ï¼ˆä»…åœ¨æ¨¡åž‹ ID ä¸åŒ…å« `/` æ—¶æœ‰æ•ˆï¼‰ã€‚
 
 ### `models status`
 
-选项：
+é€‰é¡¹ï¼š
 
 - `--json`
 - `--plain`
-- `--check`（退出码 1=已过期/缺失，2=即将过期）
-- `--probe`（对已配置的认证配置进行实时探测）
-- `--probe-provider <name>`（探测单个提供商）
-- `--probe-profile <id>`（可重复或逗号分隔的配置 ID）
+- `--check`ï¼ˆé€€å‡ºç  1=å·²è¿‡æœŸ/ç¼ºå¤±ï¼Œ2=å³å°†è¿‡æœŸï¼‰
+- `--probe`ï¼ˆå¯¹å·²é…ç½®çš„è®¤è¯é…ç½®è¿›è¡Œå®žæ—¶æŽ¢æµ‹ï¼‰
+- `--probe-provider <name>`ï¼ˆæŽ¢æµ‹å•ä¸ªæä¾›å•†ï¼‰
+- `--probe-profile <id>`ï¼ˆå¯é‡å¤æˆ–é€—å·åˆ†éš”çš„é…ç½® IDï¼‰
 - `--probe-timeout <ms>`
 - `--probe-concurrency <n>`
 - `--probe-max-tokens <n>`
-- `--agent <id>`（已配置的智能体 ID；覆盖 `OpenKrab_AGENT_DIR`/`PI_CODING_AGENT_DIR`）
+- `--agent <id>`ï¼ˆå·²é…ç½®çš„æ™ºèƒ½ä½“ IDï¼›è¦†ç›– `OPENKRAB_AGENT_DIR`/`PI_CODING_AGENT_DIR`ï¼‰
 
-## 别名 + 回退
+## åˆ«å + å›žé€€
 
 ```bash
 OpenKrab models aliases list
 OpenKrab models fallbacks list
 ```
 
-## 认证配置
+## è®¤è¯é…ç½®
 
 ```bash
 OpenKrab models auth add
@@ -76,11 +76,12 @@ OpenKrab models auth setup-token
 OpenKrab models auth paste-token
 ```
 
-`models auth login` 运行提供商插件的认证流程（OAuth/API 密钥）。使用
-`OpenKrab plugins list` 查看已安装的提供商。
+`models auth login` è¿è¡Œæä¾›å•†æ’ä»¶çš„è®¤è¯æµç¨‹ï¼ˆOAuth/API å¯†é’¥ï¼‰ã€‚ä½¿ç”¨
+`OpenKrab plugins list` æŸ¥çœ‹å·²å®‰è£…çš„æä¾›å•†ã€‚
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `setup-token` 会提示输入 setup-token 值（在任意机器上使用 `claude setup-token` 生成）。
-- `paste-token` 接受在其他地方或通过自动化生成的令牌字符串。
+- `setup-token` ä¼šæç¤ºè¾“å…¥ setup-token å€¼ï¼ˆåœ¨ä»»æ„æœºå™¨ä¸Šä½¿ç”¨ `claude setup-token` ç”Ÿæˆï¼‰ã€‚
+- `paste-token` æŽ¥å—åœ¨å…¶ä»–åœ°æ–¹æˆ–é€šè¿‡è‡ªåŠ¨åŒ–ç”Ÿæˆçš„ä»¤ç‰Œå­—ç¬¦ä¸²ã€‚
+
 

@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 你想在 stable/beta/dev 之间切换
-  - 你正在标记或发布预发布版本
-summary: stable、beta 和 dev 渠道：语义、切换和标签
-title: 开发渠道
+  - ä½ æƒ³åœ¨ stable/beta/dev ä¹‹é—´åˆ‡æ¢
+  - ä½ æ­£åœ¨æ ‡è®°æˆ–å‘å¸ƒé¢„å‘å¸ƒç‰ˆæœ¬
+summary: stableã€beta å’Œ dev æ¸ é“ï¼šè¯­ä¹‰ã€åˆ‡æ¢å’Œæ ‡ç­¾
+title: å¼€å‘æ¸ é“
 x-i18n:
   generated_at: "2026-02-03T10:07:21Z"
   model: claude-opus-4-5
@@ -13,33 +13,22 @@ x-i18n:
   workflow: 15
 ---
 
-# 开发渠道
+# å¼€å‘æ¸ é“
 
-最后更新：2026-01-21
+æœ€åŽæ›´æ–°ï¼š2026-01-21
 
-OpenKrab 提供三个更新渠道：
+OpenKrab æä¾›ä¸‰ä¸ªæ›´æ–°æ¸ é“ï¼š
 
-- **stable**：npm dist-tag `latest`。
-- **beta**：npm dist-tag `beta`（测试中的构建）。
-- **dev**：`main` 的移动头（git）。npm dist-tag：`dev`（发布时）。
+- **stable**ï¼šnpm dist-tag `latest`ã€‚
+- **beta**ï¼šnpm dist-tag `beta`ï¼ˆæµ‹è¯•ä¸­çš„æž„å»ºï¼‰ã€‚
+- **dev**ï¼š`main` çš„ç§»åŠ¨å¤´ï¼ˆgitï¼‰ã€‚npm dist-tagï¼š`dev`ï¼ˆå‘å¸ƒæ—¶ï¼‰ã€‚
 
-我们将构建发布到 **beta**，进行测试，然后**将经过验证的构建提升到 `latest`**，
-版本号不变——dist-tag 是 npm 安装的数据源。
+æˆ‘ä»¬å°†æž„å»ºå‘å¸ƒåˆ° **beta**ï¼Œè¿›è¡Œæµ‹è¯•ï¼Œç„¶åŽ**å°†ç»è¿‡éªŒè¯çš„æž„å»ºæå‡åˆ° `latest`**ï¼Œ
+ç‰ˆæœ¬å·ä¸å˜â€”â€”dist-tag æ˜¯ npm å®‰è£…çš„æ•°æ®æºã€‚
 
-## 切换渠道
+## åˆ‡æ¢æ¸ é“
 
-Git checkout：
-
-```bash
-OpenKrab update --channel stable
-OpenKrab update --channel beta
-OpenKrab update --channel dev
-```
-
-- `stable`/`beta` 检出最新匹配的标签（通常是同一个标签）。
-- `dev` 切换到 `main` 并在上游基础上 rebase。
-
-npm/pnpm 全局安装：
+Git checkoutï¼š
 
 ```bash
 OpenKrab update --channel stable
@@ -47,36 +36,48 @@ OpenKrab update --channel beta
 OpenKrab update --channel dev
 ```
 
-这会通过相应的 npm dist-tag（`latest`、`beta`、`dev`）进行更新。
+- `stable`/`beta` æ£€å‡ºæœ€æ–°åŒ¹é…çš„æ ‡ç­¾ï¼ˆé€šå¸¸æ˜¯åŒä¸€ä¸ªæ ‡ç­¾ï¼‰ã€‚
+- `dev` åˆ‡æ¢åˆ° `main` å¹¶åœ¨ä¸Šæ¸¸åŸºç¡€ä¸Š rebaseã€‚
 
-当你使用 `--channel` **显式**切换渠道时，OpenKrab 还会对齐安装方式：
+npm/pnpm å…¨å±€å®‰è£…ï¼š
 
-- `dev` 确保有一个 git checkout（默认 `~/OpenKrab`，可通过 `OpenKrab_GIT_DIR` 覆盖），
-  更新它，并从该 checkout 安装全局 CLI。
-- `stable`/`beta` 使用匹配的 dist-tag 从 npm 安装。
+```bash
+OpenKrab update --channel stable
+OpenKrab update --channel beta
+OpenKrab update --channel dev
+```
 
-提示：如果你想同时使用 stable + dev，保留两个克隆并将 Gateway 网关指向 stable 那个。
+è¿™ä¼šé€šè¿‡ç›¸åº”çš„ npm dist-tagï¼ˆ`latest`ã€`beta`ã€`dev`ï¼‰è¿›è¡Œæ›´æ–°ã€‚
 
-## 插件和渠道
+å½“ä½ ä½¿ç”¨ `--channel` **æ˜¾å¼**åˆ‡æ¢æ¸ é“æ—¶ï¼ŒOpenKrab è¿˜ä¼šå¯¹é½å®‰è£…æ–¹å¼ï¼š
 
-当你使用 `OpenKrab update` 切换渠道时，OpenKrab 还会同步插件来源：
+- `dev` ç¡®ä¿æœ‰ä¸€ä¸ª git checkoutï¼ˆé»˜è®¤ `~/OpenKrab`ï¼Œå¯é€šè¿‡ `OPENKRAB_GIT_DIR` è¦†ç›–ï¼‰ï¼Œ
+  æ›´æ–°å®ƒï¼Œå¹¶ä»Žè¯¥ checkout å®‰è£…å…¨å±€ CLIã€‚
+- `stable`/`beta` ä½¿ç”¨åŒ¹é…çš„ dist-tag ä»Ž npm å®‰è£…ã€‚
 
-- `dev` 优先使用 git checkout 中的内置插件。
-- `stable` 和 `beta` 恢复 npm 安装的插件包。
+æç¤ºï¼šå¦‚æžœä½ æƒ³åŒæ—¶ä½¿ç”¨ stable + devï¼Œä¿ç•™ä¸¤ä¸ªå…‹éš†å¹¶å°† Gateway ç½‘å…³æŒ‡å‘ stable é‚£ä¸ªã€‚
 
-## 标签最佳实践
+## æ’ä»¶å’Œæ¸ é“
 
-- 为你希望 git checkout 落在的发布版本打标签（`vYYYY.M.D` 或 `vYYYY.M.D-<patch>`）。
-- 保持标签不可变：永远不要移动或重用标签。
-- npm dist-tag 仍然是 npm 安装的数据源：
-  - `latest` → stable
-  - `beta` → 候选构建
-  - `dev` → main 快照（可选）
+å½“ä½ ä½¿ç”¨ `OpenKrab update` åˆ‡æ¢æ¸ é“æ—¶ï¼ŒOpenKrab è¿˜ä¼šåŒæ­¥æ’ä»¶æ¥æºï¼š
 
-## macOS 应用可用性
+- `dev` ä¼˜å…ˆä½¿ç”¨ git checkout ä¸­çš„å†…ç½®æ’ä»¶ã€‚
+- `stable` å’Œ `beta` æ¢å¤ npm å®‰è£…çš„æ’ä»¶åŒ…ã€‚
 
-Beta 和 dev 构建可能**不**包含 macOS 应用发布。这没问题：
+## æ ‡ç­¾æœ€ä½³å®žè·µ
 
-- git 标签和 npm dist-tag 仍然可以发布。
-- 在发布说明或变更日志中注明"此 beta 无 macOS 构建"。
+- ä¸ºä½ å¸Œæœ› git checkout è½åœ¨çš„å‘å¸ƒç‰ˆæœ¬æ‰“æ ‡ç­¾ï¼ˆ`vYYYY.M.D` æˆ– `vYYYY.M.D-<patch>`ï¼‰ã€‚
+- ä¿æŒæ ‡ç­¾ä¸å¯å˜ï¼šæ°¸è¿œä¸è¦ç§»åŠ¨æˆ–é‡ç”¨æ ‡ç­¾ã€‚
+- npm dist-tag ä»ç„¶æ˜¯ npm å®‰è£…çš„æ•°æ®æºï¼š
+  - `latest` â†’ stable
+  - `beta` â†’ å€™é€‰æž„å»º
+  - `dev` â†’ main å¿«ç…§ï¼ˆå¯é€‰ï¼‰
+
+## macOS åº”ç”¨å¯ç”¨æ€§
+
+Beta å’Œ dev æž„å»ºå¯èƒ½**ä¸**åŒ…å« macOS åº”ç”¨å‘å¸ƒã€‚è¿™æ²¡é—®é¢˜ï¼š
+
+- git æ ‡ç­¾å’Œ npm dist-tag ä»ç„¶å¯ä»¥å‘å¸ƒã€‚
+- åœ¨å‘å¸ƒè¯´æ˜Žæˆ–å˜æ›´æ—¥å¿—ä¸­æ³¨æ˜Ž"æ­¤ beta æ—  macOS æž„å»º"ã€‚
+
 

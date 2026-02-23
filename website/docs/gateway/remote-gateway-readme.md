@@ -1,10 +1,10 @@
----
-summary: "SSH tunnel setup for openkrab.app connecting to a remote gateway"
+﻿---
+summary: "SSH tunnel setup for OpenKrab.app connecting to a remote gateway"
 read_when: "Connecting the macOS app to a remote gateway over SSH"
 title: "Remote Gateway Setup"
 ---
 
-# Running openkrab.app with a Remote Gateway
+# Running OpenKrab.app with a Remote Gateway
 
 openkrab.app uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
 
@@ -58,7 +58,7 @@ ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 ### Step 3: Set Gateway Token
 
 ```bash
-launchctl setenv openkrab_GATEWAY_TOKEN "<your-token>"
+launchctl setenv OPENKRAB_GATEWAY_TOKEN "<your-token>"
 ```
 
 ### Step 4: Start SSH Tunnel
@@ -67,10 +67,10 @@ launchctl setenv openkrab_GATEWAY_TOKEN "<your-token>"
 ssh -N remote-gateway &
 ```
 
-### Step 5: Restart openkrab.app
+### Step 5: Restart OpenKrab.app
 
 ```bash
-# Quit openkrab.app (⌘Q), then reopen:
+# Quit OpenKrab.app (âŒ˜Q), then reopen:
 open /path/to/openkrab.app
 ```
 
@@ -156,3 +156,5 @@ launchctl bootout gui/$UID/bot.molt.ssh-tunnel
 | `RunAtLoad`                          | Starts tunnel when the agent loads                           |
 
 openkrab.app connects to `ws://127.0.0.1:18789` on your client machine. The SSH tunnel forwards that connection to port 18789 on the remote machine where the Gateway is running.
+
+

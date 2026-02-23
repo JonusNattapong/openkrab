@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab voicecall` (voice-call plugin command surface)"
 read_when:
   - You use the voice-call plugin and want the CLI entry points
@@ -16,19 +16,13 @@ Primary doc:
 
 ## Common commands
 
-```bash
-openkrab voicecall status --call-id <id>
-openkrab voicecall call --to "+15555550123" --message "Hello" --mode notify
-openkrab voicecall continue --call-id <id> --message "Any questions?"
-openkrab voicecall end --call-id <id>
+```bash\nOpenKrab voicecall status --call-id <id>\nOpenKrab voicecall call --to "+15555550123" --message "Hello" --mode notify\nOpenKrab voicecall continue --call-id <id> --message "Any questions?"\nOpenKrab voicecall end --call-id <id>
 ```
 
 ## Exposing webhooks (Tailscale)
 
-```bash
-openkrab voicecall expose --mode serve
-openkrab voicecall expose --mode funnel
-openkrab voicecall unexpose
+```bash\nOpenKrab voicecall expose --mode serve\nOpenKrab voicecall expose --mode funnel\nOpenKrab voicecall unexpose
 ```
 
 Security note: only expose the webhook endpoint to networks you trust. Prefer Tailscale Serve over Funnel when possible.
+

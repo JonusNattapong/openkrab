@@ -1,15 +1,15 @@
----
+﻿---
 summary: "Pairing overview: approve who can DM you + which nodes can join"
 read_when:
   - Setting up DM access control
   - Pairing a new iOS/Android node
-  - Reviewing openkrab security posture
+  - Reviewing OpenKrab security posture
 title: "Pairing"
 ---
 
 # Pairing
 
-“Pairing” is openkrab’s explicit **owner approval** step.
+â€œPairingâ€ is openkrabâ€™s explicit **owner approval** step.
 It is used in two places:
 
 1. **DM pairing** (who is allowed to talk to the bot)
@@ -31,9 +31,7 @@ Pairing codes:
 
 ### Approve a sender
 
-```bash
-openkrab pairing list telegram
-openkrab pairing approve telegram <CODE>
+```bash\nOpenKrab pairing list telegram\nOpenKrab pairing approve telegram <CODE>
 ```
 
 Supported channels: `telegram`, `whatsapp`, `signal`, `imessage`, `discord`, `slack`, `feishu`.
@@ -58,7 +56,7 @@ If you use the `device-pair` plugin, you can do first-time device pairing entire
 
 1. In Telegram, message your bot: `/pair`
 2. The bot replies with two messages: an instruction message and a separate **setup code** message (easy to copy/paste in Telegram).
-3. On your phone, open the openkrab iOS app → Settings → Gateway.
+3. On your phone, open the OpenKrab iOS app â†’ Settings â†’ Gateway.
 4. Paste the setup code and connect.
 5. Back in Telegram: `/pair approve`
 
@@ -71,10 +69,7 @@ Treat the setup code like a password while it is valid.
 
 ### Approve a node device
 
-```bash
-openkrab devices list
-openkrab devices approve <requestId>
-openkrab devices reject <requestId>
+```bash\nOpenKrab devices list\nOpenKrab devices approve <requestId>\nOpenKrab devices reject <requestId>
 ```
 
 ### Node pairing state storage
@@ -101,3 +96,4 @@ Stored under `~/.openkrab/devices/`:
   - iMessage (legacy): [iMessage](/channels/imessage)
   - Discord: [Discord](/channels/discord)
   - Slack: [Slack](/channels/slack)
+

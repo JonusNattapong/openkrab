@@ -15,12 +15,12 @@ pub struct DaemonStatus {
 
 /// Check if daemon is running (simplified - checks for process).
 pub fn get_daemon_status() -> DaemonStatus {
-    // Try to find krabkrab-gateway process
+    // Try to find openkrab-gateway process
     #[cfg(target_os = "windows")]
     let output = Command::new("tasklist")
         .args([
             "/FI",
-            "IMAGENAME eq krabkrab-gateway.exe",
+            "IMAGENAME eq openkrab-gateway.exe",
             "/FO",
             "CSV",
             "/NH",
@@ -29,7 +29,7 @@ pub fn get_daemon_status() -> DaemonStatus {
 
     #[cfg(not(target_os = "windows"))]
     let output = Command::new("pgrep")
-        .args(["-f", "krabkrab-gateway"])
+        .args(["-f", "openkrab-gateway"])
         .output();
 
     match output {
@@ -155,3 +155,4 @@ mod tests {
         assert!(output.contains("✗ not running"));
     }
 }
+

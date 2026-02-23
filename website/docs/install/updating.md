@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Updating OpenKrab safely (global install or source), plus rollback strategy"
 read_when:
   - Updating OpenKrab
@@ -8,7 +8,7 @@ title: "Updating"
 
 # Updating
 
-OpenKrab is moving fast (pre “1.0”). Treat updates like shipping infra: update → run checks → restart (or use `OpenKrab update`, which restarts) → verify.
+OpenKrab is moving fast (pre â€œ1.0â€). Treat updates like shipping infra: update â†’ run checks â†’ restart (or use `OpenKrab update`, which restarts) â†’ verify.
 
 ## Recommended: re-run the website installer (upgrade in place)
 
@@ -22,7 +22,7 @@ curl -fsSL https://OpenKrab.ai/install.sh | bash
 
 Notes:
 
-- Add `--no-onboard` if you don’t want the onboarding wizard to run again.
+- Add `--no-onboard` if you donâ€™t want the onboarding wizard to run again.
 - For **source installs**, use:
 
   ```bash
@@ -32,7 +32,7 @@ Notes:
   The installer will `git pull --rebase` **only** if the repo is clean.
 
 - For **global installs**, the script uses `npm install -g OpenKrab@latest` under the hood.
-- Legacy note: `clawdbot` remains available as a compatibility shim.
+- Legacy note: .openkrab` remains available as a compatibility shim.
 
 ## Before you update
 
@@ -82,7 +82,7 @@ OpenKrab health
 Notes:
 
 - If your Gateway runs as a service, `OpenKrab gateway restart` is preferred over killing PIDs.
-- If you’re pinned to a specific version, see “Rollback / pinning” below.
+- If youâ€™re pinned to a specific version, see â€œRollback / pinningâ€ below.
 
 ## Update (`OpenKrab update`)
 
@@ -100,7 +100,7 @@ It runs a safe-ish update flow:
 - Installs deps, builds, builds the Control UI, and runs `OpenKrab doctor`.
 - Restarts the gateway by default (use `--no-restart` to skip).
 
-If you installed via **npm/pnpm** (no git metadata), `OpenKrab update` will try to update via your package manager. If it can’t detect the install, use “Update (global install)” instead.
+If you installed via **npm/pnpm** (no git metadata), `OpenKrab update` will try to update via your package manager. If it canâ€™t detect the install, use â€œUpdate (global install)â€ instead.
 
 ## Update (Control UI / RPC)
 
@@ -137,19 +137,19 @@ Notes:
 
 - `pnpm build` matters when you run the packaged `OpenKrab` binary ([`OpenKrab.mjs`](https://github.com/OpenKrab/OpenKrab/blob/main/OpenKrab.mjs)) or use Node to run `dist/`.
 - If you run from a repo checkout without a global install, use `pnpm OpenKrab ...` for CLI commands.
-- If you run directly from TypeScript (`pnpm OpenKrab ...`), a rebuild is usually unnecessary, but **config migrations still apply** → run doctor.
+- If you run directly from TypeScript (`pnpm OpenKrab ...`), a rebuild is usually unnecessary, but **config migrations still apply** â†’ run doctor.
 - Switching between global and git installs is easy: install the other flavor, then run `OpenKrab doctor` so the gateway service entrypoint is rewritten to the current install.
 
 ## Always Run: `OpenKrab doctor`
 
-Doctor is the “safe update” command. It’s intentionally boring: repair + migrate + warn.
+Doctor is the â€œsafe updateâ€ command. Itâ€™s intentionally boring: repair + migrate + warn.
 
-Note: if you’re on a **source install** (git checkout), `OpenKrab doctor` will offer to run `OpenKrab update` first.
+Note: if youâ€™re on a **source install** (git checkout), `OpenKrab doctor` will offer to run `OpenKrab update` first.
 
 Typical things it does:
 
 - Migrate deprecated config keys / legacy config file locations.
-- Audit DM policies and warn on risky “open” settings.
+- Audit DM policies and warn on risky â€œopenâ€ settings.
 - Check Gateway health and can offer to restart.
 - Detect and migrate older gateway services (launchd/systemd; legacy schtasks) to current OpenKrab services.
 - On Linux, ensure systemd user lingering (so the Gateway survives logout).
@@ -168,7 +168,7 @@ OpenKrab gateway --port 18789
 OpenKrab logs --follow
 ```
 
-If you’re supervised:
+If youâ€™re supervised:
 
 - macOS launchd (app-bundled LaunchAgent): `launchctl kickstart -k gui/$UID/bot.molt.gateway` (use `bot.molt.<profile>`; legacy `com.OpenKrab.*` still works)
 - Linux systemd user service: `systemctl --user restart OpenKrab-gateway[-<profile>].service`
@@ -202,7 +202,7 @@ OpenKrab gateway restart
 
 ### Pin (source) by date
 
-Pick a commit from a date (example: “state of main as of 2026-01-01”):
+Pick a commit from a date (example: â€œstate of main as of 2026-01-01â€):
 
 ```bash
 git fetch origin
@@ -224,9 +224,11 @@ git checkout main
 git pull
 ```
 
-## If you’re stuck
+## If youâ€™re stuck
 
 - Run `OpenKrab doctor` again and read the output carefully (it often tells you the fix).
 - Check: [Troubleshooting](/gateway/troubleshooting)
-- Ask in Discord: [https://discord.gg/clawd](https://discord.gg/clawd)
+- Ask in Discord: [https://discord.gg/Krabd](https://discord.gg/Krabd)
+
+
 

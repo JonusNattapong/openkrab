@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Telegram bot support status, capabilities, and configuration"
 read_when:
   - Working on Telegram features or webhooks
@@ -52,10 +52,7 @@ Status: production-ready for bot DMs + groups via grammY. Long polling is the de
 
   <Step title="Start gateway and approve first DM">
 
-```bash
-openkrab gateway
-openkrab pairing list telegram
-openkrab pairing approve telegram <CODE>
+```bash\nOpenKrab gateway\nOpenKrab pairing list telegram\nOpenKrab pairing approve telegram <CODE>
 ```
 
     Pairing codes expire after 1 hour.
@@ -214,7 +211,7 @@ curl "https://api.telegram.org/bot<bot_token>/getUpdates"
 - Routing is deterministic: Telegram inbound replies back to Telegram (the model does not pick channels).
 - Inbound messages normalize into the shared channel envelope with reply metadata and media placeholders.
 - Group sessions are isolated by group ID. Forum topics append `:topic:<threadId>` to keep topics isolated.
-- DM messages can carry `message_thread_id`; openkrab routes them with thread-aware session keys and preserves thread ID for replies.
+- DM messages can carry `message_thread_id`; OpenKrab routes them with thread-aware session keys and preserves thread ID for replies.
 - Long polling uses grammY runner with per-chat/per-thread sequencing. Overall runner sink concurrency uses `agents.defaults.maxConcurrent`.
 - Telegram Bot API has no read-receipt support (`sendReadReceipts` does not apply).
 
@@ -222,7 +219,7 @@ curl "https://api.telegram.org/bot<bot_token>/getUpdates"
 
 <AccordionGroup>
   <Accordion title="Live stream preview (message edits)">
-    openkrab can stream partial replies by sending a temporary Telegram message and editing it as text arrives.
+    OpenKrab can stream partial replies by sending a temporary Telegram message and editing it as text arrives.
 
     Requirement:
 
@@ -244,11 +241,11 @@ curl "https://api.telegram.org/bot<bot_token>/getUpdates"
 
     This works in direct chats and groups/topics.
 
-    For text-only replies, openkrab keeps the same preview message and performs a final edit in place (no second message).
+    For text-only replies, OpenKrab keeps the same preview message and performs a final edit in place (no second message).
 
-    For complex replies (for example media payloads), openkrab falls back to normal final delivery and then cleans up the preview message.
+    For complex replies (for example media payloads), OpenKrab falls back to normal final delivery and then cleans up the preview message.
 
-    `streamMode` is separate from block streaming. When block streaming is explicitly enabled for Telegram, openkrab skips the preview stream to avoid double-streaming.
+    `streamMode` is separate from block streaming. When block streaming is explicitly enabled for Telegram, OpenKrab skips the preview stream to avoid double-streaming.
 
     Telegram-only reasoning stream:
 
@@ -262,7 +259,7 @@ curl "https://api.telegram.org/bot<bot_token>/getUpdates"
 
     - Markdown-ish text is rendered to Telegram-safe HTML.
     - Raw model HTML is escaped to reduce Telegram parse failures.
-    - If Telegram rejects parsed HTML, openkrab retries as plain text.
+    - If Telegram rejects parsed HTML, OpenKrab retries as plain text.
 
     Link previews are enabled by default and can be disabled with `channels.telegram.linkPreview: false`.
 
@@ -551,9 +548,9 @@ curl "https://api.telegram.org/bot<bot_token>/getUpdates"
   <Accordion title="Reaction notifications">
     Telegram reactions arrive as `message_reaction` updates (separate from message payloads).
 
-    When enabled, openkrab enqueues system events like:
+    When enabled, OpenKrab enqueues system events like:
 
-    - `Telegram reaction added: 👍 by Alice (@alice) on msg 42`
+    - `Telegram reaction added: ðŸ‘ by Alice (@alice) on msg 42`
 
     Config:
 
@@ -572,18 +569,18 @@ curl "https://api.telegram.org/bot<bot_token>/getUpdates"
   </Accordion>
 
   <Accordion title="Ack reactions">
-    `ackReaction` sends an acknowledgement emoji while openkrab is processing an inbound message.
+    `ackReaction` sends an acknowledgement emoji while OpenKrab is processing an inbound message.
 
     Resolution order:
 
     - `channels.telegram.accounts.<accountId>.ackReaction`
     - `channels.telegram.ackReaction`
     - `messages.ackReaction`
-    - agent identity emoji fallback (`agents.list[].identity.emoji`, else "👀")
+    - agent identity emoji fallback (`agents.list[].identity.emoji`, else "ðŸ‘€")
 
     Notes:
 
-    - Telegram expects unicode emoji (for example "👀").
+    - Telegram expects unicode emoji (for example "ðŸ‘€").
     - Use `""` to disable the reaction for a channel or account.
 
   </Accordion>
@@ -640,9 +637,7 @@ curl "https://api.telegram.org/bot<bot_token>/getUpdates"
 
     CLI send target can be numeric chat ID or username:
 
-```bash
-openkrab message send --channel telegram --target 123456789 --message "hi"
-openkrab message send --channel telegram --target @name --message "hi"
+```bash\nOpenKrab message send --channel telegram --target 123456789 --message "hi"\nOpenKrab message send --channel telegram --target @name --message "hi"
 ```
 
   </Accordion>
@@ -733,9 +728,9 @@ Primary reference:
 - `channels.telegram.actions.reactions`: gate Telegram tool reactions.
 - `channels.telegram.actions.sendMessage`: gate Telegram tool message sends.
 - `channels.telegram.actions.deleteMessage`: gate Telegram tool message deletes.
-- `channels.telegram.actions.sticker`: gate Telegram sticker actions — send and search (default: false).
-- `channels.telegram.reactionNotifications`: `off | own | all` — control which reactions trigger system events (default: `own` when not set).
-- `channels.telegram.reactionLevel`: `off | ack | minimal | extensive` — control agent's reaction capability (default: `minimal` when not set).
+- `channels.telegram.actions.sticker`: gate Telegram sticker actions â€” send and search (default: false).
+- `channels.telegram.reactionNotifications`: `off | own | all` â€” control which reactions trigger system events (default: `own` when not set).
+- `channels.telegram.reactionLevel`: `off | ack | minimal | extensive` â€” control agent's reaction capability (default: `minimal` when not set).
 
 - [Configuration reference - Telegram](/gateway/configuration-reference#telegram)
 
@@ -759,3 +754,4 @@ Telegram-specific high-signal fields:
 - [Channel routing](/channels/channel-routing)
 - [Multi-agent routing](/concepts/multi-agent)
 - [Troubleshooting](/channels/troubleshooting)
+

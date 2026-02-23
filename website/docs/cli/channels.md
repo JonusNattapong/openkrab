@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab channels` (accounts, status, login/logout, logs)"
 read_when:
   - You want to add/remove channel accounts (WhatsApp/Telegram/Discord/Google Chat/Slack/Mattermost (plugin)/Signal/iMessage)
@@ -17,44 +17,32 @@ Related docs:
 
 ## Common commands
 
-```bash
-openkrab channels list
-openkrab channels status
-openkrab channels capabilities
-openkrab channels capabilities --channel discord --target channel:123
-openkrab channels resolve --channel slack "#general" "@jane"
-openkrab channels logs --channel all
+```bash\nOpenKrab channels list\nOpenKrab channels status\nOpenKrab channels capabilities\nOpenKrab channels capabilities --channel discord --target channel:123\nOpenKrab channels resolve --channel slack "#general" "@jane"\nOpenKrab channels logs --channel all
 ```
 
 ## Add / remove accounts
 
-```bash
-openkrab channels add --channel telegram --token <bot-token>
-openkrab channels remove --channel telegram --delete
+```bash\nOpenKrab channels add --channel telegram --token <bot-token>\nOpenKrab channels remove --channel telegram --delete
 ```
 
 Tip: `openkrab channels add --help` shows per-channel flags (token, app token, signal-cli paths, etc).
 
 ## Login / logout (interactive)
 
-```bash
-openkrab channels login --channel whatsapp
-openkrab channels logout --channel whatsapp
+```bash\nOpenKrab channels login --channel whatsapp\nOpenKrab channels logout --channel whatsapp
 ```
 
 ## Troubleshooting
 
 - Run `openkrab status --deep` for a broad probe.
 - Use `openkrab doctor` for guided fixes.
-- `openkrab channels list` prints `Claude: HTTP 403 ... user:profile` → usage snapshot needs the `user:profile` scope. Use `--no-usage`, or provide a claude.ai session key (`CLAUDE_WEB_SESSION_KEY` / `CLAUDE_WEB_COOKIE`), or re-auth via Claude Code CLI.
+- `openkrab channels list` prints `Claude: HTTP 403 ... user:profile` â†’ usage snapshot needs the `user:profile` scope. Use `--no-usage`, or provide a claude.ai session key (`CLAUDE_WEB_SESSION_KEY` / `CLAUDE_WEB_COOKIE`), or re-auth via Claude Code CLI.
 
 ## Capabilities probe
 
 Fetch provider capability hints (intents/scopes where available) plus static feature support:
 
-```bash
-openkrab channels capabilities
-openkrab channels capabilities --channel discord --target channel:123
+```bash\nOpenKrab channels capabilities\nOpenKrab channels capabilities --channel discord --target channel:123
 ```
 
 Notes:
@@ -67,13 +55,11 @@ Notes:
 
 Resolve channel/user names to IDs using the provider directory:
 
-```bash
-openkrab channels resolve --channel slack "#general" "@jane"
-openkrab channels resolve --channel discord "My Server/#support" "@someone"
-openkrab channels resolve --channel matrix "Project Room"
+```bash\nOpenKrab channels resolve --channel slack "#general" "@jane"\nOpenKrab channels resolve --channel discord "My Server/#support" "@someone"\nOpenKrab channels resolve --channel matrix "Project Room"
 ```
 
 Notes:
 
 - Use `--kind user|group|auto` to force the target type.
 - Resolution prefers active matches when multiple entries share the same name.
+

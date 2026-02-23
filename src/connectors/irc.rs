@@ -14,7 +14,7 @@ pub struct IrcConfig {
     pub port: u16,
     /// Bot nickname.
     pub nick: String,
-    /// Channels to join (e.g. ["#krabkrab", "#general"]).
+    /// Channels to join (e.g. ["#openkrab", "#general"]).
     pub channels: Vec<String>,
     /// Optional password for NickServ or PASS.
     pub password: Option<String>,
@@ -30,7 +30,7 @@ impl Default for IrcConfig {
                 .ok()
                 .and_then(|p| p.parse().ok())
                 .unwrap_or(6667),
-            nick: std::env::var("IRC_NICK").unwrap_or_else(|_| "krabkrab".to_string()),
+            nick: std::env::var("IRC_NICK").unwrap_or_else(|_| "openkrab".to_string()),
             channels: std::env::var("IRC_CHANNELS")
                 .unwrap_or_default()
                 .split(',')
@@ -138,10 +138,10 @@ mod tests {
 
     #[test]
     fn parse_channel_message() {
-        let raw = ":alice!alice@host.net PRIVMSG #krabkrab :hello bot";
+        let raw = ":alice!alice@host.net PRIVMSG #openkrab :hello bot";
         let msg = parse_privmsg(raw, "krabbot").unwrap();
         assert_eq!(msg.from_nick, "alice");
-        assert_eq!(msg.channel, "#krabkrab");
+        assert_eq!(msg.channel, "#openkrab");
         assert_eq!(msg.text, "hello bot");
         assert!(!msg.is_private);
     }
@@ -177,3 +177,4 @@ mod tests {
         assert!(cfg.validate().is_err());
     }
 }
+

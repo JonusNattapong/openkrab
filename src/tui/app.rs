@@ -65,7 +65,7 @@ impl TuiApp {
 
     fn run_loop(&mut self) -> anyhow::Result<()> {
         self.messages
-            .push("🦀 krabkrab TUI - Type /help for commands".to_string());
+            .push("🦀 openkrab TUI - Type /help for commands".to_string());
         self.messages.push("─".repeat(50));
 
         loop {
@@ -113,7 +113,7 @@ impl TuiApp {
                         .fg(Color::Yellow)
                         .add_modifier(Modifier::BOLD),
                 )
-                .block(Block::default().borders(Borders::ALL).title("🦀 krabkrab"));
+                .block(Block::default().borders(Borders::ALL).title("🦀 openkrab"));
             f.render_widget(tabs_widget, chunks[0]);
 
             // Content
@@ -219,7 +219,7 @@ impl TuiApp {
             }
             "/memory" => {
                 self.messages
-                    .push("Use: krabkrab memory search <query>".to_string());
+                    .push("Use: openkrab memory search <query>".to_string());
             }
             "/quit" | "/exit" | "/q" => {
                 self.messages.push("Goodbye! 🦀".to_string());
@@ -242,3 +242,4 @@ mod tests {
         assert_eq!(config.session, "main");
     }
 }
+

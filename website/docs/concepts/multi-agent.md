@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Multi-agent routing: isolated agents, channel accounts, and bindings"
 title: Multi-Agent Routing
 read_when: "You want multiple isolated agents (workspaces + auth) in one gateway process."
@@ -9,7 +9,7 @@ status: active
 
 Goal: multiple _isolated_ agents (separate workspace + `agentDir` + sessions), plus multiple channel accounts (e.g. two WhatsApps) in one running Gateway. Inbound is routed to an agent via bindings.
 
-## What is “one agent”?
+## What is â€œone agentâ€?
 
 An **agent** is a fully scoped brain with its own:
 
@@ -27,47 +27,45 @@ Main agent credentials are **not** shared automatically. Never reuse `agentDir`
 across agents (it causes auth/session collisions). If you want to share creds,
 copy `auth-profiles.json` into the other agent's `agentDir`.
 
-Skills are per-agent via each workspace’s `skills/` folder, with shared skills
+Skills are per-agent via each workspaceâ€™s `skills/` folder, with shared skills
 available from `~/.openkrab/skills`. See [Skills: per-agent vs shared](/tools/skills#per-agent-vs-shared-skills).
 
 The Gateway can host **one agent** (default) or **many agents** side-by-side.
 
-**Workspace note:** each agent’s workspace is the **default cwd**, not a hard
+**Workspace note:** each agentâ€™s workspace is the **default cwd**, not a hard
 sandbox. Relative paths resolve inside the workspace, but absolute paths can
 reach other host locations unless sandboxing is enabled. See
 [Sandboxing](/gateway/sandboxing).
 
 ## Paths (quick map)
 
-- Config: `~/.openkrab/openkrab.json` (or `openkrab_CONFIG_PATH`)
-- State dir: `~/.openkrab` (or `openkrab_STATE_DIR`)
+- Config: `~/.openkrab/openkrab.json` (or `OPENKRAB_CONFIG_PATH`)
+- State dir: `~/.openkrab` (or `OPENKRAB_STATE_DIR`)
 - Workspace: `~/.openkrab/workspace` (or `~/.openkrab/workspace-<agentId>`)
 - Agent dir: `~/.openkrab/agents/<agentId>/agent` (or `agents.list[].agentDir`)
 - Sessions: `~/.openkrab/agents/<agentId>/sessions`
 
 ### Single-agent mode (default)
 
-If you do nothing, openkrab runs a single agent:
+If you do nothing, OpenKrab runs a single agent:
 
 - `agentId` defaults to **`main`**.
 - Sessions are keyed as `agent:main:<mainKey>`.
-- Workspace defaults to `~/.openkrab/workspace` (or `~/.openkrab/workspace-<profile>` when `openkrab_PROFILE` is set).
+- Workspace defaults to `~/.openkrab/workspace` (or `~/.openkrab/workspace-<profile>` when `OPENKRAB_PROFILE` is set).
 - State defaults to `~/.openkrab/agents/main/agent`.
 
 ## Agent helper
 
 Use the agent wizard to add a new isolated agent:
 
-```bash
-openkrab agents add work
+```bash\nOpenKrab agents add work
 ```
 
 Then add `bindings` (or let the wizard do it) to route inbound messages.
 
 Verify with:
 
-```bash
-openkrab agents list --bindings
+```bash\nOpenKrab agents list --bindings
 ```
 
 ## Quick start
@@ -77,9 +75,7 @@ openkrab agents list --bindings
 
 Use the wizard or create workspaces manually:
 
-```bash
-openkrab agents add coding
-openkrab agents add social
+```bash\nOpenKrab agents add coding\nOpenKrab agents add social
 ```
 
 Each agent gets its own workspace with `SOUL.md`, `AGENTS.md`, and optional `USER.md`, plus a dedicated `agentDir` and session store under `~/.openkrab/agents/<agentId>`.
@@ -94,8 +90,7 @@ Create one account per agent on your preferred channels:
 - Telegram: one bot per agent via BotFather, copy each token.
 - WhatsApp: link each phone number per account.
 
-```bash
-openkrab channels login --channel whatsapp --account work
+```bash\nOpenKrab channels login --channel whatsapp --account work
 ```
 
 See channel guides: [Discord](/channels/discord), [Telegram](/channels/telegram), [WhatsApp](/channels/whatsapp).
@@ -110,10 +105,7 @@ Add agents under `agents.list`, channel accounts under `channels.<channel>.accou
 
   <Step title="Restart and verify">
 
-```bash
-openkrab gateway restart
-openkrab agents list --bindings
-openkrab channels status --probe
+```bash\nOpenKrab gateway restart\nOpenKrab agents list --bindings\nOpenKrab channels status --probe
 ```
 
   </Step>
@@ -127,13 +119,13 @@ With **multiple agents**, each `agentId` becomes a **fully isolated persona**:
 - **Different personalities** (per-agent workspace files like `AGENTS.md` and `SOUL.md`).
 - **Separate auth + sessions** (no cross-talk unless explicitly enabled).
 
-This lets **multiple people** share one Gateway server while keeping their AI “brains” and data isolated.
+This lets **multiple people** share one Gateway server while keeping their AI â€œbrainsâ€ and data isolated.
 
 ## One WhatsApp number, multiple people (DM split)
 
-You can route **different WhatsApp DMs** to different agents while staying on **one WhatsApp account**. Match on sender E.164 (like `+15551234567`) with `peer.kind: "direct"`. Replies still come from the same WhatsApp number (no per‑agent sender identity).
+You can route **different WhatsApp DMs** to different agents while staying on **one WhatsApp account**. Match on sender E.164 (like `+15551234567`) with `peer.kind: "direct"`. Replies still come from the same WhatsApp number (no perâ€‘agent sender identity).
 
-Important detail: direct chats collapse to the agent’s **main session key**, so true isolation requires **one agent per person**.
+Important detail: direct chats collapse to the agentâ€™s **main session key**, so true isolation requires **one agent per person**.
 
 Example:
 
@@ -193,10 +185,10 @@ multiple phone numbers without mixing sessions.
 
 ## Concepts
 
-- `agentId`: one “brain” (workspace, per-agent auth, per-agent session store).
+- `agentId`: one â€œbrainâ€ (workspace, per-agent auth, per-agent session store).
 - `accountId`: one channel account instance (e.g. WhatsApp account `"personal"` vs `"biz"`).
 - `binding`: routes inbound messages to an `agentId` by `(channel, accountId, peer)` and optionally guild/team ids.
-- Direct chats collapse to `agent:<agentId>:<mainKey>` (per-agent “main”; `session.mainKey`).
+- Direct chats collapse to `agent:<agentId>:<mainKey>` (per-agent â€œmainâ€; `session.mainKey`).
 
 ## Platform examples
 
@@ -292,9 +284,7 @@ Notes:
 
 Link each account before starting the gateway:
 
-```bash
-openkrab channels login --channel whatsapp --account personal
-openkrab channels login --channel whatsapp --account biz
+```bash\nOpenKrab channels login --channel whatsapp --account personal\nOpenKrab channels login --channel whatsapp --account biz
 ```
 
 `~/.openkrab/openkrab.json` (JSON5):
@@ -534,3 +524,5 @@ If you need per-agent boundaries, use `agents.list[].tools` to deny `exec`.
 For group targeting, use `agents.list[].groupChat.mentionPatterns` so @mentions map cleanly to the intended agent.
 
 See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for detailed examples.
+
+

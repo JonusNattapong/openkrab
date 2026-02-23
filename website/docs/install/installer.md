@@ -1,4 +1,4 @@
----
+﻿---
 summary: "How the installer scripts work (install.sh, install-cli.sh, install.ps1), flags, and automation"
 read_when:
   - You want to understand `OpenKrab.ai/install.sh`
@@ -148,16 +148,16 @@ The script exits with code `2` for invalid method selection or invalid `--instal
 
 | Variable                                    | Description                                   |
 | ------------------------------------------- | --------------------------------------------- |
-| `OpenKrab_INSTALL_METHOD=git\|npm`          | Install method                                |
-| `OpenKrab_VERSION=latest\|next\|<semver>`   | npm version or dist-tag                       |
-| `OpenKrab_BETA=0\|1`                        | Use beta if available                         |
-| `OpenKrab_GIT_DIR=<path>`                   | Checkout directory                            |
-| `OpenKrab_GIT_UPDATE=0\|1`                  | Toggle git updates                            |
-| `OpenKrab_NO_PROMPT=1`                      | Disable prompts                               |
-| `OpenKrab_NO_ONBOARD=1`                     | Skip onboarding                               |
-| `OpenKrab_DRY_RUN=1`                        | Dry run mode                                  |
-| `OpenKrab_VERBOSE=1`                        | Debug mode                                    |
-| `OpenKrab_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                 |
+| `OPENKRAB_INSTALL_METHOD=git\|npm`          | Install method                                |
+| `OPENKRAB_VERSION=latest\|next\|<semver>`   | npm version or dist-tag                       |
+| `OPENKRAB_BETA=0\|1`                        | Use beta if available                         |
+| `OPENKRAB_GIT_DIR=<path>`                   | Checkout directory                            |
+| `OPENKRAB_GIT_UPDATE=0\|1`                  | Toggle git updates                            |
+| `OPENKRAB_NO_PROMPT=1`                      | Disable prompts                               |
+| `OPENKRAB_NO_ONBOARD=1`                     | Skip onboarding                               |
+| `OPENKRAB_DRY_RUN=1`                        | Dry run mode                                  |
+| `OPENKRAB_VERBOSE=1`                        | Debug mode                                    |
+| `OPENKRAB_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                 |
 | `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`          | Control sharp/libvips behavior (default: `1`) |
 
   </Accordion>
@@ -230,12 +230,12 @@ Designed for environments where you want everything under a local prefix (defaul
 
 | Variable                                    | Description                                                                       |
 | ------------------------------------------- | --------------------------------------------------------------------------------- |
-| `OpenKrab_PREFIX=<path>`                    | Install prefix                                                                    |
-| `OpenKrab_VERSION=<ver>`                    | OpenKrab version or dist-tag                                                      |
-| `OpenKrab_NODE_VERSION=<ver>`               | Node version                                                                      |
-| `OpenKrab_NO_ONBOARD=1`                     | Skip onboarding                                                                   |
-| `OpenKrab_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                                                     |
-| `OpenKrab_GIT_DIR=<path>`                   | Legacy cleanup lookup path (used when removing old `Peekaboo` submodule checkout) |
+| `OPENKRAB_PREFIX=<path>`                    | Install prefix                                                                    |
+| `OPENKRAB_VERSION=<ver>`                    | OpenKrab version or dist-tag                                                      |
+| `OPENKRAB_NODE_VERSION=<ver>`               | Node version                                                                      |
+| `OPENKRAB_NO_ONBOARD=1`                     | Skip onboarding                                                                   |
+| `OPENKRAB_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                                                     |
+| `OPENKRAB_GIT_DIR=<path>`                   | Legacy cleanup lookup path (used when removing old `Peekaboo` submodule checkout) |
 | `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`          | Control sharp/libvips behavior (default: `1`)                                     |
 
   </Accordion>
@@ -314,11 +314,11 @@ Designed for environments where you want everything under a local prefix (defaul
 
 | Variable                           | Description        |
 | ---------------------------------- | ------------------ |
-| `OpenKrab_INSTALL_METHOD=git\|npm` | Install method     |
-| `OpenKrab_GIT_DIR=<path>`          | Checkout directory |
-| `OpenKrab_NO_ONBOARD=1`            | Skip onboarding    |
-| `OpenKrab_GIT_UPDATE=0`            | Disable git pull   |
-| `OpenKrab_DRY_RUN=1`               | Dry run mode       |
+| `OPENKRAB_INSTALL_METHOD=git\|npm` | Install method     |
+| `OPENKRAB_GIT_DIR=<path>`          | Checkout directory |
+| `OPENKRAB_NO_ONBOARD=1`            | Skip onboarding    |
+| `OPENKRAB_GIT_UPDATE=0`            | Disable git pull   |
+| `OPENKRAB_DRY_RUN=1`               | Dry run mode       |
 
   </Accordion>
 </AccordionGroup>
@@ -341,7 +341,7 @@ Use non-interactive flags/env vars for predictable runs.
   </Tab>
   <Tab title="install.sh (non-interactive git)">
     ```bash
-    OpenKrab_INSTALL_METHOD=git OpenKrab_NO_PROMPT=1 \
+    OPENKRAB_INSTALL_METHOD=git OPENKRAB_NO_PROMPT=1 \
       curl -fsSL --proto '=https' --tlsv1.2 https://OpenKrab.ai/install.sh | bash
     ```
   </Tab>
@@ -403,4 +403,5 @@ Use non-interactive flags/env vars for predictable runs.
     Usually a PATH issue. See [Node.js troubleshooting](/install/node#troubleshooting).
   </Accordion>
 </AccordionGroup>
+
 

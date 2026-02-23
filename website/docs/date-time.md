@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Date and time handling across envelopes, prompts, tools, and connectors"
 read_when:
   - You are changing how timestamps are shown to the model or users
@@ -7,8 +7,7 @@ title: "Date and Time"
 ---
 
 # Date & Time
-
-openkrab defaults to **host-local time for transport timestamps** and **user timezone only in the system prompt**.
+\nOpenKrab defaults to **host-local time for transport timestamps** and **user timezone only in the system prompt**.
 Provider timestamps are preserved so tools keep their native semantics (current time is available via `session_status`).
 
 ## Message envelopes (local by default)
@@ -102,7 +101,7 @@ System: [2026-01-12 12:19:17 PST] Model switched.
 
 ## Time format detection (auto)
 
-When `timeFormat: "auto"`, openkrab inspects the OS preference (macOS/Windows)
+When `timeFormat: "auto"`, OpenKrab inspects the OS preference (macOS/Windows)
 and falls back to locale formatting. The detected value is **cached per process**
 to avoid repeated system calls.
 
@@ -126,3 +125,4 @@ If you need local time, convert it downstream using the known timezone.
 - [System Prompt](/concepts/system-prompt)
 - [Timezones](/concepts/timezone)
 - [Messages](/concepts/messages)
+

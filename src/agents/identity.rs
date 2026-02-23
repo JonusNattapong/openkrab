@@ -11,7 +11,7 @@ pub struct AgentIdentity {
 impl Default for AgentIdentity {
     fn default() -> Self {
         Self {
-            name: "krabkrab".to_string(),
+            name: "openkrab".to_string(),
             emoji: "🦀".to_string(),
             personality: "A helpful and precise AI assistant ported to Rust.".to_string(),
             system_prompt: None,
@@ -33,3 +33,4 @@ impl AgentIdentity {
         )
     }
 }
+

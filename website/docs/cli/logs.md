@@ -1,4 +1,4 @@
----
+﻿---
 summary: "CLI reference for `openkrab logs` (tail gateway logs via RPC)"
 read_when:
   - You need to tail Gateway logs remotely (without SSH)
@@ -16,13 +16,8 @@ Related:
 
 ## Examples
 
-```bash
-openkrab logs
-openkrab logs --follow
-openkrab logs --json
-openkrab logs --limit 500
-openkrab logs --local-time
-openkrab logs --follow --local-time
+```bash\nOpenKrab logs\nOpenKrab logs --follow\nOpenKrab logs --json\nOpenKrab logs --limit 500\nOpenKrab logs --local-time\nOpenKrab logs --follow --local-time
 ```
 
 Use `--local-time` to render timestamps in your local timezone.
+

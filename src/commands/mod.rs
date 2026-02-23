@@ -1,4 +1,4 @@
-//! krabkrab commands module — port of `openkrab/src/commands`
+//! openkrab commands module — port of `openkrab/src/commands`
 
 pub mod admin;
 pub mod ask;
@@ -135,3 +135,4 @@ pub use status_update::{
 pub use telegram::{telegram_send_command, telegram_send_dry_run_command};
 pub use uninstall::{uninstall_command, UninstallOptions};
 pub use whatsapp_send::{send_whatsapp_media, send_whatsapp_message, send_whatsapp_template};
+

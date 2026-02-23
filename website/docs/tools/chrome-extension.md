@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Chrome extension: let OpenKrab drive your existing Chrome tab"
 read_when:
   - You want the agent to drive an existing Chrome tab (toolbar button)
@@ -37,21 +37,21 @@ OpenKrab browser extension install
 OpenKrab browser extension path
 ```
 
-3. Chrome → `chrome://extensions`
+3. Chrome â†’ `chrome://extensions`
 
-- Enable “Developer mode”
-- “Load unpacked” → select the directory printed above
+- Enable â€œDeveloper modeâ€
+- â€œLoad unpackedâ€ â†’ select the directory printed above
 
 4. Pin the extension.
 
 ## Updates (no build step)
 
-The extension ships inside the OpenKrab release (npm package) as static files. There is no separate “build” step.
+The extension ships inside the OpenKrab release (npm package) as static files. There is no separate â€œbuildâ€ step.
 
 After upgrading OpenKrab:
 
 - Re-run `OpenKrab browser extension install` to refresh the installed files under your OpenKrab state directory.
-- Chrome → `chrome://extensions` → click “Reload” on the extension.
+- Chrome â†’ `chrome://extensions` â†’ click â€œReloadâ€ on the extension.
 
 ## Use it (set gateway token once)
 
@@ -60,7 +60,7 @@ OpenKrab ships with a built-in browser profile named `chrome` that targets the e
 Before first attach, open extension Options and set:
 
 - `Port` (default `18792`)
-- `Gateway token` (must match `gateway.auth.token` / `OpenKrab_GATEWAY_TOKEN`)
+- `Gateway token` (must match `gateway.auth.token` / `OPENKRAB_GATEWAY_TOKEN`)
 
 Use it:
 
@@ -86,14 +86,14 @@ OpenKrab browser create-profile \
 
 ## Which tab does it control?
 
-- It does **not** automatically control “whatever tab you’re looking at”.
+- It does **not** automatically control â€œwhatever tab youâ€™re looking atâ€.
 - It controls **only the tab(s) you explicitly attached** by clicking the toolbar button.
 - To switch: open the other tab and click the extension icon there.
 
 ## Badge + common errors
 
 - `ON`: attached; OpenKrab can drive that tab.
-- `…`: connecting to the local relay.
+- `â€¦`: connecting to the local relay.
 - `!`: relay not reachable/authenticated (most common: relay server not running, or gateway token missing/wrong).
 
 If you see `!`:
@@ -103,12 +103,12 @@ If you see `!`:
 
 ## Remote Gateway (use a node host)
 
-### Local Gateway (same machine as Chrome) — usually **no extra steps**
+### Local Gateway (same machine as Chrome) â€” usually **no extra steps**
 
 If the Gateway runs on the same machine as Chrome, it starts the browser control service on loopback
 and auto-starts the relay server. The extension talks to the local relay; the CLI/tool calls go to the Gateway.
 
-### Remote Gateway (Gateway runs elsewhere) — **run a node host**
+### Remote Gateway (Gateway runs elsewhere) â€” **run a node host**
 
 If your Gateway runs on another machine, start a node host on the machine that runs Chrome.
 The Gateway will proxy browser actions to that node; the extension + relay stay local to the browser machine.
@@ -141,16 +141,16 @@ Options:
 }
 ```
 
-Then ensure the tool isn’t denied by tool policy, and (if needed) call `browser` with `target="host"`.
+Then ensure the tool isnâ€™t denied by tool policy, and (if needed) call `browser` with `target="host"`.
 
 Debugging: `OpenKrab sandbox explain`
 
 ## Remote access tips
 
 - Keep the Gateway and node host on the same tailnet; avoid exposing relay ports to LAN or public Internet.
-- Pair nodes intentionally; disable browser proxy routing if you don’t want remote control (`gateway.nodes.browser.mode="off"`).
+- Pair nodes intentionally; disable browser proxy routing if you donâ€™t want remote control (`gateway.nodes.browser.mode="off"`).
 
-## How “extension path” works
+## How â€œextension pathâ€ works
 
 `OpenKrab browser extension path` prints the **installed** on-disk directory containing the extension files.
 
@@ -160,14 +160,14 @@ If you move or delete that install directory, Chrome will mark the extension as 
 
 ## Security implications (read this)
 
-This is powerful and risky. Treat it like giving the model “hands on your browser”.
+This is powerful and risky. Treat it like giving the model â€œhands on your browserâ€.
 
-- The extension uses Chrome’s debugger API (`chrome.debugger`). When attached, the model can:
+- The extension uses Chromeâ€™s debugger API (`chrome.debugger`). When attached, the model can:
   - click/type/navigate in that tab
   - read page content
-  - access whatever the tab’s logged-in session can access
+  - access whatever the tabâ€™s logged-in session can access
 - **This is not isolated** like the dedicated OpenKrab-managed profile.
-  - If you attach to your daily-driver profile/tab, you’re granting access to that account state.
+  - If you attach to your daily-driver profile/tab, youâ€™re granting access to that account state.
 
 Recommendations:
 
@@ -181,4 +181,5 @@ Related:
 - Browser tool overview: [Browser](/tools/browser)
 - Security audit: [Security](/gateway/security)
 - Tailscale setup: [Tailscale](/gateway/tailscale)
+
 

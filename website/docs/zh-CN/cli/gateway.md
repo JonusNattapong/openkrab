@@ -1,9 +1,9 @@
----
+﻿---
 read_when:
-  - 从 CLI 运行 Gateway 网关（开发或服务器）
-  - 调试 Gateway 网关认证、绑定模式和连接性
-  - 通过 Bonjour 发现 Gateway 网关（局域网 + tailnet）
-summary: OpenKrab Gateway 网关 CLI（`OpenKrab gateway`）— 运行、查询和发现 Gateway 网关
+  - ä»Ž CLI è¿è¡Œ Gateway ç½‘å…³ï¼ˆå¼€å‘æˆ–æœåŠ¡å™¨ï¼‰
+  - è°ƒè¯• Gateway ç½‘å…³è®¤è¯ã€ç»‘å®šæ¨¡å¼å’Œè¿žæŽ¥æ€§
+  - é€šè¿‡ Bonjour å‘çŽ° Gateway ç½‘å…³ï¼ˆå±€åŸŸç½‘ + tailnetï¼‰
+summary: OpenKrab Gateway ç½‘å…³ CLIï¼ˆ`OpenKrab gateway`ï¼‰â€” è¿è¡Œã€æŸ¥è¯¢å’Œå‘çŽ° Gateway ç½‘å…³
 title: gateway
 x-i18n:
   generated_at: "2026-02-03T07:45:15Z"
@@ -14,76 +14,76 @@ x-i18n:
   workflow: 15
 ---
 
-# Gateway 网关 CLI
+# Gateway ç½‘å…³ CLI
 
-Gateway 网关是 OpenKrab 的 WebSocket 服务器（渠道、节点、会话、hooks）。
+Gateway ç½‘å…³æ˜¯ OpenKrab çš„ WebSocket æœåŠ¡å™¨ï¼ˆæ¸ é“ã€èŠ‚ç‚¹ã€ä¼šè¯ã€hooksï¼‰ã€‚
 
-本页中的子命令位于 `OpenKrab gateway …` 下。
+æœ¬é¡µä¸­çš„å­å‘½ä»¤ä½äºŽ `OpenKrab gateway â€¦` ä¸‹ã€‚
 
-相关文档：
+ç›¸å…³æ–‡æ¡£ï¼š
 
 - [/gateway/bonjour](/gateway/bonjour)
 - [/gateway/discovery](/gateway/discovery)
 - [/gateway/configuration](/gateway/configuration)
 
-## 运行 Gateway 网关
+## è¿è¡Œ Gateway ç½‘å…³
 
-运行本地 Gateway 网关进程：
+è¿è¡Œæœ¬åœ° Gateway ç½‘å…³è¿›ç¨‹ï¼š
 
 ```bash
 OpenKrab gateway
 ```
 
-前台运行别名：
+å‰å°è¿è¡Œåˆ«åï¼š
 
 ```bash
 OpenKrab gateway run
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- 默认情况下，除非在 `~/.OpenKrab/OpenKrab.json` 中设置了 `gateway.mode=local`，否则 Gateway 网关将拒绝启动。使用 `--allow-unconfigured` 进行临时/开发运行。
-- 在没有认证的情况下绑定到 loopback 之外的地址会被阻止（安全护栏）。
-- `SIGUSR1` 在授权时触发进程内重启（启用 `commands.restart` 或使用 gateway 工具/config apply/update）。
-- `SIGINT`/`SIGTERM` 处理程序会停止 Gateway 网关进程，但不会恢复任何自定义终端状态。如果你用 TUI 或 raw-mode 输入包装 CLI，请在退出前恢复终端。
+- é»˜è®¤æƒ…å†µä¸‹ï¼Œé™¤éžåœ¨ `~/.OpenKrab/OpenKrab.json` ä¸­è®¾ç½®äº† `gateway.mode=local`ï¼Œå¦åˆ™ Gateway ç½‘å…³å°†æ‹’ç»å¯åŠ¨ã€‚ä½¿ç”¨ `--allow-unconfigured` è¿›è¡Œä¸´æ—¶/å¼€å‘è¿è¡Œã€‚
+- åœ¨æ²¡æœ‰è®¤è¯çš„æƒ…å†µä¸‹ç»‘å®šåˆ° loopback ä¹‹å¤–çš„åœ°å€ä¼šè¢«é˜»æ­¢ï¼ˆå®‰å…¨æŠ¤æ ï¼‰ã€‚
+- `SIGUSR1` åœ¨æŽˆæƒæ—¶è§¦å‘è¿›ç¨‹å†…é‡å¯ï¼ˆå¯ç”¨ `commands.restart` æˆ–ä½¿ç”¨ gateway å·¥å…·/config apply/updateï¼‰ã€‚
+- `SIGINT`/`SIGTERM` å¤„ç†ç¨‹åºä¼šåœæ­¢ Gateway ç½‘å…³è¿›ç¨‹ï¼Œä½†ä¸ä¼šæ¢å¤ä»»ä½•è‡ªå®šä¹‰ç»ˆç«¯çŠ¶æ€ã€‚å¦‚æžœä½ ç”¨ TUI æˆ– raw-mode è¾“å…¥åŒ…è£… CLIï¼Œè¯·åœ¨é€€å‡ºå‰æ¢å¤ç»ˆç«¯ã€‚
 
-### 选项
+### é€‰é¡¹
 
-- `--port <port>`：WebSocket 端口（默认来自配置/环境变量；通常为 `18789`）。
-- `--bind <loopback|lan|tailnet|auto|custom>`：监听器绑定模式。
-- `--auth <token|password>`：认证模式覆盖。
-- `--token <token>`：令牌覆盖（同时为进程设置 `OpenKrab_GATEWAY_TOKEN`）。
-- `--password <password>`：密码覆盖（同时为进程设置 `OpenKrab_GATEWAY_PASSWORD`）。
-- `--tailscale <off|serve|funnel>`：通过 Tailscale 暴露 Gateway 网关。
-- `--tailscale-reset-on-exit`：关闭时重置 Tailscale serve/funnel 配置。
-- `--allow-unconfigured`：允许在配置中没有 `gateway.mode=local` 的情况下启动 Gateway 网关。
-- `--dev`：如果缺失则创建开发配置 + 工作区（跳过 BOOTSTRAP.md）。
-- `--reset`：重置开发配置 + 凭证 + 会话 + 工作区（需要 `--dev`）。
-- `--force`：启动前杀死所选端口上的任何现有监听器。
-- `--verbose`：详细日志。
-- `--claude-cli-logs`：仅在控制台显示 claude-cli 日志（并启用其 stdout/stderr）。
-- `--ws-log <auto|full|compact>`：WebSocket 日志样式（默认 `auto`）。
-- `--compact`：`--ws-log compact` 的别名。
-- `--raw-stream`：将原始模型流事件记录到 jsonl。
-- `--raw-stream-path <path>`：原始流 jsonl 路径。
+- `--port <port>`ï¼šWebSocket ç«¯å£ï¼ˆé»˜è®¤æ¥è‡ªé…ç½®/çŽ¯å¢ƒå˜é‡ï¼›é€šå¸¸ä¸º `18789`ï¼‰ã€‚
+- `--bind <loopback|lan|tailnet|auto|custom>`ï¼šç›‘å¬å™¨ç»‘å®šæ¨¡å¼ã€‚
+- `--auth <token|password>`ï¼šè®¤è¯æ¨¡å¼è¦†ç›–ã€‚
+- `--token <token>`ï¼šä»¤ç‰Œè¦†ç›–ï¼ˆåŒæ—¶ä¸ºè¿›ç¨‹è®¾ç½® `OPENKRAB_GATEWAY_TOKEN`ï¼‰ã€‚
+- `--password <password>`ï¼šå¯†ç è¦†ç›–ï¼ˆåŒæ—¶ä¸ºè¿›ç¨‹è®¾ç½® `OPENKRAB_GATEWAY_PASSWORD`ï¼‰ã€‚
+- `--tailscale <off|serve|funnel>`ï¼šé€šè¿‡ Tailscale æš´éœ² Gateway ç½‘å…³ã€‚
+- `--tailscale-reset-on-exit`ï¼šå…³é—­æ—¶é‡ç½® Tailscale serve/funnel é…ç½®ã€‚
+- `--allow-unconfigured`ï¼šå…è®¸åœ¨é…ç½®ä¸­æ²¡æœ‰ `gateway.mode=local` çš„æƒ…å†µä¸‹å¯åŠ¨ Gateway ç½‘å…³ã€‚
+- `--dev`ï¼šå¦‚æžœç¼ºå¤±åˆ™åˆ›å»ºå¼€å‘é…ç½® + å·¥ä½œåŒºï¼ˆè·³è¿‡ BOOTSTRAP.mdï¼‰ã€‚
+- `--reset`ï¼šé‡ç½®å¼€å‘é…ç½® + å‡­è¯ + ä¼šè¯ + å·¥ä½œåŒºï¼ˆéœ€è¦ `--dev`ï¼‰ã€‚
+- `--force`ï¼šå¯åŠ¨å‰æ€æ­»æ‰€é€‰ç«¯å£ä¸Šçš„ä»»ä½•çŽ°æœ‰ç›‘å¬å™¨ã€‚
+- `--verbose`ï¼šè¯¦ç»†æ—¥å¿—ã€‚
+- `--claude-cli-logs`ï¼šä»…åœ¨æŽ§åˆ¶å°æ˜¾ç¤º claude-cli æ—¥å¿—ï¼ˆå¹¶å¯ç”¨å…¶ stdout/stderrï¼‰ã€‚
+- `--ws-log <auto|full|compact>`ï¼šWebSocket æ—¥å¿—æ ·å¼ï¼ˆé»˜è®¤ `auto`ï¼‰ã€‚
+- `--compact`ï¼š`--ws-log compact` çš„åˆ«åã€‚
+- `--raw-stream`ï¼šå°†åŽŸå§‹æ¨¡åž‹æµäº‹ä»¶è®°å½•åˆ° jsonlã€‚
+- `--raw-stream-path <path>`ï¼šåŽŸå§‹æµ jsonl è·¯å¾„ã€‚
 
-## 查询运行中的 Gateway 网关
+## æŸ¥è¯¢è¿è¡Œä¸­çš„ Gateway ç½‘å…³
 
-所有查询命令使用 WebSocket RPC。
+æ‰€æœ‰æŸ¥è¯¢å‘½ä»¤ä½¿ç”¨ WebSocket RPCã€‚
 
-输出模式：
+è¾“å‡ºæ¨¡å¼ï¼š
 
-- 默认：人类可读（TTY 中带颜色）。
-- `--json`：机器可读 JSON（无样式/进度指示器）。
-- `--no-color`（或 `NO_COLOR=1`）：禁用 ANSI 但保持人类可读布局。
+- é»˜è®¤ï¼šäººç±»å¯è¯»ï¼ˆTTY ä¸­å¸¦é¢œè‰²ï¼‰ã€‚
+- `--json`ï¼šæœºå™¨å¯è¯» JSONï¼ˆæ— æ ·å¼/è¿›åº¦æŒ‡ç¤ºå™¨ï¼‰ã€‚
+- `--no-color`ï¼ˆæˆ– `NO_COLOR=1`ï¼‰ï¼šç¦ç”¨ ANSI ä½†ä¿æŒäººç±»å¯è¯»å¸ƒå±€ã€‚
 
-共享选项（在支持的地方）：
+å…±äº«é€‰é¡¹ï¼ˆåœ¨æ”¯æŒçš„åœ°æ–¹ï¼‰ï¼š
 
-- `--url <url>`：Gateway 网关 WebSocket URL。
-- `--token <token>`：Gateway 网关令牌。
-- `--password <password>`：Gateway 网关密码。
-- `--timeout <ms>`：超时/预算（因命令而异）。
-- `--expect-final`：等待"最终"响应（智能体调用）。
+- `--url <url>`ï¼šGateway ç½‘å…³ WebSocket URLã€‚
+- `--token <token>`ï¼šGateway ç½‘å…³ä»¤ç‰Œã€‚
+- `--password <password>`ï¼šGateway ç½‘å…³å¯†ç ã€‚
+- `--timeout <ms>`ï¼šè¶…æ—¶/é¢„ç®—ï¼ˆå› å‘½ä»¤è€Œå¼‚ï¼‰ã€‚
+- `--expect-final`ï¼šç­‰å¾…"æœ€ç»ˆ"å“åº”ï¼ˆæ™ºèƒ½ä½“è°ƒç”¨ï¼‰ã€‚
 
 ### `gateway health`
 
@@ -93,67 +93,67 @@ OpenKrab gateway health --url ws://127.0.0.1:18789
 
 ### `gateway status`
 
-`gateway status` 显示 Gateway 网关服务（launchd/systemd/schtasks）以及可选的 RPC 探测。
+`gateway status` æ˜¾ç¤º Gateway ç½‘å…³æœåŠ¡ï¼ˆlaunchd/systemd/schtasksï¼‰ä»¥åŠå¯é€‰çš„ RPC æŽ¢æµ‹ã€‚
 
 ```bash
 OpenKrab gateway status
 OpenKrab gateway status --json
 ```
 
-选项：
+é€‰é¡¹ï¼š
 
-- `--url <url>`：覆盖探测 URL。
-- `--token <token>`：探测的令牌认证。
-- `--password <password>`：探测的密码认证。
-- `--timeout <ms>`：探测超时（默认 `10000`）。
-- `--no-probe`：跳过 RPC 探测（仅服务视图）。
-- `--deep`：也扫描系统级服务。
+- `--url <url>`ï¼šè¦†ç›–æŽ¢æµ‹ URLã€‚
+- `--token <token>`ï¼šæŽ¢æµ‹çš„ä»¤ç‰Œè®¤è¯ã€‚
+- `--password <password>`ï¼šæŽ¢æµ‹çš„å¯†ç è®¤è¯ã€‚
+- `--timeout <ms>`ï¼šæŽ¢æµ‹è¶…æ—¶ï¼ˆé»˜è®¤ `10000`ï¼‰ã€‚
+- `--no-probe`ï¼šè·³è¿‡ RPC æŽ¢æµ‹ï¼ˆä»…æœåŠ¡è§†å›¾ï¼‰ã€‚
+- `--deep`ï¼šä¹Ÿæ‰«æç³»ç»Ÿçº§æœåŠ¡ã€‚
 
 ### `gateway probe`
 
-`gateway probe` 是"调试一切"命令。它始终探测：
+`gateway probe` æ˜¯"è°ƒè¯•ä¸€åˆ‡"å‘½ä»¤ã€‚å®ƒå§‹ç»ˆæŽ¢æµ‹ï¼š
 
-- 你配置的远程 Gateway 网关（如果设置了），以及
-- localhost（loopback）**即使配置了远程也会探测**。
+- ä½ é…ç½®çš„è¿œç¨‹ Gateway ç½‘å…³ï¼ˆå¦‚æžœè®¾ç½®äº†ï¼‰ï¼Œä»¥åŠ
+- localhostï¼ˆloopbackï¼‰**å³ä½¿é…ç½®äº†è¿œç¨‹ä¹Ÿä¼šæŽ¢æµ‹**ã€‚
 
-如果多个 Gateway 网关可达，它会打印所有。当你使用隔离的配置文件/端口（例如救援机器人）时支持多个 Gateway 网关，但大多数安装仍然运行单个 Gateway 网关。
+å¦‚æžœå¤šä¸ª Gateway ç½‘å…³å¯è¾¾ï¼Œå®ƒä¼šæ‰“å°æ‰€æœ‰ã€‚å½“ä½ ä½¿ç”¨éš”ç¦»çš„é…ç½®æ–‡ä»¶/ç«¯å£ï¼ˆä¾‹å¦‚æ•‘æ´æœºå™¨äººï¼‰æ—¶æ”¯æŒå¤šä¸ª Gateway ç½‘å…³ï¼Œä½†å¤§å¤šæ•°å®‰è£…ä»ç„¶è¿è¡Œå•ä¸ª Gateway ç½‘å…³ã€‚
 
 ```bash
 OpenKrab gateway probe
 OpenKrab gateway probe --json
 ```
 
-#### 通过 SSH 远程（Mac 应用对等）
+#### é€šè¿‡ SSH è¿œç¨‹ï¼ˆMac åº”ç”¨å¯¹ç­‰ï¼‰
 
-macOS 应用的"通过 SSH 远程"模式使用本地端口转发，因此远程 Gateway 网关（可能仅绑定到 loopback）变得可以通过 `ws://127.0.0.1:<port>` 访问。
+macOS åº”ç”¨çš„"é€šè¿‡ SSH è¿œç¨‹"æ¨¡å¼ä½¿ç”¨æœ¬åœ°ç«¯å£è½¬å‘ï¼Œå› æ­¤è¿œç¨‹ Gateway ç½‘å…³ï¼ˆå¯èƒ½ä»…ç»‘å®šåˆ° loopbackï¼‰å˜å¾—å¯ä»¥é€šè¿‡ `ws://127.0.0.1:<port>` è®¿é—®ã€‚
 
-CLI 等效命令：
+CLI ç­‰æ•ˆå‘½ä»¤ï¼š
 
 ```bash
 OpenKrab gateway probe --ssh user@gateway-host
 ```
 
-选项：
+é€‰é¡¹ï¼š
 
-- `--ssh <target>`：`user@host` 或 `user@host:port`（端口默认为 `22`）。
-- `--ssh-identity <path>`：身份文件。
-- `--ssh-auto`：选择第一个发现的 Gateway 网关主机作为 SSH 目标（仅限局域网/WAB）。
+- `--ssh <target>`ï¼š`user@host` æˆ– `user@host:port`ï¼ˆç«¯å£é»˜è®¤ä¸º `22`ï¼‰ã€‚
+- `--ssh-identity <path>`ï¼šèº«ä»½æ–‡ä»¶ã€‚
+- `--ssh-auto`ï¼šé€‰æ‹©ç¬¬ä¸€ä¸ªå‘çŽ°çš„ Gateway ç½‘å…³ä¸»æœºä½œä¸º SSH ç›®æ ‡ï¼ˆä»…é™å±€åŸŸç½‘/WABï¼‰ã€‚
 
-配置（可选，用作默认值）：
+é…ç½®ï¼ˆå¯é€‰ï¼Œç”¨ä½œé»˜è®¤å€¼ï¼‰ï¼š
 
 - `gateway.remote.sshTarget`
 - `gateway.remote.sshIdentity`
 
 ### `gateway call <method>`
 
-低级 RPC 辅助工具。
+ä½Žçº§ RPC è¾…åŠ©å·¥å…·ã€‚
 
 ```bash
 OpenKrab gateway call status
 OpenKrab gateway call logs.tail --params '{"sinceMs": 60000}'
 ```
 
-## 管理 Gateway 网关服务
+## ç®¡ç† Gateway ç½‘å…³æœåŠ¡
 
 ```bash
 OpenKrab gateway install
@@ -163,29 +163,29 @@ OpenKrab gateway restart
 OpenKrab gateway uninstall
 ```
 
-注意事项：
+æ³¨æ„äº‹é¡¹ï¼š
 
-- `gateway install` 支持 `--port`、`--runtime`、`--token`、`--force`、`--json`。
-- 生命周期命令接受 `--json` 用于脚本。
+- `gateway install` æ”¯æŒ `--port`ã€`--runtime`ã€`--token`ã€`--force`ã€`--json`ã€‚
+- ç”Ÿå‘½å‘¨æœŸå‘½ä»¤æŽ¥å— `--json` ç”¨äºŽè„šæœ¬ã€‚
 
-## 发现 Gateway 网关（Bonjour）
+## å‘çŽ° Gateway ç½‘å…³ï¼ˆBonjourï¼‰
 
-`gateway discover` 扫描 Gateway 网关信标（`_OpenKrab-gw._tcp`）。
+`gateway discover` æ‰«æ Gateway ç½‘å…³ä¿¡æ ‡ï¼ˆ`_OpenKrab-gw._tcp`ï¼‰ã€‚
 
-- 组播 DNS-SD：`local.`
-- 单播 DNS-SD（广域 Bonjour）：选择一个域（示例：`OpenKrab.internal.`）并设置分割 DNS + DNS 服务器；参见 [/gateway/bonjour](/gateway/bonjour)
+- ç»„æ’­ DNS-SDï¼š`local.`
+- å•æ’­ DNS-SDï¼ˆå¹¿åŸŸ Bonjourï¼‰ï¼šé€‰æ‹©ä¸€ä¸ªåŸŸï¼ˆç¤ºä¾‹ï¼š`OpenKrab.internal.`ï¼‰å¹¶è®¾ç½®åˆ†å‰² DNS + DNS æœåŠ¡å™¨ï¼›å‚è§ [/gateway/bonjour](/gateway/bonjour)
 
-只有启用了 Bonjour 发现（默认）的 Gateway 网关才会广播信标。
+åªæœ‰å¯ç”¨äº† Bonjour å‘çŽ°ï¼ˆé»˜è®¤ï¼‰çš„ Gateway ç½‘å…³æ‰ä¼šå¹¿æ’­ä¿¡æ ‡ã€‚
 
-广域发现记录包括（TXT）：
+å¹¿åŸŸå‘çŽ°è®°å½•åŒ…æ‹¬ï¼ˆTXTï¼‰ï¼š
 
-- `role`（Gateway 网关角色提示）
-- `transport`（传输提示，例如 `gateway`）
-- `gatewayPort`（WebSocket 端口，通常为 `18789`）
-- `sshPort`（SSH 端口；如果不存在则默认为 `22`）
-- `tailnetDns`（MagicDNS 主机名，如果可用）
-- `gatewayTls` / `gatewayTlsSha256`（TLS 启用 + 证书指纹）
-- `cliPath`（远程安装的可选提示）
+- `role`ï¼ˆGateway ç½‘å…³è§’è‰²æç¤ºï¼‰
+- `transport`ï¼ˆä¼ è¾“æç¤ºï¼Œä¾‹å¦‚ `gateway`ï¼‰
+- `gatewayPort`ï¼ˆWebSocket ç«¯å£ï¼Œé€šå¸¸ä¸º `18789`ï¼‰
+- `sshPort`ï¼ˆSSH ç«¯å£ï¼›å¦‚æžœä¸å­˜åœ¨åˆ™é»˜è®¤ä¸º `22`ï¼‰
+- `tailnetDns`ï¼ˆMagicDNS ä¸»æœºåï¼Œå¦‚æžœå¯ç”¨ï¼‰
+- `gatewayTls` / `gatewayTlsSha256`ï¼ˆTLS å¯ç”¨ + è¯ä¹¦æŒ‡çº¹ï¼‰
+- `cliPath`ï¼ˆè¿œç¨‹å®‰è£…çš„å¯é€‰æç¤ºï¼‰
 
 ### `gateway discover`
 
@@ -193,15 +193,16 @@ OpenKrab gateway uninstall
 OpenKrab gateway discover
 ```
 
-选项：
+é€‰é¡¹ï¼š
 
-- `--timeout <ms>`：每个命令的超时（浏览/解析）；默认 `2000`。
-- `--json`：机器可读输出（同时禁用样式/进度指示器）。
+- `--timeout <ms>`ï¼šæ¯ä¸ªå‘½ä»¤çš„è¶…æ—¶ï¼ˆæµè§ˆ/è§£æžï¼‰ï¼›é»˜è®¤ `2000`ã€‚
+- `--json`ï¼šæœºå™¨å¯è¯»è¾“å‡ºï¼ˆåŒæ—¶ç¦ç”¨æ ·å¼/è¿›åº¦æŒ‡ç¤ºå™¨ï¼‰ã€‚
 
-示例：
+ç¤ºä¾‹ï¼š
 
 ```bash
 OpenKrab gateway discover --timeout 4000
 OpenKrab gateway discover --json | jq '.beacons[].wsUrl'
 ```
+
 

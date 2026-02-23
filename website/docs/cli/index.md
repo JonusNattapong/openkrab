@@ -1,5 +1,5 @@
----
-summary: "OpenKrab CLI reference for `krabkrab` commands, subcommands, and options"
+﻿---
+summary: "OpenKrab CLI reference for `openkrab` commands, subcommands, and options"
 read_when:
   - Adding or modifying CLI commands or options
   - Documenting new command surfaces
@@ -65,8 +65,7 @@ OpenKrab uses a lobster palette for CLI output.
 
 ## Command tree
 
-```
-krabkrab [--config <path>] [--data-dir <path>] <command>
+```\nOpenKrab [--config <path>] [--data-dir <path>] <command>
   setup                    # Initialize config and workspace
   config
     get <key>              # Get config value
@@ -143,17 +142,17 @@ krabkrab [--config <path>] [--data-dir <path>] <command>
 
 ## Security
 
-- `krabkrab security audit` — audit config + local state for common security issues
-- `krabkrab security audit --fix` — tighten safe defaults
+- `openkrab security audit` â€” audit config + local state for common security issues
+- `openkrab security audit --fix` â€” tighten safe defaults
 
 ## Memory
 
 Vector search over memory files:
 
-- `krabkrab memory status` — show index stats
-- `krabkrab memory sync --path <dir>` — sync memory from directory
-- `krabkrab memory search "<query>"` — semantic search over memory
-- `krabkrab memory index` — reindex memory files
+- `openkrab memory status` â€” show index stats
+- `openkrab memory sync --path <dir>` â€” sync memory from directory
+- `openkrab memory search "<query>"` â€” semantic search over memory
+- `openkrab memory index` â€” reindex memory files
 
 ## Setup + configuration
 
@@ -175,10 +174,7 @@ Subcommands:
 - `config unset <key>`: remove a value
 
 Examples:
-```bash
-krabkrab config get providers.openai.api_key
-krabkrab config set providers.openai.model "gpt-4o"
-krabkrab config unset providers.openai.api_key
+```bash\nOpenKrab config get providers.openai.api_key\nOpenKrab config set providers.openai.model "gpt-4o"\nOpenKrab config unset providers.openai.api_key
 ```
 
 ### `doctor`
@@ -203,10 +199,7 @@ Subcommands:
 - `channels remove`: remove a channel
 
 Examples:
-```bash
-krabkrab channels add telegram --token $TELEGRAM_BOT_TOKEN
-krabkrab channels add discord --token $DISCORD_BOT_TOKEN
-krabkrab channels status
+```bash\nOpenKrab channels add telegram --token $TELEGRAM_BOT_TOKEN\nOpenKrab channels add discord --token $DISCORD_BOT_TOKEN\nOpenKrab channels status
 ```
 
 ### `skills`
@@ -233,10 +226,7 @@ Subcommands:
 Unified outbound messaging.
 
 Examples:
-```bash
-krabkrab message send --to @username --text "Hello"
-krabkrab telegram --to @username --text "Hello from OpenKrab!"
-krabkrab discord --to 123456789 --text "Hello!"
+```bash\nOpenKrab message send --to @username --text "Hello"\nOpenKrab telegram --to @username --text "Hello from OpenKrab!"\nOpenKrab discord --to 123456789 --text "Hello!"
 ```
 
 ### `agent` / `ask`
@@ -252,9 +242,7 @@ Options:
 - `--timeout <seconds>`
 
 Examples:
-```bash
-krabkrab ask "What's on my calendar today?"
-krabkrab agent --message "Hello" --channel telegram
+```bash\nOpenKrab ask "What's on my calendar today?"\nOpenKrab agent --message "Hello" --channel telegram
 ```
 
 ### `agents`
@@ -353,10 +341,7 @@ Subcommands:
 Tail Gateway logs.
 
 Examples:
-```bash
-krabkrab logs --follow
-krabkrab logs --limit 200
-krabkrab logs --json
+```bash\nOpenKrab logs --follow\nOpenKrab logs --limit 200\nOpenKrab logs --json
 ```
 
 ## Models
@@ -397,22 +382,22 @@ Subcommands:
 - `voice mic_stop`: stop capture
 
 Examples:
-```bash
-krabkrab voice wake
-krabkrab voice speak "Hello World"
-krabkrab voice mic_start
+```bash\nOpenKrab voice wake\nOpenKrab voice speak "Hello World"\nOpenKrab voice mic_start
 ```
 
 ## Plugins
 
 Manage WASM plugins:
 
-- `krabkrab plugin list` — list loaded plugins
-- `krabkrab plugin load <path>` — load a plugin
-- `krabkrab plugin unload <name>` — unload a plugin
+- `openkrab plugin list` â€” list loaded plugins
+- `openkrab plugin load <path>` â€” load a plugin
+- `openkrab plugin unload <name>` â€” unload a plugin
 
 ## Environment variables
 
-- `KRABKRAB_CONFIG_DIR`: config directory (default: `~/.config/krabkrab/`)
-- `KRABKRAB_DATA_DIR`: data directory
+- `OPENKRAB_CONFIG_DIR`: config directory (default: `~/.config/openkrab/`)
+- `OPENKRAB_DATA_DIR`: data directory
 - `RUST_LOG`: logging level (e.g., `info`, `debug`)
+
+
+

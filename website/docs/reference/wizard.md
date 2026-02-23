@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Full reference for the CLI onboarding wizard: every step, flag, and config field"
 read_when:
   - Looking up a specific wizard step or flag
@@ -56,7 +56,7 @@ For a high-level overview, see [Onboarding Wizard](/start/wizard).
     - More detail: [/concepts/oauth](/concepts/oauth)
     <Note>
     Headless/server tip: complete OAuth on a machine with a browser, then copy
-    `~/.OpenKrab/credentials/oauth.json` (or `$OpenKrab_STATE_DIR/credentials/oauth.json`) to the
+    `~/.OpenKrab/credentials/oauth.json` (or `$OPENKRAB_STATE_DIR/credentials/oauth.json`) to the
     gateway host.
     </Note>
   </Step>
@@ -69,7 +69,7 @@ For a high-level overview, see [Onboarding Wizard](/start/wizard).
     - Port, bind, auth mode, tailscale exposure.
     - Auth recommendation: keep **Token** even for loopback so local WS clients must authenticate.
     - Disable auth only if you fully trust every local process.
-    - Non‑loopback binds still require auth.
+    - Nonâ€‘loopback binds still require auth.
   </Step>
   <Step title="Channels">
     - [WhatsApp](/channels/whatsapp): optional QR login.
@@ -125,7 +125,7 @@ OpenKrab onboard --non-interactive \
   --skip-skills
 ```
 
-Add `--json` for a machine‑readable summary.
+Add `--json` for a machineâ€‘readable summary.
 
 <Note>
 `--json` does **not** imply non-interactive mode. Use `--non-interactive` (and `--workspace`) for scripts.
@@ -220,7 +220,7 @@ OpenKrab agents add work \
 ## Gateway wizard RPC
 
 The Gateway exposes the wizard flow over RPC (`wizard.start`, `wizard.next`, `wizard.cancel`, `wizard.status`).
-Clients (macOS app, Control UI) can render steps without re‑implementing onboarding logic.
+Clients (macOS app, Control UI) can render steps without reâ€‘implementing onboarding logic.
 
 ## Signal setup (signal-cli)
 
@@ -267,4 +267,5 @@ will prompt to install it (npm or a local path) before it can be configured.
 - Config reference: [Gateway configuration](/gateway/configuration)
 - Providers: [WhatsApp](/channels/whatsapp), [Telegram](/channels/telegram), [Discord](/channels/discord), [Google Chat](/channels/googlechat), [Signal](/channels/signal), [BlueBubbles](/channels/bluebubbles) (iMessage), [iMessage](/channels/imessage) (legacy)
 - Skills: [Skills](/tools/skills), [Skills config](/tools/skills-config)
+
 

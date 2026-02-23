@@ -1,5 +1,5 @@
----
-summary: "Frequently asked questions about openkrab setup, configuration, and usage"
+﻿---
+summary: "Frequently asked questions about OpenKrab setup, configuration, and usage"
 title: "FAQ"
 ---
 
@@ -26,12 +26,12 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [How do I try the latest bits?](#how-do-i-try-the-latest-bits)
   - [How long does install and onboarding usually take?](#how-long-does-install-and-onboarding-usually-take)
   - [Installer stuck? How do I get more feedback?](#installer-stuck-how-do-i-get-more-feedback)
-  - [Windows install says git not found or openkrab not recognized](#windows-install-says-git-not-found-or-openkrab-not-recognized)
+  - [Windows install says git not found or OpenKrab not recognized](#windows-install-says-git-not-found-or-openkrab-not-recognized)
   - [The docs didn't answer my question - how do I get a better answer?](#the-docs-didnt-answer-my-question-how-do-i-get-a-better-answer)
-  - [How do I install openkrab on Linux?](#how-do-i-install-openkrab-on-linux)
-  - [How do I install openkrab on a VPS?](#how-do-i-install-openkrab-on-a-vps)
+  - [How do I install OpenKrab on Linux?](#how-do-i-install-openkrab-on-linux)
+  - [How do I install OpenKrab on a VPS?](#how-do-i-install-openkrab-on-a-vps)
   - [Where are the cloud/VPS install guides?](#where-are-the-cloudvps-install-guides)
-  - [Can I ask openkrab to update itself?](#can-i-ask-openkrab-to-update-itself)
+  - [Can I ask OpenKrab to update itself?](#can-i-ask-openkrab-to-update-itself)
   - [What does the onboarding wizard actually do?](#what-does-the-onboarding-wizard-actually-do)
   - [Do I need a Claude or OpenAI subscription to run this?](#do-i-need-a-claude-or-openai-subscription-to-run-this)
   - [Can I use Claude Max subscription without an API key](#can-i-use-claude-max-subscription-without-an-api-key)
@@ -47,24 +47,24 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [How do I keep hosted model traffic in a specific region?](#how-do-i-keep-hosted-model-traffic-in-a-specific-region)
   - [Do I have to buy a Mac Mini to install this?](#do-i-have-to-buy-a-mac-mini-to-install-this)
   - [Do I need a Mac mini for iMessage support?](#do-i-need-a-mac-mini-for-imessage-support)
-  - [If I buy a Mac mini to run openkrab, can I connect it to my MacBook Pro?](#if-i-buy-a-mac-mini-to-run-openkrab-can-i-connect-it-to-my-macbook-pro)
+  - [If I buy a Mac mini to run OpenKrab, can I connect it to my MacBook Pro?](#if-i-buy-a-mac-mini-to-run-openkrab-can-i-connect-it-to-my-macbook-pro)
   - [Can I use Bun?](#can-i-use-bun)
   - [Telegram: what goes in `allowFrom`?](#telegram-what-goes-in-allowfrom)
-  - [Can multiple people use one WhatsApp number with different openkrab instances?](#can-multiple-people-use-one-whatsapp-number-with-different-openkrab-instances)
+  - [Can multiple people use one WhatsApp number with different OpenKrab instances?](#can-multiple-people-use-one-whatsapp-number-with-different-openkrab-instances)
   - [Can I run a "fast chat" agent and an "Opus for coding" agent?](#can-i-run-a-fast-chat-agent-and-an-opus-for-coding-agent)
   - [Does Homebrew work on Linux?](#does-homebrew-work-on-linux)
   - [What's the difference between the hackable (git) install and npm install?](#whats-the-difference-between-the-hackable-git-install-and-npm-install)
   - [Can I switch between npm and git installs later?](#can-i-switch-between-npm-and-git-installs-later)
   - [Should I run the Gateway on my laptop or a VPS?](#should-i-run-the-gateway-on-my-laptop-or-a-vps)
-  - [How important is it to run openkrab on a dedicated machine?](#how-important-is-it-to-run-openkrab-on-a-dedicated-machine)
+  - [How important is it to run OpenKrab on a dedicated machine?](#how-important-is-it-to-run-openkrab-on-a-dedicated-machine)
   - [What are the minimum VPS requirements and recommended OS?](#what-are-the-minimum-vps-requirements-and-recommended-os)
-  - [Can I run openkrab in a VM and what are the requirements](#can-i-run-openkrab-in-a-vm-and-what-are-the-requirements)
+  - [Can I run OpenKrab in a VM and what are the requirements](#can-i-run-openkrab-in-a-vm-and-what-are-the-requirements)
 - [What is openkrab?](#what-is-openkrab)
-  - [What is openkrab, in one paragraph?](#what-is-openkrab-in-one-paragraph)
+  - [What is OpenKrab, in one paragraph?](#what-is-openkrab-in-one-paragraph)
   - [What's the value proposition?](#whats-the-value-proposition)
   - [I just set it up what should I do first](#i-just-set-it-up-what-should-i-do-first)
   - [What are the top five everyday use cases for openkrab](#what-are-the-top-five-everyday-use-cases-for-openkrab)
-  - [Can openkrab help with lead gen outreach ads and blogs for a SaaS](#can-openkrab-help-with-lead-gen-outreach-ads-and-blogs-for-a-saas)
+  - [Can OpenKrab help with lead gen outreach ads and blogs for a SaaS](#can-openkrab-help-with-lead-gen-outreach-ads-and-blogs-for-a-saas)
   - [What are the advantages vs Claude Code for web development?](#what-are-the-advantages-vs-claude-code-for-web-development)
 - [Skills and automation](#skills-and-automation)
   - [How do I customize skills without keeping the repo dirty?](#how-do-i-customize-skills-without-keeping-the-repo-dirty)
@@ -73,7 +73,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [The bot freezes while doing heavy work. How do I offload that?](#the-bot-freezes-while-doing-heavy-work-how-do-i-offload-that)
   - [Cron or reminders do not fire. What should I check?](#cron-or-reminders-do-not-fire-what-should-i-check)
   - [How do I install skills on Linux?](#how-do-i-install-skills-on-linux)
-  - [Can openkrab run tasks on a schedule or continuously in the background?](#can-openkrab-run-tasks-on-a-schedule-or-continuously-in-the-background)
+  - [Can OpenKrab run tasks on a schedule or continuously in the background?](#can-openkrab-run-tasks-on-a-schedule-or-continuously-in-the-background)
   - [Can I run Apple macOS-only skills from Linux?](#can-i-run-apple-macos-only-skills-from-linux)
   - [Do you have a Notion or HeyGen integration?](#do-you-have-a-notion-or-heygen-integration)
   - [How do I install the Chrome extension for browser takeover?](#how-do-i-install-the-chrome-extension-for-browser-takeover)
@@ -85,8 +85,8 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [Does memory persist forever? What are the limits?](#does-memory-persist-forever-what-are-the-limits)
   - [Does semantic memory search require an OpenAI API key?](#does-semantic-memory-search-require-an-openai-api-key)
 - [Where things live on disk](#where-things-live-on-disk)
-  - [Is all data used with openkrab saved locally?](#is-all-data-used-with-openkrab-saved-locally)
-  - [Where does openkrab store its data?](#where-does-openkrab-store-its-data)
+  - [Is all data used with OpenKrab saved locally?](#is-all-data-used-with-openkrab-saved-locally)
+  - [Where does OpenKrab store its data?](#where-does-openkrab-store-its-data)
   - [Where should AGENTS.md / SOUL.md / USER.md / MEMORY.md live?](#where-should-agentsmd-soulmd-usermd-memorymd-live)
   - [What's the recommended backup strategy?](#whats-the-recommended-backup-strategy)
   - [How do I completely uninstall openkrab?](#how-do-i-completely-uninstall-openkrab)
@@ -100,13 +100,13 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [How do I enable web search (and web fetch)?](#how-do-i-enable-web-search-and-web-fetch)
   - [config.apply wiped my config. How do I recover and avoid this?](#configapply-wiped-my-config-how-do-i-recover-and-avoid-this)
   - [How do I run a central Gateway with specialized workers across devices?](#how-do-i-run-a-central-gateway-with-specialized-workers-across-devices)
-  - [Can the openkrab browser run headless?](#can-the-openkrab-browser-run-headless)
+  - [Can the OpenKrab browser run headless?](#can-the-openkrab-browser-run-headless)
   - [How do I use Brave for browser control?](#how-do-i-use-brave-for-browser-control)
 - [Remote gateways and nodes](#remote-gateways-and-nodes)
   - [How do commands propagate between Telegram, the gateway, and nodes?](#how-do-commands-propagate-between-telegram-the-gateway-and-nodes)
   - [How can my agent access my computer if the Gateway is hosted remotely?](#how-can-my-agent-access-my-computer-if-the-gateway-is-hosted-remotely)
   - [Tailscale is connected but I get no replies. What now?](#tailscale-is-connected-but-i-get-no-replies-what-now)
-  - [Can two openkrab instances talk to each other (local + VPS)?](#can-two-openkrab-instances-talk-to-each-other-local-vps)
+  - [Can two OpenKrab instances talk to each other (local + VPS)?](#can-two-openkrab-instances-talk-to-each-other-local-vps)
   - [Do I need separate VPSes for multiple agents](#do-i-need-separate-vpses-for-multiple-agents)
   - [Is there a benefit to using a node on my personal laptop instead of SSH from a VPS?](#is-there-a-benefit-to-using-a-node-on-my-personal-laptop-instead-of-ssh-from-a-vps)
   - [Do nodes run a gateway service?](#do-nodes-run-a-gateway-service)
@@ -116,21 +116,21 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [How do I connect a Mac node to a remote Gateway (Tailscale Serve)?](#how-do-i-connect-a-mac-node-to-a-remote-gateway-tailscale-serve)
   - [Should I install on a second laptop or just add a node?](#should-i-install-on-a-second-laptop-or-just-add-a-node)
 - [Env vars and .env loading](#env-vars-and-env-loading)
-  - [How does openkrab load environment variables?](#how-does-openkrab-load-environment-variables)
+  - [How does OpenKrab load environment variables?](#how-does-openkrab-load-environment-variables)
   - ["I started the Gateway via the service and my env vars disappeared." What now?](#i-started-the-gateway-via-the-service-and-my-env-vars-disappeared-what-now)
   - [I set `COPILOT_GITHUB_TOKEN`, but models status shows "Shell env: off." Why?](#i-set-copilotgithubtoken-but-models-status-shows-shell-env-off-why)
 - [Sessions and multiple chats](#sessions-and-multiple-chats)
   - [How do I start a fresh conversation?](#how-do-i-start-a-fresh-conversation)
   - [Do sessions reset automatically if I never send `/new`?](#do-sessions-reset-automatically-if-i-never-send-new)
-  - [Is there a way to make a team of openkrab instances one CEO and many agents](#is-there-a-way-to-make-a-team-of-openkrab-instances-one-ceo-and-many-agents)
+  - [Is there a way to make a team of OpenKrab instances one CEO and many agents](#is-there-a-way-to-make-a-team-of-openkrab-instances-one-ceo-and-many-agents)
   - [Why did context get truncated mid-task? How do I prevent it?](#why-did-context-get-truncated-midtask-how-do-i-prevent-it)
-  - [How do I completely reset openkrab but keep it installed?](#how-do-i-completely-reset-openkrab-but-keep-it-installed)
+  - [How do I completely reset OpenKrab but keep it installed?](#how-do-i-completely-reset-openkrab-but-keep-it-installed)
   - [I'm getting "context too large" errors - how do I reset or compact?](#im-getting-context-too-large-errors-how-do-i-reset-or-compact)
   - [Why am I seeing "LLM request rejected: messages.N.content.X.tool_use.input: Field required"?](#why-am-i-seeing-llm-request-rejected-messagesncontentxtooluseinput-field-required)
   - [Why am I getting heartbeat messages every 30 minutes?](#why-am-i-getting-heartbeat-messages-every-30-minutes)
   - [Do I need to add a "bot account" to a WhatsApp group?](#do-i-need-to-add-a-bot-account-to-a-whatsapp-group)
   - [How do I get the JID of a WhatsApp group?](#how-do-i-get-the-jid-of-a-whatsapp-group)
-  - [Why doesn't openkrab reply in a group?](#why-doesnt-openkrab-reply-in-a-group)
+  - [Why doesn't OpenKrab reply in a group?](#why-doesnt-openkrab-reply-in-a-group)
   - [Do groups/threads share context with DMs?](#do-groupsthreads-share-context-with-dms)
   - [How many workspaces and agents can I create?](#how-many-workspaces-and-agents-can-i-create)
   - [Can I run multiple bots or chats at the same time (Slack), and how should I set that up?](#can-i-run-multiple-bots-or-chats-at-the-same-time-slack-and-how-should-i-set-that-up)
@@ -139,10 +139,10 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [What model do you recommend?](#what-model-do-you-recommend)
   - [How do I switch models without wiping my config?](#how-do-i-switch-models-without-wiping-my-config)
   - [Can I use self-hosted models (llama.cpp, vLLM, Ollama)?](#can-i-use-selfhosted-models-llamacpp-vllm-ollama)
-  - [What do openkrab, Flawd, and Krill use for models?](#what-do-openkrab-flawd-and-krill-use-for-models)
+  - [What do OpenKrab, Flawd, and Krill use for models?](#what-do-openkrab-flawd-and-krill-use-for-models)
   - [How do I switch models on the fly (without restarting)?](#how-do-i-switch-models-on-the-fly-without-restarting)
   - [Can I use GPT 5.2 for daily tasks and Codex 5.3 for coding](#can-i-use-gpt-52-for-daily-tasks-and-codex-53-for-coding)
-  - [Why do I see "Model … is not allowed" and then no reply?](#why-do-i-see-model-is-not-allowed-and-then-no-reply)
+  - [Why do I see "Model â€¦ is not allowed" and then no reply?](#why-do-i-see-model-is-not-allowed-and-then-no-reply)
   - [Why do I see "Unknown model: minimax/MiniMax-M2.1"?](#why-do-i-see-unknown-model-minimaxminimaxm21)
   - [Can I use MiniMax as my default and OpenAI for complex tasks?](#can-i-use-minimax-as-my-default-and-openai-for-complex-tasks)
   - [Are opus / sonnet / gpt built-in shortcuts?](#are-opus-sonnet-gpt-builtin-shortcuts)
@@ -163,7 +163,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [Why does `openkrab gateway status` say `Runtime: running` but `RPC probe: failed`?](#why-does-openkrab-gateway-status-say-runtime-running-but-rpc-probe-failed)
   - [Why does `openkrab gateway status` show `Config (cli)` and `Config (service)` different?](#why-does-openkrab-gateway-status-show-config-cli-and-config-service-different)
   - [What does "another gateway instance is already listening" mean?](#what-does-another-gateway-instance-is-already-listening-mean)
-  - [How do I run openkrab in remote mode (client connects to a Gateway elsewhere)?](#how-do-i-run-openkrab-in-remote-mode-client-connects-to-a-gateway-elsewhere)
+  - [How do I run OpenKrab in remote mode (client connects to a Gateway elsewhere)?](#how-do-i-run-openkrab-in-remote-mode-client-connects-to-a-gateway-elsewhere)
   - [The Control UI says "unauthorized" (or keeps reconnecting). What now?](#the-control-ui-says-unauthorized-or-keeps-reconnecting-what-now)
   - [I set `gateway.bind: "tailnet"` but it can't bind / nothing listens](#i-set-gatewaybind-tailnet-but-it-cant-bind-nothing-listens)
   - [Can I run multiple Gateways on the same host?](#can-i-run-multiple-gateways-on-the-same-host)
@@ -182,7 +182,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 - [Media and attachments](#media-and-attachments)
   - [My skill generated an image/PDF, but nothing was sent](#my-skill-generated-an-imagepdf-but-nothing-was-sent)
 - [Security and access control](#security-and-access-control)
-  - [Is it safe to expose openkrab to inbound DMs?](#is-it-safe-to-expose-openkrab-to-inbound-dms)
+  - [Is it safe to expose OpenKrab to inbound DMs?](#is-it-safe-to-expose-openkrab-to-inbound-dms)
   - [Is prompt injection only a concern for public bots?](#is-prompt-injection-only-a-concern-for-public-bots)
   - [Should my bot have its own email GitHub account or phone number](#should-my-bot-have-its-own-email-github-account-or-phone-number)
   - [Can I give it autonomy over my text messages and is that safe](#can-i-give-it-autonomy-over-my-text-messages-and-is-that-safe)
@@ -200,7 +200,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 1. **Quick status (first check)**
 
    ```bash
-   openkrab status
+   OpenKrab status
    ```
 
    Fast local summary: OS + update, gateway/service reachability, agents/sessions, provider config + runtime issues (when gateway is reachable).
@@ -208,7 +208,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 2. **Pasteable report (safe to share)**
 
    ```bash
-   openkrab status --all
+   OpenKrab status --all
    ```
 
    Read-only diagnosis with log tail (tokens redacted).
@@ -216,7 +216,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 3. **Daemon + port state**
 
    ```bash
-   openkrab gateway status
+   OpenKrab gateway status
    ```
 
    Shows supervisor runtime vs RPC reachability, the probe target URL, and which config the service likely used.
@@ -224,7 +224,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 4. **Deep probes**
 
    ```bash
-   openkrab status --deep
+   OpenKrab status --deep
    ```
 
    Runs gateway health checks + provider probes (requires a reachable gateway). See [Health](/gateway/health).
@@ -232,7 +232,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 5. **Tail the latest log**
 
    ```bash
-   openkrab logs --follow
+   OpenKrab logs --follow
    ```
 
    If RPC is down, fall back to:
@@ -246,7 +246,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 6. **Run the doctor (repairs)**
 
    ```bash
-   openkrab doctor
+   OpenKrab doctor
    ```
 
    Repairs/migrates config/state + runs health checks. See [Doctor](/gateway/doctor).
@@ -254,8 +254,8 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 7. **Gateway snapshot**
 
    ```bash
-   openkrab health --json
-   openkrab health --verbose   # shows the target URL + config path on errors
+   OpenKrab health --json
+   OpenKrab health --verbose   # shows the target URL + config path on errors
    ```
 
    Asks the running gateway for a full snapshot (WS-only). See [Health](/gateway/health).
@@ -279,7 +279,7 @@ the hackable (git) install:
 curl -fsSL https://openkrab.ai/install.sh | bash -s -- --install-method git
 ```
 
-This installs openkrab **from a git checkout**, so the agent can read the code + docs and
+This installs OpenKrab **from a git checkout**, so the agent can read the code + docs and
 reason about the exact version you are running. You can always switch back to stable later
 by re-running the installer without `--install-method git`.
 
@@ -292,10 +292,7 @@ If you discover a real bug or fix, please file a GitHub issue or send a PR:
 
 Start with these commands (share outputs when asking for help):
 
-```bash
-openkrab status
-openkrab models status
-openkrab doctor
+```bash\nOpenKrab status\nOpenKrab models status\nOpenKrab doctor
 ```
 
 What they do:
@@ -315,8 +312,7 @@ Install docs: [Install](/install), [Installer flags](/install/installer), [Updat
 The repo recommends running from source and using the onboarding wizard:
 
 ```bash
-curl -fsSL https://openkrab.ai/install.sh | bash
-openkrab onboard --install-daemon
+curl -fsSL https://openkrab.ai/install.sh | bash\nOpenKrab onboard --install-daemon
 ```
 
 The wizard can also build UI assets automatically. After onboarding, you typically run the Gateway on port **18789**.
@@ -328,11 +324,10 @@ git clone https://github.com/openkrab/openkrab.git
 cd openkrab
 pnpm install
 pnpm build
-pnpm ui:build # auto-installs UI deps on first run
-openkrab onboard
+pnpm ui:build # auto-installs UI deps on first run\nOpenKrab onboard
 ```
 
-If you don't have a global install yet, run it via `pnpm openkrab onboard`.
+If you don't have a global install yet, run it via `pnpm OpenKrab onboard`.
 
 ### How do I open the dashboard after onboarding
 
@@ -343,7 +338,7 @@ The wizard opens your browser with a clean (non-tokenized) dashboard URL right a
 **Localhost (same machine):**
 
 - Open `http://127.0.0.1:18789/`.
-- If it asks for auth, paste the token from `gateway.auth.token` (or `openkrab_GATEWAY_TOKEN`) into Control UI settings.
+- If it asks for auth, paste the token from `gateway.auth.token` (or `OPENKRAB_GATEWAY_TOKEN`) into Control UI settings.
 - Retrieve it from the gateway host: `openkrab config get gateway.auth.token` (or generate one: `openkrab doctor --generate-gateway-token`).
 
 **Not on localhost:**
@@ -388,22 +383,17 @@ and tokens stay at 0, the agent never ran.
 
 1. Restart the Gateway:
 
-```bash
-openkrab gateway restart
+```bash\nOpenKrab gateway restart
 ```
 
 2. Check status + auth:
 
-```bash
-openkrab status
-openkrab models status
-openkrab logs --follow
+```bash\nOpenKrab status\nOpenKrab models status\nOpenKrab logs --follow
 ```
 
 3. If it still hangs, run:
 
-```bash
-openkrab doctor
+```bash\nOpenKrab doctor
 ```
 
 If the Gateway is remote, ensure the tunnel/Tailscale connection is up and that the UI
@@ -415,8 +405,8 @@ Yes. Copy the **state directory** and **workspace**, then run Doctor once. This
 keeps your bot "exactly the same" (memory, session history, auth, and channel
 state) as long as you copy **both** locations:
 
-1. Install openkrab on the new machine.
-2. Copy `$openkrab_STATE_DIR` (default: `~/.openkrab`) from the old machine.
+1. Install OpenKrab on the new machine.
+2. Copy `$OPENKRAB_STATE_DIR` (default: `~/.openkrab`) from the old machine.
 3. Copy your workspace (default: `~/.openkrab/workspace`).
 4. Run `openkrab doctor` and restart the Gateway service.
 
@@ -500,8 +490,7 @@ Two options:
 
 1. **Dev channel (git checkout):**
 
-```bash
-openkrab update --channel dev
+```bash\nOpenKrab update --channel dev
 ```
 
 This switches to the `main` branch and updates from source.
@@ -557,7 +546,7 @@ Set-PSDebug -Trace 0
 
 More options: [Installer flags](/install/installer).
 
-### Windows install says git not found or openkrab not recognized
+### Windows install says git not found or OpenKrab not recognized
 
 Two common Windows issues:
 
@@ -566,7 +555,7 @@ Two common Windows issues:
 - Install **Git for Windows** and make sure `git` is on your PATH.
 - Close and reopen PowerShell, then re-run the installer.
 
-**2) openkrab is not recognized after install**
+**2) OpenKrab is not recognized after install**
 
 - Your npm global bin folder is not on PATH.
 - Check the path:
@@ -592,7 +581,7 @@ curl -fsSL https://openkrab.ai/install.sh | bash -s -- --install-method git
 
 More detail: [Install](/install) and [Installer flags](/install/installer).
 
-### How do I install openkrab on Linux
+### How do I install OpenKrab on Linux
 
 Short answer: follow the Linux guide, then run the onboarding wizard.
 
@@ -600,7 +589,7 @@ Short answer: follow the Linux guide, then run the onboarding wizard.
 - Full walkthrough: [Getting Started](/start/getting-started).
 - Installer + updates: [Install & updates](/install/updating).
 
-### How do I install openkrab on a VPS
+### How do I install OpenKrab on a VPS
 
 Any Linux VPS works. Install on the server, then use SSH/Tailscale to reach the Gateway.
 
@@ -627,7 +616,7 @@ Gateway in the cloud.
 Hub: [Platforms](/platforms). Remote access: [Gateway remote](/gateway/remote).
 Nodes: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
 
-### Can I ask openkrab to update itself
+### Can I ask OpenKrab to update itself
 
 Short answer: **possible, not recommended**. The update flow can restart the
 Gateway (which drops the active session), may need a clean git checkout, and
@@ -635,19 +624,12 @@ can prompt for confirmation. Safer: run updates from a shell as the operator.
 
 Use the CLI:
 
-```bash
-openkrab update
-openkrab update status
-openkrab update --channel stable|beta|dev
-openkrab update --tag <dist-tag|version>
-openkrab update --no-restart
+```bash\nOpenKrab update\nOpenKrab update status\nOpenKrab update --channel stable|beta|dev\nOpenKrab update --tag <dist-tag|version>\nOpenKrab update --no-restart
 ```
 
 If you must automate from an agent:
 
-```bash
-openkrab update --yes --no-restart
-openkrab gateway restart
+```bash\nOpenKrab update --yes --no-restart\nOpenKrab gateway restart
 ```
 
 Docs: [Update](/cli/update), [Updating](/install/updating).
@@ -667,7 +649,7 @@ It also warns if your configured model is unknown or missing auth.
 
 ### Do I need a Claude or OpenAI subscription to run this
 
-No. You can run openkrab with **API keys** (Anthropic/OpenAI/others) or with
+No. You can run OpenKrab with **API keys** (Anthropic/OpenAI/others) or with
 **local-only models** so your data stays on your device. Subscriptions (Claude
 Pro/Max or OpenAI Codex) are optional ways to authenticate those providers.
 
@@ -700,7 +682,7 @@ Copy the token it prints, then choose **Anthropic token (paste setup-token)** in
 
 ### Do you support Claude subscription auth (Claude Pro or Max)
 
-Yes - via **setup-token**. openkrab no longer reuses Claude Code CLI OAuth tokens; use a setup-token or an Anthropic API key. Generate the token anywhere and paste it on the gateway host. See [Anthropic](/providers/anthropic) and [OAuth](/concepts/oauth).
+Yes - via **setup-token**. OpenKrab no longer reuses Claude Code CLI OAuth tokens; use a setup-token or an Anthropic API key. Generate the token anywhere and paste it on the gateway host. See [Anthropic](/providers/anthropic) and [OAuth](/concepts/oauth).
 
 Note: Claude subscription access is governed by Anthropic's terms. For production or multi-user workloads, API keys are usually the safer choice.
 
@@ -711,7 +693,7 @@ use a **Claude subscription** (setup-token or Claude Code OAuth), wait for the w
 reset or upgrade your plan. If you use an **Anthropic API key**, check the Anthropic Console
 for usage/billing and raise limits as needed.
 
-Tip: set a **fallback model** so openkrab can keep replying while a provider is rate-limited.
+Tip: set a **fallback model** so OpenKrab can keep replying while a provider is rate-limited.
 See [Models](/cli/models) and [OAuth](/concepts/oauth).
 
 ### Is AWS Bedrock supported
@@ -719,12 +701,11 @@ See [Models](/cli/models) and [OAuth](/concepts/oauth).
 Yes - via pi-ai's **Amazon Bedrock (Converse)** provider with **manual config**. You must supply AWS credentials/region on the gateway host and add a Bedrock provider entry in your models config. See [Amazon Bedrock](/providers/bedrock) and [Model providers](/providers/models). If you prefer a managed key flow, an OpenAI-compatible proxy in front of Bedrock is still a valid option.
 
 ### How does Codex auth work
-
-openkrab supports **OpenAI Code (Codex)** via OAuth (ChatGPT sign-in). The wizard can run the OAuth flow and will set the default model to `openai-codex/gpt-5.3-codex` when appropriate. See [Model providers](/concepts/model-providers) and [Wizard](/start/wizard).
+\nOpenKrab supports **OpenAI Code (Codex)** via OAuth (ChatGPT sign-in). The wizard can run the OAuth flow and will set the default model to `openai-codex/gpt-5.3-codex` when appropriate. See [Model providers](/concepts/model-providers) and [Wizard](/start/wizard).
 
 ### Do you support OpenAI subscription auth Codex OAuth
 
-Yes. openkrab fully supports **OpenAI Code (Codex) subscription OAuth**. The onboarding wizard
+Yes. OpenKrab fully supports **OpenAI Code (Codex) subscription OAuth**. The onboarding wizard
 can run the OAuth flow for you.
 
 See [OAuth](/concepts/oauth), [Model providers](/concepts/model-providers), and [Wizard](/start/wizard).
@@ -742,7 +723,7 @@ This stores OAuth tokens in auth profiles on the gateway host. Details: [Model p
 
 ### Is a local model OK for casual chats
 
-Usually no. openkrab needs large context + strong safety; small cards truncate and leak. If you must, run the **largest** MiniMax M2.1 build you can locally (LM Studio) and see [/gateway/local-models](/gateway/local-models). Smaller/quantized models increase prompt-injection risk - see [Security](/gateway/security).
+Usually no. OpenKrab needs large context + strong safety; small cards truncate and leak. If you must, run the **largest** MiniMax M2.1 build you can locally (LM Studio) and see [/gateway/local-models](/gateway/local-models). Smaller/quantized models increase prompt-injection risk - see [Security](/gateway/security).
 
 ### How do I keep hosted model traffic in a specific region
 
@@ -750,7 +731,7 @@ Pick region-pinned endpoints. OpenRouter exposes US-hosted options for MiniMax, 
 
 ### Do I have to buy a Mac Mini to install this
 
-No. openkrab runs on macOS or Linux (Windows via WSL2). A Mac mini is optional - some people
+No. OpenKrab runs on macOS or Linux (Windows via WSL2). A Mac mini is optional - some people
 buy one as an always-on host, but a small VPS, home server, or Raspberry Pi-class box works too.
 
 You only need a Mac **for macOS-only tools**. For iMessage, use [BlueBubbles](/channels/bluebubbles) (recommended) - the BlueBubbles server runs on any Mac, and the Gateway can run on Linux or elsewhere. If you want other macOS-only tools, run the Gateway on a Mac or pair a macOS node.
@@ -765,12 +746,12 @@ any Mac works. **Use [BlueBubbles](/channels/bluebubbles)** (recommended) for iM
 Common setups:
 
 - Run the Gateway on Linux/VPS, and run the BlueBubbles server on any Mac signed into Messages.
-- Run everything on the Mac if you want the simplest single‑machine setup.
+- Run everything on the Mac if you want the simplest singleâ€‘machine setup.
 
 Docs: [BlueBubbles](/channels/bluebubbles), [Nodes](/nodes),
 [Mac remote mode](/platforms/mac/remote).
 
-### If I buy a Mac mini to run openkrab can I connect it to my MacBook Pro
+### If I buy a Mac mini to run OpenKrab can I connect it to my MacBook Pro
 
 Yes. The **Mac mini can run the Gateway**, and your MacBook Pro can connect as a
 **node** (companion device). Nodes don't run the Gateway - they provide extra
@@ -796,7 +777,7 @@ without WhatsApp/Telegram.
 
 `channels.telegram.allowFrom` is **the human sender's Telegram user ID** (numeric). It is not the bot username.
 
-The onboarding wizard accepts `@username` input and resolves it to a numeric ID, but openkrab authorization uses numeric IDs only.
+The onboarding wizard accepts `@username` input and resolves it to a numeric ID, but OpenKrab authorization uses numeric IDs only.
 
 Safer (no third-party bot):
 
@@ -812,7 +793,7 @@ Third-party (less private):
 
 See [/channels/telegram](/channels/telegram#access-control-dms--groups).
 
-### Can multiple people use one WhatsApp number with different openkrab instances
+### Can multiple people use one WhatsApp number with different OpenKrab instances
 
 Yes, via **multi-agent routing**. Bind each sender's WhatsApp **DM** (peer `kind: "direct"`, sender E.164 like `+15551234567`) to a different `agentId`, so each person gets their own workspace and session store. Replies still come from the **same WhatsApp account**, and DM access control (`channels.whatsapp.dmPolicy` / `channels.whatsapp.allowFrom`) is global per WhatsApp account. See [Multi-Agent Routing](/concepts/multi-agent) and [WhatsApp](/channels/whatsapp).
 
@@ -831,7 +812,7 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 brew install <formula>
 ```
 
-If you run openkrab via systemd, ensure the service PATH includes `/home/linuxbrew/.linuxbrew/bin` (or your brew prefix) so `brew`-installed tools resolve in non-login shells.
+If you run OpenKrab via systemd, ensure the service PATH includes `/home/linuxbrew/.linuxbrew/bin` (or your brew prefix) so `brew`-installed tools resolve in non-login shells.
 Recent builds also prepend common user bin dirs on Linux systemd services (for example `~/.local/bin`, `~/.npm-global/bin`, `~/.local/share/pnpm`, `~/.bun/bin`) and honor `PNPM_HOME`, `NPM_CONFIG_PREFIX`, `BUN_INSTALL`, `VOLTA_HOME`, `ASDF_DATA_DIR`, `NVM_DIR`, and `FNM_DIR` when set.
 
 ### What's the difference between the hackable git install and npm install
@@ -846,26 +827,22 @@ Docs: [Getting started](/start/getting-started), [Updating](/install/updating).
 ### Can I switch between npm and git installs later
 
 Yes. Install the other flavor, then run Doctor so the gateway service points at the new entrypoint.
-This **does not delete your data** - it only changes the openkrab code install. Your state
+This **does not delete your data** - it only changes the OpenKrab code install. Your state
 (`~/.openkrab`) and workspace (`~/.openkrab/workspace`) stay untouched.
 
-From npm → git:
+From npm â†’ git:
 
 ```bash
 git clone https://github.com/openkrab/openkrab.git
 cd openkrab
 pnpm install
-pnpm build
-openkrab doctor
-openkrab gateway restart
+pnpm build\nOpenKrab doctor\nOpenKrab gateway restart
 ```
 
-From git → npm:
+From git â†’ npm:
 
 ```bash
-npm install -g openkrab@latest
-openkrab doctor
-openkrab gateway restart
+npm install -g openkrab@latest\nOpenKrab doctor\nOpenKrab gateway restart
 ```
 
 Doctor detects a gateway service entrypoint mismatch and offers to rewrite the service config to match the current install (use `--repair` in automation).
@@ -891,7 +868,7 @@ lowest friction and you're okay with sleep/restarts, run it locally.
 
 **Recommended default:** VPS if you had gateway disconnects before. Local is great when you're actively using the Mac and want local file access or UI automation with a visible browser.
 
-### How important is it to run openkrab on a dedicated machine
+### How important is it to run OpenKrab on a dedicated machine
 
 Not required, but **recommended for reliability and isolation**.
 
@@ -902,8 +879,7 @@ If you want the best of both worlds, keep the Gateway on a dedicated host and pa
 For security guidance, read [Security](/gateway/security).
 
 ### What are the minimum VPS requirements and recommended OS
-
-openkrab is lightweight. For a basic Gateway + one chat channel:
+\nOpenKrab is lightweight. For a basic Gateway + one chat channel:
 
 - **Absolute minimum:** 1 vCPU, 1GB RAM, ~500MB disk.
 - **Recommended:** 1-2 vCPU, 2GB RAM or more for headroom (logs, media, multiple channels). Node tools and browser automation can be resource hungry.
@@ -912,7 +888,7 @@ OS: use **Ubuntu LTS** (or any modern Debian/Ubuntu). The Linux install path is 
 
 Docs: [Linux](/platforms/linux), [VPS hosting](/vps).
 
-### Can I run openkrab in a VM and what are the requirements
+### Can I run OpenKrab in a VM and what are the requirements
 
 Yes. Treat a VM the same as a VPS: it needs to be always on, reachable, and have enough
 RAM for the Gateway and any channels you enable.
@@ -929,13 +905,11 @@ If you are running macOS in a VM, see [macOS VM](/install/macos-vm).
 
 ## What is openkrab?
 
-### What is openkrab in one paragraph
-
-openkrab is a personal AI assistant you run on your own devices. It replies on the messaging surfaces you already use (WhatsApp, Telegram, Slack, Mattermost (plugin), Discord, Google Chat, Signal, iMessage, WebChat) and can also do voice + a live Canvas on supported platforms. The **Gateway** is the always-on control plane; the assistant is the product.
+### What is OpenKrab in one paragraph
+\nOpenKrab is a personal AI assistant you run on your own devices. It replies on the messaging surfaces you already use (WhatsApp, Telegram, Slack, Mattermost (plugin), Discord, Google Chat, Signal, iMessage, WebChat) and can also do voice + a live Canvas on supported platforms. The **Gateway** is the always-on control plane; the assistant is the product.
 
 ### What's the value proposition
-
-openkrab is not "just a Claude wrapper." It's a **local-first control plane** that lets you run a
+\nOpenKrab is not "just a Claude wrapper." It's a **local-first control plane** that lets you run a
 capable assistant on **your own hardware**, reachable from the chat apps you already use, with
 stateful sessions, memory, and tools - without handing control of your workflows to a hosted
 SaaS.
@@ -978,21 +952,19 @@ Everyday wins usually look like:
 - **Browser automation:** filling forms, collecting data, and repeating web tasks.
 - **Cross device coordination:** send a task from your phone, let the Gateway run it on a server, and get the result back in chat.
 
-### Can openkrab help with lead gen outreach ads and blogs for a SaaS
+### Can OpenKrab help with lead gen outreach ads and blogs for a SaaS
 
 Yes for **research, qualification, and drafting**. It can scan sites, build shortlists,
 summarize prospects, and write outreach or ad copy drafts.
 
 For **outreach or ad runs**, keep a human in the loop. Avoid spam, follow local laws and
-platform policies, and review anything before it is sent. The safest pattern is to let
-openkrab draft and you approve.
+platform policies, and review anything before it is sent. The safest pattern is to let\nOpenKrab draft and you approve.
 
 Docs: [Security](/gateway/security).
 
 ### What are the advantages vs Claude Code for web development
-
-openkrab is a **personal assistant** and coordination layer, not an IDE replacement. Use
-Claude Code or Codex for the fastest direct coding loop inside a repo. Use openkrab when you
+\nOpenKrab is a **personal assistant** and coordination layer, not an IDE replacement. Use
+Claude Code or Codex for the fastest direct coding loop inside a repo. Use OpenKrab when you
 want durable memory, cross-device access, and tool orchestration.
 
 Advantages:
@@ -1013,7 +985,7 @@ Use managed overrides instead of editing the repo copy. Put your changes in `~/.
 
 ### Can I load skills from a custom folder
 
-Yes. Add extra directories via `skills.load.extraDirs` in `~/.openkrab/openkrab.json` (lowest precedence). Default precedence remains: `<workspace>/skills` → `~/.openkrab/skills` → bundled → `skills.load.extraDirs`. `clawhub` installs into `./skills` by default, which openkrab treats as `<workspace>/skills`.
+Yes. Add extra directories via `skills.load.extraDirs` in `~/.openkrab/openkrab.json` (lowest precedence). Default precedence remains: `<workspace>/skills` â†’ `~/.openkrab/skills` â†’ bundled â†’ `skills.load.extraDirs`. `KrabHub` installs into `./skills` by default, which OpenKrab treats as `<workspace>/skills`.
 
 ### How can I use different models for different tasks
 
@@ -1045,35 +1017,33 @@ scheduled jobs will not run.
 
 Checklist:
 
-- Confirm cron is enabled (`cron.enabled`) and `openkrab_SKIP_CRON` is not set.
+- Confirm cron is enabled (`cron.enabled`) and `OPENKRAB_SKIP_CRON` is not set.
 - Check the Gateway is running 24/7 (no sleep/restarts).
 - Verify timezone settings for the job (`--tz` vs host timezone).
 
 Debug:
 
-```bash
-openkrab cron run <jobId> --force
-openkrab cron runs --id <jobId> --limit 50
+```bash\nOpenKrab cron run <jobId> --force\nOpenKrab cron runs --id <jobId> --limit 50
 ```
 
 Docs: [Cron jobs](/automation/cron-jobs), [Cron vs Heartbeat](/automation/cron-vs-heartbeat).
 
 ### How do I install skills on Linux
 
-Use **ClawHub** (CLI) or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
-Browse skills at [https://clawhub.com](https://clawhub.com).
+Use **KrabHub** (CLI) or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
+Browse skills at [https://KrabHub.com](https://KrabHub.com).
 
-Install the ClawHub CLI (pick one package manager):
+Install the KrabHub CLI (pick one package manager):
 
 ```bash
-npm i -g clawhub
+npm i -g KrabHub
 ```
 
 ```bash
-pnpm add -g clawhub
+pnpm add -g KrabHub
 ```
 
-### Can openkrab run tasks on a schedule or continuously in the background
+### Can OpenKrab run tasks on a schedule or continuously in the background
 
 Yes. Use the Gateway scheduler:
 
@@ -1094,7 +1064,7 @@ You have three supported patterns:
 Run the Gateway where the macOS binaries exist, then connect from Linux in [remote mode](#how-do-i-run-openkrab-in-remote-mode-client-connects-to-a-gateway-elsewhere) or over Tailscale. The skills load normally because the Gateway host is macOS.
 
 **Option B - use a macOS node (no SSH).**
-Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Commands** to "Always Ask" or "Always Allow" on the Mac. openkrab can treat macOS-only skills as eligible when the required binaries exist on the node. The agent runs those skills via the `nodes` tool. If you choose "Always Ask", approving "Always Allow" in the prompt adds that command to the allowlist.
+Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Commands** to "Always Ask" or "Always Allow" on the Mac. OpenKrab can treat macOS-only skills as eligible when the required binaries exist on the node. The agent runs those skills via the `nodes` tool. If you choose "Always Ask", approving "Always Allow" in the prompt adds that command to the allowlist.
 
 **Option C - proxy macOS binaries over SSH (advanced).**
 Keep the Gateway on Linux, but make the required CLI binaries resolve to SSH wrappers that run on a Mac. Then override the skill to allow Linux so it stays eligible.
@@ -1140,22 +1110,20 @@ targeting those APIs.
 Install skills:
 
 ```bash
-clawhub install <skill-slug>
-clawhub update --all
+KrabHub install <skill-slug>
+KrabHub update --all
 ```
 
-ClawHub installs into `./skills` under your current directory (or falls back to your configured openkrab workspace); openkrab treats that as `<workspace>/skills` on the next session. For shared skills across agents, place them in `~/.openkrab/skills/<name>/SKILL.md`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills) and [ClawHub](/tools/clawhub).
+KrabHub installs into `./skills` under your current directory (or falls back to your configured OpenKrab workspace); OpenKrab treats that as `<workspace>/skills` on the next session. For shared skills across agents, place them in `~/.openkrab/skills/<name>/SKILL.md`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills) and [KrabHub](/tools/KrabHub).
 
 ### How do I install the Chrome extension for browser takeover
 
 Use the built-in installer, then load the unpacked extension in Chrome:
 
-```bash
-openkrab browser extension install
-openkrab browser extension path
+```bash\nOpenKrab browser extension install\nOpenKrab browser extension path
 ```
 
-Then Chrome → `chrome://extensions` → enable "Developer mode" → "Load unpacked" → pick that folder.
+Then Chrome â†’ `chrome://extensions` â†’ enable "Developer mode" â†’ "Load unpacked" â†’ pick that folder.
 
 Full guide (including remote Gateway + security notes): [Chrome extension](/tools/chrome-extension)
 
@@ -1174,8 +1142,8 @@ Yes. See [Sandboxing](/gateway/sandboxing). For Docker-specific setup (full gate
 The default image is security-first and runs as the `node` user, so it does not
 include system packages, Homebrew, or bundled browsers. For a fuller setup:
 
-- Persist `/home/node` with `openkrab_HOME_VOLUME` so caches survive.
-- Bake system deps into the image with `openkrab_DOCKER_APT_PACKAGES`.
+- Persist `/home/node` with `OPENKRAB_HOME_VOLUME` so caches survive.
+- Bake system deps into the image with `OPENKRAB_DOCKER_APT_PACKAGES`.
 - Install Playwright browsers via the bundled CLI:
   `node /app/node_modules/playwright-core/cli.js install chromium`
 - Set `PLAYWRIGHT_BROWSERS_PATH` and ensure the path is persisted.
@@ -1197,13 +1165,11 @@ Key config reference: [Gateway configuration](/gateway/configuration#agentsdefau
 Set `agents.defaults.sandbox.docker.binds` to `["host:path:mode"]` (e.g., `"/home/user/src:/src:ro"`). Global + per-agent binds merge; per-agent binds are ignored when `scope: "shared"`. Use `:ro` for anything sensitive and remember binds bypass the sandbox filesystem walls. See [Sandboxing](/gateway/sandboxing#custom-bind-mounts) and [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated#bind-mounts-security-quick-check) for examples and safety notes.
 
 ### How does memory work
-
-openkrab memory is just Markdown files in the agent workspace:
+\nOpenKrab memory is just Markdown files in the agent workspace:
 
 - Daily notes in `memory/YYYY-MM-DD.md`
 - Curated long-term notes in `MEMORY.md` (main/private sessions only)
-
-openkrab also runs a **silent pre-compaction memory flush** to remind the model
+\nOpenKrab also runs a **silent pre-compaction memory flush** to remind the model
 to write durable notes before auto-compaction. This only runs when the workspace
 is writable (read-only sandboxes skip it). See [Memory](/concepts/memory).
 
@@ -1225,7 +1191,7 @@ does **not** grant embeddings access, so **signing in with Codex (OAuth or the
 Codex CLI login)** does not help for semantic memory search. OpenAI embeddings
 still need a real API key (`OPENAI_API_KEY` or `models.providers.openai.apiKey`).
 
-If you don't set a provider explicitly, openkrab auto-selects a provider when it
+If you don't set a provider explicitly, OpenKrab auto-selects a provider when it
 can resolve an API key (auth profiles, `models.providers.*.apiKey`, or env vars).
 It prefers OpenAI if an OpenAI key resolves, otherwise Gemini if a Gemini key
 resolves. If neither key is available, memory search stays disabled until you
@@ -1249,7 +1215,7 @@ Docs: [Memory](/concepts/memory), [Context](/concepts/context).
 
 ## Where things live on disk
 
-### Is all data used with openkrab saved locally
+### Is all data used with OpenKrab saved locally
 
 No - **openkrab's state is local**, but **external services still see what you send them**.
 
@@ -1263,20 +1229,20 @@ No - **openkrab's state is local**, but **external services still see what you s
 
 Related: [Agent workspace](/concepts/agent-workspace), [Memory](/concepts/memory).
 
-### Where does openkrab store its data
+### Where does OpenKrab store its data
 
-Everything lives under `$openkrab_STATE_DIR` (default: `~/.openkrab`):
+Everything lives under `$OPENKRAB_STATE_DIR` (default: `~/.openkrab`):
 
 | Path                                                            | Purpose                                                      |
 | --------------------------------------------------------------- | ------------------------------------------------------------ |
-| `$openkrab_STATE_DIR/openkrab.json`                             | Main config (JSON5)                                          |
-| `$openkrab_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use) |
-| `$openkrab_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth + API keys)                             |
-| `$openkrab_STATE_DIR/agents/<agentId>/agent/auth.json`          | Runtime auth cache (managed automatically)                   |
-| `$openkrab_STATE_DIR/credentials/`                              | Provider state (e.g. `whatsapp/<accountId>/creds.json`)      |
-| `$openkrab_STATE_DIR/agents/`                                   | Per-agent state (agentDir + sessions)                        |
-| `$openkrab_STATE_DIR/agents/<agentId>/sessions/`                | Conversation history & state (per agent)                     |
-| `$openkrab_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Session metadata (per agent)                                 |
+| `$OPENKRAB_STATE_DIR/openkrab.json`                             | Main config (JSON5)                                          |
+| `$OPENKRAB_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use) |
+| `$OPENKRAB_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth + API keys)                             |
+| `$OPENKRAB_STATE_DIR/agents/<agentId>/agent/auth.json`          | Runtime auth cache (managed automatically)                   |
+| `$OPENKRAB_STATE_DIR/credentials/`                              | Provider state (e.g. `whatsapp/<accountId>/creds.json`)      |
+| `$OPENKRAB_STATE_DIR/agents/`                                   | Per-agent state (agentDir + sessions)                        |
+| `$OPENKRAB_STATE_DIR/agents/<agentId>/sessions/`                | Conversation history & state (per agent)                     |
+| `$OPENKRAB_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Session metadata (per agent)                                 |
 
 Legacy single-agent path: `~/.openkrab/agent/*` (migrated by `openkrab doctor`).
 
@@ -1331,7 +1297,7 @@ Relative paths resolve inside the workspace, but absolute paths can access other
 host locations unless sandboxing is enabled. If you need isolation, use
 [`agents.defaults.sandbox`](/gateway/sandboxing) or per-agent sandbox settings. If you
 want a repo to be the default working directory, point that agent's
-`workspace` to the repo root. The openkrab repo is just source code; keep the
+`workspace` to the repo root. The OpenKrab repo is just source code; keep the
 workspace separate unless you intentionally want the agent to work inside it.
 
 Example (repo as default cwd):
@@ -1353,18 +1319,17 @@ Session state is owned by the **gateway host**. If you're in remote mode, the se
 ## Config basics
 
 ### What format is the config Where is it
-
-openkrab reads an optional **JSON5** config from `$openkrab_CONFIG_PATH` (default: `~/.openkrab/openkrab.json`):
+\nOpenKrab reads an optional **JSON5** config from `$OPENKRAB_CONFIG_PATH` (default: `~/.openkrab/openkrab.json`):
 
 ```
-$openkrab_CONFIG_PATH
+$OPENKRAB_CONFIG_PATH
 ```
 
 If the file is missing, it uses safe-ish defaults (including a default workspace of `~/.openkrab/workspace`).
 
 ### I set gatewaybind lan or tailnet and now nothing listens the UI says unauthorized
 
-Non-loopback binds **require auth**. Configure `gateway.auth.mode` + `gateway.auth.token` (or use `openkrab_GATEWAY_TOKEN`).
+Non-loopback binds **require auth**. Configure `gateway.auth.mode` + `gateway.auth.token` (or use `OPENKRAB_GATEWAY_TOKEN`).
 
 ```json5
 {
@@ -1384,8 +1349,7 @@ Notes:
 - The Control UI authenticates via `connect.params.auth.token` (stored in app/UI settings). Avoid putting tokens in URLs.
 
 ### Why do I need a token on localhost now
-
-openkrab enforces token auth by default, including loopback. If no token is configured, gateway startup auto-generates one and saves it to `gateway.auth.token`, so **local WS clients must authenticate**. This blocks other local processes from calling the Gateway.
+\nOpenKrab enforces token auth by default, including loopback. If no token is configured, gateway startup auto-generates one and saves it to `gateway.auth.token`, so **local WS clients must authenticate**. This blocks other local processes from calling the Gateway.
 
 If you **really** want open loopback, set `gateway.auth.mode: "none"` explicitly in your config. Doctor can generate a token for you any time: `openkrab doctor --generate-gateway-token`.
 
@@ -1440,7 +1404,7 @@ The common pattern is **one Gateway** (e.g. Raspberry Pi) plus **nodes** and **a
 
 Docs: [Nodes](/nodes), [Remote access](/gateway/remote), [Multi-Agent Routing](/concepts/multi-agent), [Sub-agents](/tools/subagents), [TUI](/web/tui).
 
-### Can the openkrab browser run headless
+### Can the OpenKrab browser run headless
 
 Yes. It's a config option:
 
@@ -1475,7 +1439,7 @@ See the full config examples in [Browser](/tools/browser#use-brave-or-another-ch
 Telegram messages are handled by the **gateway**. The gateway runs the agent and
 only then calls nodes over the **Gateway WebSocket** when a node tool is needed:
 
-Telegram → Gateway → Agent → `node.*` → Node → Gateway → Telegram
+Telegram â†’ Gateway â†’ Agent â†’ `node.*` â†’ Node â†’ Gateway â†’ Telegram
 
 Nodes don't see inbound provider traffic; they only receive node RPC calls.
 
@@ -1494,8 +1458,8 @@ Typical setup:
 5. Approve the node on the Gateway:
 
    ```bash
-   openkrab nodes pending
-   openkrab nodes approve <requestId>
+   OpenKrab nodes pending
+   OpenKrab nodes approve <requestId>
    ```
 
 No separate TCP bridge is required; nodes connect over the Gateway WebSocket.
@@ -1521,7 +1485,7 @@ Then verify auth and routing:
 
 Docs: [Tailscale](/gateway/tailscale), [Remote access](/gateway/remote), [Channels](/channels).
 
-### Can two openkrab instances talk to each other local VPS
+### Can two OpenKrab instances talk to each other local VPS
 
 Yes. There is no built-in "bot-to-bot" bridge, but you can wire it up in a few
 reliable ways:
@@ -1536,8 +1500,7 @@ via SSH/Tailscale (see [Remote access](/gateway/remote)).
 
 Example pattern (run from a machine that can reach the target Gateway):
 
-```bash
-openkrab agent --message "Hello from local bot" --deliver --channel telegram --reply-to <chat-id>
+```bash\nOpenKrab agent --message "Hello from local bot" --deliver --channel telegram --reply-to <chat-id>
 ```
 
 Tip: add a guardrail so the two bots do not loop endlessly (mention-only, channel
@@ -1646,8 +1609,7 @@ Minimal steps:
 
 If you want the Control UI without SSH, use Tailscale Serve on the VPS:
 
-```bash
-openkrab gateway --tailscale serve
+```bash\nOpenKrab gateway --tailscale serve
 ```
 
 This keeps the gateway bound to loopback and exposes HTTPS via Tailscale. See [Tailscale](/gateway/tailscale).
@@ -1664,20 +1626,19 @@ Recommended setup:
 3. **Approve the node** on the gateway:
 
    ```bash
-   openkrab nodes pending
-   openkrab nodes approve <requestId>
+   OpenKrab nodes pending
+   OpenKrab nodes approve <requestId>
    ```
 
 Docs: [Gateway protocol](/gateway/protocol), [Discovery](/gateway/discovery), [macOS remote mode](/platforms/mac/remote).
 
 ## Env vars and .env loading
 
-### How does openkrab load environment variables
-
-openkrab reads env vars from the parent process (shell, launchd/systemd, CI, etc.) and additionally loads:
+### How does OpenKrab load environment variables
+\nOpenKrab reads env vars from the parent process (shell, launchd/systemd, CI, etc.) and additionally loads:
 
 - `.env` from the current working directory
-- a global fallback `.env` from `~/.openkrab/.env` (aka `$openkrab_STATE_DIR/.env`)
+- a global fallback `.env` from `~/.openkrab/.env` (aka `$OPENKRAB_STATE_DIR/.env`)
 
 Neither `.env` file overrides existing env vars.
 
@@ -1713,12 +1674,12 @@ Two common fixes:
 ```
 
 This runs your login shell and imports only missing expected keys (never overrides). Env var equivalents:
-`openkrab_LOAD_SHELL_ENV=1`, `openkrab_SHELL_ENV_TIMEOUT_MS=15000`.
+`OPENKRAB_LOAD_SHELL_ENV=1`, `OPENKRAB_SHELL_ENV_TIMEOUT_MS=15000`.
 
 ### I set COPILOTGITHUBTOKEN but models status shows Shell env off Why
 
 `openkrab models status` reports whether **shell env import** is enabled. "Shell env: off"
-does **not** mean your env vars are missing - it just means openkrab won't load
+does **not** mean your env vars are missing - it just means OpenKrab won't load
 your login shell automatically.
 
 If the Gateway runs as a service (launchd/systemd), it won't inherit your shell
@@ -1735,8 +1696,7 @@ environment. Fix by doing one of these:
 
 Then restart the gateway and recheck:
 
-```bash
-openkrab models status
+```bash\nOpenKrab models status
 ```
 
 Copilot tokens are read from `COPILOT_GITHUB_TOKEN` (also `GH_TOKEN` / `GITHUB_TOKEN`).
@@ -1762,7 +1722,7 @@ transcripts - it just starts a new session.
 }
 ```
 
-### Is there a way to make a team of openkrab instances one CEO and many agents
+### Is there a way to make a team of OpenKrab instances one CEO and many agents
 
 Yes, via **multi-agent routing** and **sub-agents**. You can create one coordinator
 agent and several worker agents with their own workspaces and models.
@@ -1787,30 +1747,27 @@ What helps:
 - Use sub-agents for long or parallel work so the main chat stays smaller.
 - Pick a model with a larger context window if this happens often.
 
-### How do I completely reset openkrab but keep it installed
+### How do I completely reset OpenKrab but keep it installed
 
 Use the reset command:
 
-```bash
-openkrab reset
+```bash\nOpenKrab reset
 ```
 
 Non-interactive full reset:
 
-```bash
-openkrab reset --scope full --yes --non-interactive
+```bash\nOpenKrab reset --scope full --yes --non-interactive
 ```
 
 Then re-run onboarding:
 
-```bash
-openkrab onboard --install-daemon
+```bash\nOpenKrab onboard --install-daemon
 ```
 
 Notes:
 
 - The onboarding wizard also offers **Reset** if it sees an existing config. See [Wizard](/start/wizard).
-- If you used profiles (`--profile` / `openkrab_PROFILE`), reset each state dir (defaults are `~/.openkrab-<profile>`).
+- If you used profiles (`--profile` / `OPENKRAB_PROFILE`), reset each state dir (defaults are `~/.openkrab-<profile>`).
 - Dev reset: `openkrab gateway --dev --reset` (dev-only; wipes dev config + credentials + sessions + workspace).
 
 ### Im getting context too large errors how do I reset or compact
@@ -1864,14 +1821,14 @@ Heartbeats run every **30m** by default. Tune or disable them:
 ```
 
 If `HEARTBEAT.md` exists but is effectively empty (only blank lines and markdown
-headers like `# Heading`), openkrab skips the heartbeat run to save API calls.
+headers like `# Heading`), OpenKrab skips the heartbeat run to save API calls.
 If the file is missing, the heartbeat still runs and the model decides what to do.
 
 Per-agent overrides use `agents.list[].heartbeat`. Docs: [Heartbeat](/gateway/heartbeat).
 
 ### Do I need to add a bot account to a WhatsApp group
 
-No. openkrab runs on **your own account**, so if you're in the group, openkrab can see it.
+No. OpenKrab runs on **your own account**, so if you're in the group, OpenKrab can see it.
 By default, group replies are blocked until you allow senders (`groupPolicy: "allowlist"`).
 
 If you want only **you** to be able to trigger group replies:
@@ -1891,8 +1848,7 @@ If you want only **you** to be able to trigger group replies:
 
 Option 1 (fastest): tail logs and send a test message in the group:
 
-```bash
-openkrab logs --follow --json
+```bash\nOpenKrab logs --follow --json
 ```
 
 Look for `chatId` (or `from`) ending in `@g.us`, like:
@@ -1900,13 +1856,12 @@ Look for `chatId` (or `from`) ending in `@g.us`, like:
 
 Option 2 (if already configured/allowlisted): list groups from config:
 
-```bash
-openkrab directory groups list --channel whatsapp
+```bash\nOpenKrab directory groups list --channel whatsapp
 ```
 
 Docs: [WhatsApp](/channels/whatsapp), [Directory](/cli/directory), [Logs](/cli/logs).
 
-### Why doesnt openkrab reply in a group
+### Why doesnt OpenKrab reply in a group
 
 Two common causes:
 
@@ -1962,7 +1917,7 @@ openkrab's default model is whatever you set as:
 agents.defaults.model.primary
 ```
 
-Models are referenced as `provider/model` (example: `anthropic/claude-opus-4-6`). If you omit the provider, openkrab currently assumes `anthropic` as a temporary deprecation fallback - but you should still **explicitly** set `provider/model`.
+Models are referenced as `provider/model` (example: `anthropic/claude-opus-4-6`). If you omit the provider, OpenKrab currently assumes `anthropic` as a temporary deprecation fallback - but you should still **explicitly** set `provider/model`.
 
 ### What model do you recommend
 
@@ -2013,7 +1968,7 @@ If you did overwrite config, restore from backup or re-run `openkrab doctor` to 
 
 Docs: [Models](/concepts/models), [Configure](/cli/configure), [Config](/cli/config), [Doctor](/gateway/doctor).
 
-### What do openkrab, Flawd, and Krill use for models
+### What do OpenKrab, Flawd, and Krill use for models
 
 - **openkrab + Flawd:** Anthropic Opus (`anthropic/claude-opus-4-6`) - see [Anthropic](/providers/anthropic).
 - **Krill:** MiniMax M2.1 (`minimax/MiniMax-M2.1`) - see [MiniMax](/providers/minimax).
@@ -2099,7 +2054,7 @@ Fix checklist:
 4. Run:
 
    ```bash
-   openkrab models list
+   OpenKrab models list
    ```
 
    and pick from the list (or `/model list` in chat).
@@ -2144,14 +2099,14 @@ Docs: [Models](/concepts/models), [Multi-Agent Routing](/concepts/multi-agent), 
 
 ### Are opus sonnet gpt builtin shortcuts
 
-Yes. openkrab ships a few default shorthands (only applied when the model exists in `agents.defaults.models`):
+Yes. OpenKrab ships a few default shorthands (only applied when the model exists in `agents.defaults.models`):
 
-- `opus` → `anthropic/claude-opus-4-6`
-- `sonnet` → `anthropic/claude-sonnet-4-5`
-- `gpt` → `openai/gpt-5.2`
-- `gpt-mini` → `openai/gpt-5-mini`
-- `gemini` → `google/gemini-3-pro-preview`
-- `gemini-flash` → `google/gemini-3-flash-preview`
+- `opus` â†’ `anthropic/claude-opus-4-6`
+- `sonnet` â†’ `anthropic/claude-sonnet-4-5`
+- `gpt` â†’ `openai/gpt-5.2`
+- `gpt-mini` â†’ `openai/gpt-5-mini`
+- `gemini` â†’ `google/gemini-3-pro-preview`
+- `gemini-flash` â†’ `google/gemini-3-flash-preview`
 
 If you set your own alias with the same name, your value wins.
 
@@ -2233,7 +2188,7 @@ Failover happens in two stages:
 1. **Auth profile rotation** within the same provider.
 2. **Model fallback** to the next model in `agents.defaults.model.fallbacks`.
 
-Cooldowns apply to failing profiles (exponential backoff), so openkrab can keep responding even when a provider is rate-limited or temporarily failing.
+Cooldowns apply to failing profiles (exponential backoff), so OpenKrab can keep responding even when a provider is rate-limited or temporarily failing.
 
 ### What does this error mean
 
@@ -2268,7 +2223,7 @@ can't find it in its auth store.
   - Clear any pinned order that forces a missing profile:
 
     ```bash
-    openkrab models auth order clear --provider anthropic
+    OpenKrab models auth order clear --provider anthropic
     ```
 
 - **Confirm you're running commands on the gateway host**
@@ -2276,7 +2231,7 @@ can't find it in its auth store.
 
 ### Why did it also try Google Gemini and fail
 
-If your model config includes Google Gemini as a fallback (or you switched to a Gemini shorthand), openkrab will try it during model fallback. If you haven't configured Google credentials, you'll see `No API key found for provider "google"`.
+If your model config includes Google Gemini as a fallback (or you switched to a Gemini shorthand), OpenKrab will try it during model fallback. If you haven't configured Google credentials, you'll see `No API key found for provider "google"`.
 
 Fix: either provide Google auth, or remove/avoid Google models in `agents.defaults.model.fallbacks` / aliases so fallback doesn't route there.
 
@@ -2285,7 +2240,7 @@ Fix: either provide Google auth, or remove/avoid Google models in `agents.defaul
 Cause: the session history contains **thinking blocks without signatures** (often from
 an aborted/partial stream). Google Antigravity requires signatures for thinking blocks.
 
-Fix: openkrab now strips unsigned thinking blocks for Google Antigravity Claude. If it still appears, start a **new session** or set `/thinking off` for that agent.
+Fix: OpenKrab now strips unsigned thinking blocks for Google Antigravity Claude. If it still appears, start a **new session** or set `/thinking off` for that agent.
 
 ## Auth profiles: what they are and how to manage them
 
@@ -2300,8 +2255,7 @@ An auth profile is a named credential record (OAuth or API key) tied to a provid
 ```
 
 ### What are typical profile IDs
-
-openkrab uses provider-prefixed IDs like:
+\nOpenKrab uses provider-prefixed IDs like:
 
 - `anthropic:default` (common when no email identity exists)
 - `anthropic:<email>` for OAuth identities
@@ -2310,34 +2264,27 @@ openkrab uses provider-prefixed IDs like:
 ### Can I control which auth profile is tried first
 
 Yes. Config supports optional metadata for profiles and an ordering per provider (`auth.order.<provider>`). This does **not** store secrets; it maps IDs to provider/mode and sets rotation order.
-
-openkrab may temporarily skip a profile if it's in a short **cooldown** (rate limits/timeouts/auth failures) or a longer **disabled** state (billing/insufficient credits). To inspect this, run `openkrab models status --json` and check `auth.unusableProfiles`. Tuning: `auth.cooldowns.billingBackoffHours*`.
+\nOpenKrab may temporarily skip a profile if it's in a short **cooldown** (rate limits/timeouts/auth failures) or a longer **disabled** state (billing/insufficient credits). To inspect this, run `openkrab models status --json` and check `auth.unusableProfiles`. Tuning: `auth.cooldowns.billingBackoffHours*`.
 
 You can also set a **per-agent** order override (stored in that agent's `auth-profiles.json`) via the CLI:
 
 ```bash
-# Defaults to the configured default agent (omit --agent)
-openkrab models auth order get --provider anthropic
+# Defaults to the configured default agent (omit --agent)\nOpenKrab models auth order get --provider anthropic
 
-# Lock rotation to a single profile (only try this one)
-openkrab models auth order set --provider anthropic anthropic:default
+# Lock rotation to a single profile (only try this one)\nOpenKrab models auth order set --provider anthropic anthropic:default
 
-# Or set an explicit order (fallback within provider)
-openkrab models auth order set --provider anthropic anthropic:work anthropic:default
+# Or set an explicit order (fallback within provider)\nOpenKrab models auth order set --provider anthropic anthropic:work anthropic:default
 
-# Clear override (fall back to config auth.order / round-robin)
-openkrab models auth order clear --provider anthropic
+# Clear override (fall back to config auth.order / round-robin)\nOpenKrab models auth order clear --provider anthropic
 ```
 
 To target a specific agent:
 
-```bash
-openkrab models auth order set --provider anthropic --agent main anthropic:default
+```bash\nOpenKrab models auth order set --provider anthropic --agent main anthropic:default
 ```
 
 ### OAuth vs API key whats the difference
-
-openkrab supports both:
+\nOpenKrab supports both:
 
 - **OAuth** often leverages subscription access (where applicable).
 - **API keys** use pay-per-token billing.
@@ -2353,10 +2300,10 @@ The wizard explicitly supports Anthropic setup-token and OpenAI Codex OAuth and 
 Precedence:
 
 ```
---port > openkrab_GATEWAY_PORT > gateway.port > default 18789
+--port > OPENKRAB_GATEWAY_PORT > gateway.port > default 18789
 ```
 
-### Why does openkrab gateway status say Runtime running but RPC probe failed
+### Why does OpenKrab gateway status say Runtime running but RPC probe failed
 
 Because "running" is the **supervisor's** view (launchd/systemd/schtasks). The RPC probe is the CLI actually connecting to the gateway WebSocket and calling `status`.
 
@@ -2366,25 +2313,23 @@ Use `openkrab gateway status` and trust these lines:
 - `Listening:` (what's actually bound on the port)
 - `Last gateway error:` (common root cause when the process is alive but the port isn't listening)
 
-### Why does openkrab gateway status show Config cli and Config service different
+### Why does OpenKrab gateway status show Config cli and Config service different
 
-You're editing one config file while the service is running another (often a `--profile` / `openkrab_STATE_DIR` mismatch).
+You're editing one config file while the service is running another (often a `--profile` / `OPENKRAB_STATE_DIR` mismatch).
 
 Fix:
 
-```bash
-openkrab gateway install --force
+```bash\nOpenKrab gateway install --force
 ```
 
 Run that from the same `--profile` / environment you want the service to use.
 
 ### What does another gateway instance is already listening mean
-
-openkrab enforces a runtime lock by binding the WebSocket listener immediately on startup (default `ws://127.0.0.1:18789`). If the bind fails with `EADDRINUSE`, it throws `GatewayLockError` indicating another instance is already listening.
+\nOpenKrab enforces a runtime lock by binding the WebSocket listener immediately on startup (default `ws://127.0.0.1:18789`). If the bind fails with `EADDRINUSE`, it throws `GatewayLockError` indicating another instance is already listening.
 
 Fix: stop the other instance, free the port, or run with `openkrab gateway --port <port>`.
 
-### How do I run openkrab in remote mode client connects to a Gateway elsewhere
+### How do I run OpenKrab in remote mode client connects to a Gateway elsewhere
 
 Set `gateway.mode: "remote"` and point to a remote WebSocket URL, optionally with a token/password:
 
@@ -2419,7 +2364,7 @@ Fix:
 - Fastest: `openkrab dashboard` (prints + copies the dashboard URL, tries to open; shows SSH hint if headless).
 - If you don't have a token yet: `openkrab doctor --generate-gateway-token`.
 - If remote, tunnel first: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`.
-- Set `gateway.auth.token` (or `openkrab_GATEWAY_TOKEN`) on the gateway host.
+- Set `gateway.auth.token` (or `OPENKRAB_GATEWAY_TOKEN`) on the gateway host.
 - In the Control UI settings, paste the same token.
 - Still stuck? Run `openkrab status --all` and follow [Troubleshooting](/gateway/troubleshooting). See [Dashboard](/web/dashboard) for auth details.
 
@@ -2440,14 +2385,14 @@ Usually no - one Gateway can run multiple messaging channels and agents. Use mul
 
 Yes, but you must isolate:
 
-- `openkrab_CONFIG_PATH` (per-instance config)
-- `openkrab_STATE_DIR` (per-instance state)
+- `OPENKRAB_CONFIG_PATH` (per-instance config)
+- `OPENKRAB_STATE_DIR` (per-instance state)
 - `agents.defaults.workspace` (workspace isolation)
 - `gateway.port` (unique ports)
 
 Quick setup (recommended):
 
-- Use `openkrab --profile <name> …` per instance (auto-creates `~/.openkrab-<name>`).
+- Use `openkrab --profile <name> â€¦` per instance (auto-creates `~/.openkrab-<name>`).
 - Set a unique `gateway.port` in each profile config (or pass `--port` for manual runs).
 - Install a per-profile service: `openkrab --profile <name> gateway install`.
 
@@ -2474,8 +2419,7 @@ Quick fixes:
 
 If you're using the CLI or TUI, the URL should look like:
 
-```
-openkrab tui --url ws://<host>:18789 --token <token>
+```\nOpenKrab tui --url ws://<host>:18789 --token <token>
 ```
 
 Protocol details: [Gateway protocol](/gateway/protocol).
@@ -2494,13 +2438,12 @@ You can set a stable path via `logging.file`. File log level is controlled by `l
 
 Fastest log tail:
 
-```bash
-openkrab logs --follow
+```bash\nOpenKrab logs --follow
 ```
 
 Service/supervisor logs (when the gateway runs via launchd/systemd):
 
-- macOS: `$openkrab_STATE_DIR/logs/gateway.log` and `gateway.err.log` (default: `~/.openkrab/logs/...`; profiles use `~/.openkrab-<profile>/logs/...`)
+- macOS: `$OPENKRAB_STATE_DIR/logs/gateway.log` and `gateway.err.log` (default: `~/.openkrab/logs/...`; profiles use `~/.openkrab-<profile>/logs/...`)
 - Linux: `journalctl --user -u openkrab-gateway[-<profile>].service -n 200 --no-pager`
 - Windows: `schtasks /Query /TN "openkrab Gateway (<profile>)" /V /FO LIST`
 
@@ -2510,9 +2453,7 @@ See [Troubleshooting](/gateway/troubleshooting#log-locations) for more.
 
 Use the gateway helpers:
 
-```bash
-openkrab gateway status
-openkrab gateway restart
+```bash\nOpenKrab gateway status\nOpenKrab gateway restart
 ```
 
 If you run the gateway manually, `openkrab gateway --force` can reclaim the port. See [Gateway](/gateway).
@@ -2526,30 +2467,24 @@ There are **two Windows install modes**:
 Open PowerShell, enter WSL, then restart:
 
 ```powershell
-wsl
-openkrab gateway status
-openkrab gateway restart
+wsl\nOpenKrab gateway status\nOpenKrab gateway restart
 ```
 
 If you never installed the service, start it in the foreground:
 
-```bash
-openkrab gateway run
+```bash\nOpenKrab gateway run
 ```
 
 **2) Native Windows (not recommended):** the Gateway runs directly in Windows.
 
 Open PowerShell and run:
 
-```powershell
-openkrab gateway status
-openkrab gateway restart
+```powershell\nOpenKrab gateway status\nOpenKrab gateway restart
 ```
 
 If you run it manually (no service), use:
 
-```powershell
-openkrab gateway run
+```powershell\nOpenKrab gateway run
 ```
 
 Docs: [Windows (WSL2)](/platforms/windows), [Gateway service runbook](/gateway).
@@ -2558,11 +2493,7 @@ Docs: [Windows (WSL2)](/platforms/windows), [Gateway service runbook](/gateway).
 
 Start with a quick health sweep:
 
-```bash
-openkrab status
-openkrab models status
-openkrab channels status
-openkrab logs --follow
+```bash\nOpenKrab status\nOpenKrab models status\nOpenKrab channels status\nOpenKrab logs --follow
 ```
 
 Common causes:
@@ -2587,8 +2518,7 @@ This usually means the UI lost the WebSocket connection. Check:
 
 Then tail logs:
 
-```bash
-openkrab logs --follow
+```bash\nOpenKrab logs --follow
 ```
 
 Docs: [Dashboard](/web/dashboard), [Remote access](/gateway/remote), [Troubleshooting](/gateway/troubleshooting).
@@ -2597,9 +2527,7 @@ Docs: [Dashboard](/web/dashboard), [Remote access](/gateway/remote), [Troublesho
 
 Start with logs and channel status:
 
-```bash
-openkrab channels status
-openkrab channels logs --channel telegram
+```bash\nOpenKrab channels status\nOpenKrab channels logs --channel telegram
 ```
 
 If you are on a VPS or behind a proxy, confirm outbound HTTPS is allowed and DNS works.
@@ -2611,10 +2539,7 @@ Docs: [Telegram](/channels/telegram), [Channel troubleshooting](/channels/troubl
 
 First confirm the Gateway is reachable and the agent can run:
 
-```bash
-openkrab status
-openkrab models status
-openkrab logs --follow
+```bash\nOpenKrab status\nOpenKrab models status\nOpenKrab logs --follow
 ```
 
 In the TUI, use `/status` to see the current state. If you expect replies in a chat
@@ -2626,9 +2551,7 @@ Docs: [TUI](/web/tui), [Slash commands](/tools/slash-commands).
 
 If you installed the service:
 
-```bash
-openkrab gateway stop
-openkrab gateway start
+```bash\nOpenKrab gateway stop\nOpenKrab gateway start
 ```
 
 This stops/starts the **supervised service** (launchd on macOS, systemd on Linux).
@@ -2636,13 +2559,12 @@ Use this when the Gateway runs in the background as a daemon.
 
 If you're running in the foreground, stop with Ctrl-C, then:
 
-```bash
-openkrab gateway run
+```bash\nOpenKrab gateway run
 ```
 
 Docs: [Gateway service runbook](/gateway).
 
-### ELI5 openkrab gateway restart vs openkrab gateway
+### ELI5 OpenKrab gateway restart vs OpenKrab gateway
 
 - `openkrab gateway restart`: restarts the **background service** (launchd/systemd).
 - `openkrab gateway`: runs the gateway **in the foreground** for this terminal session.
@@ -2662,8 +2584,7 @@ Outbound attachments from the agent must include a `MEDIA:<path-or-url>` line (o
 
 CLI sending:
 
-```bash
-openkrab message send --target +15555550123 --message "Here you go" --media /path/to/file.png
+```bash\nOpenKrab message send --target +15555550123 --message "Here you go" --media /path/to/file.png
 ```
 
 Also check:
@@ -2675,7 +2596,7 @@ See [Images](/nodes/images).
 
 ## Security and access control
 
-### Is it safe to expose openkrab to inbound DMs
+### Is it safe to expose OpenKrab to inbound DMs
 
 Treat inbound DMs as untrusted input. Defaults are designed to reduce risk:
 
@@ -2739,8 +2660,7 @@ Pairing codes are sent **only** when an unknown sender messages the bot and
 
 Check pending requests:
 
-```bash
-openkrab pairing list telegram
+```bash\nOpenKrab pairing list telegram
 ```
 
 If you want immediate access, allowlist your sender id or set `dmPolicy: "open"`
@@ -2748,18 +2668,16 @@ for that account.
 
 ### WhatsApp will it message my contacts How does pairing work
 
-No. Default WhatsApp DM policy is **pairing**. Unknown senders only get a pairing code and their message is **not processed**. openkrab only replies to chats it receives or to explicit sends you trigger.
+No. Default WhatsApp DM policy is **pairing**. Unknown senders only get a pairing code and their message is **not processed**. OpenKrab only replies to chats it receives or to explicit sends you trigger.
 
 Approve pairing with:
 
-```bash
-openkrab pairing approve whatsapp <code>
+```bash\nOpenKrab pairing approve whatsapp <code>
 ```
 
 List pending requests:
 
-```bash
-openkrab pairing list whatsapp
+```bash\nOpenKrab pairing list whatsapp
 ```
 
 Wizard phone number prompt: it's used to set your **allowlist/owner** so your own DMs are permitted. It's not used for auto-sending. If you run on your personal WhatsApp number, use that number and enable `channels.whatsapp.selfChatMode`.
@@ -2810,8 +2728,7 @@ Slash commands overview: see [Slash commands](/tools/slash-commands).
 Most commands must be sent as a **standalone** message that starts with `/`, but a few shortcuts (like `/status`) also work inline for allowlisted senders.
 
 ### How do I send a Discord message from Telegram Crosscontext messaging denied
-
-openkrab blocks **cross-provider** messaging by default. If a tool call is bound
+\nOpenKrab blocks **cross-provider** messaging by default. If a tool call is bound
 to Telegram, it won't send to Discord unless you explicitly allow it.
 
 Enable cross-provider messaging for the agent:
@@ -2852,8 +2769,11 @@ You can add options like `debounce:2s cap:25 drop:summarize` for followup modes.
 
 **Q: "What's the default model for Anthropic with an API key?"**
 
-**A:** In openkrab, credentials and model selection are separate. Setting `ANTHROPIC_API_KEY` (or storing an Anthropic API key in auth profiles) enables authentication, but the actual default model is whatever you configure in `agents.defaults.model.primary` (for example, `anthropic/claude-sonnet-4-5` or `anthropic/claude-opus-4-6`). If you see `No credentials found for profile "anthropic:default"`, it means the Gateway couldn't find Anthropic credentials in the expected `auth-profiles.json` for the agent that's running.
+**A:** In OpenKrab, credentials and model selection are separate. Setting `ANTHROPIC_API_KEY` (or storing an Anthropic API key in auth profiles) enables authentication, but the actual default model is whatever you configure in `agents.defaults.model.primary` (for example, `anthropic/claude-sonnet-4-5` or `anthropic/claude-opus-4-6`). If you see `No credentials found for profile "anthropic:default"`, it means the Gateway couldn't find Anthropic credentials in the expected `auth-profiles.json` for the agent that's running.
 
 ---
 
-Still stuck? Ask in [Discord](https://discord.com/invite/clawd) or open a [GitHub discussion](https://github.com/openkrab/openkrab/discussions).
+Still stuck? Ask in [Discord](https://discord.com/invite/Krabd) or open a [GitHub discussion](https://github.com/openkrab/openkrab/discussions).
+
+
+

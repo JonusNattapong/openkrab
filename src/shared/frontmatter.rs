@@ -1,7 +1,7 @@
 //! Port of `openkrab/src/shared/frontmatter.ts`
 //!
 //! Frontmatter and manifest parsing utilities for plugins/extensions.
-//! Resolves KrabKrab manifest blocks from YAML/JSON5 frontmatter and extracts
+//! Resolves openkrab manifest blocks from YAML/JSON5 frontmatter and extracts
 //! requirement declarations, install specs, OS filters, etc.
 
 use serde_json::Value;
@@ -65,10 +65,10 @@ pub fn parse_frontmatter_bool(value: Option<&str>, fallback: bool) -> bool {
 // ─── Manifest block resolution ──────────────────────────────────────────────
 
 /// Known manifest key names (current + legacy).
-const MANIFEST_KEY: &str = "krabkrab";
+const MANIFEST_KEY: &str = "openkrab";
 const LEGACY_MANIFEST_KEYS: &[&str] = &["openkrab", "krab"];
 
-/// Try to resolve an KrabKrab manifest block from parsed frontmatter
+/// Try to resolve an openkrab manifest block from parsed frontmatter
 /// metadata.
 ///
 /// Looks for a JSON5 string under `metadata` (or custom key), parses it, then
@@ -273,3 +273,4 @@ mod tests {
         assert_eq!(req.config, vec!["providers.openai"]);
     }
 }
+

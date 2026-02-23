@@ -25,7 +25,7 @@ pub struct SessionStats {
 
 fn get_db_path() -> PathBuf {
     let home = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    home.join("krabkrab").join("memory.db")
+    home.join("openkrab").join("memory.db")
 }
 
 fn open_store() -> Result<MemoryStore, String> {
@@ -318,3 +318,4 @@ mod tests {
         assert_eq!(loaded.transcript.len(), 1);
     }
 }
+

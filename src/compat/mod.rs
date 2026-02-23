@@ -1,15 +1,15 @@
-//! compat — Compatibility layer: legacy name mappings and feature flags.
+﻿//! compat â€” Compatibility layer: legacy name mappings and feature flags.
 //! Ported from `openkrab/src/compat/legacy-names.ts` (Phase 8).
 //!
 //! Provides canonical name resolution for connectors and providers
-//! that shipped under different names in earlier openclaw versions,
+//! that shipped under different names in earlier OpenKrab versions,
 //! plus runtime feature-flag helpers.
 
 use std::collections::HashMap;
 
-// ─── Legacy name mappings ─────────────────────────────────────────────────────
+// â”€â”€â”€ Legacy name mappings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/// Canonical name → set of accepted aliases (including itself).
+/// Canonical name â†’ set of accepted aliases (including itself).
 static CONNECTOR_ALIASES: &[(&str, &[&str])] = &[
     ("telegram", &["telegram", "tg", "tlg"]),
     ("slack", &["slack", "sl"]),
@@ -67,7 +67,7 @@ pub fn known_providers() -> Vec<&'static str> {
     PROVIDER_ALIASES.iter().map(|(p, _)| *p).collect()
 }
 
-// ─── Feature flags ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Feature flags â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Runtime feature flags read from environment variables.
 #[derive(Debug, Clone, Default)]
@@ -76,10 +76,10 @@ pub struct FeatureFlags {
 }
 
 impl FeatureFlags {
-    /// Load flags from `KRABKRAB_FEATURES` env var (comma-separated list of `flag` or `!flag`).
+    /// Load flags from `OPENKRAB_FEATURES` env var (comma-separated list of `flag` or `!flag`).
     pub fn from_env() -> Self {
         let mut flags = HashMap::new();
-        if let Ok(val) = std::env::var("KRABKRAB_FEATURES") {
+        if let Ok(val) = std::env::var("OPENKRAB_FEATURES") {
             for part in val.split(',') {
                 let part = part.trim();
                 if part.starts_with('!') {
@@ -116,7 +116,7 @@ impl FeatureFlags {
     }
 }
 
-// ─── Config key migration ─────────────────────────────────────────────────────
+// â”€â”€â”€ Config key migration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Maps old config key names to new ones (for migrating stored configs).
 static CONFIG_KEY_MIGRATIONS: &[(&str, &str)] = &[
@@ -210,3 +210,6 @@ mod tests {
         assert!(!map.contains_key("agent.name"));
     }
 }
+
+
+

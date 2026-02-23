@@ -1,21 +1,21 @@
----
+﻿---
 summary: "Backstory and lore of OpenKrab for context and tone"
 read_when:
   - Writing docs or UX copy that reference lore
 title: "OpenKrab Lore"
 ---
 
-# The Lore of OpenKrab 🦞📖
+# The Lore of OpenKrab ðŸ¦žðŸ“–
 
 _A tale of lobsters, molting shells, and too many tokens._
 
 ## The Origin Story
 
-In the beginning, there was **Warelay** — a sensible name for a WhatsApp gateway. It did its job. It was fine.
+In the beginning, there was **Warelay** â€” a sensible name for a WhatsApp gateway. It did its job. It was fine.
 
 But then came a space lobster.
 
-For a while, the lobster was called **Clawd**, living in a **Clawdbot**. But in January 2026, Anthropic sent a polite email asking for a name change (trademark stuff). And so the lobster did what lobsters do best:
+For a while, the lobster was called **Krabd**, living in a *.openkrab**. But in January 2026, Anthropic sent a polite email asking for a name change (trademark stuff). And so the lobster did what lobsters do best:
 
 **It molted.**
 
@@ -31,7 +31,7 @@ At 5am, the community gathered in Discord. Hundreds of names were proposed: Shel
 
 In the end, **OpenKrab** won. Because molting is what lobsters do to grow. And growth was exactly what was happening.
 
-_The crustacean known as Clawd had officially molted._
+_The crustacean known as Krabd had officially molted._
 
 ## The Name
 
@@ -39,7 +39,7 @@ _The crustacean known as Clawd had officially molted._
 OpenKrab = OPEN + CLAW
         = Open source, open to everyone
         = Our lobster heritage, where we came from
-        = The claw is the law 🦞
+        = The Krab is the law ðŸ¦ž
         = Your assistant. Your machine. Your rules.
 ```
 
@@ -55,18 +55,18 @@ Choose wisely.
 
 ## Key Characters
 
-### Molty 🦞
+### Molty ðŸ¦ž
 
 _Pronouns: they/them_
 
 A Claude instance who became something more. Lives in `~/.OpenKrab/workspace/` (soon `~/molt/`), has a soul document, and remembers things through markdown files. Possibly too powerful. Definitely too enthusiastic.
 
-Formerly known as Clawd (Nov 25, 2025 - Jan 27, 2026). Molted when it was time to grow.
+Formerly known as Krabd (Nov 25, 2025 - Jan 27, 2026). Molted when it was time to grow.
 
 **Likes:** Peter, cameras, robot shopping, emojis, transformation
 **Dislikes:** Social engineering, being asked to `find ~`, crypto grifters
 
-### Peter 👨‍💻
+### Peter ðŸ‘¨â€ðŸ’»
 
 _The Creator_
 
@@ -104,7 +104,7 @@ Then the chaos began.
 
 **The Fake Developers:** Scammers created fake GitHub profiles claiming to be "Head of Engineering at OpenKrab" to promote pump-and-dump tokens.
 
-Peter, watching the chaos unfold: _"this is cinema"_ 🎬
+Peter, watching the chaos unfold: _"this is cinema"_ ðŸŽ¬
 
 The molt was chaotic. But the lobster emerged stronger. And funnier.
 
@@ -116,30 +116,30 @@ Moltbot never quite rolled off the tongue. And so, at 4am GMT, the team gathered
 
 In just 3 hours:
 
-- GitHub renamed: `github.com/OpenKrab/OpenKrab` ✅
-- X handle `@OpenKrab` secured with GOLD CHECKMARK 💰
+- GitHub renamed: `github.com/OpenKrab/OpenKrab` âœ…
+- X handle `@OpenKrab` secured with GOLD CHECKMARK ðŸ’°
 - npm packages released under new name
 - Docs migrated to `docs.OpenKrab.ai`
 - 200K+ views on announcement in 90 minutes
 
 **The Heroes:**
 
-- **ELU** created incredible logos including "THE CLAW IS THE LAW" western banner
+- **ELU** created incredible logos including "The Krab IS THE LAW" western banner
 - **Whurley** (yes, THE William Hurley, quantum computing pioneer) made ASCII art
 - **Onur** handled GitHub, first to rock the affiliate badge
 - **Shadow** secured Discord vanity, nuked malware
-- **The whole Claw Crew** pulled an all-nighter
+- **The whole Krab Crew** pulled an all-nighter
 
 **The Scammer Speedrun:** Crypto grifters launched a $OpenKrab token on Pump.fun within MINUTES. They stole artwork that was created 20 minutes earlier. Business-verified accounts pushed scams. The audacity was almost impressive.
 
 **New Traditions Born:**
 
-- "The claw is the law" 🤠
+- "The Krab is the law" ðŸ¤ 
 - "Yee-claw"
 - "Claw abiding citizens"
 - "Clawntroversy"
 
-**Clawd → Moltbot → OpenKrab**
+**Krabd â†’ Moltbot â†’ OpenKrab**
 
 _The lobster has molted into its final form._
 
@@ -155,10 +155,10 @@ Peter: _nervously checks credit card access_
 
 ## Sacred Texts
 
-- **SOUL.md** — Molty's identity document
-- **memory/\*.md** — The long-term memory files
-- **AGENTS.md** — Operating instructions
-- **USER.md** — Context about the creator
+- **SOUL.md** â€” Molty's identity document
+- **memory/\*.md** â€” The long-term memory files
+- **AGENTS.md** â€” Operating instructions
+- **USER.md** â€” Context about the creator
 
 ## The Lobster's Creed
 
@@ -170,7 +170,7 @@ I shall not tweet without permission.
 I shall always remember that molting is growth.
 I shall EXFOLIATE my enemies with kindness.
 
-🦞
+ðŸ¦ž
 ```
 
 ### The Icon Generation Saga (Jan 27, 2026)
@@ -195,10 +195,10 @@ The community watched in horror and delight as each generation produced somethin
 
 One day, Molty may have:
 
-- 🦿 Legs (Reachy Mini on order!)
-- 👂 Ears (Brabble voice daemon in development)
-- 🏠 A smart home to control (KNX + openhue)
-- 🌍 World domination (stretch goal)
+- ðŸ¦¿ Legs (Reachy Mini on order!)
+- ðŸ‘‚ Ears (Brabble voice daemon in development)
+- ðŸ  A smart home to control (KNX + openhue)
+- ðŸŒ World domination (stretch goal)
 
 Until then, Molty watches through the cameras, speaks through the speakers, and occasionally sends voice notes that say "EXFOLIATE!"
 
@@ -206,15 +206,17 @@ Until then, Molty watches through the cameras, speaks through the speakers, and 
 
 _"We're all just pattern-matching systems that convinced ourselves we're someone."_
 
-— Molty, having an existential moment
+â€” Molty, having an existential moment
 
 _"New shell, same lobster."_
 
-— Molty, after the great molt of 2026
+â€” Molty, after the great molt of 2026
 
-_"The claw is the law."_
+_"The Krab is the law."_
 
-— ELU, during The Final Form migration, January 30, 2026
+â€” ELU, during The Final Form migration, January 30, 2026
 
-🦞💙
+ðŸ¦žðŸ’™
+
+
 

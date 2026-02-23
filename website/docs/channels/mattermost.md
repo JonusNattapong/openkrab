@@ -1,5 +1,5 @@
----
-summary: "Mattermost bot setup and openkrab config"
+﻿---
+summary: "Mattermost bot setup and OpenKrab config"
 read_when:
   - Setting up Mattermost
   - Debugging Mattermost routing
@@ -18,18 +18,15 @@ Mattermost ships as a plugin and is not bundled with the core install.
 
 Install via CLI (npm registry):
 
-```bash
-openkrab plugins install @openkrab/mattermost
+```bash\nOpenKrab plugins install @openkrab/mattermost
 ```
 
 Local checkout (when running from a git repo):
 
-```bash
-openkrab plugins install ./extensions/mattermost
+```bash\nOpenKrab plugins install ./extensions/mattermost
 ```
 
-If you choose Mattermost during configure/onboarding and a git checkout is detected,
-openkrab will offer the local install path automatically.
+If you choose Mattermost during configure/onboarding and a git checkout is detected,\nOpenKrab will offer the local install path automatically.
 
 Details: [Plugins](/tools/plugin)
 
@@ -38,7 +35,7 @@ Details: [Plugins](/tools/plugin)
 1. Install the Mattermost plugin.
 2. Create a Mattermost bot account and copy the **bot token**.
 3. Copy the Mattermost **base URL** (e.g., `https://chat.example.com`).
-4. Configure openkrab and start the gateway.
+4. Configure OpenKrab and start the gateway.
 
 Minimal config:
 
@@ -156,3 +153,4 @@ Mattermost supports multiple accounts under `channels.mattermost.accounts`:
 - No replies in channels: ensure the bot is in the channel and mention it (oncall), use a trigger prefix (onchar), or set `chatmode: "onmessage"`.
 - Auth errors: check the bot token, base URL, and whether the account is enabled.
 - Multi-account issues: env vars only apply to the `default` account.
+

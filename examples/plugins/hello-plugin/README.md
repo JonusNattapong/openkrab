@@ -1,13 +1,13 @@
-# Hello Plugin Example
+﻿# Hello Plugin Example
 
-This is a simple example plugin demonstrating the krabkrab plugin system.
+This is a simple example plugin demonstrating the openkrab plugin system.
 
 ## Structure
 
 ```
 hello-plugin/
-├── plugin.json    # Plugin manifest
-└── lib.rs         # Plugin implementation (for static plugins)
+â”œâ”€â”€ plugin.json    # Plugin manifest
+â””â”€â”€ lib.rs         # Plugin implementation (for static plugins)
 ```
 
 ## Manifest (plugin.json)
@@ -17,7 +17,7 @@ hello-plugin/
   "name": "hello-plugin",
   "version": "1.0.0",
   "description": "A simple example plugin that provides a greeting tool",
-  "author": "krabkrab Team",
+  "author": "openkrab Team",
   "enabled": true,
   "kind": "extension",
   "requires": ["tools"],
@@ -48,7 +48,7 @@ Generates a greeting message in multiple languages.
 **Response:**
 ```json
 {
-  "greeting": "¡Hola, Alice!",
+  "greeting": "Â¡Hola, Alice!",
   "language": "es",
   "name": "Alice"
 }
@@ -76,7 +76,7 @@ Generates a farewell message.
 For static plugins, add the plugin module to your codebase and register it:
 
 ```rust
-use krabkrab::plugins::{PluginManager, PluginRegistry};
+use openkrab::plugins::{PluginManager, PluginRegistry};
 
 // Register the plugin
 manager.registry_mut().register(hello_plugin::manifest()).unwrap();
@@ -87,12 +87,12 @@ manager.registry_mut().register(hello_plugin::manifest()).unwrap();
 For dynamic plugins, place the plugin in one of the plugin directories:
 
 - `./plugins/`
-- `~/.krabkrab/plugins/`
+- `~/.openkrab/plugins/`
 
 Then load it:
 
 ```rust
-use krabkrab::plugins::loader::PluginManager;
+use openkrab::plugins::loader::PluginManager;
 
 let mut manager = PluginManager::new();
 let summary = manager.load_all()?;
@@ -103,14 +103,14 @@ println!("Loaded {} plugins", summary.loaded);
 
 Native plugins should export these symbols:
 
-- `krabkrab_plugin_manifest_json` -> returns `*const c_char` with `PluginManifest` JSON
-- `krabkrab_plugin_declaration_json` -> returns `*const c_char` with `PluginDeclaration` JSON
+- `OPENKRAB_PLUGIN_MANIFEST_JSON` -> returns `*const c_char` with `PluginManifest` JSON
+- `OPENKRAB_PLUGIN_DECLARATION_JSON` -> returns `*const c_char` with `PluginDeclaration` JSON
 
 Example signature:
 
 ```rust
 #[no_mangle]
-pub extern "C" fn krabkrab_plugin_declaration_json() -> *const std::os::raw::c_char {
+pub extern "C" fn OPENKRAB_PLUGIN_DECLARATION_JSON() -> *const std::os::raw::c_char {
     // return pointer to static, null-terminated JSON string
 }
 ```
@@ -120,5 +120,7 @@ pub extern "C" fn krabkrab_plugin_declaration_json() -> *const std::os::raw::c_c
 Run the plugin tests:
 
 ```bash
-cargo test -p krabkrab plugins::
+cargo test -p openkrab plugins::
 ```
+
+

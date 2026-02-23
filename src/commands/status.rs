@@ -23,7 +23,7 @@ pub async fn status_command(cfg: &AppConfig, opts: StatusOptions) -> String {
     let mut lines = Vec::new();
 
     // Header
-    lines.push("🦀 krabkrab Status".to_string());
+    lines.push("🦀 openkrab Status".to_string());
     lines.push(String::new());
 
     // 1. Status summary
@@ -109,3 +109,4 @@ mod tests {
         assert!(status.contains("providers registered"));
     }
 }
+

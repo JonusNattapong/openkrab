@@ -442,7 +442,7 @@ OpenKrab status --deep
 - `--json`：输出 JSON（无样式）。
 - `-v`、`--verbose`：包含缺失需求详情。
 
-提示：使用 `npx clawhub` 搜索、安装和同步 Skills。
+提示：使用 `npx KrabHub` 搜索、安装和同步 Skills。
 
 ### `pairing`
 
@@ -1030,4 +1030,5 @@ OpenKrab models status
 - `--message <text>`
 - `--timeout-ms <ms>`（默认为 `agents.defaults.timeoutSeconds`）
 - `--history-limit <n>`
+
 

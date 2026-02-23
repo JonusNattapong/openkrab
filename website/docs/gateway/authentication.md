@@ -1,4 +1,4 @@
----
+﻿---
 summary: "Model authentication: OAuth, API keys, and setup-token"
 read_when:
   - Debugging model auth or OAuth expiry
@@ -7,24 +7,22 @@ title: "Authentication"
 ---
 
 # Authentication
-
-openkrab supports OAuth and API keys for model providers. For Anthropic
+\nOpenKrab supports OAuth and API keys for model providers. For Anthropic
 accounts, we recommend using an **API key**. For Claude subscription access,
-use the long‑lived token created by `claude setup-token`.
+use the longâ€‘lived token created by `claude setup-token`.
 
 See [/concepts/oauth](/concepts/oauth) for the full OAuth flow and storage
 layout.
 
 ## Recommended Anthropic setup (API key)
 
-If you’re using Anthropic directly, use an API key.
+If youâ€™re using Anthropic directly, use an API key.
 
 1. Create an API key in the Anthropic Console.
 2. Put it on the **gateway host** (the machine running `openkrab gateway`).
 
 ```bash
-export ANTHROPIC_API_KEY="..."
-openkrab models status
+export ANTHROPIC_API_KEY="..."\nOpenKrab models status
 ```
 
 3. If the Gateway runs under systemd/launchd, prefer putting the key in
@@ -38,12 +36,10 @@ EOF
 
 Then restart the daemon (or restart your Gateway process) and re-check:
 
-```bash
-openkrab models status
-openkrab doctor
+```bash\nOpenKrab models status\nOpenKrab doctor
 ```
 
-If you’d rather not manage env vars yourself, the onboarding wizard can store
+If youâ€™d rather not manage env vars yourself, the onboarding wizard can store
 API keys for daemon use: `openkrab onboard`.
 
 See [Help](/help) for details on env inheritance (`env.shellEnv`,
@@ -51,7 +47,7 @@ See [Help](/help) for details on env inheritance (`env.shellEnv`,
 
 ## Anthropic: setup-token (subscription auth)
 
-For Anthropic, the recommended path is an **API key**. If you’re using a Claude
+For Anthropic, the recommended path is an **API key**. If youâ€™re using a Claude
 subscription, the setup-token flow is also supported. Run it on the **gateway host**:
 
 ```bash
@@ -60,14 +56,12 @@ claude setup-token
 
 Then paste it into openkrab:
 
-```bash
-openkrab models auth setup-token --provider anthropic
+```bash\nOpenKrab models auth setup-token --provider anthropic
 ```
 
 If the token was created on another machine, paste it manually:
 
-```bash
-openkrab models auth paste-token --provider anthropic
+```bash\nOpenKrab models auth paste-token --provider anthropic
 ```
 
 If you see an Anthropic error like:
@@ -76,19 +70,16 @@ If you see an Anthropic error like:
 This credential is only authorized for use with Claude Code and cannot be used for other API requests.
 ```
 
-…use an Anthropic API key instead.
+â€¦use an Anthropic API key instead.
 
 Manual token entry (any provider; writes `auth-profiles.json` + updates config):
 
-```bash
-openkrab models auth paste-token --provider anthropic
-openkrab models auth paste-token --provider openrouter
+```bash\nOpenKrab models auth paste-token --provider anthropic\nOpenKrab models auth paste-token --provider openrouter
 ```
 
 Automation-friendly check (exit `1` when expired/missing, `2` when expiring):
 
-```bash
-openkrab models status --check
+```bash\nOpenKrab models status --check
 ```
 
 Optional ops scripts (systemd/Termux) are documented here:
@@ -98,9 +89,7 @@ Optional ops scripts (systemd/Termux) are documented here:
 
 ## Checking model auth status
 
-```bash
-openkrab models status
-openkrab doctor
+```bash\nOpenKrab models status\nOpenKrab doctor
 ```
 
 ## API key rotation behavior (gateway)
@@ -109,13 +98,13 @@ Some providers support retrying a request with alternative keys when an API call
 hits a provider rate limit.
 
 - Priority order:
-  - `openkrab_LIVE_<PROVIDER>_KEY` (single override)
+  - `OPENKRAB_LIVE_<PROVIDER>_KEY` (single override)
   - `<PROVIDER>_API_KEYS`
   - `<PROVIDER>_API_KEY`
   - `<PROVIDER>_API_KEY_*`
 - Google providers also include `GOOGLE_API_KEY` as an additional fallback.
 - The same key list is deduplicated before use.
-- openkrab retries with the next key only for rate-limit errors (for example
+- OpenKrab retries with the next key only for rate-limit errors (for example
   `429`, `rate_limit`, `quota`, `resource exhausted`).
 - Non-rate-limit errors are not retried with alternate keys.
 - If all keys fail, the final error from the last attempt is returned.
@@ -130,25 +119,21 @@ Use `/model` (or `/model list`) for a compact picker; use `/model status` for th
 
 ### Per-agent (CLI override)
 
-Set an explicit auth profile order override for an agent (stored in that agent’s `auth-profiles.json`):
+Set an explicit auth profile order override for an agent (stored in that agentâ€™s `auth-profiles.json`):
 
-```bash
-openkrab models auth order get --provider anthropic
-openkrab models auth order set --provider anthropic anthropic:default
-openkrab models auth order clear --provider anthropic
+```bash\nOpenKrab models auth order get --provider anthropic\nOpenKrab models auth order set --provider anthropic anthropic:default\nOpenKrab models auth order clear --provider anthropic
 ```
 
 Use `--agent <id>` to target a specific agent; omit it to use the configured default agent.
 
 ## Troubleshooting
 
-### “No credentials found”
+### â€œNo credentials foundâ€
 
 If the Anthropic token profile is missing, run `claude setup-token` on the
 **gateway host**, then re-check:
 
-```bash
-openkrab models status
+```bash\nOpenKrab models status
 ```
 
 ### Token expiring/expired
@@ -160,3 +145,5 @@ is missing, rerun `claude setup-token` and paste the token again.
 
 - Claude Max or Pro subscription (for `claude setup-token`)
 - Claude Code CLI installed (`claude` command available)
+
+

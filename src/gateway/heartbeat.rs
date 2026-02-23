@@ -1,5 +1,5 @@
 //! heartbeat — Periodic heartbeat runner for connectivity checks.
-//! Ported from OpenClaw's `startHeartbeatRunner` concept.
+//! Ported from OpenKrab's `startHeartbeatRunner` concept.
 //!
 //! Runs a periodic check to verify that channels and gateway connections
 //! are alive, emitting status events and optionally restarting unhealthy services.
@@ -427,3 +427,4 @@ mod tests {
         runner.stop().await.unwrap();
     }
 }
+
