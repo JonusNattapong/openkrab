@@ -29,7 +29,7 @@ OpenKrab is a Rust implementation inspired by [OpenClaw](https://github.com/open
 
 ## 📊 Benchmark Snapshot (OpenKrab vs Others)
 
-| Metric | OpenClaw | NanoBot | PicoClaw | OpenKrab 🦀 | ZeroClaw |
+| Metric | OpenClaw | NanoBot | PicoClaw | OpenKrab | ZeroClaw |
 |--------|----------|---------|----------|-------------|----------|
 | **Language** | TypeScript | Python | Go | **Rust** | Rust |
 | **RAM** | >1GB | >100MB | <10MB | **~50MB** | <5MB |
