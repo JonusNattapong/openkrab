@@ -1,14 +1,14 @@
 ---
 summary: "Enable and configure Native Desktop Notifications across macOS, Windows, and Linux"
 read_when:
-  - You want to receive system notifications from OpenClaw
+  - You want to receive system notifications from OpenKrab
   - You need to debug desktop notifications
 title: "Desktop Notifications"
 ---
 
 # Desktop Notifications
 
-OpenClaw supports native desktop notifications across macOS, Windows, and Linux via the `notify-rust` crate. When enabled, actions or inbound events (like messages from a channel) can trigger popup notifications with sound directly to your desktop.
+OpenKrab supports native desktop notifications across macOS, Windows, and Linux via the `notify-rust` crate. When enabled, actions or inbound events (like messages from a channel) can trigger popup notifications with sound directly to your desktop.
 
 ## Supported Platforms
 
@@ -18,7 +18,7 @@ OpenClaw supports native desktop notifications across macOS, Windows, and Linux 
 
 ## Features
 
-OpenClaw's notification system supports:
+OpenKrab's notification system supports:
 
 - Custom Titles and Bodies
 - Sound playback mapped to native identifiers
@@ -31,7 +31,7 @@ Notifications are enabled automatically when interacting with the dashboard or w
 To verify notifications are working:
 
 ```bash
-openclaw system notify --title "Test" --body "Hello from OpenClaw!"
+OpenKrab system notify --title "Test" --body "Hello from OpenKrab!"
 ```
 
 ## Sound Identifiers
@@ -42,4 +42,5 @@ When triggering sounds, different platforms support different sound IDs:
 - **Windows**: `default`, `IM`, `Mail`, `Reminder`, `SMS`, `Alarm`.
 - **Linux**: Usually depends on your freedesktop sound theme (e.g., `message-new-instant`, `bell`).
 
-*(By default, OpenClaw attempts to fall back cleanly if a requested sound is missing.)*
+*(By default, OpenKrab attempts to fall back cleanly if a requested sound is missing.)*
+

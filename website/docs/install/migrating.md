@@ -1,18 +1,18 @@
 ---
-summary: "Migration guide from OpenClaw (TypeScript) to OpenKrab (Rust)"
+summary: "Migration guide from OpenKrab (TypeScript) to OpenKrab (Rust)"
 read_when:
-  - You are migrating from OpenClaw to OpenKrab
+  - You are migrating from OpenKrab to OpenKrab
   - You want to understand the differences between TypeScript and Rust versions
-title: "Migration from OpenClaw"
+title: "Migration from OpenKrab"
 ---
 
-# Migration from OpenClaw
+# Migration from OpenKrab
 
-If you're coming from **OpenClaw** (the original TypeScript/Node.js implementation), this guide will help you migrate to **OpenKrab** (the Rust implementation).
+If you're coming from **OpenKrab** (the original TypeScript/Node.js implementation), this guide will help you migrate to **OpenKrab** (the Rust implementation).
 
 ## Why Rust?
 
-| Feature | OpenClaw (TypeScript) | OpenKrab (Rust) |
+| Feature | OpenKrab (TypeScript) | OpenKrab (Rust) |
 |---------|----------------------|-----------------|
 | **Performance** | V8 JIT limitations | Native compiled, ~5x faster |
 | **Memory Safety** | Runtime errors possible | Compile-time guarantees |
@@ -26,10 +26,10 @@ If you're coming from **OpenClaw** (the original TypeScript/Node.js implementati
 
 ### 1. Installation
 
-**OpenClaw (old):**
+**OpenKrab (old):**
 ```bash
-npm install -g openclaw@latest
-openclaw onboard --install-daemon
+npm install -g OpenKrab@latest
+OpenKrab onboard --install-daemon
 ```
 
 **OpenKrab (new):**
@@ -45,7 +45,7 @@ cargo build --release
 
 ### 2. Configuration Format
 
-**OpenClaw:** JSON5 (`~/.clawdbot/openclaw.json`)
+**OpenKrab:** JSON5 (`~/.clawdbot/OpenKrab.json`)
 ```json5
 {
   agents: {
@@ -75,40 +75,40 @@ bot_token = "123:abc"
 
 ### 3. CLI Commands
 
-| OpenClaw | OpenKrab | Notes |
+| OpenKrab | OpenKrab | Notes |
 |----------|----------|-------|
-| `openclaw` | `krabkrab` | New binary name |
-| `openclaw onboard` | `krabkrab setup` | Setup wizard |
-| `openclaw config get <path>` | `krabkrab config get <key>` | Dot notation |
-| `openclaw gateway --port 18789` | `krabkrab gateway --port 18789` | Similar |
-| `openclaw channels login` | `krabkrab channels add` | Different flow |
-| `openclaw doctor` | `krabkrab doctor` | Same |
-| `openclaw status` | `krabkrab status` | Same |
-| `openclaw message send` | `krabkrab message send` | Similar |
-| `openclaw memory index` | `krabkrab memory sync` | Different name |
+| `OpenKrab` | `krabkrab` | New binary name |
+| `OpenKrab onboard` | `krabkrab setup` | Setup wizard |
+| `OpenKrab config get <path>` | `krabkrab config get <key>` | Dot notation |
+| `OpenKrab gateway --port 18789` | `krabkrab gateway --port 18789` | Similar |
+| `OpenKrab channels login` | `krabkrab channels add` | Different flow |
+| `OpenKrab doctor` | `krabkrab doctor` | Same |
+| `OpenKrab status` | `krabkrab status` | Same |
+| `OpenKrab message send` | `krabkrab message send` | Similar |
+| `OpenKrab memory index` | `krabkrab memory sync` | Different name |
 
 ### 4. Directory Structure
 
-| OpenClaw | OpenKrab |
+| OpenKrab | OpenKrab |
 |----------|----------|
 | `~/.clawdbot/` | `~/.config/krabkrab/` |
-| `~/.clawdbot/openclaw.json` | `~/.config/krabkrab/config.toml` |
+| `~/.clawdbot/OpenKrab.json` | `~/.config/krabkrab/config.toml` |
 | `~/.clawdbot/workspace/` | `~/.local/share/krabkrab/workspace/` |
 | `~/.clawdbot/sessions/` | `~/.local/share/krabkrab/sessions/` |
 | `~/.clawdbot/credentials/` | `~/.local/share/krabkrab/credentials/` |
 
 ### 5. Environment Variables
 
-| OpenClaw | OpenKrab |
+| OpenKrab | OpenKrab |
 |----------|----------|
-| `OPENCLAW_HOME` | `KRABKRAB_CONFIG_DIR` |
-| `OPENCLAW_STATE_DIR` | `KRABKRAB_DATA_DIR` |
-| `OPENCLAW_CONFIG_PATH` | `KRABKRAB_CONFIG_FILE` |
+| `OpenKrab_HOME` | `KRABKRAB_CONFIG_DIR` |
+| `OpenKrab_STATE_DIR` | `KRABKRAB_DATA_DIR` |
+| `OpenKrab_CONFIG_PATH` | `KRABKRAB_CONFIG_FILE` |
 | `CLAWDBOT_PROFILE` | `KRABKRAB_PROFILE` |
 
 ### 6. Model Provider Configuration
 
-**OpenClaw:**
+**OpenKrab:**
 ```json5
 {
   agents: {
@@ -132,11 +132,11 @@ model = "claude-3-5-sonnet-20241022"
 
 ## Migration Steps
 
-### Step 1: Export OpenClaw Config
+### Step 1: Export OpenKrab Config
 
 ```bash
-# On your old OpenClaw installation
-cp ~/.clawdbot/openclaw.json ~/openclaw-backup.json
+# On your old OpenKrab installation
+cp ~/.clawdbot/OpenKrab.json ~/OpenKrab-backup.json
 ```
 
 ### Step 2: Install OpenKrab
@@ -153,7 +153,7 @@ sudo cp target/release/krabkrab /usr/local/bin/
 OpenKrab includes a migration helper:
 
 ```bash
-krabkrab migrate --from-openclaw ~/openclaw-backup.json
+krabkrab migrate --from-OpenKrab ~/OpenKrab-backup.json
 ```
 
 This will:
@@ -215,9 +215,9 @@ OpenKrab is a single binary. No package manager needed.
 
 ### 2. Different Plugin Format
 
-**OpenClaw:** TypeScript/JavaScript plugins
+**OpenKrab:** TypeScript/JavaScript plugins
 ```javascript
-// openclaw-plugin.js
+// OpenKrab-plugin.js
 module.exports = {
   name: "my-plugin",
   // ...
@@ -235,7 +235,7 @@ pub extern "C" fn init() {
 
 ### 3. Config Hot Reload
 
-OpenKrab supports config hot reload like OpenClaw, but uses TOML instead of JSON5.
+OpenKrab supports config hot reload like OpenKrab, but uses TOML instead of JSON5.
 
 ### 4. No Built-in Update
 
@@ -266,7 +266,7 @@ krabkrab doctor --fix
 
 ### "Plugins not loading"
 
-- OpenClaw plugins (JS) won't work with OpenKrab
+- OpenKrab plugins (JS) won't work with OpenKrab
 - Look for Rust/WASM versions of plugins
 - Or port your plugin using the plugin SDK
 
@@ -274,13 +274,13 @@ krabkrab doctor --fix
 
 - GitHub Issues: [github.com/openkrab/openkrab/issues](https://github.com/openkrab/openkrab/issues)
 - Migration questions: Tag your issue with `migration` label
-- Original OpenClaw: [github.com/openclaw/openclaw](https://github.com/openclaw/openclaw)
+- Original OpenKrab: [github.com/OpenKrab/OpenKrab](https://github.com/OpenKrab/OpenKrab)
 
 ## Porting Status Summary
 
 OpenKrab is a **complete rewrite** in Rust:
 
-| Metric | OpenClaw (TS) | OpenKrab (Rust) |
+| Metric | OpenKrab (TS) | OpenKrab (Rust) |
 |--------|---------------|-----------------|
 | **Total Lines** | ~27,139 | ~56,276 |
 | **Test Coverage** | - | 410+ tests |
@@ -301,3 +301,4 @@ OpenKrab is a **complete rewrite** in Rust:
 - Cross-platform native binaries
 
 The migration is straightforward - config conversion from JSON5 to TOML is the main task.
+

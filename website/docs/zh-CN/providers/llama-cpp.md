@@ -1,14 +1,14 @@
 ---
-summary: "通过 Llama.cpp（本地 OpenAI 兼容器）运行 OpenClaw"
+summary: "通过 Llama.cpp（本地 OpenAI 兼容器）运行 OpenKrab"
 read_when:
-  - 你想通过 Llama.cpp 使用本地模型运行 OpenClaw
+  - 你想通过 Llama.cpp 使用本地模型运行 OpenKrab
   - 你需要 llama.cpp 的安装和配置指导
 title: "Llama.cpp"
 ---
 
 # Llama.cpp
 
-OpenClaw 支持通过 OpenAI 兼容 API (`/v1`) 集成 `llama.cpp`。这让你可以使用 CPU 或者 GPU 高效地运行量化的本地模型，并将其无缝接入 OpenClaw 的生态系统。
+OpenKrab 支持通过 OpenAI 兼容 API (`/v1`) 集成 `llama.cpp`。这让你可以使用 CPU 或者 GPU 高效地运行量化的本地模型，并将其无缝接入 OpenKrab 的生态系统。
 
 ## 快速开始
 
@@ -34,7 +34,7 @@ export LLAMA_CPP_EMBED_MODEL="local-model"
 
 ## 配置
 
-如果你更喜欢在 `openclaw.json` (或通过 CLI) 中显式地定义配置，你可以在 `providers` 下面这样配置它：
+如果你更喜欢在 `OpenKrab.json` (或通过 CLI) 中显式地定义配置，你可以在 `providers` 下面这样配置它：
 
 ```json5
 {
@@ -81,3 +81,4 @@ curl http://localhost:8080/v1/models
 ```
 
 如果它运行在不同的端口，请更新 `LLAMA_CPP_HOST` 变量或更新你的配置文件。
+
