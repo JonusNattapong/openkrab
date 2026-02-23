@@ -22,7 +22,7 @@ title: "OpenKrab"
   <Card title="Get Started" href="/start/getting-started" icon="rocket">
     Install OpenKrab and bring up the Gateway in minutes.
   </Card>
-  <Card title="Configure" href="/start/configuration" icon="settings">
+  <Card title="Configure" href="/gateway/configuration" icon="settings">
     Set up your AI providers and messaging channels.
   </Card>
   <Card title="Web Dashboard" href="/web/dashboard" icon="layout-dashboard">
@@ -196,7 +196,7 @@ embedding_provider = "openai"
   <Card title="Channels" href="/channels/telegram" icon="message-square">
     Channel-specific setup for Telegram, Slack, Discord, and more.
   </Card>
-  <Card title="Voice System" href="/tools/voice" icon="mic">
+  <Card title="Voice System" href="/plugins/voice-call" icon="mic">
     Wake word, talk mode, VAD, and audio processing.
   </Card>
   <Card title="Help" href="/help" icon="life-buoy">

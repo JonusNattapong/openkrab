@@ -118,7 +118,7 @@ Full environment variable reference: [Environment vars](/help/environment).
   <Card title="Channels" href="/channels">
     Connect Telegram, Slack, Discord, WhatsApp, and more.
   </Card>
-  <Card title="Voice System" href="/tools/voice">
+  <Card title="Voice System" href="/plugins/voice-call">
     Setup wake word detection and talk mode.
   </Card>
 </Columns>
